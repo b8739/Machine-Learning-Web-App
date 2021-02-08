@@ -133,6 +133,25 @@ def dataupload():
 	# 	dfplot = df
 	# 	)
 
+#### 아래 라우팅 수정해서 Put이랑 Delete 만들면 됨####
+
+# @app.route('/field/<field_id>', methods=['PUT', 'DELETE'])
+# def single_book(book_id):
+#     response_object = {'status': 'success'}
+#     if request.method == 'PUT':
+#         post_data = request.get_json()
+#         remove_book(book_id)
+#         BOOKS.append({
+#             'id': uuid.uuid4().hex,
+#             'title': post_data.get('title'),
+#             'author': post_data.get('author'),
+#             'read': post_data.get('read')
+#         })
+#         response_object['message'] = 'Book updated!'
+#     if request.method == 'DELETE':
+#         remove_book(book_id)
+#         response_object['message'] = 'Book removed!'
+#     return jsonify(response_object)
 
 if __name__ == '__main__':
     app.run()
