@@ -10,13 +10,15 @@
           <!-- table head -->
           <thead>
             <tr>
+              <th>Index</th>
               <th v-for="(headerValue, index) in header" :key="index" scope="col">{{ header[index]}}</th>
             </tr>
           </thead>
           <!-- table body -->
           <tbody>
             <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
-              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{ dataSet[tdIndex][trIndex]}} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <td>{{ trIndex}}</td> <!-- 0부터 시작하도록 수정해야 함-->
+              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{dataSet[tdIndex][trIndex]}} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
             </tr>
           </tbody> 
         </table>
@@ -34,28 +36,11 @@ export default {
     data() {
     return {
       header: [],
-      dataSet: 0,
+      dataSet: [],
       //dataUploadedFlag: false,
     };
   },
-    // data() {
-  //   return {
-  //     books: [],
-  //     addBookForm: {
-  //       title: '',
-  //       author: '',
-  //       read: [],
-  //     },
-  //     message: '',
-  //     showMessage: false,
-  //     editForm: {
-  //       id: '',
-  //       title: '',
-  //       author: '',
-  //       read: [],
-  //     },
-  //   };
-  // },
+    
   components: {
     //components 추가
   },
@@ -63,21 +48,9 @@ export default {
     saveResponseData (columnValues) {
       for (const columnValue of columnValues) {  
         this.header.push(columnValue);
-        //console.log(`this.header: ${this.header}`);
+      
       }
     },
-    // ***메소드 작성방식 참고***
-
-    // getBooks() {
-    //   const path = 'http://localhost:5000/books';
-    //   axios.get(path)
-    //     .then((res) => {
-    //       this.books = res.data.books;
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     });
-    // },
   },
   created() {
     // console.log(this.$route.params.dataset);
