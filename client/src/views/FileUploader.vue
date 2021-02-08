@@ -67,7 +67,7 @@ import axios from 'axios';
             }
           }
         ).then((response) => {
-                console.log(response.data[0]);
+                console.log(response);
                 this.result = response.data;
                 this.$router.push({name: 'dataSummary', params: {dataset: this.result}});
             })

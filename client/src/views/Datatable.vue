@@ -7,18 +7,18 @@
         <button type="button" class="btn btn-success btn-sm">Add Data</button>
         <br><br>
         <table class="table table-hover">
+          <!-- table head -->
           <thead>
             <tr>
               <th v-for="(headerValue, index) in header" :key="index" scope="col">{{ header[index]}}</th>
             </tr>
           </thead>
-          <!-- <tbody>
-            <tr v-for="(book, index) in books" :key="index">
-              <td>{{ book.title}}</td>
-              <td>{{ book.author }}</td>
-              <td></td>
+          <!-- table body -->
+          <tbody>
+            <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
+              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{ dataSet[tdIndex][trIndex]}} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
             </tr>
-          </tbody> -->
+          </tbody> 
         </table>
       </div>
     </div>
@@ -34,7 +34,7 @@ export default {
     data() {
     return {
       header: [],
-      dataSet: [],
+      dataSet: 0,
       //dataUploadedFlag: false,
     };
   },
@@ -83,12 +83,12 @@ export default {
     // console.log(this.$route.params.dataset);
     // console.log(this.$route.params.dataset['petal_length']); // {0:...}
     // console.log(Object.keys(this.$route.params.dataset)); //columns
+
+    //data: header에 데이터 삽입
     let columnValues = Object.keys(this.$route.params.dataset);
     this.saveResponseData(columnValues);
     this.dataSet = this.$route.params.dataset;
+    console.log(this.dataSet);
 
-    for (var key in this.dataSet){
-    console.log(`뭘까: ${key}`);
-  }
 }}
 </script>
