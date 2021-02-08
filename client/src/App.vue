@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div id="content" class="content">
+      header!
         <router-view></router-view>
     </div>
   </div>
@@ -8,11 +9,13 @@
 
 <script>
 import FileUploader from "./views/FileUploader.vue"
+import Datatable from "./views/Datatable.vue"
 
 export default {
     name: "App",
     components:{
       FileUploader,
+      Datatable,
     },
 };
 

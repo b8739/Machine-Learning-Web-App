@@ -69,9 +69,11 @@ import axios from 'axios';
         ).then((response) => {
                 console.log(response.data[0]);
                 this.result = response.data;
+                this.$router.push({name: 'dataSummary', params: {dataset: this.result}});
             })
           .catch((ex)=> {
-              console.log("ERR!!!!! : ", ex)
+              console.log("ERR!!!!! : ", ex);
+              // this.$router.push('/dataSummary'); //delete later
           });
       },
       /*
@@ -85,7 +87,6 @@ import axios from 'axios';
         for( var i = 0; i < uploadedFiles.length; i++ ){
           this.files.push( uploadedFiles[i] );
         }
-        console.log(this.files);
       },
       /*
         Removes a select file the user has uploaded

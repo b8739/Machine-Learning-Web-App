@@ -22,6 +22,7 @@
         </table>
       </div>
     </div>
+   </div>
 </template>
 
 <script>
@@ -37,12 +38,6 @@ export default {
       dataUploadedFlag: false,
     };
   },
-    watch: {
-    dataUploadedFlag: function () {
-      if (dataUploadedFlag === true){
-
-      }
-    },
     // data() {
   //   return {
   //     books: [],
@@ -65,6 +60,12 @@ export default {
     //components 추가
   },
   methods: {
+    saveResponseData (columnValues) {
+      for (const columnValue of columnValues) {  
+        this.header.push(columnValue);
+        console.log(`this.header: ${this.header}`);
+      }
+    },
     // ***메소드 작성방식 참고***
 
     // getBooks() {
@@ -79,7 +80,11 @@ export default {
     // },
   },
   created() {
+    console.log(this.$route.params.dataset);
+    console.log(this.$route.params.dataset['petal_length']); // {0:...}
+    console.log(Object.keys(this.$route.params.dataset)); //columns
+    this.saveResponseData(Object.keys(this.$route.params.dataset));
     //initialize 되었을 때 어떤 동작을 할 지 정의
-  },
-};
+  }
+}
 </script>
