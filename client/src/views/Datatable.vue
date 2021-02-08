@@ -8,17 +8,17 @@
         <br><br>
         <table class="table table-hover">
           <thead>
-            <tr v-for="(column, index) in df_columns" :key="index">
-              <th scope="col">{{ df_columns.index}}</th>
+            <tr>
+              <th v-for="(headerValue, index) in header" :key="index" scope="col">{{ header[index]}}</th>
             </tr>
           </thead>
-          <tbody>
+          <!-- <tbody>
             <tr v-for="(book, index) in books" :key="index">
               <td>{{ book.title}}</td>
               <td>{{ book.author }}</td>
               <td></td>
             </tr>
-          </tbody>
+          </tbody> -->
         </table>
       </div>
     </div>
@@ -35,7 +35,7 @@ export default {
     return {
       header: [],
       dataSet: [],
-      dataUploadedFlag: false,
+      //dataUploadedFlag: false,
     };
   },
     // data() {
@@ -63,7 +63,7 @@ export default {
     saveResponseData (columnValues) {
       for (const columnValue of columnValues) {  
         this.header.push(columnValue);
-        console.log(`this.header: ${this.header}`);
+        //console.log(`this.header: ${this.header}`);
       }
     },
     // ***메소드 작성방식 참고***
@@ -80,11 +80,15 @@ export default {
     // },
   },
   created() {
-    console.log(this.$route.params.dataset);
-    console.log(this.$route.params.dataset['petal_length']); // {0:...}
-    console.log(Object.keys(this.$route.params.dataset)); //columns
-    this.saveResponseData(Object.keys(this.$route.params.dataset));
-    //initialize 되었을 때 어떤 동작을 할 지 정의
+    // console.log(this.$route.params.dataset);
+    // console.log(this.$route.params.dataset['petal_length']); // {0:...}
+    // console.log(Object.keys(this.$route.params.dataset)); //columns
+    let columnValues = Object.keys(this.$route.params.dataset);
+    this.saveResponseData(columnValues);
+    this.dataSet = this.$route.params.dataset;
+
+    for (var key in this.dataSet){
+    console.log(`뭘까: ${key}`);
   }
-}
+}}
 </script>
