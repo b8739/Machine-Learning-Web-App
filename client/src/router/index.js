@@ -1,23 +1,17 @@
 import Vue from 'vue';
-import Router from 'vue-router';
-import Ping from '../components/Ping.vue';
-import Books from '../components/Books.vue';
+import VueRouter from 'vue-router';
+import FileUploader from "../views/FileUploader";
 
-Vue.use(Router);
+Vue.use(VueRouter); //View Router를 사용했다고 선언
 
-export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes: [
-    {
-      path: '/ping',
-      name: 'Ping',
-      component: Ping,
+const router = new VueRouter({
+    mode:"history",
+
+    routes:[{
+        path:"/", 
+        component: FileUploader
     },
-    {
-      path: '/',
-      name: 'Books',
-      component: Books,
-    },
-  ],
+    ]
 });
+
+export default router;

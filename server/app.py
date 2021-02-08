@@ -120,8 +120,8 @@ def dataupload():
 		newfile = FileContents(name=file.filename,data=file.read(),modeldata=msg)
 		db.session.add(newfile)
 		db.session.commit()
-
-	return jsonify('s')
+		dfplot = jsonify(df.to_dict())
+	return jsonify(df.to_dict())
 	# return render_template('details.html',filename=filename,date=date,
 	# 	df_size=df_size,
 	# 	df_shape=df_shape,
