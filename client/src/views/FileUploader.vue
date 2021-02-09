@@ -1,24 +1,24 @@
 <template>
   <div class="container">
     <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop">
-      <p><strong> Drop A File</strong></p>
+      <label><strong> Drop A File</strong></label>
       <p>OR</p>
-    <!-- dropzone -->
-      <!-- <dropzone :dropzoneFiles="files"> </dropzone> -->
-    <!-- manual -->
-    <div class="large-12 medium-12 small-12 cell">
-      <label>Select File
-        <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/>
-      </label>
-    </div>
-    <div class="large-12 medium-12 small-12 cell">
-      <div v-for="(file, index) in files" class="file-listing" :key="index">{{ file.name }} <span class="remove-file" v-on:click="removeFile( key )">Remove</span></div>
-    </div>
-    <br>
-    <br>
-    <div class="large-12 medium-12 small-12 cell">
-      <button v-on:click="submitFiles()">Submit</button>
-    </div>
+      <!-- dropzone -->
+        <!-- <dropzone :dropzoneFiles="files"> </dropzone> -->
+      <!-- manual -->
+      <div class="large-12 medium-12 small-12 cell">
+        <label>Select File
+          <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/>
+        </label>
+      </div>
+      <div class="large-12 medium-12 small-12 cell">
+        <div v-for="(file, index) in files" class="file-listing" :key="index">{{ file.name }} <span class="remove-file" v-on:click="removeFile( key )">Remove</span></div>
+      </div>
+      <br>
+      <br>
+      <div class="large-12 medium-12 small-12 cell">
+        <button v-on:click="submitFiles()">Submit</button>
+      </div>
   </div>
   </div>
 </template>
@@ -156,26 +156,32 @@ import axios from 'axios';
     cursor: pointer;
     float: right;
   }
-  /* dropbox */
-      .dropBox{
-      width: 300px;
-      height: 200px;
-      border: 2px dashed #87ceeb;
-      margin: 100px auto 0;
-      text-align: center;
-      padding-top: 20px;
-      /* font-family: 'Roboto Condensed', sans-serif; */
-    }
+/* dropbox */
+  .dropBox{
+    width: 300px;
+    height: 200px;
+    border: 2px dashed #87ceeb;
+    margin: 100px auto 0;
+    text-align: center;
+    padding-top: 20px;
+    font-size: 17px;
+    background-color: #fff;
+}
 
-    .dropBox p {
-      color:#444444;
-    }
+.dropBox p {
+  color:#333333;
+  font-size: 14px;
+}
 
-    .dropBox button{
-      background-color: #87ceeb;
-      border: none;
-      color:#fff;
-    }
-    
-
+.dropBox button{
+  background-color: #87ceeb;
+  border: none;
+  color:#fff;
+  width: 60px;
+  height: 20px;
+}
+.dropbox button:hover {
+    background-color: #8ab6ca;
+    cursor: pointer;
+}
 </style>

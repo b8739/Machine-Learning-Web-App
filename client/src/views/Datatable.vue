@@ -6,7 +6,7 @@
         <hr><br><br>
         <button type="button" class="">Add Data</button>
         <br><br>
-        <table class="">
+        <table class="dataTable">
           <!-- table head -->
           <thead>
             <tr>
@@ -79,3 +79,23 @@ export default {
     console.log(this.dataSet);
 }}
 </script>
+
+<style>
+  .dataTable{
+    margin: 0 auto;
+  }
+  .dataTable tr:nth-child(odd) {
+    background-color: #D9E1F2;
+    }
+  .dataTable tr:nth-child(even) {
+    background-color: #f0f8ff;
+    }
+  th{
+    width: 115px;
+  }
+  .dataTable tr:hover {
+    background-color: #8ab6ca;
+    cursor: pointer;
+}
+
+</style>
