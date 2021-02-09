@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <!-- dropzone -->
+      <dropzone/>
+    <!-- manual -->
     <div class="large-12 medium-12 small-12 cell">
       <label>Files
         <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/>
@@ -21,6 +24,8 @@
 
 <script>
 import axios from 'axios';
+import Dropzone from '../components/Dropzone.vue';
+
   export default {
     /*
       Defines the data used by the component
@@ -29,6 +34,9 @@ import axios from 'axios';
       return {
         files: []
       }
+    },
+    components: {
+        dropzone: Dropzone,
     },
     /*
       Defines the method used by the component
