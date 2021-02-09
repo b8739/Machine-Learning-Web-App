@@ -16,7 +16,6 @@ const router = new VueRouter({
         path:"/dataSummary", 
         name:"dataSummary", 
         component: Datatable,
-        props: true
     },
     ]
 });

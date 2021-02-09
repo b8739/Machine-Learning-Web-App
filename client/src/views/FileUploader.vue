@@ -1,10 +1,13 @@
 <template>
   <div class="container">
+    <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop">
+      <p><strong> Drop A File</strong></p>
+      <p>OR</p>
     <!-- dropzone -->
-      <dropzone :dropzoneFiles="files"> </dropzone>
+      <!-- <dropzone :dropzoneFiles="files"> </dropzone> -->
     <!-- manual -->
     <div class="large-12 medium-12 small-12 cell">
-      <label>Files
+      <label>Select File
         <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()"/>
       </label>
     </div>
@@ -12,19 +15,17 @@
       <div v-for="(file, index) in files" class="file-listing" :key="index">{{ file.name }} <span class="remove-file" v-on:click="removeFile( key )">Remove</span></div>
     </div>
     <br>
-    <div class="large-12 medium-12 small-12 cell">
-      <button v-on:click="addFiles()">Add Files</button>
-    </div>
     <br>
     <div class="large-12 medium-12 small-12 cell">
       <button v-on:click="submitFiles()">Submit</button>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
 import axios from 'axios';
-import Dropzone from '../components/Dropzone.vue';
+// import Dropzone from '../components/Dropzone.vue';
 
   export default {
     /*
@@ -36,18 +37,12 @@ import Dropzone from '../components/Dropzone.vue';
       }
     },
     components: {
-        dropzone: Dropzone,
+        // dropzone: Dropzone,
     },
     /*
       Defines the method used by the component
     */
     methods: {
-      /*
-        Adds a file
-      */
-      addFiles(){
-        this.$refs.files.click();
-      },
       /*
         Submits files to the server
       */
@@ -104,6 +99,46 @@ import Dropzone from '../components/Dropzone.vue';
         this.files.splice( key, 1 );
       },
       // dropzone methods
+              onDrop(event) {
+            const uploadedFiles = event.dataTransfer.files;
+            // Do something with the dropped file
+            console.log(uploadedFiles);
+            for( var i = 0; i < uploadedFiles.length; i++ ){
+            this.files.push( uploadedFiles[i] );
+            }
+            //일단 바로 submit (추후 수정)
+                    /*
+          Initialize the form data
+        */
+        let formData = new FormData();
+        /*
+          Iteate over any file sent over appending the files
+          to the form data.
+        */
+        for( var i = 0; i < this.files.length; i++ ){
+          let file = this.files[i];
+          formData.append('csv_data', file);
+        }
+        /*
+          Make the request to the POST /select-files URL
+        */
+        axios.post('http://localhost:5000/dataupload',
+          formData,
+          {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+          }
+        ).then((response) => {
+                console.log(response);
+                this.result = response.data;
+                this.$router.push({name: 'dataSummary', params: {dataset: this.result}});
+            })
+          .catch((ex)=> {
+              console.log("ERR!!!!! : ", ex);
+              // this.$router.push('/dataSummary'); //delete later
+          });
+        }
     }
   }
 </script>
@@ -121,4 +156,26 @@ import Dropzone from '../components/Dropzone.vue';
     cursor: pointer;
     float: right;
   }
+  /* dropbox */
+      .dropBox{
+      width: 300px;
+      height: 200px;
+      border: 2px dashed #87ceeb;
+      margin: 100px auto 0;
+      text-align: center;
+      padding-top: 20px;
+      /* font-family: 'Roboto Condensed', sans-serif; */
+    }
+
+    .dropBox p {
+      color:#444444;
+    }
+
+    .dropBox button{
+      background-color: #87ceeb;
+      border: none;
+      color:#fff;
+    }
+    
+
 </style>

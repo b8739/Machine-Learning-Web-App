@@ -1,17 +1,10 @@
 <template>
     <div>
-        <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop"></div>
+        <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop">
+          <p><strong> Drop A File</strong></p>
+        </div>
     </div>
 </template>
-
-<style>
-    .dropBox{
-        width: 300px;
-        height: 200px;
-        background-color: #123;
-    }
-  
-</style>
 
 <script>
 import axios from 'axios';
@@ -69,3 +62,19 @@ export default {
   }
 }
 </script>
+
+<style>
+    .dropBox{
+      width: 300px;
+      height: 200px;
+      border: 2px dashed #87ceeb;
+      margin: 100px auto 0;
+      text-align: center;
+      padding-top: 20px;
+    }
+
+    .dropBox p {
+      color:#444444;
+    }
+  
+</style>

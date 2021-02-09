@@ -22,7 +22,25 @@ export default {
 };
 
 </script>
+
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Nunito+Sans&display=swap');
+/* reset */
+*{
+  font-family: 'Nunito Sans', sans-serif, 'Noto Sans', sans-serif;
+}
+a{
+  text-decoration: none;
+}
+
+body,p,span{
+  margin: 0;
+  padding: 0;
+}
+/* base.html */
+
+
+
 </style>
 
 

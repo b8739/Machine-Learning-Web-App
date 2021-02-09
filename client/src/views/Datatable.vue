@@ -1,17 +1,17 @@
 <template>
   <div class="container">
-    <div class="row">
-      <div class="col-sm-10">
+    <div class="">
+      <div class="">
         <h1>Data Table</h1>
         <hr><br><br>
-        <button type="button" class="btn btn-success btn-sm">Add Data</button>
+        <button type="button" class="">Add Data</button>
         <br><br>
-        <table class="table table-hover">
+        <table class="">
           <!-- table head -->
           <thead>
             <tr>
               <th>Index</th>
-              <th v-for="(headerValue, index) in header" :key="index" scope="col">{{ header[index]}}</th>
+              <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
               <th>Edit</th>
             </tr>
           </thead>
@@ -20,17 +20,17 @@
             <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
               <td>{{ trIndex}}</td> <!-- 0부터 시작하도록 수정해야 함-->
               <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{dataSet[tdIndex][trIndex]}} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
-                  <div class="btn-group" role="group">
+                  <div class="" role="group">
                   <!-- update -->
                     <button
                       type="button"
-                      class="btn btn-warning btn-sm" v-b-modal.book-update-modal
+                      class="" 
                       @click="editData()"> Update
                     </button>
                     <!-- delete -->
                     <button
                       type="button"
-                      class="btn btn-danger btn-sm"
+                      class=""
                       @click="onDeleteData()">Delete
                     </button>
                 </div>
@@ -68,15 +68,14 @@ export default {
     },
   },
   created() {
-    // console.log(this.$route.params.dataset);
+    console.log(this.$route.params.dataset);
     // console.log(this.$route.params.dataset['petal_length']); // {0:...}
     // console.log(Object.keys(this.$route.params.dataset)); //columns
 
-    //data: header에 데이터 삽입
+    //data: header에 데이터 삽입.
     let columnValues = Object.keys(this.$route.params.dataset);
     this.saveResponseData(columnValues);
     this.dataSet = this.$route.params.dataset;
     console.log(this.dataSet);
-
 }}
 </script>
