@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- dropzone -->
-      <dropzone/>
+      <dropzone :dropzoneFiles="files"> </dropzone>
     <!-- manual -->
     <div class="large-12 medium-12 small-12 cell">
       <label>Files
@@ -89,6 +89,7 @@ import Dropzone from '../components/Dropzone.vue';
       */
       handleFilesUpload(){
         let uploadedFiles = this.$refs.files.files;
+        console.log(uploadedFiles);
         /*
           Adds the uploaded file to the files array
         */
@@ -101,7 +102,8 @@ import Dropzone from '../components/Dropzone.vue';
       */
       removeFile( key ){
         this.files.splice( key, 1 );
-      }
+      },
+      // dropzone methods
     }
   }
 </script>
