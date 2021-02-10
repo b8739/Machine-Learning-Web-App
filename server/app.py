@@ -113,6 +113,23 @@ def dataupload():
 
 		# EDA function
 		df = pd.read_csv(os.path.join('static/uploadsDB',filename))
+			table_name = 'userFile'
+		userFile_df.to_sql (
+			table_name,
+			engine,
+			if_exists='replace',
+			index=False,
+			chunksize=500,
+			dtype={
+				"sepal_length": Integer,
+				"sepal_width": Integer,
+				"petal_length": Integer,
+				"petal_width":  Integer,
+				"species": Text
+			}
+		)
+		meta.create_all(engine)
+
 		df_size = df.size
 		df_shape = df.shape
 		df_columns = list(df.columns)
@@ -153,10 +170,6 @@ def dataupload():
 			model_names = names 
 			
 		# Saving Results of Uploaded Files to Sqlite DB
-		newfile = FileContents(name=file.filename,data=file.read(),modeldata=msg)
-		db.session.add(newfile)
-		db.session.commit()
-  
 		dfplot = jsonify(df.to_dict())
 	return jsonify(df.to_dict())
 	# return render_template('details.html',filename=filename,date=date,
