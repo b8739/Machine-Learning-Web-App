@@ -2,7 +2,9 @@ from flask import Flask, jsonify, request, render_template,request,url_for
 from flask_cors import CORS
 
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
-from flask_sqlalchemy import SQLAlchemy 
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.types import Integer, Text, String, DateTime
+from sqlalchemy import create_engine, MetaData
 from flask_migrate import Migrate
 
 from werkzeug.utils  import secure_filename
@@ -55,6 +57,40 @@ class FileContents(db.Model):
 	name = db.Column(db.String(300))
 	modeldata = db.Column(db.String(300))
 	data = db.Column(db.LargeBinary)
+
+def __repr__(self):
+	return f"FileContents('{self.id}', '{self.name}', '{self.modeldata}', {self.data})"
+
+class FileInfo (db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+
+class DataSummary (db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+
+# engine
+engine = create_engine('sqlite:///static/uploadsDB/newfilestorage.db', echo = True)
+meta = MetaData()
+
+@app.route('/', methods=['GET'])
+def testing():
+	jobs_df = pd.read_csv('./static/uploadsDB/iris.csv')
+	table_name = 'nyc'
+	jobs_df.to_sql (
+		table_name,
+		engine,
+		if_exists='replace',
+		index=False,
+		chunksize=500,
+		dtype={
+			"sepal_length": Integer,
+			"sepal_width": Integer,
+			"petal_length": Integer,
+			"petal_width":  Integer,
+			"species": Text
+		}
+	)
+	meta.create_all(engine)
+	return jsonify('pong!')
 
 # sanity check route
 @app.route('/ping', methods=['GET'])
@@ -120,6 +156,7 @@ def dataupload():
 		newfile = FileContents(name=file.filename,data=file.read(),modeldata=msg)
 		db.session.add(newfile)
 		db.session.commit()
+  
 		dfplot = jsonify(df.to_dict())
 	return jsonify(df.to_dict())
 	# return render_template('details.html',filename=filename,date=date,
@@ -132,7 +169,10 @@ def dataupload():
 	# 	fullfile = fullfile,
 	# 	dfplot = df
 	# 	)
-
+@app.route('/checkDB',methods=['GET'])
+def checkDatabase	():
+    database = FileContents.query.all()
+    return render_template('index.html', database=database)
 #### 아래 라우팅 수정해서 Put이랑 Delete 만들면 됨####
 
 # @app.route('/field/<field_id>', methods=['PUT', 'DELETE'])
