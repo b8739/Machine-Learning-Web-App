@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.types import Integer, Text, String, DateTime
 from sqlalchemy import create_engine, MetaData
 from flask_migrate import Migrate
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 from werkzeug.utils  import secure_filename
 import os
@@ -34,6 +36,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 # configuration
 DEBUG = True
 
+# Base
+Base = declarative_base()
+
 
 # instantiate the app
 app = Flask(__name__)
@@ -52,17 +57,19 @@ configure_uploads(app,files)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///static/uploadsDB/filestorage.db'
 
 # Saving Data To Database Storage
-class FileContents(db.Model):
-	id = db.Column(db.Integer,primary_key=True)
-	name = db.Column(db.String(300))
-	modeldata = db.Column(db.String(300))
-	data = db.Column(db.LargeBinary)
+class FileContents(Base):
+	__tablename__ = 'FileContents'
+	sepal_length = db.Column(db.Integer,primary_key=True)
+	sepal_width = db.Column(db.Integer)
+	petal_length = db.Column(db.Integer)
+	petal_width = db.Column(db.Integer)
+	species = db.Column(db.String(300))
+	# modeldata = db.Column(db.String(300))
+	# data = db.Column(db.LargeBinary)
 
-def __repr__(self):
-	return f"FileContents('{self.id}', '{self.name}', '{self.modeldata}', {self.data})"
+# def __repr__(self):
+# 	return f"FileContents('{self.id}', '{self.name}', '{self.modeldata}', {self.data})"
 
-class FileInfo (db.Model):
-    id = db.Column(db.Integer,primary_key=True)
 
 class DataSummary (db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -105,8 +112,21 @@ def dataupload():
 			chunksize=500,
 			method='multi'
 		)
+  
 		meta.create_all(engine)
+		Base.metadata.create_all(engine)
+		# create a configured "Session" class
+		Session = sessionmaker(bind=engine)
 
+		# create a Session
+
+		s = Session()
+		john = FileContents(sepal_length = 2)
+		s.add(john)
+ 
+		# Commit the new User John to the database
+		s.commit()
+  
 		dataset_df_size = dataset_df.size
 		dataset_df_shape = dataset_df.shape
 		dataset_df_columns = list(dataset_df.columns)
