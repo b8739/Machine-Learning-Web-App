@@ -112,9 +112,9 @@ def dataupload():
 		date = str(datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S"))
 
 		# EDA function
-		df = pd.read_csv(os.path.join('static/uploadsDB',filename))
-			table_name = 'userFile'
-		userFile_df.to_sql (
+		dataset_df = pd.read_csv(os.path.join('static/uploadsDB',filename))
+		table_name = 'dataset'
+		dataset_df.to_sql (
 			table_name,
 			engine,
 			if_exists='replace',
@@ -130,19 +130,19 @@ def dataupload():
 		)
 		meta.create_all(engine)
 
-		df_size = df.size
-		df_shape = df.shape
-		df_columns = list(df.columns)
-		df_targetname = df[df.columns[-1]].name
-		df_featurenames = df_columns[0:-1] # select all columns till last column
-		df_Xfeatures = df.iloc[:,0:-1] 
-		df_Ylabels = df[df.columns[-1]] # Select the last column as target
+		dataset_df_size = dataset_df.size
+		dataset_df_shape = dataset_df.shape
+		dataset_df_columns = list(dataset_df.columns)
+		dataset_df_targetname = dataset_df[dataset_df.columns[-1]].name
+		dataset_df_featurenames = dataset_df_columns[0:-1] # select all columns till last column
+		dataset_df_Xfeatures = dataset_df.iloc[:,0:-1] 
+		dataset_df_Ylabels = dataset_df[dataset_df.columns[-1]] # Select the last column as target
 		# same as above df_Ylabels = df.iloc[:,-1]
 		
 
 		# Model Building
-		X = df_Xfeatures
-		Y = df_Ylabels
+		X = dataset_df_Xfeatures
+		Y = dataset_df_Ylabels
 		seed = 7
 		# prepare models
 		models = []
@@ -170,8 +170,8 @@ def dataupload():
 			model_names = names 
 			
 		# Saving Results of Uploaded Files to Sqlite DB
-		dfplot = jsonify(df.to_dict())
-	return jsonify(df.to_dict())
+		dfplot = jsonify(dataset_df.to_dict())
+	return jsonify(dataset_df.to_dict())
 	# return render_template('details.html',filename=filename,date=date,
 	# 	df_size=df_size,
 	# 	df_shape=df_shape,
