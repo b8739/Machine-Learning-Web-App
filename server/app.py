@@ -73,23 +73,6 @@ meta = MetaData()
 
 @app.route('/', methods=['GET'])
 def testing():
-	jobs_df = pd.read_csv('./static/uploadsDB/iris.csv')
-	table_name = 'nyc'
-	jobs_df.to_sql (
-		table_name,
-		engine,
-		if_exists='replace',
-		index=False,
-		chunksize=500,
-		dtype={
-			"sepal_length": Integer,
-			"sepal_width": Integer,
-			"petal_length": Integer,
-			"petal_width":  Integer,
-			"species": Text
-		}
-	)
-	meta.create_all(engine)
 	return jsonify('pong!')
 
 # sanity check route
@@ -120,13 +103,7 @@ def dataupload():
 			if_exists='replace',
 			index=False,
 			chunksize=500,
-			dtype={
-				"sepal_length": Integer,
-				"sepal_width": Integer,
-				"petal_length": Integer,
-				"petal_width":  Integer,
-				"species": Text
-			}
+			method='multi'
 		)
 		meta.create_all(engine)
 
@@ -170,7 +147,6 @@ def dataupload():
 			model_names = names 
 			
 		# Saving Results of Uploaded Files to Sqlite DB
-		dfplot = jsonify(dataset_df.to_dict())
 	return jsonify(dataset_df.to_dict())
 	# return render_template('details.html',filename=filename,date=date,
 	# 	df_size=df_size,
