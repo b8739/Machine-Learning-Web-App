@@ -45,11 +45,6 @@ engine = create_engine('mysql+mysqldb://root:root@localhost/newdatabase',echo = 
 def testing():
 	return jsonify('Hello World!')
 
-# sanity check route
-@app.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify('pong!')
-
 # Route for our Processing and Details Page
 @app.route('/dataupload',methods=['GET','POST'])
 def dataupload():
@@ -58,7 +53,7 @@ def dataupload():
 
 		# pandas
 		dataset_df = pd.read_csv(file)
-		table_name = 'Dataset'
+		table_name = 'dataset'
 
 		# csv to sql
 		dataset_df.to_sql (
@@ -72,10 +67,10 @@ def dataupload():
 
 	return jsonify(dataset_df.to_dict())
  
-@app.route('/checkDB',methods=['GET'])
-def checkDatabase	():
-    database = Dataset.query.all()
-    return render_template('index.html', database=database)
+# @app.route('/checkDB',methods=['GET'])
+# def checkDatabase	():
+#     database = Dataset.query.all()
+#     return render_template('index.html', database=database)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

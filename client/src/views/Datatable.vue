@@ -1,11 +1,12 @@
 <template>
   <div class="container">
-    <div class="">
-      <div class="">
+    <div class="innerContainer">
+      <div class="mainContents">
         <h1>Data Table</h1>
         <hr><br><br>
-        <button type="button" class="">Add Data</button>
+        <button type="button" class="" v-b-modal.add-modal>Add Data</button>
         <br><br>
+        <!-- table -->
         <table class="dataTable">
           <!-- table head -->
           <thead>
@@ -38,6 +39,45 @@
           </tbody> 
         </table>
       </div>
+      <!-- add modal -->
+    <b-modal ref="addDataModal"
+            id="add-modal"
+            title="Add a new data"
+            hide-footer>
+      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+        <!-- section 1 -->
+      <b-form-group id="form-title-group"
+                    label="Title:"
+                    label-for="form-title-input">
+          <b-form-input id="form-title-input"
+                        type="text"
+                        
+                        required
+                        placeholder="Enter title">
+          </b-form-input>
+        </b-form-group>
+        <!-- section 2 -->
+        <b-form-group id="form-author-group"
+                      label="Author:"
+                      label-for="form-author-input">
+            <b-form-input id="form-author-input"
+                          type="text"
+                          
+                          required
+                          placeholder="Enter author">
+            </b-form-input>
+          </b-form-group>
+          <!-- section 3 -->
+        <b-form-group id="form-read-group">
+          <b-form-checkbox-group id="form-checks">
+            <b-form-checkbox value="true">Read?</b-form-checkbox>
+          </b-form-checkbox-group>
+        </b-form-group>
+        <!-- modal buttons -->
+        <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button type="reset" variant="danger">Reset</b-button>
+      </b-form>
+    </b-modal>
     </div>
    </div>
 </template>
@@ -50,9 +90,9 @@
 export default {
     data() {
     return {
-      header: [],
-      dataSet: [],
-      //dataUploadedFlag: false,
+      header: [], //전달받은 df의 맨 상단 column
+      dataSet: [],//전달받은 df의 맨 상단 column
+      addForm: {},
     };
   },
     
@@ -60,23 +100,58 @@ export default {
     //components 추가
   },
   methods: {
+    loadData(){
+      console.log(this.$route.params.dataset);
+      // console.log(this.$route.params.dataset['petal_length']); // {0:...}
+      // console.log(Object.keys(this.$route.params.dataset)); //columns
+
+      //data: header에 데이터 삽입.
+      let columnValues = Object.keys(this.$route.params.dataset); //route로 전달받은 params의 dataset의 key 값 (ex.sepal_width...)를 columnValue에 삽입
+      this.saveResponseData(columnValues); //for문들 돌면서 data에 정의된 this.header에 차곡차곡 들어감
+      this.dataSet = this.$route.params.dataset; //route로 전달받은 params의 dataset을, data에 정의된 this.dataset에 넣음
+      console.log(this.dataSet);
+    },
     saveResponseData (columnValues) {
       for (const columnValue of columnValues) {  
         this.header.push(columnValue);
       
       }
     },
+    // 변형시켜야 하는 메소드들
+        onReset(evt) {
+      evt.preventDefault();
+      this.$refs.addDataModal.hide();
+      this.initForm();
+    },
+        onSubmit(evt) {
+      evt.preventDefault();
+      this.$refs.addDataModal.hide();
+      let read = false;
+      if (this.addForm.read[0]) read = true;
+      const payload = {
+        // need to be added
+      };
+      this.addData(payload);
+      this.initForm();
+    },
+    addData(payload) {
+      const path = 'http://localhost:5000/addData';
+      axios.post(path, payload)
+        .then(() => {
+          this.loadData();
+          this.message = 'Data added!';
+          this.showMessage = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.loadData();
+        });
+    },
+    initForm() {
+    },
   },
   created() {
-    console.log(this.$route.params.dataset);
-    // console.log(this.$route.params.dataset['petal_length']); // {0:...}
-    // console.log(Object.keys(this.$route.params.dataset)); //columns
-
-    //data: header에 데이터 삽입.
-    let columnValues = Object.keys(this.$route.params.dataset);
-    this.saveResponseData(columnValues);
-    this.dataSet = this.$route.params.dataset;
-    console.log(this.dataSet);
+    this.loadData();
 }}
 </script>
 
