@@ -19,8 +19,8 @@
           <!-- table body -->
           <tbody>
             <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
-              <td>{{ trIndex}}</td> <!-- 0부터 시작하도록 수정해야 함-->
-              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{dataSet[tdIndex][trIndex]}} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <td>{{ trIndex }}</td> <!-- 0부터 시작하도록 수정해야 함-->
+              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{ dataSet [ tdIndex ] [ trIndex ] }} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update -->
                     <button
@@ -39,39 +39,24 @@
           </tbody> 
         </table>
       </div>
-      <!-- add modal -->
+    <!-- add modal -->
     <b-modal ref="addDataModal"
-            id="add-modal"
-            title="Add a new data"
-            hide-footer>
+             id="add-modal"
+             title="Add a new data"
+             hide-footer>
+      <!-- add form -->
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <!-- section 1 -->
-      <b-form-group id="form-title-group"
-                    label="Title:"
-                    label-for="form-title-input">
-          <b-form-input id="form-title-input"
-                        type="text"
-                        
-                        required
-                        placeholder="Enter title">
-          </b-form-input>
-        </b-form-group>
-        <!-- section 2 -->
-        <b-form-group id="form-author-group"
-                      label="Author:"
-                      label-for="form-author-input">
-            <b-form-input id="form-author-input"
+        <!-- add form group -->
+        <b-form-group id="form-title-group"
+                      label-for="form-title-input"
+                      v-for="(headerValue, index) in header" :key="index">
+                      <label for=''>{{ header[index] }}</label>
+            <b-form-input id="form-title-input"
                           type="text"
-                          
+                          v-model="addForm[index]"
                           required
-                          placeholder="Enter author">
+                          placeholder="Enter the Value">
             </b-form-input>
-          </b-form-group>
-          <!-- section 3 -->
-        <b-form-group id="form-read-group">
-          <b-form-checkbox-group id="form-checks">
-            <b-form-checkbox value="true">Read?</b-form-checkbox>
-          </b-form-checkbox-group>
         </b-form-group>
         <!-- modal buttons -->
         <b-button type="submit" variant="primary">Submit</b-button>
@@ -101,29 +86,30 @@ export default {
   },
   methods: {
     loadData(){
-      console.log(this.$route.params.dataset);
-      // console.log(this.$route.params.dataset['petal_length']); // {0:...}
-      // console.log(Object.keys(this.$route.params.dataset)); //columns
-
-      //data: header에 데이터 삽입.
+      // console.log(this.$route.params.dataset);
       let columnValues = Object.keys(this.$route.params.dataset); //route로 전달받은 params의 dataset의 key 값 (ex.sepal_width...)를 columnValue에 삽입
       this.saveResponseData(columnValues); //for문들 돌면서 data에 정의된 this.header에 차곡차곡 들어감
       this.dataSet = this.$route.params.dataset; //route로 전달받은 params의 dataset을, data에 정의된 this.dataset에 넣음
-      console.log(this.dataSet);
+      // console.log(this.dataSet);
+
+
     },
+
     saveResponseData (columnValues) {
       for (const columnValue of columnValues) {  
         this.header.push(columnValue);
-      
+        this.addForm[columnValue]= '';
       }
     },
+
     // 변형시켜야 하는 메소드들
-        onReset(evt) {
+    onReset(evt) {
       evt.preventDefault();
       this.$refs.addDataModal.hide();
       this.initForm();
     },
-        onSubmit(evt) {
+
+    onSubmit(evt) {
       evt.preventDefault();
       this.$refs.addDataModal.hide();
       let read = false;
@@ -134,6 +120,7 @@ export default {
       this.addData(payload);
       this.initForm();
     },
+
     addData(payload) {
       const path = 'http://localhost:5000/addData';
       axios.post(path, payload)
@@ -147,13 +134,24 @@ export default {
           this.loadData();
         });
     },
+
     initForm() {
+      },
     },
-  },
+  
   created() {
     this.loadData();
-}}
+  }
+}
 </script>
+
+
+
+
+
+
+
+
 
 <style>
   .dataTable{

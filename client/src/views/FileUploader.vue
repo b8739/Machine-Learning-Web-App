@@ -102,7 +102,7 @@ import axios from 'axios';
               onDrop(event) {
             const uploadedFiles = event.dataTransfer.files;
             // Do something with the dropped file
-            console.log(uploadedFiles);
+            // console.log(uploadedFiles);
             for( var i = 0; i < uploadedFiles.length; i++ ){
             this.files.push( uploadedFiles[i] );
             }
@@ -130,7 +130,7 @@ import axios from 'axios';
             }
           }
         ).then((response) => {
-                console.log(response);
+                // console.log(response);
                 this.result = response.data;
                 this.$router.push({name: 'dataSummary', params: {dataset: this.result}});
             })
