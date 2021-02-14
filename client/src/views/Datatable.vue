@@ -11,7 +11,7 @@
           <!-- table head -->
           <thead>
             <tr>
-              <th>Index</th>
+              <!-- <th>Index</th> -->
               <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
               <th>Edit</th>
             </tr>
@@ -19,13 +19,12 @@
           <!-- table body -->
           <tbody>
             <tr v-for="(dataValue, trIndex) in newDataset[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
-              <td>{{ trIndex }}</td> <!-- 0부터 시작하도록 수정해야 함-->
               <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> {{ newDataset [ tdIndex ] [ trIndex ] }} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update -->
                     <button
                       type="button"
-                      class="" 
+                      class="" v-b-modal.edit-modal
                       @click="editData()"> Update
                     </button>
                     <!-- delete -->
@@ -63,6 +62,31 @@
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
+
+    <!-- edit modal -->
+        <b-modal ref="editDataModal"
+             id="edit-modal"
+             title="Edit existing data"
+             hide-footer>
+      <!-- edit form -->
+      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+        <!-- edit form group -->
+        <b-form-group id="form-title-edit-group"
+                      label-for="form-title-edit-input"
+                      v-for="(headerValue, index) in header" :key="index">
+                      <label for=''>{{ header[index] }}</label>
+            <b-form-input id="form-title-edit-input"
+                          type="text"
+                          v-model="editForm[header[index]]"
+                          required
+                          placeholder="Enter the Value">
+            </b-form-input>
+        </b-form-group>
+        <!-- modal buttons -->
+        <b-button type="submit" variant="primary">Update</b-button>
+        <b-button type="reset" variant="danger">Cancel</b-button>
+      </b-form>
+    </b-modal>
     </div>
    </div>
 </template>
@@ -80,6 +104,7 @@ export default {
     return {
       header: [], //전달받은 df의 맨 상단 column
       addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
+      editForm: {},
       newDataset:{},
       hadLoaded: false
     };
@@ -108,6 +133,7 @@ export default {
         this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
         this.addForm[columnValue]= "";
       }
+      this.editForm = this.addForm;
     },
 
     // 변형시켜야 하는 메소드들
@@ -146,6 +172,11 @@ export default {
   
   created() {
     this.loadData();
+    console.log(this.header)
+  },
+  mounted() {
+    console.log("mounted");
+    console.log(this.header)
   },
   beforeUpdate(){
     console.log("beforecreate");
@@ -153,10 +184,8 @@ export default {
   updated() {
     console.log("updated");
     this.hadLoaded = true;
-  },
-  mounted() {
-    console.log("mounted");
-  },
+  }
+
 
 
 }
