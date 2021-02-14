@@ -74,13 +74,14 @@ import axios from 'axios';
 
 export default {
     name: 'Datatable',
-    props: ['dataset'],
+    // props: ['preHeader'],
 
     data() {
     return {
       header: [], //전달받은 df의 맨 상단 column
       addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
-      newDataset:{}
+      newDataset:{},
+      hadLoaded: false
     };
   },
     
@@ -88,29 +89,21 @@ export default {
     //components 추가
   },
   methods: {
-    preLoadData(){
-      this.newDataset = this.dataset;
-      // console.log(this.$route.params.dataset);
-      let columnValues = Object.keys(this.newDataset); //route로 전달받은 params의 dataset의 key 값 (ex.sepal_width...)를 columnValue에 삽입
-      this.saveResponseData(columnValues); //for문들 돌면서 data에 정의된 this.header에 차곡차곡 들어감
-      // console.log(this.dataSet);
-      
-    },
-
     loadData(){
       const path = 'http://localhost:5000/loadData';
       axios.get(path)
         .then((res) => {
           this.newDataset = res.data;
-          console.log(res);
-          console.log(res.data);
+          if (this.hadLoaded==false)
+          this.saveResponseData();
         })
         .catch((error) => {
           console.error(error);
         });
     },
 
-    saveResponseData (columnValues) {
+    saveResponseData () {
+      let columnValues = Object.keys(this.newDataset);
       for (const columnValue of columnValues) {  
         this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
         this.addForm[columnValue]= "";
@@ -152,18 +145,17 @@ export default {
     },
   
   created() {
-    console.log("Datatable created");
-    this.preLoadData();
-    console.log(this.newDataset);
+    this.loadData();
   },
   beforeUpdate(){
-    console.log("Datatable beforecreate");
+    console.log("beforecreate");
   },
   updated() {
-    console.log("Datatable updated");
+    console.log("updated");
+    this.hadLoaded = true;
   },
   mounted() {
-    console.log("Datatable mounted");
+    console.log("mounted");
   },
 
 

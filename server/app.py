@@ -76,7 +76,7 @@ def dataupload():
 			table_name,
 			engine,
 			if_exists='replace',
-			index=False,
+			index=True,
 			chunksize=500,
 			method='multi'
 		)
@@ -109,6 +109,14 @@ def loadData():
 	print(data)
 	conn.close()
 	return jsonify(data.to_dict())
+
+# @app.route('/loadData',methods=['PUT','DELETE'])
+# def loadData():
+# 	conn = engine.connect()
+# 	data = pd.read_sql_table('dataset', conn)
+# 	print(data)
+# 	conn.close()
+# 	return jsonify(data.to_dict())
 
 if __name__ == '__main__':
     app.run(debug=True)

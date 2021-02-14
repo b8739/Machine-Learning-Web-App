@@ -69,10 +69,9 @@ import axios from 'axios';
                 'Content-Type': 'multipart/form-data'
             }
           }
-        ).then((response) => {
-                console.log(response);
-                this.result = response.data;
-                this.$router.push({name: 'dataSummary', params: {dataset: this.result}});
+        ).then((res) => {
+                console.log(res);
+                this.$router.push({path: 'dataSummary'});
             })
           .catch((ex)=> {
               console.log("ERR!!!!! : ", ex);
