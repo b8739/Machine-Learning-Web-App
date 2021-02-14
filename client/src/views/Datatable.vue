@@ -53,7 +53,7 @@
                       <label for=''>{{ header[index] }}</label>
             <b-form-input id="form-title-input"
                           type="text"
-                          v-model="addForm[index]"
+                          v-model="addForm[header[index]]"
                           required
                           placeholder="Enter the Value">
             </b-form-input>
@@ -69,7 +69,7 @@
 
 <script>
 //import 방식 참고
-// import axios from 'axios';
+import axios from 'axios';
 // import Alert from './Alert.vue';
 
 export default {
@@ -77,7 +77,7 @@ export default {
     return {
       header: [], //전달받은 df의 맨 상단 column
       dataSet: [],//전달받은 df의 맨 상단 column
-      addForm: {},
+      addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
     };
   },
     
@@ -91,13 +91,11 @@ export default {
       this.saveResponseData(columnValues); //for문들 돌면서 data에 정의된 this.header에 차곡차곡 들어감
       this.dataSet = this.$route.params.dataset; //route로 전달받은 params의 dataset을, data에 정의된 this.dataset에 넣음
       // console.log(this.dataSet);
-
-
     },
 
     saveResponseData (columnValues) {
       for (const columnValue of columnValues) {  
-        this.header.push(columnValue);
+        this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
         this.addForm[columnValue]= '';
       }
     },
@@ -111,20 +109,17 @@ export default {
 
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.addDataModal.hide();
-      let read = false;
-      if (this.addForm.read[0]) read = true;
-      const payload = {
-        // need to be added
-      };
-      this.addData(payload);
+      this.$refs.addDataModal.hide();                                     
+      this.addData(this.addForm);
       this.initForm();
+      this.header = []; //header일단 여기서 초기화 (임시, 나중에 함수화할것임)
     },
 
     addData(payload) {
       const path = 'http://localhost:5000/addData';
       axios.post(path, payload)
         .then(() => {
+          console.log(payload);
           this.loadData();
           this.message = 'Data added!';
           this.showMessage = true;
@@ -136,12 +131,14 @@ export default {
     },
 
     initForm() {
+      this.addForm = {};
       },
     },
   
   created() {
     this.loadData();
-  }
+  },
+
 }
 </script>
 
