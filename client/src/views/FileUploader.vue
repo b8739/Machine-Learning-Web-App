@@ -138,7 +138,20 @@ axios.post('http://localhost:5000/dataupload',
       console.log("ERR!!!!! : ", ex);
       // this.$router.push('/dataSummary'); //delete later
   });
-}
+},
+//실험
+  created() {
+    console.log("Datatable created");
+  },
+  beforeUpdate(){
+    console.log("Datatable beforecreate");
+  },
+  updated() {
+    console.log("Datatable updated");
+  },
+  mounted() {
+    console.log("Datatable mounted");
+  },
     }
   }
 </script>

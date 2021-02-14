@@ -10,12 +10,14 @@ const router = new VueRouter({
 
     routes:[{
         path:"/", 
-        component: FileUploader
+        component: FileUploader,
+        props:true
     },
     {
         path:"/dataSummary", 
         name:"dataSummary", 
         component: Datatable,
+        props:true
     },
     ]
 });

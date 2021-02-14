@@ -60,7 +60,7 @@ Session = sessionmaker(bind=engine)
 
 @app.route('/', methods=['GET'])
 def testing():
-	return jsonify('Hello World!')
+	return jsonify ("hello world")
 
 # Route for our Processing and Details Page
 @app.route('/dataupload',methods=['GET','POST'])
@@ -86,26 +86,29 @@ def dataupload():
 def addData():
 	response_object = {'status': 'success'}
 	post_data = request.json
-	# addData_df = pd.read_json(post_data)
-	# print (addData_df)
-	# mysql에 session으로 데이터 추가
+	# .to_sql를 사용하기 위해서 dict 데이터를 dataframe으로 변환함
 	dictToDf = pd.DataFrame(post_data, index=[0])
-	# print(dictToDf.loc[0])
-	# print(dictToDf.loc[1])
-	# print(dictToDf.loc[2])
-	# print(dictToDf.loc[3])
-	print(dictToDf)
-
+	# 변환한 dataframe을 to_sql을 사용해서 mysql에 append함
 	table_name = 'dataset'
 	dictToDf.to_sql (
 				table_name,
 				engine,
 				if_exists='append',
 				index=False,
-				chunksize=500,
+				chunksize=200,
 				method='multi'
 			)
-	return jsonify("hr")
+	response_object['message'] = 'Data added!'
+   # sql을 .read_sql_table로 읽어들이고 frontend에 return 해줌
+	return jsonify(response_object)
+
+@app.route('/loadData',methods=['GET','POST'])
+def loadData():
+	conn = engine.connect()
+	data = pd.read_sql_table('dataset', conn)
+	print(data)
+	conn.close()
+	return jsonify(data.to_dict())
 
 if __name__ == '__main__':
     app.run(debug=True)

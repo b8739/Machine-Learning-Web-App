@@ -18,9 +18,9 @@
           </thead>
           <!-- table body -->
           <tbody>
-            <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
+            <tr v-for="(dataValue, trIndex) in newDataset[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
               <td>{{ trIndex }}</td> <!-- 0부터 시작하도록 수정해야 함-->
-              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> {{ dataSet [ tdIndex ] [ trIndex ] }} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> {{ newDataset [ tdIndex ] [ trIndex ] }} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update -->
                     <button
@@ -73,11 +73,14 @@ import axios from 'axios';
 // import Alert from './Alert.vue';
 
 export default {
+    name: 'Datatable',
+    props: ['dataset'],
+
     data() {
     return {
       header: [], //전달받은 df의 맨 상단 column
-      dataSet: [],//전달받은 df의 맨 상단 column
       addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
+      newDataset:{}
     };
   },
     
@@ -85,18 +88,32 @@ export default {
     //components 추가
   },
   methods: {
-    loadData(){
+    preLoadData(){
+      this.newDataset = this.dataset;
       // console.log(this.$route.params.dataset);
-      let columnValues = Object.keys(this.$route.params.dataset); //route로 전달받은 params의 dataset의 key 값 (ex.sepal_width...)를 columnValue에 삽입
+      let columnValues = Object.keys(this.newDataset); //route로 전달받은 params의 dataset의 key 값 (ex.sepal_width...)를 columnValue에 삽입
       this.saveResponseData(columnValues); //for문들 돌면서 data에 정의된 this.header에 차곡차곡 들어감
-      this.dataSet = this.$route.params.dataset; //route로 전달받은 params의 dataset을, data에 정의된 this.dataset에 넣음
       // console.log(this.dataSet);
+      
+    },
+
+    loadData(){
+      const path = 'http://localhost:5000/loadData';
+      axios.get(path)
+        .then((res) => {
+          this.newDataset = res.data;
+          console.log(res);
+          console.log(res.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
 
     saveResponseData (columnValues) {
       for (const columnValue of columnValues) {  
         this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-        this.addForm[columnValue]= '';
+        this.addForm[columnValue]= "";
       }
     },
 
@@ -112,14 +129,13 @@ export default {
       this.$refs.addDataModal.hide();                                     
       this.addData(this.addForm);
       this.initForm();
-      this.header = []; //header일단 여기서 초기화 (임시, 나중에 함수화할것임)
+      // this.header = []; //header일단 여기서 초기화 (임시, 나중에 함수화할것임)
     },
 
     addData(payload) {
       const path = 'http://localhost:5000/addData';
       axios.post(path, payload)
         .then(() => {
-          console.log(payload);
           this.loadData();
           this.message = 'Data added!';
           this.showMessage = true;
@@ -136,8 +152,20 @@ export default {
     },
   
   created() {
-    this.loadData();
+    console.log("Datatable created");
+    this.preLoadData();
+    console.log(this.newDataset);
   },
+  beforeUpdate(){
+    console.log("Datatable beforecreate");
+  },
+  updated() {
+    console.log("Datatable updated");
+  },
+  mounted() {
+    console.log("Datatable mounted");
+  },
+
 
 }
 </script>
