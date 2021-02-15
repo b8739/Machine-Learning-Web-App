@@ -25,7 +25,7 @@
                     <button
                       type="button"
                       class="" v-b-modal.edit-modal
-                      @click="editData()"> Update
+                      @click="getIndexForEdit(trIndex)"> Update
                     </button>
                     <!-- delete -->
                     <button
@@ -69,15 +69,15 @@
              title="Edit existing data"
              hide-footer>
       <!-- edit form -->
-      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+      <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
         <!-- edit form group -->
         <b-form-group id="form-title-edit-group"
                       label-for="form-title-edit-input"
-                      v-for="(headerValue, index) in header" :key="index">
-                      <label for=''>{{ header[index] }}</label>
+                      v-for="(headerValue, index) in headerWithoutIndex" :key="index">
+                      <label for=''>{{ headerWithoutIndex[index] }}</label>
             <b-form-input id="form-title-edit-input"
                           type="text"
-                          v-model="editForm[header[index]]"
+                          v-model="editForm[headerWithoutIndex[index]]"
                           required
                           placeholder="Enter the Value">
             </b-form-input>
@@ -94,6 +94,7 @@
 <script>
 //import 방식 참고
 import axios from 'axios';
+import Vue from 'vue'
 // import Alert from './Alert.vue';
 
 export default {
@@ -106,9 +107,15 @@ export default {
       addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
       editForm: {},
       newDataset:{},
-      hadLoaded: false
+      hadLoaded: false,
     };
   },
+  computed:{
+  headerWithoutIndex(){
+    // console.log(this.header.slice(1,this.header.length));
+    return this.header.slice(1,this.header.length);
+  }
+},
     
   components: {
     //components 추가
@@ -132,8 +139,8 @@ export default {
       for (const columnValue of columnValues) {  
         this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
         this.addForm[columnValue]= "";
+        this.editForm[columnValue]= "";
       }
-      this.editForm = this.addForm;
     },
 
     // 변형시켜야 하는 메소드들
@@ -164,7 +171,36 @@ export default {
           this.loadData();
         });
     },
-
+    getIndexForEdit(targetIndex){ 
+      console.log(`targetIndex: ${targetIndex}`);
+      this.editForm['index'] = targetIndex;
+    },
+    // for update
+    onSubmitUpdate(evt) {
+      evt.preventDefault();
+      this.$refs.editDataModal.hide();
+      const payload = {
+      };
+      // this.updateBook(payload, this.editForm);
+    },
+    onResetUpdate(evt) {
+      evt.preventDefault();
+      this.$refs.editDataModal.hide();
+      this.initForm();
+      this.loadData(); // why?
+    },
+    updateBook(payload) {
+      const path = ``;
+      axios.put(path, payload)
+        .then(() => {
+          this.loadData();
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.loadData();
+        });
+    },
     initForm() {
       this.addForm = {};
       },
@@ -172,11 +208,10 @@ export default {
   
   created() {
     this.loadData();
-    console.log(this.header)
+
   },
   mounted() {
     console.log("mounted");
-    console.log(this.header)
   },
   beforeUpdate(){
     console.log("beforecreate");
@@ -202,6 +237,7 @@ export default {
 <style>
   .dataTable{
     margin: 0 auto;
+    text-align: center;
   }
   .dataTable tr:nth-child(odd) {
     background-color: #D9E1F2;

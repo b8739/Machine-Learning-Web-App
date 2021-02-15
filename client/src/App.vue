@@ -11,11 +11,13 @@
 import Header from "./components/Header.vue"
 import FileUploader from "./views/FileUploader.vue"
 import Datatable from "./views/Datatable.vue"
+import Login from "./views/Login.vue"
 
 export default {
     name: "App",
     components:{
       Header,
+      Login,
       FileUploader,
       Datatable,
     },
