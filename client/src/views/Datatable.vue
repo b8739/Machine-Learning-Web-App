@@ -11,7 +11,7 @@
           <!-- table head -->
           <thead>
             <tr>
-              <!-- <th>Index</th> -->
+              <th>Index</th>
               <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
               <th>Edit</th>
             </tr>
@@ -19,6 +19,7 @@
           <!-- table body -->
           <tbody>
             <tr v-for="(dataValue, trIndex) in newDataset[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
+              <td>{{ trIndex }}</td>
               <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> {{ newDataset [ tdIndex ] [ trIndex ] }} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update -->
@@ -179,8 +180,8 @@ export default {
     onSubmitUpdate(evt) {
       evt.preventDefault();
       this.$refs.editDataModal.hide();
-      const payload = {
-      };
+      this.updateData(this.editForm);
+      
       // this.updateBook(payload, this.editForm);
     },
     onResetUpdate(evt) {
@@ -189,8 +190,9 @@ export default {
       this.initForm();
       this.loadData(); // why?
     },
-    updateBook(payload) {
-      const path = ``;
+    updateData(payload) {
+      console.log(payload);
+      const path = `http://localhost:5000/updateData`;
       axios.put(path, payload)
         .then(() => {
           this.loadData();

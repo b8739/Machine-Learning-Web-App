@@ -53,11 +53,12 @@ Session = sessionmaker(bind=engine)
 
 # newData=Dataset(sepal_width=5)
 
-# session = Session()
+session = Session()
 # session.add(newData)
 # session.commit()
 
 
+ 
 @app.route('/', methods=['GET'])
 def testing():
 	return jsonify ("hello world")
@@ -76,7 +77,7 @@ def dataupload():
 			table_name,
 			engine,
 			if_exists='replace',
-			index=True,
+			index=False,
 			chunksize=500,
 			method='multi'
 		)
@@ -106,17 +107,32 @@ def addData():
 def loadData():
 	conn = engine.connect()
 	data = pd.read_sql_table('dataset', conn)
-	print(data)
+	# print(data)
 	conn.close()
 	return jsonify(data.to_dict())
 
-# @app.route('/loadData',methods=['PUT','DELETE'])
-# def loadData():
-# 	conn = engine.connect()
-# 	data = pd.read_sql_table('dataset', conn)
-# 	print(data)
-# 	conn.close()
-# 	return jsonify(data.to_dict())
+@app.route('/updateData', methods=['PUT', 'DELETE'])
+def updateData():
+	# if request.method == 'PUT':
+	# 	put_data = request.get_json
+		# dictToDf = pd.DataFrame(put_data, index=[0])
+		# print(dictToDf)
+		# 임시 update방법, 근데 query를 안 사용할 순 없을까?
+		# print(put_data)
+		# print(request.get_json)
+		# print(request.json)
+		# conn = engine.connect()
+		# num = put_data['index']
+		# print(num)
+		# df = pd.read_sql_query("select * from dataset limit "+num+",1;", conn)
+		# for key, value in put_data.items()
+		# 	setattr(df,key,value)
+		# conn.close
+		# print(df)
+		# --
+# if request.method == 'DELETE':
+	return jsonify("uploader")
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -13,7 +13,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # EDA function
 dataset_df = pd.read_csv(os.path.join('static/uploadsDB',filename))
-table_name = 'Dataset'
+table_name = "Dataset"
 
 # dataset_df_size = dataset_df.size
 # dataset_df_shape = dataset_df.shape
