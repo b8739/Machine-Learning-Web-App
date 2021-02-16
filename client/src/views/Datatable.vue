@@ -203,7 +203,7 @@ export default {
       const path = `http://localhost:5000/updateData`;
       axios.put(path, payload)
         .then(() => {
-          // this.loadData();
+          this.loadData();
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -235,14 +235,6 @@ export default {
 
 }
 </script>
-
-
-
-
-
-
-
-
 
 <style>
   .dataTable{

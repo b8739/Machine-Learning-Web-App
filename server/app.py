@@ -86,17 +86,7 @@ def dataupload():
 			index=False,
 			chunksize=500,
 			method='multi'
-		)
-		# SQL문 작성
-		targetColumn = 'sepal_length'
-		updatedValue = '1000'
-		targetID = '0'
-  
-		sql = "UPDATE dataset SET "+targetColumn+" = " + updatedValue + " WHERE ID = " + targetID+";"
-
-		session.execute(sql)
-		session.commit()
-		session.close()
+		)  
 	return jsonify(dataset_df.to_dict())
 
 @app.route('/addData',methods=['GET','POST'])
@@ -130,21 +120,27 @@ def loadData():
 def updateData():
 	if request.method == 'PUT':
 		post_data = request.get_json() #json으로 하면 dict is not callable뜸
-		index = post_data['index']
+		index = post_data['ID']
+		# SQL문 작성
+  
+		# sql = "UPDATE dataset SET "+targetColumn+" = " + updatedValue + " WHERE ID = " + targetID+";"
 
+		# session.execute(sql)
+		# session.commit()
+		# session.close()
+  
+		# targetColumn 받아오기
+		targetColumn = ''
+		for key, value in post_data.items():
+			if(key!='ID'):
+				targetColumn += key + " = " + value + ", "
+		targetColumn = targetColumn[:len(targetColumn)-2]
 
-
-		updateRow = pd.read_sql_query("select * from dataset limit "+index+",1;", session.bind)
-		print(type(updateRow))
-		setattr(updateRow,'sepal_length','1')
-		dd = 'sepal_length'
+		# sql문 작성
+		sql = "UPDATE dataset SET "+targetColumn + " WHERE ID = " + index+";"
+		session.execute(sql)
 		session.commit()
 		session.close()
-		# for key, value in post_data.items():
-		# 	setattr(updateRow,key,value)
-		# 	print(updateRow)
-		# conn.close
-		# print(updateRow)
 	return jsonify("hello")
 
 
