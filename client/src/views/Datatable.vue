@@ -20,7 +20,7 @@
           <tbody>
             <tr v-for="(dataValue, trIndex) in newDataset[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
               <!-- <td>{{ trIndex }}</td> -->
-              <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> <div contenteditable>{{ newDataset [ tdIndex ] [ trIndex ] }}</div> </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> <input v-model = "newDataset [ tdIndex ][ trIndex ]"> </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update button-->
                     <button
@@ -244,6 +244,7 @@ export default {
 </script>
 
 <style>
+
   .dataTable{
     margin: 0 auto;
     text-align: center;
@@ -261,5 +262,7 @@ export default {
     background-color: #8ab6ca;
     cursor: pointer;
 }
-
+  tbody input {
+    border:none;
+  }
 </style>
