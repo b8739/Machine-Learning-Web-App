@@ -130,7 +130,7 @@ export default {
       axios.get(path)
         .then((res) => {
           this.newDataset = res.data;
-          this.indexNum = Object.keys(this.newDataset['index']).length-1;//149
+          this.indexNum = Object.keys(this.newDataset['ID']).length-1;//149
           if (this.hadLoaded==false)
           this.saveResponseData();
         })
@@ -158,7 +158,7 @@ export default {
     onSubmit(evt) {
       evt.preventDefault();
       this.$refs.addDataModal.hide();
-      this.addForm['index'] = this.nextIndexNum;  
+      this.addForm['ID'] = this.nextIndexNum;  
       for (const addvalue in this.addForm){
         console.log(addvalue);
       }                     
@@ -182,7 +182,7 @@ export default {
     },
     getIndexForUpdate(targetIndex){ 
       console.log(`targetIndex: ${targetIndex}`);
-      this.updateForm['index'] = targetIndex;
+      this.updateForm['ID'] = targetIndex;
     },
     // for update
     onSubmitUpdate(evt) {

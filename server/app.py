@@ -50,7 +50,7 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 # engine
 engine = create_engine('mysql+mysqldb://root:root@localhost/newdatabase',echo = True)
 Session = sessionmaker(bind=engine)
-
+session = Session()
 # newData=Dataset(sepal_width=5)
 
 
@@ -58,6 +58,10 @@ Session = sessionmaker(bind=engine)
 # session.commit()
 
 # 임시 update방법, 근데 query를 안 사용할 순 없을까?
+# __tablename__ = "dataset"
+# columnName = 'sepal_length'
+# index = '0'
+# sql = "UPDATE"+__tablename__+"SET"+columnName+"='2002 WHERE index = "+index+";"
 
 
 @app.route('/', methods=['GET'])
@@ -72,16 +76,27 @@ def dataupload():
 
 		# pandas
 		dataset_df = pd.read_csv(file)
+		dataset_df = dataset_df.reset_index().rename(columns={"index": "ID"})
 		table_name = 'dataset'
 		# csv to sql
 		dataset_df.to_sql (
 			table_name,
 			engine,
 			if_exists='replace',
-			index=True,
+			index=False,
 			chunksize=500,
 			method='multi'
 		)
+		# SQL문 작성
+		targetColumn = 'sepal_length'
+		updatedValue = '1000'
+		targetID = '0'
+  
+		sql = "UPDATE dataset SET "+targetColumn+" = " + updatedValue + " WHERE ID = " + targetID+";"
+
+		session.execute(sql)
+		session.commit()
+		session.close()
 	return jsonify(dataset_df.to_dict())
 
 @app.route('/addData',methods=['GET','POST'])
@@ -106,10 +121,9 @@ def addData():
 
 @app.route('/loadData',methods=['GET','POST'])
 def loadData():
-	conn = engine.connect()
-	data = pd.read_sql_table('dataset', conn)
+	data = pd.read_sql_table('dataset', session.bind)
 	# print(data)
-	conn.close()
+	session.close()
 	return jsonify(data.to_dict())
 
 @app.route('/updateData', methods=['PUT', 'DELETE'])
@@ -117,9 +131,11 @@ def updateData():
 	if request.method == 'PUT':
 		post_data = request.get_json() #json으로 하면 dict is not callable뜸
 		index = post_data['index']
-		session = Session()
+
+
+
 		updateRow = pd.read_sql_query("select * from dataset limit "+index+",1;", session.bind)
-		print(updateRow)
+		print(type(updateRow))
 		setattr(updateRow,'sepal_length','1')
 		dd = 'sepal_length'
 		session.commit()
