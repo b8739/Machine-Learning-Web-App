@@ -114,7 +114,14 @@ export default {
   },
   computed:{
   headerWithoutIndex(){
-    return this.header.slice(1,this.header.length); 
+    const idIndex = this.header.indexOf("ID");
+    let tempHeader;
+    if(idIndex!=-1){
+      tempHeader = this.header.slice();
+      tempHeader.splice(idIndex,1);
+      // console.log(tempHeader);
+    }
+    return tempHeader; 
   },
   nextIndexNum(){
     return this.indexNum+1;
@@ -129,6 +136,7 @@ export default {
       const path = 'http://localhost:5000/loadData';
       axios.get(path)
         .then((res) => {
+          console.log(res.data);
           this.newDataset = res.data;
           this.indexNum = Object.keys(this.newDataset['ID']).length-1;//149
           if (this.hadLoaded==false)
@@ -218,7 +226,7 @@ export default {
   
   created() {
     this.loadData();
-
+  console.log("created");
   },
   mounted() {
     console.log("mounted");

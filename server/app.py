@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, text, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from collections import OrderedDict
 
 from flask_mysqldb import MySQL
 
@@ -20,6 +21,8 @@ import time
 # EDA Packages
 import pandas as pd 
 import numpy as np 
+
+ordered_dic = OrderedDict()
 
 # Python API
 # from model import *
@@ -114,7 +117,7 @@ def loadData():
 	data = pd.read_sql_table('dataset', session.bind)
 	# print(data)
 	session.close()
-	return jsonify(data.to_dict())
+	return jsonify(data.to_dict(into=ordered_dic))
 
 @app.route('/updateData', methods=['PUT', 'DELETE'])
 def updateData():
