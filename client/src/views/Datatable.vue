@@ -11,7 +11,7 @@
           <!-- table head -->
           <thead>
             <tr>
-              <th>Index</th>
+              <!-- <th>Index</th> -->
               <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
               <th>Edit</th>
             </tr>
@@ -19,14 +19,14 @@
           <!-- table body -->
           <tbody>
             <tr v-for="(dataValue, trIndex) in newDataset[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
-              <td>{{ trIndex }}</td>
+              <!-- <td>{{ trIndex }}</td> -->
               <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> {{ newDataset [ tdIndex ] [ trIndex ] }} </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update -->
                     <button
                       type="button"
-                      class="" v-b-modal.edit-modal
-                      @click="getIndexForEdit(trIndex)"> Update
+                      class="" v-b-modal.update-modal
+                      @click="getIndexForUpdate(trIndex)"> Update
                     </button>
                     <!-- delete -->
                     <button
@@ -49,11 +49,11 @@
         <!-- add form group -->
         <b-form-group id="form-title-group"
                       label-for="form-title-input"
-                      v-for="(headerValue, index) in header" :key="index">
-                      <label for=''>{{ header[index] }}</label>
+                      v-for="(headerValue, index) in headerWithoutIndex" :key="index">
+                      <label for=''>{{ headerWithoutIndex[index] }}</label>
             <b-form-input id="form-title-input"
                           type="text"
-                          v-model="addForm[header[index]]"
+                          v-model="addForm[headerWithoutIndex[index]]"
                           required
                           placeholder="Enter the Value">
             </b-form-input>
@@ -64,21 +64,21 @@
       </b-form>
     </b-modal>
 
-    <!-- edit modal -->
-        <b-modal ref="editDataModal"
-             id="edit-modal"
-             title="Edit existing data"
+    <!-- update modal -->
+        <b-modal ref="updateDataModal"
+             id="update-modal"
+             title="Update existing data"
              hide-footer>
-      <!-- edit form -->
+      <!-- update form -->
       <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
-        <!-- edit form group -->
-        <b-form-group id="form-title-edit-group"
-                      label-for="form-title-edit-input"
+        <!-- update form group -->
+        <b-form-group id="form-title-update-group"
+                      label-for="form-title-update-input"
                       v-for="(headerValue, index) in headerWithoutIndex" :key="index">
                       <label for=''>{{ headerWithoutIndex[index] }}</label>
-            <b-form-input id="form-title-edit-input"
+            <b-form-input id="form-title-update-input"
                           type="text"
-                          v-model="editForm[headerWithoutIndex[index]]"
+                          v-model="updateForm[headerWithoutIndex[index]]"
                           required
                           placeholder="Enter the Value">
             </b-form-input>
@@ -106,15 +106,18 @@ export default {
     return {
       header: [], //전달받은 df의 맨 상단 column
       addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
-      editForm: {},
+      updateForm: {},
       newDataset:{},
       hadLoaded: false,
+      indexNum: ''
     };
   },
   computed:{
   headerWithoutIndex(){
-    // console.log(this.header.slice(1,this.header.length));
-    return this.header.slice(1,this.header.length);
+    return this.header.slice(1,this.header.length); 
+  },
+  nextIndexNum(){
+    return this.indexNum+1;
   }
 },
     
@@ -127,6 +130,7 @@ export default {
       axios.get(path)
         .then((res) => {
           this.newDataset = res.data;
+          this.indexNum = Object.keys(this.newDataset['index']).length-1;//149
           if (this.hadLoaded==false)
           this.saveResponseData();
         })
@@ -139,8 +143,8 @@ export default {
       let columnValues = Object.keys(this.newDataset);
       for (const columnValue of columnValues) {  
         this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
+        this.updateForm[columnValue]= "";
         this.addForm[columnValue]= "";
-        this.editForm[columnValue]= "";
       }
     },
 
@@ -153,9 +157,13 @@ export default {
 
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.addDataModal.hide();                                     
+      this.$refs.addDataModal.hide();
+      this.addForm['index'] = this.nextIndexNum;  
+      for (const addvalue in this.addForm){
+        console.log(addvalue);
+      }                     
       this.addData(this.addForm);
-      this.initForm();
+      // this.initForm();
       // this.header = []; //header일단 여기서 초기화 (임시, 나중에 함수화할것임)
     },
 
@@ -172,21 +180,21 @@ export default {
           this.loadData();
         });
     },
-    getIndexForEdit(targetIndex){ 
+    getIndexForUpdate(targetIndex){ 
       console.log(`targetIndex: ${targetIndex}`);
-      this.editForm['index'] = targetIndex;
+      this.updateForm['index'] = targetIndex;
     },
     // for update
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editDataModal.hide();
-      this.updateData(this.editForm);
+      this.$refs.updateDataModal.hide();
+      this.updateData(this.updateForm);
       
-      // this.updateBook(payload, this.editForm);
+      // this.updateBook(payload, this.updateForm);
     },
     onResetUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editDataModal.hide();
+      this.$refs.updateDataModal.hide();
       this.initForm();
       this.loadData(); // why?
     },
@@ -195,7 +203,7 @@ export default {
       const path = `http://localhost:5000/updateData`;
       axios.put(path, payload)
         .then(() => {
-          this.loadData();
+          // this.loadData();
         })
         .catch((error) => {
           // eslint-disable-next-line

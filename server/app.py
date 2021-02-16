@@ -53,12 +53,13 @@ Session = sessionmaker(bind=engine)
 
 # newData=Dataset(sepal_width=5)
 
-session = Session()
+
 # session.add(newData)
 # session.commit()
 
+# 임시 update방법, 근데 query를 안 사용할 순 없을까?
 
- 
+
 @app.route('/', methods=['GET'])
 def testing():
 	return jsonify ("hello world")
@@ -77,7 +78,7 @@ def dataupload():
 			table_name,
 			engine,
 			if_exists='replace',
-			index=False,
+			index=True,
 			chunksize=500,
 			method='multi'
 		)
@@ -113,25 +114,22 @@ def loadData():
 
 @app.route('/updateData', methods=['PUT', 'DELETE'])
 def updateData():
-	# if request.method == 'PUT':
-	# 	put_data = request.get_json
-		# dictToDf = pd.DataFrame(put_data, index=[0])
-		# print(dictToDf)
-		# 임시 update방법, 근데 query를 안 사용할 순 없을까?
-		# print(put_data)
-		# print(request.get_json)
-		# print(request.json)
-		# conn = engine.connect()
-		# num = put_data['index']
-		# print(num)
-		# df = pd.read_sql_query("select * from dataset limit "+num+",1;", conn)
-		# for key, value in put_data.items()
-		# 	setattr(df,key,value)
+	if request.method == 'PUT':
+		post_data = request.get_json() #json으로 하면 dict is not callable뜸
+		index = post_data['index']
+		session = Session()
+		updateRow = pd.read_sql_query("select * from dataset limit "+index+",1;", session.bind)
+		print(updateRow)
+		setattr(updateRow,'sepal_length','1')
+		dd = 'sepal_length'
+		session.commit()
+		session.close()
+		# for key, value in post_data.items():
+		# 	setattr(updateRow,key,value)
+		# 	print(updateRow)
 		# conn.close
-		# print(df)
-		# --
-# if request.method == 'DELETE':
-	return jsonify("uploader")
+		# print(updateRow)
+	return jsonify("hello")
 
 
 if __name__ == '__main__':
