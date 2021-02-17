@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <!-- <h1>Data Table</h1> -->
-    <!-- <hr><br><br> -->
     <button type="button" v-b-modal.add-modal>Add Data</button>
     <button type="button" @click="visibilityToggle()" >Update Data</button>
     <br><br>
@@ -48,78 +47,19 @@
         </tr>
       </tbody> 
     </table>
-
-    <!-- add modal -->
-    <b-modal ref="addDataModal"
-              id="add-modal"
-              title="Add a new data"
-              hide-footer>
-      <!-- add form -->
-      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <!-- add form group -->
-        <b-form-group id="form-title-group"
-                      label-for="form-title-input"
-                      v-for="(headerValue, index) in headerWithoutIndex" :key="index">
-                      <label for=''>{{ headerWithoutIndex[index] }}</label>
-            <b-form-input id="form-title-input"
-                          type="text"
-                          v-model="addForm[headerWithoutIndex[index]]"
-                          required
-                          placeholder="Enter the Value">
-            </b-form-input>
-        </b-form-group>
-        <!-- modal buttons -->
-        <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
-      </b-form>
-    </b-modal>
-
-<!-- update modal -->
-    <b-modal ref="updateDataModal"
-          id="update-modal"
-          title="Update existing data"
-          hide-footer>
-  <!-- update form -->
-  <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
-    <!-- update form group -->
-    <b-form-group id="form-title-update-group"
-                  label-for="form-title-update-input"
-                  v-for="(headerValue, index) in headerWithoutIndex" :key="index">
-                  <label for=''>{{ headerWithoutIndex[index] }}</label>
-        <b-form-input id="form-title-update-input"
-                      type="text"
-                      v-model="updateForm[headerWithoutIndex[index]]"
-                      required
-                      placeholder="Enter the Value">
-        </b-form-input>
-    </b-form-group>
-    <!-- modal buttons -->
-    <b-button type="submit" variant="primary">Update</b-button>
-    <b-button type="reset" variant="danger">Cancel</b-button>
-  </b-form>
-</b-modal>
-
    </div>
 </template>
 
 <script>
 //import 방식 참고
 import axios from 'axios';
-import Sidebar from "../components/Sidebar.vue"
-// import Alert from './Alert.vue';
 
 export default {
   name: 'Datatable',
-  // props: ['preHeader'],
+  props: ['header','dataSet','hadLoaded'],
 
   data() {
   return {
-    header: [], //전달받은 df의 맨 상단 column
-    addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
-    updateForm: {},
-    dataSet:{},
-    hadLoaded: false,
-    indexNum: '',
     isHidden:true,
     editable: false,
     rowIndex:[]
@@ -127,119 +67,14 @@ export default {
 },
 
   computed:{
-  headerWithoutIndex(){
-    const idIndex = this.header.indexOf("ID");
-    let tempHeader;
-    if(idIndex!=-1){ //처음엔 -1이라서 에러를 발생시킴, 때문에 if문으로 해당 경우의 수를 제거
-      tempHeader = this.header.slice(); //copy by value
-      tempHeader.splice(idIndex,1);
-    }
-    return tempHeader; 
-  },
-  nextIndexNum(){
-    return this.indexNum+1;
-  },
-  compareIndex(){
-    
-  },
+
 },
     
   components: {
-    Sidebar,
   },
+
   methods: {
-    loadData(){
-      const path = 'http://localhost:5000/loadData';
-      axios.get(path)
-        .then((res) => {
-          console.log(res.data);
-          this.dataSet = res.data;
-          // 데이터 추가 시 필요한 index number
-          this.indexNum = Object.keys(this.dataSet['ID']).length-1;//149
-          //'처음' 데이터를 받아올때만 Header를 받아오도록 처리
-          if (this.hadLoaded==false)
-          this.saveResponseData();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
 
-    saveResponseData () {
-      let columnValues = Object.keys(this.dataSet);
-      for (const columnValue of columnValues) {  
-        this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-        this.updateForm[columnValue]= "";
-        this.addForm[columnValue]= "";
-      }
-    },
-
-    // 변형시켜야 하는 메소드들
-    onReset(evt) {
-      evt.preventDefault();
-      this.$refs.addDataModal.hide();
-      this.initForm();
-    },
-
-    onSubmit(evt) {
-      evt.preventDefault();
-      this.$refs.addDataModal.hide();
-      this.addForm['ID'] = this.nextIndexNum;  
-      for (const addvalue in this.addForm){
-        console.log(addvalue);
-      }                     
-      this.addData(this.addForm);
-      // this.initForm();
-      // this.header = []; //header일단 여기서 초기화 (임시, 나중에 함수화할것임)
-    },
-
-    addData(payload) {
-      const path = 'http://localhost:5000/addData';
-      axios.post(path, payload)
-        .then(() => {
-          this.loadData();
-          this.message = 'Data added!';
-          this.showMessage = true;
-        })
-        .catch((error) => {
-          console.log(error);
-          this.loadData();
-        });
-    },
-    getIndexForUpdate(targetIndex){ 
-      console.log(`targetIndex: ${targetIndex}`);
-      this.updateForm['ID'] = targetIndex;
-    },
-    // for update
-    onSubmitUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.updateDataModal.hide();
-      this.updateData(this.updateForm);
-      
-      // this.updateBook(payload, this.updateForm);
-    },
-    onResetUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.updateDataModal.hide();
-      this.initForm();
-      this.loadData(); // why?
-    },
-    updateData(payload) {
-      console.log(payload);
-      const path = `http://localhost:5000/updateData`;
-      axios.put(path, payload)
-        .then(() => {
-          this.loadData();
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error);
-          this.loadData();
-        });
-    },
-    initForm() {
-      this.addForm = {};
-      },
     visibilityToggle(){
       this.isHidden = !this.isHidden;
       for(let i = 0; i<Object.keys(this.dataSet[this.header[0]]).length; i++){
@@ -250,7 +85,6 @@ export default {
 
   // --lifecycle
   created() {
-    this.loadData();
     console.log("created");
   },
   mounted() {
@@ -261,7 +95,6 @@ export default {
   },
   updated() {
     console.log("updated");
-    this.hadLoaded = true;
   }
 
 

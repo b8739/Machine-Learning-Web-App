@@ -19,8 +19,8 @@ export default {
   .sidebar{
     width: 300px;
     height:100vh;
-    background-color: blanchedalmond;
     position: absolute;
+    border-right: 1px solid #DEE4EA;
   }
   
 </style>
