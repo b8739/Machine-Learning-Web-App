@@ -13,7 +13,7 @@
           <thead>
             <tr>
               <!-- <th>Index</th> -->
-              <th :class="{ visibility: isVisible }"></th>
+              <th :class="{ visibility: isHidden }"></th>
               <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
               <th>Edit</th>
             </tr>
@@ -22,8 +22,16 @@
           <tbody>
             <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
               <!-- <td>{{ trIndex }}</td> -->
-              <td ><input type='checkbox' :class="{ visibility: isVisible }"></td>
-              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> <input v-model = "dataSet [ tdIndex ][ trIndex ]"> </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <td ><input type='checkbox' 
+                          :class="{ visibility: isHidden }" 
+                          v-model = "rowIndex[trIndex]">
+              </td>
+              <td v-for="(dataValue, tdIndex) in dataSet" 
+                  :key="tdIndex"> 
+                <input v-model = "dataSet [ tdIndex ][ trIndex ]" 
+                       :class ="{dataEditable:rowIndex[trIndex]}"> 
+                       <!-- :class="{ dataEditable: compareIndex }" -->
+              </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update button-->
                     <button
@@ -113,7 +121,9 @@ export default {
     dataSet:{},
     hadLoaded: false,
     indexNum: '',
-    isVisible:false,
+    isHidden:true,
+    editable: false,
+    rowIndex:[]
   };
 },
 
@@ -129,6 +139,9 @@ export default {
   },
   nextIndexNum(){
     return this.indexNum+1;
+  },
+  compareIndex(){
+    
   },
 },
     
@@ -229,14 +242,17 @@ export default {
       this.addForm = {};
       },
     visibilityToggle(){
-      this.isVisible = !this.isVisible;
+      this.isHidden = !this.isHidden;
+      for(let i = 0; i<Object.keys(this.dataSet[this.header[0]]).length; i++){
+        this.rowIndex.push(false);
+      }
     },
     },
 
   // --lifecycle
   created() {
     this.loadData();
-  console.log("created");
+    console.log("created");
   },
   mounted() {
     console.log("mounted");
@@ -255,42 +271,43 @@ export default {
 </script>
 
 <style>
-
+  /* 테이블 레이아웃 */
   .dataTable{
     margin: 0 auto;
     text-align: center;
+    vertical-align: center;
   }
+  /* 테이블 색상 */
   .dataTable tr:nth-child(odd) {
     background-color: #D9E1F2;
     }
   .dataTable tr:nth-child(even) {
     background-color: #f0f8ff;
     }
-  th{
-    width: 115px;
-  }
+  /* 테이블 이벤트 */
   .dataTable tr:hover {
     background-color: #8ab6ca;
     cursor: pointer;
 }
-  td{
-    vertical-align: center;
-  }
-  tbody td input {
+  /* 테이블 셀 레이아웃 및 속성 */
+  .dataTable tbody td input {
     text-align: center;
     background: transparent;
     border:none;
     pointer-events: none;
   }
-  th:first-child{
-    /* background-color:#fff; */
+  
+  .dataTable th:first-child{
      display:inline;
   }
-  td:first-child{
-    /* background-color:#fff; */
+  /* 테이블 체크박스 체크 가능하도록 */
+  .dataTable td:first-child input{
+    pointer-events: auto ;
   }
-  .visibility{
-    /* margin-left: 10px; */
+  .dataTable .visibility{
     visibility:hidden;
+  }
+  .dataTable .dataEditable{
+    background:#fff;
   }
 </style>
