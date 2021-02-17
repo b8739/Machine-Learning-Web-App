@@ -4,7 +4,8 @@
       <div class="mainContents">
         <h1>Data Table</h1>
         <hr><br><br>
-        <button type="button" class="" v-b-modal.add-modal>Add Data</button>
+        <button type="button" v-b-modal.add-modal>Add Data</button>
+        <button type="button" @click="visibilityToggle()" >Update Data</button>
         <br><br>
         <!-- table -->
         <table class="dataTable">
@@ -12,15 +13,17 @@
           <thead>
             <tr>
               <!-- <th>Index</th> -->
+              <th :class="{ visibility: isVisible }"></th>
               <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
               <th>Edit</th>
             </tr>
           </thead>
           <!-- table body -->
           <tbody>
-            <tr v-for="(dataValue, trIndex) in newDataset[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
+            <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
               <!-- <td>{{ trIndex }}</td> -->
-              <td v-for="(dataValue, tdIndex) in newDataset" :key="tdIndex"> <input v-model = "newDataset [ tdIndex ][ trIndex ]"> </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <td ><input type='checkbox' :class="{ visibility: isVisible }"></td>
+              <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex"> <input v-model = "dataSet [ tdIndex ][ trIndex ]"> </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update button-->
                     <button
@@ -99,19 +102,21 @@ import Vue from 'vue'
 // import Alert from './Alert.vue';
 
 export default {
-    name: 'Datatable',
-    // props: ['preHeader'],
+  name: 'Datatable',
+  // props: ['preHeader'],
 
-    data() {
-    return {
-      header: [], //전달받은 df의 맨 상단 column
-      addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
-      updateForm: {},
-      newDataset:{},
-      hadLoaded: false,
-      indexNum: ''
-    };
-  },
+  data() {
+  return {
+    header: [], //전달받은 df의 맨 상단 column
+    addForm: {},//ex. sepal-width:' ' , sepal-length: ' ' ...
+    updateForm: {},
+    dataSet:{},
+    hadLoaded: false,
+    indexNum: '',
+    isVisible:false,
+  };
+},
+
   computed:{
   headerWithoutIndex(){
     const idIndex = this.header.indexOf("ID");
@@ -124,7 +129,7 @@ export default {
   },
   nextIndexNum(){
     return this.indexNum+1;
-  }
+  },
 },
     
   components: {
@@ -136,8 +141,10 @@ export default {
       axios.get(path)
         .then((res) => {
           console.log(res.data);
-          this.newDataset = res.data;
-          this.indexNum = Object.keys(this.newDataset['ID']).length-1;//149
+          this.dataSet = res.data;
+          // 데이터 추가 시 필요한 index number
+          this.indexNum = Object.keys(this.dataSet['ID']).length-1;//149
+          //'처음' 데이터를 받아올때만 Header를 받아오도록 처리
           if (this.hadLoaded==false)
           this.saveResponseData();
         })
@@ -147,7 +154,7 @@ export default {
     },
 
     saveResponseData () {
-      let columnValues = Object.keys(this.newDataset);
+      let columnValues = Object.keys(this.dataSet);
       for (const columnValue of columnValues) {  
         this.header.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
         this.updateForm[columnValue]= "";
@@ -221,8 +228,12 @@ export default {
     initForm() {
       this.addForm = {};
       },
+    visibilityToggle(){
+      this.isVisible = !this.isVisible;
     },
-  
+    },
+
+  // --lifecycle
   created() {
     this.loadData();
   console.log("created");
@@ -262,7 +273,24 @@ export default {
     background-color: #8ab6ca;
     cursor: pointer;
 }
-  tbody input {
+  td{
+    vertical-align: center;
+  }
+  tbody td input {
+    text-align: center;
+    background: transparent;
     border:none;
+    pointer-events: none;
+  }
+  th:first-child{
+    /* background-color:#fff; */
+     display:inline;
+  }
+  td:first-child{
+    /* background-color:#fff; */
+  }
+  .visibility{
+    /* margin-left: 10px; */
+    visibility:hidden;
   }
 </style>
