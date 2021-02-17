@@ -117,7 +117,7 @@ def loadData():
 	data = pd.read_sql_table('dataset', session.bind)
 	# print(data)
 	session.close()
-	return jsonify(data.to_dict(into=ordered_dic))
+	return jsonify(data.to_dict())
 
 @app.route('/updateData', methods=['PUT', 'DELETE'])
 def updateData():

@@ -28,9 +28,10 @@
               </td>
               <td v-for="(dataValue, tdIndex) in dataSet" 
                   :key="tdIndex"> 
-                <input v-model = "dataSet [ tdIndex ][ trIndex ]" 
-                       :class ="{dataEditable:rowIndex[trIndex]}"> 
-                       <!-- :class="{ dataEditable: compareIndex }" -->
+                  <textarea
+                        rows="1" 
+                         v-model = "dataSet [ tdIndex ][ trIndex ]" 
+                        :class ="{dataEditable:rowIndex[trIndex]}"></textarea>
               </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
                   <div class="" role="group">
                   <!-- update button-->
@@ -271,11 +272,21 @@ export default {
 </script>
 
 <style>
+  textarea{
+    border: none;
+    background-color: transparent;
+    resize: none !important;
+    outline: none;
+  }
   /* 테이블 레이아웃 */
   .dataTable{
+    overflow:scroll;
     margin: 0 auto;
     text-align: center;
     vertical-align: center;
+  }
+  .dataTable th{
+    width:100px;
   }
   /* 테이블 색상 */
   .dataTable tr:nth-child(odd) {
@@ -290,10 +301,9 @@ export default {
     cursor: pointer;
 }
   /* 테이블 셀 레이아웃 및 속성 */
-  .dataTable tbody td input {
+  .dataTable tbody td textarea {
     text-align: center;
-    background: transparent;
-    border:none;
+    vertical-align: middle;
     pointer-events: none;
   }
   
