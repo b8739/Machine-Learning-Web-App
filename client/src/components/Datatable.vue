@@ -1,61 +1,59 @@
 <template>
   <div class="container">
-    <div class="innerContainer">
-      <div class="mainContents">
-        <h1>Data Table</h1>
-        <hr><br><br>
-        <button type="button" v-b-modal.add-modal>Add Data</button>
-        <button type="button" @click="visibilityToggle()" >Update Data</button>
-        <br><br>
-        <!-- table -->
-        <table class="dataTable">
-          <!-- table head -->
-          <thead>
-            <tr>
-              <!-- <th>Index</th> -->
-              <th :class="{ visibility: isHidden }"></th>
-              <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <!-- table body -->
-          <tbody>
-            <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
-              <!-- <td>{{ trIndex }}</td> -->
-              <td ><input type='checkbox' 
-                          :class="{ visibility: isHidden }" 
-                          v-model = "rowIndex[trIndex]">
-              </td>
-              <td v-for="(dataValue, tdIndex) in dataSet" 
-                  :key="tdIndex"> 
-                  <textarea
-                        rows="1" 
-                         v-model = "dataSet [ tdIndex ][ trIndex ]" 
-                        :class ="{dataEditable:rowIndex[trIndex]}"></textarea>
-              </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
-                  <div class="" role="group">
-                  <!-- update button-->
-                    <button
-                      type="button"
-                      class="" v-b-modal.update-modal
-                      @click="getIndexForUpdate(trIndex)"> Update
-                    </button>
-                    <!-- delete button-->
-                    <button
-                      type="button"
-                      class=""
-                      @click="onDeleteData()">Delete
-                    </button>
-                </div>
-            </tr>
-          </tbody> 
-        </table>
-      </div>
+    <!-- <h1>Data Table</h1> -->
+    <!-- <hr><br><br> -->
+    <button type="button" v-b-modal.add-modal>Add Data</button>
+    <button type="button" @click="visibilityToggle()" >Update Data</button>
+    <br><br>
+    <!-- table -->
+    <table class="dataTable">
+      <!-- table head -->
+      <thead>
+        <tr>
+          <!-- <th>Index</th> -->
+          <th :class="{ visibility: isHidden }"></th>
+          <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index]}}</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <!-- table body -->
+      <tbody>
+        <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex"> <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
+          <!-- <td>{{ trIndex }}</td> -->
+          <td ><input type='checkbox' 
+                      :class="{ visibility: isHidden }" 
+                      v-model = "rowIndex[trIndex]">
+          </td>
+          <td v-for="(dataValue, tdIndex) in dataSet" 
+              :key="tdIndex"> 
+              <textarea
+                    rows="1" 
+                      v-model = "dataSet [ tdIndex ][ trIndex ]" 
+                    :class ="{dataEditable:rowIndex[trIndex]}"></textarea>
+          </td> <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
+              <div class="" role="group">
+              <!-- update button-->
+                <button
+                  type="button"
+                  class="" v-b-modal.update-modal
+                  @click="getIndexForUpdate(trIndex)"> Update
+                </button>
+                <!-- delete button-->
+                <button
+                  type="button"
+                  class=""
+                  @click="onDeleteData()">Delete
+                </button>
+            </div>
+        </tr>
+      </tbody> 
+    </table>
+
     <!-- add modal -->
     <b-modal ref="addDataModal"
-             id="add-modal"
-             title="Add a new data"
-             hide-footer>
+              id="add-modal"
+              title="Add a new data"
+              hide-footer>
       <!-- add form -->
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
         <!-- add form group -->
@@ -76,38 +74,38 @@
       </b-form>
     </b-modal>
 
-    <!-- update modal -->
-        <b-modal ref="updateDataModal"
-             id="update-modal"
-             title="Update existing data"
-             hide-footer>
-      <!-- update form -->
-      <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
-        <!-- update form group -->
-        <b-form-group id="form-title-update-group"
-                      label-for="form-title-update-input"
-                      v-for="(headerValue, index) in headerWithoutIndex" :key="index">
-                      <label for=''>{{ headerWithoutIndex[index] }}</label>
-            <b-form-input id="form-title-update-input"
-                          type="text"
-                          v-model="updateForm[headerWithoutIndex[index]]"
-                          required
-                          placeholder="Enter the Value">
-            </b-form-input>
-        </b-form-group>
-        <!-- modal buttons -->
-        <b-button type="submit" variant="primary">Update</b-button>
-        <b-button type="reset" variant="danger">Cancel</b-button>
-      </b-form>
-    </b-modal>
-    </div>
+<!-- update modal -->
+    <b-modal ref="updateDataModal"
+          id="update-modal"
+          title="Update existing data"
+          hide-footer>
+  <!-- update form -->
+  <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
+    <!-- update form group -->
+    <b-form-group id="form-title-update-group"
+                  label-for="form-title-update-input"
+                  v-for="(headerValue, index) in headerWithoutIndex" :key="index">
+                  <label for=''>{{ headerWithoutIndex[index] }}</label>
+        <b-form-input id="form-title-update-input"
+                      type="text"
+                      v-model="updateForm[headerWithoutIndex[index]]"
+                      required
+                      placeholder="Enter the Value">
+        </b-form-input>
+    </b-form-group>
+    <!-- modal buttons -->
+    <b-button type="submit" variant="primary">Update</b-button>
+    <b-button type="reset" variant="danger">Cancel</b-button>
+  </b-form>
+</b-modal>
+
    </div>
 </template>
 
 <script>
 //import 방식 참고
 import axios from 'axios';
-import Vue from 'vue'
+import Sidebar from "../components/Sidebar.vue"
 // import Alert from './Alert.vue';
 
 export default {
@@ -147,7 +145,7 @@ export default {
 },
     
   components: {
-    //components 추가
+    Sidebar,
   },
   methods: {
     loadData(){
@@ -272,6 +270,9 @@ export default {
 </script>
 
 <style>
+  .container{
+    max-width: 1200px;
+  }
   textarea{
     border: none;
     background-color: transparent;
@@ -283,7 +284,7 @@ export default {
     overflow:scroll;
     margin: 0 auto;
     text-align: center;
-    vertical-align: center;
+    vertical-align: middle;
   }
   .dataTable th{
     width:100px;
@@ -319,5 +320,9 @@ export default {
   }
   .dataTable .dataEditable{
     background:#fff;
+    pointer-events: auto;
+  }
+  textarea{
+    max-width:100px;
   }
 </style>

@@ -36,6 +36,9 @@ import axios from 'axios';
         files: []
       }
     },
+    
+    props: ['sidebarStatus'],
+
     components: {
         // dropzone: Dropzone,
     },

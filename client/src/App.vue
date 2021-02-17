@@ -9,17 +9,22 @@
 
 <script>
 import Header from "./components/Header.vue"
-import FileUploader from "./views/FileUploader.vue"
-import Datatable from "./views/Datatable.vue"
+// import Sidebar from "./components/Sidebar.vue"
+import DataSummary from "./views/DataSummary.vue"
+
 import Login from "./views/Login.vue"
+
 
 export default {
     name: "App",
+
     components:{
       Header,
-      Login,
-      FileUploader,
-      Datatable,
+      // Login,
+      // FileUploader,
+
+      // Sidebar,
+      DataSummary
     },
 };
 
@@ -30,14 +35,15 @@ export default {
 /* reset */
 *{
   font-family: 'Nunito Sans', sans-serif, 'Noto Sans', sans-serif;
+    margin: 0;
+  padding: 0;
 }
 a{
   text-decoration: none;
 }
 
 body,p,span{
-  margin: 0;
-  padding: 0;
+
 }
 /* base.html */
 
