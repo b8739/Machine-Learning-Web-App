@@ -3,7 +3,7 @@
     <div class="sidebar">
       <div class="editData">
         <button type="button" v-b-modal.add-modal>Add Data</button>
-        <button type="button" @click="visibilityToggle()">Update Data</button>
+        <button type="button" @click="showElement()">Update Data</button>
       </div>
     </div>
     <DataTable
@@ -13,6 +13,7 @@
       :isHidden="isHidden"
       :rowIndex="rowIndex"
     />
+    <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
     <AddModal :header="header" :addForm="addForm" :indexNum="indexNum" @loadDataStatus="loadData" />
   </div>
 </template>
@@ -49,8 +50,6 @@ export default {
           // console.log(res.data);
           this.dataSet = res.data;
           // 데이터 추가 시 필요한 index number
-          console.log("loadData 실행");
-          console.log(this.dataSet);
           this.indexNum = Object.keys(this.dataSet["ID"]).length - 1; //149
           //'처음' 데이터를 받아올때만 Header를 받아오도록 처리
           if (this.hadLoaded == false) this.saveResponseData();
@@ -105,7 +104,7 @@ export default {
     initForm() {
       this.addForm = {};
     },
-    visibilityToggle() {
+    showElement() {
       this.isHidden = !this.isHidden;
       for (let i = 0; i < Object.keys(this.dataSet[this.header[0]]).length; i++) {
         this.rowIndex.push(false);

@@ -18,7 +18,7 @@
           <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
           <!-- <td>{{ trIndex }}</td> -->
           <td>
-            <input type="checkbox" :class="{ visibility: isHidden }" v-bind="rowIndex[trIndex]" />
+            <input type="checkbox" :class="{ visibility: isHidden }" v-model="rowIndex[trIndex]" />
           </td>
           <td v-for="(dataValue, tdIndex) in dataSet" :key="tdIndex">
             <textarea
@@ -85,6 +85,7 @@ export default {
   max-width: 1200px;
 }
 textarea {
+  max-width: 90px;
   border: none;
   background-color: transparent;
   resize: none !important;
@@ -132,8 +133,5 @@ textarea {
 .dataTable .dataEditable {
   background: #fff;
   pointer-events: auto;
-}
-textarea {
-  max-width: 100px;
 }
 </style>
