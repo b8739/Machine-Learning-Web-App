@@ -6,13 +6,19 @@
         <button type="button" @click="visibilityToggle()">Update Data</button>
       </div>
     </div>
-    <Datatable :header="header" :dataSet="dataSet" :indexNum="indexNum" :hadLoaded="hadLoaded" />
-    <AddModal :header="header" :addForm="addForm" />
+    <DataTable
+      :header="header"
+      :dataSet="dataSet"
+      :hadLoaded="hadLoaded"
+      :isHidden="isHidden"
+      :rowIndex="rowIndex"
+    />
+    <AddModal :header="header" :addForm="addForm" :indexNum="indexNum" @loadDataStatus="loadData" />
   </div>
 </template>
 <script>
 import axios from "axios";
-import Datatable from "../components/Datatable";
+import DataTable from "../components/DataTable";
 import Sidebar from "../components/Sidebar";
 import AddModal from "../components/AddModal";
 
@@ -24,11 +30,13 @@ export default {
       indexNum: "",
       addForm: {}, //ex. sepal-width:' ' , sepal-length: ' ' ...
       updateForm: {},
-      hadLoaded: false
+      hadLoaded: false,
+      isHidden: true,
+      rowIndex: []
     };
   },
   components: {
-    Datatable,
+    DataTable,
     Sidebar,
     AddModal
   },
@@ -38,9 +46,11 @@ export default {
       axios
         .get(path)
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
           this.dataSet = res.data;
           // 데이터 추가 시 필요한 index number
+          console.log("loadData 실행");
+          console.log(this.dataSet);
           this.indexNum = Object.keys(this.dataSet["ID"]).length - 1; //149
           //'처음' 데이터를 받아올때만 Header를 받아오도록 처리
           if (this.hadLoaded == false) this.saveResponseData();
@@ -94,20 +104,26 @@ export default {
     },
     initForm() {
       this.addForm = {};
+    },
+    visibilityToggle() {
+      this.isHidden = !this.isHidden;
+      for (let i = 0; i < Object.keys(this.dataSet[this.header[0]]).length; i++) {
+        this.rowIndex.push(false);
+      }
     }
   },
   created() {
     this.loadData();
-    console.log("created");
+    // console.log("created");
   },
   mounted() {
-    console.log("mounted");
+    // console.log("mounted");
   },
   beforeUpdate() {
-    console.log("beforecreate");
+    // console.log("beforecreate");
   },
   updated() {
-    console.log("updated");
+    // console.log("updated");
     this.hadLoaded = true;
   }
 };
