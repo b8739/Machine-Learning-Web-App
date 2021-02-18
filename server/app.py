@@ -22,7 +22,7 @@ import time
 import pandas as pd 
 import numpy as np 
 
-ordered_dic = OrderedDict()
+from dataSummarizer import summarizeData
 
 # Python API
 # from model import *
@@ -42,29 +42,26 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 # 임시 schema
-# class Dataset(Base):
-#     __tablename__ = 'dataset'
-#     sepal_length = Column(Integer,primary_key=True)
-#     sepal_width = Column(Integer)
-#     petal_length = Column(Integer)
-#     petal_width = Column(Integer)
-#     species = Column(String(300))
+class DataInfo(Base):
+    __tablename__ = 'dataInfo'
+    columnName = Column(String(300),primary_key=True)
+    dataType = Column(String(300))
+    normalization = Column(String(300))
+    mean = Column(Integer)
+    stdev = Column(String(300))
+    quartile = Column(String(300))
+    numofna = Column(String(300))
     
 # engine
 engine = create_engine('mysql+mysqldb://root:root@localhost/newdatabase',echo = True)
 Session = sessionmaker(bind=engine)
 session = Session()
-# newData=Dataset(sepal_width=5)
 
+# john = DataInfo(columnName = '2')
+# session.add(john)
 
-# session.add(newData)
+# # Commit the new User John to the database
 # session.commit()
-
-# 임시 update방법, 근데 query를 안 사용할 순 없을까?
-# __tablename__ = "dataset"
-# columnName = 'sepal_length'
-# index = '0'
-# sql = "UPDATE"+__tablename__+"SET"+columnName+"='2002 WHERE index = "+index+";"
 
 
 @app.route('/', methods=['GET'])
@@ -76,13 +73,15 @@ def testing():
 def dataupload():
 	if request.method == 'POST' and 'csv_data' in request.files:
 		file = request.files['csv_data']
-
+		# dataInfo 테이블 생성
+		Base.metadata.create_all(engine)
 		# pandas
-		dataset_df = pd.read_csv(file)
-		dataset_df = dataset_df.reset_index().rename(columns={"index": "ID"})
+		df = pd.read_csv(file)
+		df = df.reset_index().rename(columns={"index": "ID"})
+		
 		table_name = 'dataset'
 		# csv to sql
-		dataset_df.to_sql (
+		df.to_sql (
 			table_name,
 			engine,
 			if_exists='replace',
@@ -90,7 +89,8 @@ def dataupload():
 			chunksize=500,
 			method='multi'
 		)  
-	return jsonify(dataset_df.to_dict())
+	# return jsonify(df.to_dict())
+		return summarizeData(df)
 
 @app.route('/addData',methods=['GET','POST'])
 def addData():
@@ -146,6 +146,10 @@ def updateData():
 		session.close()
 	return jsonify("hello")
 
+@app.route('/dataSummarize',methods=['GET','POST'])
+def dataSummarize():
+  df = pd.read_csv('./static/uploadsDB/iris.csv')
+  return (summarizeData(df))
 
 if __name__ == '__main__':
     app.run(debug=True)
