@@ -53,7 +53,7 @@ class DataInfo(Base):
     numofna = Column(String(300))
     
 # engine
-engine = create_engine('mysql+mysqldb://root:root@localhost/newdatabase',echo = True)
+engine = create_engine('mysql+mysqldb://root:root@localhost/newdatabase',echo = False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -76,7 +76,8 @@ def dataupload():
 		# dataInfo 테이블 생성
 		Base.metadata.create_all(engine)
 		# pandas
-		df = pd.read_csv(file)
+		df = pd.read_csv(file, keep_default_na=False)
+		print(df)
 		df = df.reset_index().rename(columns={"index": "ID"})
 		
 		table_name = 'dataset'
@@ -86,11 +87,15 @@ def dataupload():
 			engine,
 			if_exists='replace',
 			index=False,
-			chunksize=500,
+			chunksize=1000,
 			method='multi'
 		)  
 	# return jsonify(df.to_dict())
 		return summarizeData(df)
+
+""" 
+addData: Dataset에 data를 'Add'할 때 라우팅
+"""
 
 @app.route('/addData',methods=['GET','POST'])
 def addData():
@@ -105,19 +110,36 @@ def addData():
 				engine,
 				if_exists='append',
 				index=False,
-				chunksize=200,
-				method='multi'
+				chunksize=4000,
+				method='multi',
+				keep_default_na=False
 			)
 	response_object['message'] = 'Data added!'
    # sql을 .read_sql_table로 읽어들이고 frontend에 return 해줌
 	return jsonify(response_object)
 
+
+
+""" 
+loadData: Frontend에서 Dataset을 로드해오는 라우팅
+"""
+
 @app.route('/loadData',methods=['GET','POST'])
 def loadData():
+  ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
 	data = pd.read_sql_table('dataset', session.bind)
-	# print(data)
 	session.close()
 	return jsonify(data.to_dict())
+ 
+  # ### 2) CSV 파일을 읽어서 DICT 형태로 RETURN해주는 방식 (1번 방식이 속도가 느려서 일단 2번으로 진행) ###
+  # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
+  # return jsonify(df.to_dict())
+
+
+
+""" 
+updateData: Dataset의 data을 수정할때의 라우팅
+"""
 
 @app.route('/updateData', methods=['PUT', 'DELETE'])
 def updateData():
@@ -146,10 +168,17 @@ def updateData():
 		session.close()
 	return jsonify("hello")
 
-@app.route('/dataSummarize',methods=['GET','POST'])
-def dataSummarize():
-  df = pd.read_csv('./static/uploadsDB/iris.csv')
-  return (summarizeData(df))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+
+""" 
+updateData: Dataset의 data을 수정할때의 라우팅
+"""
+
+# @app.route('/dataSummarize',methods=['GET','POST'])
+# def dataSummarize():
+#   df = pd.read_csv('./static/uploadsDB/iris.csv')
+#   return (summarizeData(df))
+
+# if __name__ == '__main__':
+#     app.run(debug=True)

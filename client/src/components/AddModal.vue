@@ -7,14 +7,14 @@
         <b-form-group
           id="form-title-group"
           label-for="form-title-input"
-          v-for="(headerValue, index) in headerWithoutIndex"
+          v-for="(columnsValue, index) in columnsWithoutIndex"
           :key="index"
         >
-          <label for="">{{ headerWithoutIndex[index] }}</label>
+          <label for="">{{ columnsWithoutIndex[index] }}</label>
           <b-form-input
             id="form-title-input"
             type="text"
-            v-model="addForm[headerWithoutIndex[index]]"
+            v-model="addForm[columnsWithoutIndex[index]]"
             required
             placeholder="Enter the Value"
           >
@@ -36,7 +36,7 @@ export default {
       loadDataStatus: true
     };
   },
-  props: ["addForm", "header", "indexNum"],
+  props: ["addForm", "columnsWithoutIndex", "indexNum"],
   methods: {
     onReset(evt) {
       evt.preventDefault();
@@ -51,7 +51,7 @@ export default {
       console.log(this.addForm["ID"]);
       this.addData(this.addForm);
       // this.initForm();
-      // this.header = []; //header일단 여기서 초기화 (임시, 나중에 함수화할것임)
+      // this.columns = []; //columns 여기서 초기화 (임시, 나중에 함수화할것임)
     },
 
     addData(payload) {
@@ -70,16 +70,6 @@ export default {
     }
   },
   computed: {
-    headerWithoutIndex() {
-      const idIndex = this.header.indexOf("ID");
-      let tempHeader;
-      if (idIndex != -1) {
-        //처음엔 -1이라서 에러를 발생시킴, 때문에 if문으로 해당 경우의 수를 제거
-        tempHeader = this.header.slice(); //copy by value
-        tempHeader.splice(idIndex, 1);
-      }
-      return tempHeader;
-    },
     nextIndexNum() {
       return this.indexNum + 1;
     }

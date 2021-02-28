@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import FileUploader from "../views/FileUploader";
 import DataSummary from "../views/DataSummary";
+import '../assets/css/main.css';
 
 // import Login from "../views/Login";
 

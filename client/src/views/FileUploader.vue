@@ -133,9 +133,8 @@ export default {
           }
         })
         .then(response => {
-          // console.log(response);
           this.result = response.data;
-          this.$router.push({ name: "dataSummary", params: { dataset: this.result } });
+          this.$router.push({ name: "dataSummary", params: { summarizedData: this.result } });
         })
         .catch(ex => {
           console.log("ERR!!!!! : ", ex);
@@ -176,7 +175,7 @@ span.remove-file {
 .dropBox {
   width: 300px;
   height: 200px;
-  border: 2px dashed #87ceeb;
+  border: 2px dashed #97cfb7;
   margin: 100px auto 0;
   text-align: center;
   padding-top: 20px;
@@ -190,14 +189,14 @@ span.remove-file {
 }
 
 .dropBox button {
-  background-color: #87ceeb;
+  background-color: #97cfb7;
   border: none;
   color: #fff;
   width: 60px;
   height: 20px;
 }
 .dropbox button:hover {
-  background-color: #8ab6ca;
+  background-color: #97cfb7;
   cursor: pointer;
 }
 </style>

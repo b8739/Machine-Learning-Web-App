@@ -6,21 +6,10 @@
 
 <script>
 export default {
-  data(){
-    return{
-      
-    }
+  data() {
+    return {};
   },
-  props: ['sidebarStatus'],
-}
-
+  props: ["sidebarStatus"]
+};
 </script>
-<style>
-  .sidebar{
-    width: 300px;
-    height:100vh;
-    position: absolute;
-    border-right: 1px solid #DEE4EA;
-  }
-  
-</style>
+<style></style>

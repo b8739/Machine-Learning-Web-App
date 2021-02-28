@@ -46,7 +46,7 @@ def summarizeData(df):
 
   # 반환
   summarizedDF = (df_numeric_info.to_dict(), df_categorical_info.to_dict())
-  return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict())
+  return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns)
 
 
 

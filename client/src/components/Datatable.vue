@@ -8,13 +8,13 @@
         <tr>
           <!-- <th>Index</th> -->
           <th :class="{ visibility: isHidden }"></th>
-          <th v-for="(headerValue, index) in header" :key="index" scope="">{{ header[index] }}</th>
-          <th>Edit</th>
+          <th v-for="(column, index) in columns" :key="index" scope="">{{ columns[index] }}</th>
+          <!-- <th>Edit</th> -->
         </tr>
       </thead>
       <!-- table body -->
       <tbody>
-        <tr v-for="(dataValue, trIndex) in dataSet[header[0]]" :key="trIndex">
+        <tr v-for="(dataValue, trIndex) in dataSet[columns[0]]" :key="trIndex">
           <!-- make row: csv파일의 1번째 열의 개수만큼 행을 만듦-->
           <!-- <td>{{ trIndex }}</td> -->
           <td>
@@ -30,16 +30,16 @@
           <!-- make column: index는 0부터 5번이 맞고, 뒤에꺼는 엄청 많은 param-->
           <div class="" role="group">
             <!-- update button-->
-            <button
+            <!-- <button
               type="button"
               class=""
               v-b-modal.update-modal
               @click="getIndexForUpdate(trIndex)"
             >
               Update
-            </button>
+            </button> -->
             <!-- delete button-->
-            <button type="button" class="" @click="onDeleteData()">Delete</button>
+            <!-- <button type="button" class="" @click="onDeleteData()">Delete</button> -->
           </div>
         </tr>
       </tbody>
@@ -52,7 +52,7 @@
 
 export default {
   name: "Datatable",
-  props: ["header", "dataSet", "hadLoaded", "isHidden", "rowIndex"],
+  props: ["columns", "dataSet", "hadLoaded", "isHidden", "rowIndex"],
 
   data() {
     return {};
@@ -80,7 +80,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .container {
   max-width: 1200px;
 }
@@ -97,6 +97,8 @@ textarea {
   margin: 0 auto;
   text-align: center;
   vertical-align: middle;
+  margin-top: 100px;
+  transform: translateX(3%);
 }
 .dataTable th {
   width: 100px;
