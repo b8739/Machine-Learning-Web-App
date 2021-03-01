@@ -4,9 +4,14 @@
     <table class="dataTable">
       <tbody>
         <!-- 행 -->
-        <tr v-for="(numericColumn, numericIndex) in numericColumns" :key="numericIndex">
-          <!-- 열 -->
+        <tr
+          v-for="(numericColumn, numericIndex) in numericColumns"
+          :key="numericIndex"
+          @click="openEditModal(dataSet[numericColumns[numericIndex]], dataSet['Date'], indexNum)"
+        >
+          <!-- 1st column -->
           <td>{{ numericColumn }}</td>
+          <!-- 2nd column -->
           <td>
             <tr>
               <span class="info_title">Col #: </span>
@@ -18,6 +23,7 @@
             </tr>
           </td>
 
+          <!-- 3rd column -->
           <td>
             <tr>
               <span class="info_title">Mean: </span>
@@ -37,6 +43,7 @@
             </tr>
           </td>
 
+          <!-- 4th column -->
           <td>
             <Histogram
               :dataValue="dataSet[numericColumns[numericIndex]]"
@@ -76,12 +83,19 @@
         </tr>
       </tbody>
     </table>
-    <td></td>
+    <EditModal
+      :class="{ visibilityHidden: editModal_hidden }"
+      :dataValue="editModal_dataValue"
+      :date="editModal_date"
+      :indexNum="editModal_indexNum"
+    />
+    <portal-target name="destination"> </portal-target>
   </div>
 </template>
 
 <script>
 import Histogram from "./Histogram";
+import EditModal from "./EditModal";
 // import Histogram from "../components/Histogram";
 export default {
   data() {
@@ -96,12 +110,18 @@ export default {
       numeric_numOfNaJson: {},
       categorical_mostCommon: {},
       categorical_numOfNaJson: {},
-      categoryIndex: 0
+      categoryIndex: 0,
+      //editModal
+      editModal_hidden: true,
+      editModal_dataValue: {},
+      editModal_date: {},
+      editModal_indexNum: {}
     };
   },
 
   components: {
-    Histogram
+    Histogram,
+    EditModal
   },
   props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum", "thisistest"],
   computed: {
@@ -109,7 +129,14 @@ export default {
       return this.categoryIndex++;
     }
   },
-  methods: {},
+  methods: {
+    openEditModal(dataSet, date, indexNum) {
+      this.editModal_hidden = false;
+      this.editModal_dataValue = dataSet;
+      this.editModal_date = date;
+      this.editModal_indexNum = indexNum;
+    }
+  },
   created() {
     console.log("created");
     this.numeric_meanJson = this.summarizedData[0]["mean"];
@@ -151,6 +178,13 @@ export default {
 .dataTable tr {
   background-color: #ecf1f6;
 }
+.dataTable tr:hover {
+  background-color: #b1e6d2;
+  cursor: pointer;
+}
+.dataTable tr:hover tr {
+  background-color: #b1e6d2;
+}
 .dataTable td:first-child {
   font-weight: 600;
 }
@@ -160,5 +194,8 @@ export default {
 }
 .dataTable .info_title {
   color: grey;
+}
+.visibilityHidden {
+  display: none;
 }
 </style>

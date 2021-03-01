@@ -11,13 +11,13 @@
         <button class="btn-1" @click="displaySwitch()">Feature</button>
         <button class="btn-1" @click="displaySwitch()">Table</button>
       </div>
-      <!-- <DataFeatures
+      <DataFeatures
         :class="{ visibilityHidden: showFeatures }"
         :columnsWithoutIndex="columnsWithoutIndex"
         :summarizedData="summarizedData"
         :dataSet="dataSet"
         :indexNum="indexNum"
-      /> -->
+      />
 
       <!-- <DataTable
         :class="{ visibilityHidden: showTable }"
@@ -27,7 +27,7 @@
         :isHidden="isHidden"
         :rowIndex="rowIndex"
       /> -->
-      <InfiniteTable />
+      <!-- <InfiniteTable /> -->
       <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
       <AddModal
         :columnsWithoutIndex="columnsWithoutIndex"
@@ -158,7 +158,7 @@ export default {
     }
   },
   created() {
-    // this.loadData();
+    this.loadData();
     // console.log("created");
   },
   mounted() {
@@ -185,7 +185,7 @@ a {
   overflow: hidden;
 }
 .sidebar {
-  width: 30%;
+  width: 20%;
   height: 100vh;
   border-right: 1px solid #dee4ea;
   float: left;

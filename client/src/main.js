@@ -6,7 +6,9 @@ import router from './router';
 import VueApexCharts from 'vue-apexcharts'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import PortalVue from 'portal-vue'
 
+Vue.use(PortalVue)
 // import 'vuetify/dist/vuetify.min.css';
 
 // Vue.use(Vuetify);

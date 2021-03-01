@@ -41,6 +41,7 @@ export default {
   },
   watch: {
     dataValue: function(data) {
+      console.log("data감지");
       if (data != null) {
         this.putIntoArray(this.dataValue, this.dataArray);
         this.updateSeriesLine();
@@ -56,8 +57,8 @@ export default {
 
   created() {},
   mounted() {
-    this.putIntoArray(this.dataValue);
-    this.updateSeriesLine();
+    // this.putIntoArray(this.dataValue);
+    // this.updateSeriesLine();
   },
 
   methods: {

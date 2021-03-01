@@ -1,8 +1,9 @@
 <template>
   <div>
-    <table>
+    <table class="dataTable">
       <thead>
         <tr>
+          <th>ID</th>
           <th>Open</th>
           <th>High</th>
           <th>Low</th>
@@ -13,6 +14,7 @@
       </thead>
       <tbody>
         <tr v-for="(data, index) in dataSet" :key="index">
+          <td>{{ data.ID }}</td>
           <td>{{ data.Open }}</td>
           <td>{{ data.High }}</td>
           <td>{{ data.Low }}</td>
@@ -64,7 +66,10 @@ export default {
 };
 </script>
 <style scoped>
-table {
-  height: 500px;
+.dataTable tr:nth-child(odd) {
+  background-color: #d9e1f2;
+}
+.dataTable tr:nth-child(even) {
+  background-color: #f0f8ff;
 }
 </style>
