@@ -28,7 +28,6 @@
 
 <script>
 import axios from "axios";
-// import Dropzone from '../components/Dropzone.vue';
 
 export default {
   /*
@@ -42,9 +41,7 @@ export default {
 
   props: ["sidebarStatus"],
 
-  components: {
-    // dropzone: Dropzone,
-  },
+  components: {},
   /*
       Defines the method used by the component
     */
