@@ -1,17 +1,20 @@
 <template>
   <div class="wrap">
     <Histogram :dataValue="dataValue" :date="date" :indexNum="indexNum" />
+    <InfiniteTable />
   </div>
 </template>
 <script>
 import Histogram from "./Histogram";
+import InfiniteTable from "../components/InfiniteTable";
 export default {
   data() {
     return {};
   },
   props: ["dataValue", "date", "indexNum"],
   components: {
-    Histogram
+    Histogram,
+    InfiniteTable
   }
 };
 </script>

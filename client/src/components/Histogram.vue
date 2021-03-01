@@ -20,7 +20,31 @@ export default {
       dateArray: [],
       options: {
         chart: {
-          type: "area"
+          type: "area",
+          zoom: {
+            enabled: true,
+            autoScaleXaxis: false,
+            zoomedArea: {
+              fill: {
+                color: "#90CAF9",
+                opacity: 0.4
+              },
+              stroke: {
+                color: "#0D47A1",
+                opacity: 0.4,
+                width: 1
+              }
+            }
+          },
+          events: {
+            beforeZoom: function(chartContext, { xaxis }) {
+              return {
+                xaxis: {
+                  min: 0
+                }
+              };
+            }
+          }
         },
         dataLabels: {
           enabled: false
