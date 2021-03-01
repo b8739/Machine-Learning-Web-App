@@ -63,3 +63,8 @@ export default {
   created() {}
 };
 </script>
+<style scoped>
+table {
+  height: 500px;
+}
+</style>

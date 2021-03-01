@@ -193,7 +193,6 @@ a {
 
 #mainContents {
   width: 70%;
-  height: 100vh;
   float: left;
 }
 .toggle-summary {
