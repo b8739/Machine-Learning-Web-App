@@ -6,34 +6,36 @@
         <button class="editButton btn-1" type="button" @click="showElement()">Update Row</button>
       </div>
     </div>
-    <div class="toggle-summary">
-      <button class="btn-1" @click="displaySwitch()">Feature</button>
-      <button class="btn-1" @click="displaySwitch()">Table</button>
-    </div>
-    <!-- <DataFeatures
-      :class="{ visibilityHidden: showFeatures }"
-      :columnsWithoutIndex="columnsWithoutIndex"
-      :summarizedData="summarizedData"
-      :dataSet="dataSet"
-      :indexNum="indexNum"
-    /> -->
+    <div id="mainContents">
+      <div class="toggle-summary">
+        <button class="btn-1" @click="displaySwitch()">Feature</button>
+        <button class="btn-1" @click="displaySwitch()">Table</button>
+      </div>
+      <!-- <DataFeatures
+        :class="{ visibilityHidden: showFeatures }"
+        :columnsWithoutIndex="columnsWithoutIndex"
+        :summarizedData="summarizedData"
+        :dataSet="dataSet"
+        :indexNum="indexNum"
+      /> -->
 
-    <!-- <DataTable
-      :class="{ visibilityHidden: showTable }"
-      :columns="columns"
-      :dataSet="dataSet"
-      :hadLoaded="hadLoaded"
-      :isHidden="isHidden"
-      :rowIndex="rowIndex"
-    /> -->
-    <InfiniteTable />
-    <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
-    <AddModal
-      :columnsWithoutIndex="columnsWithoutIndex"
-      :addForm="addForm"
-      :indexNum="indexNum"
-      @loadDataStatus="loadData"
-    />
+      <!-- <DataTable
+        :class="{ visibilityHidden: showTable }"
+        :columns="columns"
+        :dataSet="dataSet"
+        :hadLoaded="hadLoaded"
+        :isHidden="isHidden"
+        :rowIndex="rowIndex"
+      /> -->
+      <InfiniteTable />
+      <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
+      <AddModal
+        :columnsWithoutIndex="columnsWithoutIndex"
+        :addForm="addForm"
+        :indexNum="indexNum"
+        @loadDataStatus="loadData"
+      />
+    </div>
   </div>
 </template>
 <script>
@@ -179,16 +181,22 @@ body {
 a {
   text-decoration: none;
 }
-
+#wrap {
+  overflow: hidden;
+}
 .sidebar {
-  width: 300px;
+  width: 30%;
   height: 100vh;
-  position: absolute;
   border-right: 1px solid #dee4ea;
+  float: left;
 }
 
+#mainContents {
+  width: 70%;
+  height: 100vh;
+  float: left;
+}
 .toggle-summary {
-  position: absolute;
   top: 105px;
   left: 400px;
 }

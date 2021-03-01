@@ -12,7 +12,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(data, index) in dataset" :key="index">
+        <tr v-for="(data, index) in dataSet" :key="index">
           <td>{{ data.Open }}</td>
           <td>{{ data.High }}</td>
           <td>{{ data.Low }}</td>
