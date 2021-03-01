@@ -36,13 +36,28 @@ export default {
               }
             }
           },
+
           events: {
-            beforeZoom: function(chartContext, { xaxis }) {
+            zoomed: function(chartContext, { xaxis, yaxis }) {
+              console.log(xaxis);
+              console.log(yaxis);
+            },
+            beforeZoom: (chartContext, { xaxis }) => {
+              this.toggleDataPointSelection(xaxis);
               return {
                 xaxis: {
                   min: 0
                 }
               };
+            }
+          }
+        },
+        states: {
+          active: {
+            allowMultipleDataPointsSelection: true,
+            filter: {
+              type: "darken",
+              value: 0.35
             }
           }
         },
@@ -52,6 +67,9 @@ export default {
         series: [],
         title: {
           text: "Distribution"
+        },
+        markers: {
+          size: 4
         },
         noData: {
           text: "Loading..."
@@ -65,7 +83,6 @@ export default {
   },
   watch: {
     dataValue: function(data) {
-      console.log("data감지");
       if (data != null) {
         this.putIntoArray(this.dataValue, this.dataArray);
         this.updateSeriesLine();
@@ -108,6 +125,11 @@ export default {
           categories: newCategories
         }
       });
+    },
+    toggleDataPointSelection(xaxis) {
+      for (let i = xaxis.min; i <= xaxis.max; i++) {
+        this.$refs.realtimeChart.toggleDataPointSelection(0, i);
+      }
     }
   }
 };
