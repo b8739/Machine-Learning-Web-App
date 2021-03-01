@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template,request,url_for
+from flask import Flask, jsonify, request, render_template,request,url_for, Response
 from flask_cors import CORS
 
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
@@ -128,9 +128,11 @@ loadData: Frontend에서 Dataset을 로드해오는 라우팅
 def loadData():
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
 	data = pd.read_sql_table('dataset', session.bind)
+	print (data)
 	session.close()
-	return jsonify(data.to_dict())
- 
+	# return jsonify(data.to_dict())
+	return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
+
   # ### 2) CSV 파일을 읽어서 DICT 형태로 RETURN해주는 방식 (1번 방식이 속도가 느려서 일단 2번으로 진행) ###
   # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
   # return jsonify(df.to_dict())
