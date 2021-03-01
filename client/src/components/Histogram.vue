@@ -1,21 +1,26 @@
 <template>
-  <div>
-    <apexchart ref="realtimeChart" width="300" type="bar" :options="options" :series="series">
-    </apexchart>
+  <div id="chart">
+    <apexchart
+      ref="realtimeChart"
+      type="area"
+      width="500"
+      :options="options"
+      :series="series"
+    ></apexchart>
   </div>
 </template>
 
 <script>
 export default {
   name: "Histogram",
-  props: ["dataValue", "indexNum"],
+  props: ["dataValue", "indexNum", "date"],
   data() {
     return {
       dataArray: [],
+      dateArray: [],
       options: {
         chart: {
-          height: 350,
-          type: "bar"
+          type: "area"
         },
         dataLabels: {
           enabled: false
@@ -26,6 +31,9 @@ export default {
         },
         noData: {
           text: "Loading..."
+        },
+        xaxis: {
+          type: "datatime"
         }
       },
       series: []
@@ -34,8 +42,14 @@ export default {
   watch: {
     dataValue: function(data) {
       if (data != null) {
-        this.putIntoArray(this.dataValue);
+        this.putIntoArray(this.dataValue, this.dataArray);
         this.updateSeriesLine();
+      }
+    },
+    date: function(data) {
+      if (data != null) {
+        this.putIntoArray(this.date, this.dateArray);
+        this.updateOptions(this.dateArray);
       }
     }
   },
@@ -47,9 +61,9 @@ export default {
   },
 
   methods: {
-    putIntoArray(jsonObject) {
+    putIntoArray(jsonObject, targetArray) {
       for (let i = 0; i <= this.indexNum; i++) {
-        this.dataArray.push(jsonObject[i]);
+        targetArray.push(jsonObject[i]);
       }
     },
     updateSeriesLine() {
@@ -62,6 +76,13 @@ export default {
         false,
         true
       );
+    },
+    updateOptions(newCategories) {
+      this.$refs.realtimeChart.updateOptions({
+        xaxis: {
+          categories: newCategories
+        }
+      });
     }
   }
 };

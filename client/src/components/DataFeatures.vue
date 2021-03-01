@@ -38,7 +38,11 @@
           </td>
 
           <td>
-            <Histogram :dataValue="dataSet[numericColumns[numericIndex]]" :indexNum="indexNum" />
+            <Histogram
+              :dataValue="dataSet[numericColumns[numericIndex]]"
+              :date="dataSet['Date']"
+              :indexNum="indexNum"
+            />
           </td>
         </tr>
 
