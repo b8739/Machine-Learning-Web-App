@@ -88,6 +88,7 @@
       :dataValue="editModal_dataValue"
       :date="editModal_date"
       :indexNum="editModal_indexNum"
+      :columns="columns"
     />
     <portal-target name="destination"> </portal-target>
   </div>
@@ -123,7 +124,7 @@ export default {
     Histogram,
     EditModal
   },
-  props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum"],
+  props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum", "columns"],
   computed: {
     categoryIndexAddOne() {
       return this.categoryIndex++;

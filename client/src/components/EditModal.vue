@@ -1,7 +1,7 @@
 <template>
   <div class="innerWrap">
     <Histogram :dataValue="dataValue" :date="date" :indexNum="indexNum" @xaxis="getXaxis" />
-    <InfiniteTable :xaxis="xaxis" />
+    <InfiniteTable :xaxis="xaxis" :columns="columns" />
   </div>
 </template>
 <script>
@@ -13,7 +13,7 @@ export default {
       xaxis: {}
     };
   },
-  props: ["dataValue", "date", "indexNum"],
+  props: ["dataValue", "date", "indexNum", "columns"],
   components: {
     Histogram,
     InfiniteTable
@@ -30,7 +30,7 @@ export default {
   width: 850px;
   height: 850px;
   background-color: rgb(211, 211, 211);
-  /* position: absolute; */
+  position: absolute;
   transform: translate(75%, 25%);
   top: 0;
   left: 0;

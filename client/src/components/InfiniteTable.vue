@@ -2,29 +2,15 @@
   <div>
     <table class="dataTable">
       <thead>
-        <tr>
-          <th>ID</th>
-          <th>Open</th>
-          <th>High</th>
-          <th>Low</th>
-          <th>Close</th>
-          <th>Volume</th>
-          <th>Name</th>
-        </tr>
+        <th v-for="(column, thIndex) in columns" :key="thIndex">{{ columns[thIndex] }}</th>
       </thead>
       <tbody>
         <tr
-          v-for="(data, index) in dataSet"
-          :key="index"
-          :class="{ tableSelected: tableSelectedToggles[index] }"
+          v-for="(data, trIndex) in dataSet"
+          :key="trIndex"
+          :class="{ tableSelected: tableSelectedToggles[trIndex] }"
         >
-          <td>{{ data.ID }}</td>
-          <td>{{ data.Open }}</td>
-          <td>{{ data.High }}</td>
-          <td>{{ data.Low }}</td>
-          <td>{{ data.Close }}</td>
-          <td>{{ data.Volume }}</td>
-          <td>{{ data.Name }}</td>
+          <td v-for="(column, thIndex) in columns" :key="thIndex">{{ data[columns[thIndex]] }}</td>
         </tr>
       </tbody>
     </table>
@@ -44,7 +30,7 @@ export default {
       tableSelectedToggles: []
     };
   },
-  props: ["xaxis"],
+  props: ["xaxis", "columns"],
   components: {
     InfiniteLoading
   },
@@ -82,6 +68,16 @@ export default {
     // for (let i = 0; i < Object.keys(this.dataSet[this.columns[0]]).length; i++) {
     //   this.tableSelectedToggles.push(false);
     // }
+    axios
+      .get(api, {
+        params: {
+          limit: this.limit
+        }
+      })
+      .then(({ data }) => {
+        this.limit += 10;
+        this.dataSet.push(...data);
+      });
   }
 };
 </script>

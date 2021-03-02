@@ -14,6 +14,7 @@
       <DataFeatures
         :class="{ visibilityHidden: showFeatures }"
         :columnsWithoutIndex="columnsWithoutIndex"
+        :columns="columns"
         :summarizedData="summarizedData"
         :dataSet="dataSet"
         :indexNum="indexNum"
