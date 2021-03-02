@@ -123,7 +123,7 @@ export default {
     Histogram,
     EditModal
   },
-  props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum", "thisistest"],
+  props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum"],
   computed: {
     categoryIndexAddOne() {
       return this.categoryIndex++;
@@ -162,7 +162,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 .container {
   max-width: 1200px;
 }

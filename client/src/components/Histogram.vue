@@ -18,6 +18,7 @@ export default {
     return {
       dataArray: [],
       dateArray: [],
+      xaxis: {},
       options: {
         chart: {
           type: "area",
@@ -39,10 +40,12 @@ export default {
 
           events: {
             zoomed: function(chartContext, { xaxis, yaxis }) {
-              console.log(xaxis);
-              console.log(yaxis);
+              // console.log(xaxis);
+              // console.log(yaxis);
             },
             beforeZoom: (chartContext, { xaxis }) => {
+              this.xaxis = xaxis;
+              this.$emit("xaxis", this.xaxis);
               this.toggleDataPointSelection(xaxis);
               return {
                 xaxis: {
@@ -69,7 +72,14 @@ export default {
           text: "Distribution"
         },
         markers: {
-          size: 4
+          size: 4,
+          // colors: "blue",
+          strokeWidth: 0.1,
+          strokeColor: "skyblue",
+          hover: {
+            size: 6,
+            strokeColor: "#fff"
+          }
         },
         noData: {
           text: "Loading..."

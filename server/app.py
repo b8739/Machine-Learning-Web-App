@@ -77,7 +77,6 @@ def dataupload():
 		Base.metadata.create_all(engine)
 		# pandas
 		df = pd.read_csv(file, keep_default_na=False)
-		print(df)
 		df = df.reset_index().rename(columns={"index": "ID"})
 		
 		table_name = 'dataset'
@@ -128,7 +127,6 @@ loadData: Frontend에서 Dataset을 로드해오는 라우팅
 def loadData():
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
 	data = pd.read_sql_table('dataset', session.bind)
-	print (data)
 	session.close()
 	# return jsonify(data.to_dict())
 	return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
@@ -174,8 +172,21 @@ def updateData():
 
 
 """ 
-updateData: Dataset의 data을 수정할때의 라우팅
+infinite-loading Test: 
 """
+@app.route('/infiniteLoading',methods=['GET','POST'])
+def infiniteLoading():
+	limit = request.args.get('limit')
+	conn = engine.connect()
+	df = pd.read_sql_query("select * from dataset limit "+limit+",10;", conn)
+	return Response(df.to_json( orient='records'), mimetype='application/json')
+
+
+
+
+
+
+
 
 # @app.route('/dataSummarize',methods=['GET','POST'])
 # def dataSummarize():
