@@ -1,5 +1,5 @@
 <template>
-  <div class="wrap">
+  <div class="innerWrap">
     <Histogram :dataValue="dataValue" :date="date" :indexNum="indexNum" @xaxis="getXaxis" />
     <InfiniteTable :xaxis="xaxis" />
   </div>
@@ -26,14 +26,16 @@ export default {
 };
 </script>
 <style scoped>
-.wrap {
+.innerWrap {
   width: 850px;
   height: 850px;
   background-color: rgb(211, 211, 211);
-  position: absolute;
+  /* position: absolute; */
   transform: translate(75%, 25%);
   top: 0;
   left: 0;
   z-index: 1000;
+  overflow: scroll;
+  overflow-x: hidden;
 }
 </style>

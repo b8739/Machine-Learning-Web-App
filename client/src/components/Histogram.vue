@@ -21,6 +21,13 @@ export default {
       xaxis: {},
       options: {
         chart: {
+          selection: {
+            xaxis: {
+              min: undefined,
+              max: undefined
+            },
+            enabled: true
+          },
           type: "area",
           zoom: {
             enabled: true,
@@ -37,13 +44,13 @@ export default {
               }
             }
           },
-
           events: {
             zoomed: function(chartContext, { xaxis, yaxis }) {
               // console.log(xaxis);
               // console.log(yaxis);
             },
             beforeZoom: (chartContext, { xaxis }) => {
+              this.updateSelection();
               this.xaxis = xaxis;
               this.$emit("xaxis", this.xaxis);
               this.toggleDataPointSelection(xaxis);
@@ -101,7 +108,7 @@ export default {
     date: function(data) {
       if (data != null) {
         this.putIntoArray(this.date, this.dateArray);
-        this.updateOptions(this.dateArray);
+        this.updateCategories(this.dateArray);
       }
     }
   },
@@ -129,10 +136,22 @@ export default {
         true
       );
     },
-    updateOptions(newCategories) {
+    updateCategories(newCategories) {
       this.$refs.realtimeChart.updateOptions({
         xaxis: {
           categories: newCategories
+        }
+      });
+    },
+    updateSelection() {
+      this.$refs.realtimeChart.updateOptions({
+        chart: {
+          selection: {
+            xaxis: {
+              min: undefined,
+              max: undefined
+            }
+          }
         }
       });
     },
