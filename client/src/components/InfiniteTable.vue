@@ -93,7 +93,6 @@ export default {
   margin-top: 100px;
   text-align: center;
   vertical-align: middle;
-  transform: translateX(8%);
 }
 .dataTable tr {
   background-color: #ecf1f6;

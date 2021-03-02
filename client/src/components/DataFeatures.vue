@@ -89,6 +89,7 @@
       :date="editModal_date"
       :indexNum="editModal_indexNum"
       :columns="columns"
+      @newEditModalStatus="closeEditModal"
     />
     <portal-target name="destination"> </portal-target>
   </div>
@@ -116,7 +117,8 @@ export default {
       editModal_hidden: true,
       editModal_dataValue: {},
       editModal_date: {},
-      editModal_indexNum: {}
+      editModal_indexNum: {},
+      editModal_darkenBackground: false
     };
   },
 
@@ -136,6 +138,12 @@ export default {
       this.editModal_dataValue = dataSet;
       this.editModal_date = date;
       this.editModal_indexNum = indexNum;
+    },
+    closeEditModal() {
+      this.editModal_hidden = true;
+      this.editModal_dataValue = {};
+      this.editModal_date = {};
+      this.editModal_indexNum = {};
     }
   },
   created() {
@@ -174,7 +182,7 @@ export default {
   margin-top: 100px;
   text-align: center;
   vertical-align: middle;
-  transform: translateX(8%);
+  /* transform: translateX(8%); */
 }
 .dataTable tr {
   background-color: #ecf1f6;

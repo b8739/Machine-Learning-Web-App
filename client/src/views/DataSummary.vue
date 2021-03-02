@@ -2,7 +2,7 @@
   <div id="wrap">
     <div class="sidebar">
       <div class="editData">
-        <button class="editButto btn-1" type="button" v-b-modal.add-modal>Add Row</button>
+        <button class="editButton btn-1" type="button" v-b-modal.add-modal>Add Row</button>
         <button class="editButton btn-1" type="button" @click="showElement()">Update Row</button>
       </div>
     </div>
