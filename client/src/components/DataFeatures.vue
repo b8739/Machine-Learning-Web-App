@@ -43,9 +43,12 @@
             </tr>
           </td>
 
+          <!-- <td>
+            <Histogram :dataValue="dataSet[numericColumns[numericIndex]]" :indexNum="indexNum" />
+          </td> -->
           <!-- 4th column -->
           <td>
-            <Histogram
+            <TimeSeries
               :dataValue="dataSet[numericColumns[numericIndex]]"
               :date="dataSet['Date']"
               :indexNum="indexNum"
@@ -96,9 +99,9 @@
 </template>
 
 <script>
-import Histogram from "./Histogram";
+import TimeSeries from "./TimeSeries";
 import EditModal from "./EditModal";
-// import Histogram from "../components/Histogram";
+import Histogram from "./Histogram";
 export default {
   data() {
     return {
@@ -123,8 +126,9 @@ export default {
   },
 
   components: {
-    Histogram,
-    EditModal
+    TimeSeries,
+    EditModal,
+    Histogram
   },
   props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum", "columns"],
   computed: {

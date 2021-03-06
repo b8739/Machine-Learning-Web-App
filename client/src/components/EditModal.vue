@@ -5,14 +5,14 @@
       <button class="exitButton" @click="closeEditModal()">Close</button>
       <h1 class="title">Edit Data</h1>
       <div class="graphContainer">
-        <Histogram :dataValue="dataValue" :date="date" :indexNum="indexNum" @xaxis="getXaxis" />
+        <TimeSeries :dataValue="dataValue" :date="date" :indexNum="indexNum" @xaxis="getXaxis" />
       </div>
       <InfiniteTable :xaxis="xaxis" :columns="columns" />
     </div>
   </div>
 </template>
 <script>
-import Histogram from "./Histogram";
+import TimeSeries from "./TimeSeries";
 import InfiniteTable from "../components/InfiniteTable";
 import DarkBackground from "../components/DarkBackground";
 export default {
@@ -23,7 +23,7 @@ export default {
   },
   props: ["dataValue", "date", "indexNum", "columns"],
   components: {
-    Histogram,
+    TimeSeries,
     InfiniteTable,
     DarkBackground
   },

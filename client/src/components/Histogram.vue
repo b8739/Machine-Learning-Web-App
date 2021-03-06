@@ -1,102 +1,32 @@
 <template>
-  <div id="chart">
-    <apexchart
-      ref="realtimeChart"
-      type="area"
-      width="300"
-      height="170"
-      :options="options"
-      :series="series"
-    ></apexchart>
+  <div>
+    <apexchart ref="realtimeChart" width="250" type="bar" :options="options" :series="series">
+    </apexchart>
   </div>
 </template>
 
 <script>
 export default {
   name: "Histogram",
-  props: ["dataValue", "indexNum", "date"],
+  props: ["dataValue", "indexNum"],
   data() {
     return {
       dataArray: [],
-      dateArray: [],
-      xaxis: {},
       options: {
         chart: {
+          height: 350,
+          type: "bar",
           toolbar: {
             show: false
-          },
-          // selection: {
-          //   xaxis: {
-          //     min: undefined,
-          //     max: undefined
-          //   },
-          //   enabled: true
-          // },
-          type: "area",
-          zoom: {
-            enabled: true,
-            autoScaleXaxis: false,
-            zoomedArea: {
-              fill: {
-                color: "#90CAF9",
-                opacity: 0.4
-              },
-              stroke: {
-                color: "#0D47A1",
-                opacity: 0.4,
-                width: 1
-              }
-            }
-          },
-          events: {
-            zoomed: function(chartContext, { xaxis, yaxis }) {
-              // console.log(xaxis);
-              // console.log(yaxis);
-            },
-            beforeZoom: (chartContext, { xaxis }) => {
-              this.updateSelection();
-              this.xaxis = xaxis;
-              this.$emit("xaxis", this.xaxis);
-              this.toggleDataPointSelection(xaxis);
-              return {
-                xaxis: {
-                  min: 0
-                }
-              };
-            }
-          }
-        },
-        states: {
-          active: {
-            allowMultipleDataPointsSelection: true,
-            filter: {
-              type: "darken",
-              value: 0.35
-            }
           }
         },
         dataLabels: {
           enabled: false
         },
         series: [],
-        title: {
-          text: "Distribution"
-        },
-        markers: {
-          size: 1,
-          // colors: "blue",
-          strokeWidth: 0.1,
-          strokeColor: "skyblue",
-          hover: {
-            size: 1,
-            strokeColor: "#fff"
-          }
-        },
+        title: {},
         noData: {
           text: "Loading..."
-        },
-        xaxis: {
-          type: "datatime"
         }
       },
       series: []
@@ -105,28 +35,20 @@ export default {
   watch: {
     dataValue: function(data) {
       if (data != null) {
-        this.putIntoArray(this.dataValue, this.dataArray);
+        this.putIntoArray(this.dataValue);
         this.updateSeriesLine();
-      }
-    },
-    date: function(data) {
-      if (data != null) {
-        this.putIntoArray(this.date, this.dateArray);
-        this.updateCategories(this.dateArray);
       }
     }
   },
-
   created() {},
   mounted() {
-    // this.putIntoArray(this.dataValue);
-    // this.updateSeriesLine();
+    this.putIntoArray(this.dataValue);
+    this.updateSeriesLine();
   },
-
   methods: {
-    putIntoArray(jsonObject, targetArray) {
+    putIntoArray(jsonObject) {
       for (let i = 0; i <= this.indexNum; i++) {
-        targetArray.push(jsonObject[i]);
+        this.dataArray.push(jsonObject[i]);
       }
     },
     updateSeriesLine() {
@@ -139,30 +61,6 @@ export default {
         false,
         true
       );
-    },
-    updateCategories(newCategories) {
-      this.$refs.realtimeChart.updateOptions({
-        xaxis: {
-          categories: newCategories
-        }
-      });
-    },
-    updateSelection() {
-      this.$refs.realtimeChart.updateOptions({
-        chart: {
-          selection: {
-            xaxis: {
-              min: undefined,
-              max: undefined
-            }
-          }
-        }
-      });
-    },
-    toggleDataPointSelection(xaxis) {
-      for (let i = xaxis.min; i <= xaxis.max; i++) {
-        this.$refs.realtimeChart.toggleDataPointSelection(0, i);
-      }
     }
   }
 };
