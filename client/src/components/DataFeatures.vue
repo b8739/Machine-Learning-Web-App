@@ -183,9 +183,10 @@ export default {
   text-align: left;
   vertical-align: middle;
   border-collapse: collapse;
-  border-radius: 15px;
+  border-radius: 5px;
   border-style: hidden; /* hide standard table (collapsed) border */
-  box-shadow: 0 0 0 1px rgba(104, 102, 102, 0.644); /* this draws the table border  */
+  box-shadow: 0 0 0 1px rgba(104, 102, 102, 0.644);
+  /* this draws the table border  */
   /* background-color: #234; */
 }
 .dataTable tr {
@@ -202,11 +203,8 @@ export default {
   font-weight: 600;
 }
 .dataTable td {
-  /* border-radius: 15px; */
   padding: 15px;
   border: 1.5px solid rgba(104, 102, 102, 0.644);
-
-  /* border-radius: 8px; */
 }
 .dataTable .info_title {
   color: grey;

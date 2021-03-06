@@ -15,7 +15,7 @@
 /* reset */
 
 body {
-  background-color: #f2f2f2;
+  background-color: #f0f0f0;
 }
 a {
   text-decoration: none;
@@ -32,12 +32,13 @@ nav {
   text-align: center;
   height: 60px;
   /* background-color: #87ceeb; */
-  background-color: #c4c2c2;
+  background-color: #f5f5f5;
   overflow: hidden;
+  border-bottom: 0.5px solid #cccbcbe7;
 }
 nav a {
   display: inline-block;
-  color: #fafafa;
+  color: rgb(53, 53, 53);
   margin: 13px 60px 0 0;
   font-size: 20px;
 }
