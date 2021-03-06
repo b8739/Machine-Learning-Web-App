@@ -180,26 +180,33 @@ export default {
   font-size: 15px;
   margin: 0 auto;
   margin-top: 100px;
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
-  /* transform: translateX(8%); */
+  border-collapse: collapse;
+  border-radius: 15px;
+  border-style: hidden; /* hide standard table (collapsed) border */
+  box-shadow: 0 0 0 1px rgba(104, 102, 102, 0.644); /* this draws the table border  */
+  /* background-color: #234; */
 }
 .dataTable tr {
-  background-color: #ecf1f6;
+  /* background-color: #ecf1f6; */
 }
 .dataTable tr:hover {
-  background-color: #b1e6d2;
+  /* background-color: #b1e6d2; */
   cursor: pointer;
 }
 .dataTable tr:hover tr {
-  background-color: #b1e6d2;
+  /* background-color: #b1e6d2; */
 }
 .dataTable td:first-child {
   font-weight: 600;
 }
 .dataTable td {
-  border-right: 0.5px solid rgba(209, 229, 219, 0.8);
+  /* border-radius: 15px; */
   padding: 15px;
+  border: 1.5px solid rgba(104, 102, 102, 0.644);
+
+  /* border-radius: 8px; */
 }
 .dataTable .info_title {
   color: grey;

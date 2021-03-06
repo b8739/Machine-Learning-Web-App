@@ -32,7 +32,7 @@ nav {
   text-align: center;
   height: 60px;
   /* background-color: #87ceeb; */
-  background-color: #97cfb7;
+  background-color: #c4c2c2;
   overflow: hidden;
 }
 nav a {

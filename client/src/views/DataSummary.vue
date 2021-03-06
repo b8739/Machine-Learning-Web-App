@@ -195,10 +195,7 @@ a {
 #mainContents {
   width: 70%;
   float: left;
-}
-.toggle-summary {
-  top: 105px;
-  left: 400px;
+  padding: 20px;
 }
 .toggle-summary button {
   width: 90px;

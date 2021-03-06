@@ -3,7 +3,8 @@
     <apexchart
       ref="realtimeChart"
       type="area"
-      width="500"
+      width="300"
+      height="170"
       :options="options"
       :series="series"
     ></apexchart>
@@ -21,13 +22,16 @@ export default {
       xaxis: {},
       options: {
         chart: {
-          selection: {
-            xaxis: {
-              min: undefined,
-              max: undefined
-            },
-            enabled: true
+          toolbar: {
+            show: false
           },
+          // selection: {
+          //   xaxis: {
+          //     min: undefined,
+          //     max: undefined
+          //   },
+          //   enabled: true
+          // },
           type: "area",
           zoom: {
             enabled: true,
@@ -79,12 +83,12 @@ export default {
           text: "Distribution"
         },
         markers: {
-          size: 4,
+          size: 1,
           // colors: "blue",
           strokeWidth: 0.1,
           strokeColor: "skyblue",
           hover: {
-            size: 6,
+            size: 1,
             strokeColor: "#fff"
           }
         },
