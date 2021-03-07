@@ -1,5 +1,4 @@
 # from app import df
-
 import pandas as pd 
 import numpy as np 
 import os
@@ -8,47 +7,63 @@ import matplotlib
 from app import jsonify
 
 def summarizeData(df):
-  # 0) df type에 따라서 나누기 (categorical/numeric)
-  df_categorical = df.select_dtypes(include = ['object']).copy()
-  df_numeric = df.select_dtypes(include = ['float64'] or ['int64'] ).copy()
+  
+  ''' 1) 데이터 타입 전처리 (object -> numeric/category)'''
+  # 1-1 object로 분류된 범주형 데이터의 dtype을 'category'로 변경 
+  category_features = []
+  threshold = 10
+ 
+  for each in df.columns:
+    if df[each].nunique() < threshold:
+        category_features.append(each)
+    elif each == 'Date' :
+        category_features.append(each)
 
-  # 1) numeric 변수 생성
-  # df_numeric_type = df_numeric.dtypes
+  for each in category_features:
+    df[each] = df[each].astype('category')
+
+  # 1-2 dtype에 따라서 df를 numeric과 categroical로 나눔
+  df_numeric = df.select_dtypes(exclude = ['category']).copy()
+  df_categorical = df.select_dtypes(include = ['category'] ).copy()
+  
+  # 1-3 csv 파일이 크면 float이나 int도 object로 읽어지는 문제가 있음. 이에 따라 수동으로 데이터타입을 변경 (object -> unsigned numeric)
+  for each in df_numeric:
+    df[each] = pd.to_numeric(df[each], downcast="unsigned")
+  
+  ''' 2) Numeric 정보 담은 변수 생성 과정 '''
+  '''2-1 Numeric'''
+  # 2-1-1) 각 numeric 관련 변수 생성
   df_numeric_columns = list((df_numeric).columns)
-  df_numeric_mean =  df_numeric.mean().round(3)
-  df_numeric_std = df_numeric.std().round(3)
+  df_numeric_mean =  df_numeric.mean().round(1)
+  df_numeric_std = df_numeric.std().round(1)
   df_numeric_quantile = df_numeric.quantile()
   df_numeric_numOfNA = df_numeric.isnull().sum()
 
-  # 2) numeric Dataframe 생성
+  # 2-1-2 모든 numeric 변수들을 담고 있는 종합 Info 변수 생성
   df_numeric_info = pd.DataFrame(index=list(df_numeric.columns)) 
 
-  # 3) df에 투입
-  # df_numeric_info.insert(0,'type',df_numeric_type)
+  # 2-1-3 Info 변수에 각 변수 투입
   df_numeric_info.insert(0,'mean',df_numeric_mean)
   df_numeric_info.insert(1,'std',df_numeric_std)
   df_numeric_info.insert(2,'quantile',df_numeric_quantile)
   df_numeric_info.insert(3,'numOfNA',df_numeric_numOfNA)
 
   #####################################################
-
-  # 1) categorical 변수 생성
+  '''2-2Category'''
+  # 2-2-1) 각 category 관련 변수 생성
   df_categorical_columns = list((df_categorical).columns)
   df_categorical_mostCommon = df_categorical.value_counts().idxmax()
   df_categorical_numOfNA = df_categorical.isnull().sum()
 
-  # 2) categorical dataframe 생성
+  # 2-2-2) 모든 category 변수들을 담고 있는 종합 Info 변수 생성
   df_categorical_info = pd.DataFrame(index=list(df_categorical.columns)) 
 
-  # 3) categorical 변수 df에 투입
+  # 2-2-3) Info 변수에 각 변수 투입
   df_categorical_info.insert(0,'mostCommon',df_categorical_mostCommon)
   df_categorical_info.insert(1,'numOfNA',df_categorical_numOfNA)
 
-  # 반환
+  ''' 3) Return '''
+  
+# 반환
   summarizedDF = (df_numeric_info.to_dict(), df_categorical_info.to_dict())
   return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns)
-
-
-
-
-

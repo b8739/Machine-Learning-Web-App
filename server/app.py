@@ -78,7 +78,6 @@ def dataupload():
 		# pandas
 		df = pd.read_csv(file, keep_default_na=False)
 		df = df.reset_index().rename(columns={"index": "ID"})
-		
 		table_name = 'dataset'
 		# csv to sql
 		df.to_sql (

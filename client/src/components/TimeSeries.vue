@@ -132,7 +132,7 @@ export default {
       }
     },
     getCount(datasetLength) {
-      return Math.round(datasetLength * 0.4);
+      return Math.round(datasetLength * 0.1);
     },
     getRandom(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
