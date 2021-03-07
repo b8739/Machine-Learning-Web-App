@@ -76,7 +76,7 @@ def dataupload():
 		# dataInfo 테이블 생성
 		Base.metadata.create_all(engine)
 		# pandas
-		df = pd.read_csv(file, keep_default_na=False)
+		df = pd.read_csv(file)
 		df = df.reset_index().rename(columns={"index": "ID"})
 		table_name = 'dataset'
 		# csv to sql
@@ -183,7 +183,7 @@ def infiniteLoading():
 
 @app.route('/dataSummarize',methods=['GET','POST'])
 def dataSummarize():
-  df = pd.read_csv('./static/uploadsDB/iris.csv')
+  df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
   return (summarizeData(df))
 
 if __name__ == '__main__':

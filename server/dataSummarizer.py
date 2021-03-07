@@ -69,7 +69,7 @@ def summarizeData(df):
   df_categorical_info.insert(1,'numOfNA',df_categorical_numOfNA)
 
   ''' 3) Return '''
-  
+  print(df.dtypes)
 # 반환
   summarizedDF = (df_numeric_info.to_dict(), df_categorical_info.to_dict())
   return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns)
