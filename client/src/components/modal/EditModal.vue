@@ -12,9 +12,9 @@
   </div>
 </template>
 <script>
-import TimeSeries from "./TimeSeries";
-import InfiniteTable from "../components/InfiniteTable";
-import DarkBackground from "../components/DarkBackground";
+import TimeSeries from "../charts/TimeSeries";
+import InfiniteTable from "../InfiniteTable";
+import DarkBackground from "./DarkBackground";
 export default {
   data() {
     return {

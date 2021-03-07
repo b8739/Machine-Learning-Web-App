@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img class="logo" src="../assets/attic_logo.png" alt="" />
+    <img class="logo" src="../../assets/attic_logo.png" alt="" />
     <nav>
       <a href="#">Datasets</a>
       <a href="#">Preprocess</a>
@@ -25,7 +25,7 @@ a {
   width: 4%;
   position: absolute;
   top: 15px;
-  left: 12px;
+  left: 20px;
 }
 
 nav {

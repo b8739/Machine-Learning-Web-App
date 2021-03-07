@@ -102,9 +102,10 @@
 </template>
 
 <script>
-import TimeSeries from "./TimeSeries";
-import EditModal from "./EditModal";
-import Histogram from "./Histogram";
+import TimeSeries from "./charts/TimeSeries";
+import Histogram from "./charts/Histogram";
+import EditModal from "./modal/EditModal";
+
 export default {
   data() {
     return {

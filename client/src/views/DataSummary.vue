@@ -43,8 +43,8 @@
 import axios from "axios";
 //components
 import DataTable from "../components/DataTable";
-import Sidebar from "../components/Sidebar";
-import AddModal from "../components/AddModal";
+import Sidebar from "../components/layout/Sidebar";
+import AddModal from "../components/modal/AddModal";
 import DataFeatures from "../components/DataFeatures";
 import InfiniteTable from "../components/InfiniteTable";
 
