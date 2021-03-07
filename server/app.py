@@ -181,16 +181,10 @@ def infiniteLoading():
 	return Response(df.to_json( orient='records'), mimetype='application/json')
 
 
+@app.route('/dataSummarize',methods=['GET','POST'])
+def dataSummarize():
+  df = pd.read_csv('./static/uploadsDB/iris.csv')
+  return (summarizeData(df))
 
-
-
-
-
-
-# @app.route('/dataSummarize',methods=['GET','POST'])
-# def dataSummarize():
-#   df = pd.read_csv('./static/uploadsDB/iris.csv')
-#   return (summarizeData(df))
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)

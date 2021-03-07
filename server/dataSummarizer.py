@@ -36,7 +36,10 @@ def summarizeData(df):
   df_numeric_columns = list((df_numeric).columns)
   df_numeric_mean =  df_numeric.mean().round(1)
   df_numeric_std = df_numeric.std().round(1)
-  df_numeric_quantile = df_numeric.quantile()
+  df_numeric_quantile1 = df_numeric.quantile(.25).round(2)
+  df_numeric_quantile2 = df_numeric.quantile(.5).round(2)
+  df_numeric_quantile3 = df_numeric.quantile(.75).round(2)
+  df_numeric_quantile4 = df_numeric.quantile(1).round(2)
   df_numeric_numOfNA = df_numeric.isnull().sum()
 
   # 2-1-2 모든 numeric 변수들을 담고 있는 종합 Info 변수 생성
@@ -45,11 +48,14 @@ def summarizeData(df):
   # 2-1-3 Info 변수에 각 변수 투입
   df_numeric_info.insert(0,'mean',df_numeric_mean)
   df_numeric_info.insert(1,'std',df_numeric_std)
-  df_numeric_info.insert(2,'quantile',df_numeric_quantile)
+  df_numeric_info.insert(2,'quantile1',df_numeric_quantile1)
+  df_numeric_info.insert(2,'quantile2',df_numeric_quantile2)
+  df_numeric_info.insert(2,'quantile3',df_numeric_quantile3)
+  df_numeric_info.insert(2,'quantile4',df_numeric_quantile4)
   df_numeric_info.insert(3,'numOfNA',df_numeric_numOfNA)
 
   #####################################################
-  '''2-2Category'''
+  '''2-2 Category'''
   # 2-2-1) 각 category 관련 변수 생성
   df_categorical_columns = list((df_categorical).columns)
   df_categorical_mostCommon = df_categorical.value_counts().idxmax()

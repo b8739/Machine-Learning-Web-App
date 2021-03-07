@@ -35,7 +35,10 @@
             </tr>
             <tr>
               <span class="info_title">Quantile: </span>
-              <span>{{ numeric_quantileJson[numericColumn] }}</span>
+              <span>{{ numeric_quantile1[numericColumn] }}, </span>
+              <span>{{ numeric_quantile2[numericColumn] }}, </span>
+              <span>{{ numeric_quantile3[numericColumn] }}, </span>
+              <span>{{ numeric_quantile4[numericColumn] }}</span>
             </tr>
             <tr>
               <span class="info_title">Num. of NA: </span>
@@ -154,10 +157,17 @@ export default {
     console.log("created");
     this.numeric_meanJson = this.summarizedData[0]["mean"];
     this.numeric_stdJson = this.summarizedData[0]["std"];
-    this.numeric_quantileJson = this.summarizedData[0]["quantile"];
+
+    this.numeric_quantile1 = this.summarizedData[0]["quantile1"];
+    this.numeric_quantile2 = this.summarizedData[0]["quantile2"];
+    this.numeric_quantile3 = this.summarizedData[0]["quantile3"];
+    this.numeric_quantile4 = this.summarizedData[0]["quantile4"];
+
     this.numeric_numOfNaJson = this.summarizedData[0]["numOfNA"];
+
     this.categorical_mostCommon = this.summarizedData[1]["mostCommon"];
     this.categorical_numOfNaJson = this.summarizedData[1]["numOfNA"];
+
     this.numericColumns = this.summarizedData[2];
     this.categoricalColumns = this.summarizedData[3];
     this.categoryIndex = this.summarizedData[2].length;
