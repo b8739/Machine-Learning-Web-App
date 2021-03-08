@@ -1,6 +1,13 @@
 <template>
   <div>
-    <apexchart ref="realtimeChart" width="250" type="bar" :options="options" :series="series">
+    <apexchart
+      ref="realtimeChart"
+      width="250px"
+      height="180px"
+      type="bar"
+      :options="options"
+      :series="series"
+    >
     </apexchart>
   </div>
 </template>
@@ -8,10 +15,10 @@
 <script>
 export default {
   name: "Histogram",
-  props: ["dataValue", "indexNum"],
+  props: ["indexNum", "interval", "distribution"],
   data() {
     return {
-      dataArray: [],
+      intervalArray: [],
       options: {
         chart: {
           height: 350,
@@ -33,29 +40,35 @@ export default {
     };
   },
   watch: {
-    dataValue: function(data) {
+    distribution: function(data) {
       if (data != null) {
-        this.putIntoArray(this.dataValue);
-        this.updateSeriesLine();
+        // this.putIntoArray(this.intervalArray);
+        this.updateSeriesLine(this.distribution);
       }
     }
+    // Interval: function(data) {
+    //   if (data != null) {
+    //     this.putIntoArray(this.dataValue);
+    //     this.updateSeriesLine();
+    //   }
+    // }
   },
   created() {},
   mounted() {
-    this.putIntoArray(this.dataValue);
-    this.updateSeriesLine();
+    // this.putIntoArray(this.intervalArray);
+    this.updateSeriesLine(this.distribution);
   },
   methods: {
-    putIntoArray(jsonObject) {
-      for (let i = 0; i <= this.indexNum; i++) {
-        this.dataArray.push(jsonObject[i]);
-      }
-    },
-    updateSeriesLine() {
+    // putIntoArray(jsonObject, targetArray) {
+    //   for (var key in jsonObject) {
+    //     targetArray.push(jsonObject[key]);
+    //   }
+    // },
+    updateSeriesLine(dataValue) {
       this.$refs.realtimeChart.updateSeries(
         [
           {
-            data: this.dataArray
+            data: dataValue
           }
         ],
         false,

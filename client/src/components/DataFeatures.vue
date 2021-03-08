@@ -46,9 +46,13 @@
             </tr>
           </td>
 
-          <!-- <td>
-            <Histogram :dataValue="dataSet[numericColumns[numericIndex]]" :indexNum="indexNum" />
-          </td> -->
+          <td>
+            <Histogram
+              :distribution="summarizedData[5][numericIndex]"
+              :interval="summarizedData[6][numericIndex]"
+              :indexNum="indexNum"
+            />
+          </td>
           <!-- 4th column -->
           <td>
             <TimeSeries
