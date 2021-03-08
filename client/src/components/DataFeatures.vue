@@ -96,6 +96,7 @@
       :indexNum="editModal_indexNum"
       :columns="columns"
       @newEditModalStatus="closeEditModal"
+      :editModal_hidden="editModal_hidden"
     />
     <portal-target name="destination"> </portal-target>
   </div>
@@ -149,9 +150,10 @@ export default {
     },
     closeEditModal() {
       this.editModal_hidden = true;
-      this.editModal_dataValue = {};
-      this.editModal_date = {};
-      this.editModal_indexNum = {};
+
+      // this.editModal_dataValue = {};
+      // this.editModal_date = {};
+      // this.editModal_indexNum = {};
     }
   },
   created() {

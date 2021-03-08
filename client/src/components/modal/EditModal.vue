@@ -5,7 +5,13 @@
       <button class="exitButton" @click="closeEditModal()">Close</button>
       <h1 class="title">Edit Data</h1>
       <div class="graphContainer">
-        <TimeSeries :dataValue="dataValue" :date="date" :indexNum="indexNum" @xaxis="getXaxis" />
+        <TimeSeries
+          :dataValue="dataValue"
+          :date="date"
+          :indexNum="indexNum"
+          @xaxis="getXaxis"
+          :editModal_hidden="editModal_hidden"
+        />
       </div>
       <InfiniteTable :xaxis="xaxis" :columns="columns" />
     </div>
@@ -21,7 +27,7 @@ export default {
       xaxis: {}
     };
   },
-  props: ["dataValue", "date", "indexNum", "columns"],
+  props: ["dataValue", "date", "indexNum", "columns", "editModal_hidden"],
   components: {
     TimeSeries,
     InfiniteTable,

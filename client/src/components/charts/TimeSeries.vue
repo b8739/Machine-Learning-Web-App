@@ -14,7 +14,7 @@
 <script>
 export default {
   name: "TimeSeries",
-  props: ["indexNum", "dataValue", "date"],
+  props: ["indexNum", "dataValue", "date", "editModal_hidden"],
   data() {
     return {
       dataArray: [],
@@ -97,14 +97,15 @@ export default {
     };
   },
   watch: {
-    // indexNum: function(data) {
-    //   if (data != null) {
-    //     // console.log(this.indexNum);
-
-    //   }
-    // },
+    editModal_hidden: function(data) {
+      console.log(data);
+      if (data == true) {
+        this.resetSeries();
+      }
+    },
     dataValue: function(data) {
       if (data != null) {
+        console.log("data change");
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(this.dataValue, this.dataArray, this.randomIndexArray);
         this.updateSeriesLine(this.dataArray);
@@ -119,10 +120,7 @@ export default {
   },
 
   created() {},
-  mounted() {
-    // this.putIntoArray(this.dataValue);
-    // this.updateSeriesLine();
-  },
+  mounted() {},
 
   methods: {
     //PREPROCESS
@@ -170,11 +168,11 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
-    updateSeriesLine(dataValue) {
+    updateSeriesLine(dataArray) {
       this.$refs.realtimeChart.updateSeries(
         [
           {
-            data: dataValue
+            data: dataArray
           }
         ],
         false,
@@ -204,6 +202,10 @@ export default {
       for (let i = xaxis.min; i <= xaxis.max; i++) {
         this.$refs.realtimeChart.toggleDataPointSelection(0, i);
       }
+    },
+    resetSeries() {
+      this.dataArray = [];
+      console.log("reset");
     }
   }
 };
