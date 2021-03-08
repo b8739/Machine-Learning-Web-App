@@ -28,7 +28,7 @@
         :isHidden="isHidden"
         :rowIndex="rowIndex"
       /> -->
-      <!-- <InfiniteTable /> -->
+      <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
       <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
       <AddModal
         :columnsWithoutIndex="columnsWithoutIndex"
