@@ -158,19 +158,21 @@ export default {
     },
     rawDataset: function(data) {
       if (data != null) {
-        // this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-        // this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
+        this.randomIndexArray = this.getRandomArray(0, this.nameChangeMark[0]);
 
         this.divideDatasetByName(this.datasetByName, this.nameChangeMark);
-        this.updateSeriesLine(this.datasetByName[0]);
+
+        this.putIntoArray(this.datasetByName[0], this.dataArray, this.randomIndexArray);
+
+        this.updateSeriesLine(this.dataArray);
       }
     },
     date: function(data) {
       if (data != null) {
-        // this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
         this.divideDateByName(this.dateByName, this.nameChangeMark);
-        this.formatDate(this.dateByName);
-        this.updateCategories(this.dateByName);
+        this.putIntoArray(this.dateByName, this.dateArray, this.randomIndexArray);
+        this.formatDate(this.dateArray);
+        this.updateCategories(this.dateArray);
       }
     },
     immediate: true
@@ -219,10 +221,10 @@ export default {
       }
     },
     //preprocess methods
-    putIntoArray(jsonObject, targetArray, randomIndex) {
+    putIntoArray(unRandomizedDataset, randomizedDataset, randomIndex) {
       for (let i = 0; i < randomIndex.length; i++) {
-        // targetArray.push(jsonObject[randomIndex[i]]); 이게 정말 randomize되는것
-        targetArray.push(jsonObject[i]);
+        randomizedDataset.push(unRandomizedDataset[randomIndex[i]]); //이게 정말 randomize되는것
+        // targetArray.push(unRandomizedDataset[i]);
       }
     },
     //date methods
@@ -233,7 +235,7 @@ export default {
     },
     //randomize methods
     getCount(datasetLength) {
-      return Math.round(datasetLength * 0.1);
+      return Math.round(datasetLength * 0.4);
     },
     getRandom(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
