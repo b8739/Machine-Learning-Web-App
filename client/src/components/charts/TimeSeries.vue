@@ -159,10 +159,11 @@ export default {
     rawDataset: function(data) {
       if (data != null) {
         this.randomIndexArray = this.getRandomArray(0, this.nameChangeMark[0]);
-
         this.divideDatasetByName(this.datasetByName, this.nameChangeMark);
-
-        this.putIntoArray(this.datasetByName[0], this.dataArray, this.randomIndexArray);
+        for (let i = 0; i < this.datasetByName.length; i++) {
+          this.randomizeDataset(this.datasetByName[i], this.dataArray, this.randomIndexArray);
+        }
+        // this.randomizeDataset(this.datasetByName[0], this.dataArray, this.randomIndexArray);
 
         this.updateSeriesLine(this.dataArray);
       }
@@ -170,7 +171,7 @@ export default {
     date: function(data) {
       if (data != null) {
         this.divideDateByName(this.dateByName, this.nameChangeMark);
-        this.putIntoArray(this.dateByName, this.dateArray, this.randomIndexArray);
+        this.randomizeDate(this.dateByName, this.dateArray, this.randomIndexArray);
         this.formatDate(this.dateArray);
         this.updateCategories(this.dateArray);
       }
@@ -191,9 +192,9 @@ export default {
     // console.log("mount");
     if (this.firstMount == false) {
       this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-      this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
+      this.randomizeDataset(this.rawDataset, this.dataArray, this.randomIndexArray);
       this.updateSeriesLine(this.dataArray);
-      this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+      this.randomizeDataset(this.date, this.dateArray, this.randomIndexArray);
       this.updateCategories(this.dateArray);
     }
   },
@@ -221,10 +222,18 @@ export default {
       }
     },
     //preprocess methods
-    putIntoArray(unRandomizedDataset, randomizedDataset, randomIndex) {
+    randomizeDataset(dataset_unrandomized, dataset_randomized, randomIndex) {
+      let tempArray = [];
       for (let i = 0; i < randomIndex.length; i++) {
-        randomizedDataset.push(unRandomizedDataset[randomIndex[i]]); //이게 정말 randomize되는것
-        // targetArray.push(unRandomizedDataset[i]);
+        tempArray.push(dataset_unrandomized[randomIndex[i]]); //이게 정말 randomize되는것
+        // targetArray.push(dataset_unrandomized[i]);
+      }
+      dataset_randomized.push(tempArray);
+    },
+    randomizeDate(dataset_unrandomized, dataset_randomized, randomIndex) {
+      for (let i = 0; i < randomIndex.length; i++) {
+        dataset_randomized.push(dataset_unrandomized[randomIndex[i]]); //이게 정말 randomize되는것
+        // targetArray.push(dataset_unrandomized[i]);
       }
     },
     //date methods
@@ -235,7 +244,7 @@ export default {
     },
     //randomize methods
     getCount(datasetLength) {
-      return Math.round(datasetLength * 0.4);
+      return Math.round(datasetLength * 0.1);
     },
     getRandom(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
@@ -277,7 +286,20 @@ export default {
       this.$refs.realtimeChart.updateSeries(
         [
           {
-            data: dataArray
+            name: "MMM",
+            data: dataArray[0]
+          },
+          {
+            name: "AXP",
+            data: dataArray[1]
+          },
+          {
+            name: "AAPL",
+            data: dataArray[2]
+          },
+          {
+            name: "BA",
+            data: dataArray[3]
           }
         ],
         false,
