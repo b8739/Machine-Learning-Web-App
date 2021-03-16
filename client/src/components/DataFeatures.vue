@@ -164,6 +164,7 @@ export default {
           this.nameChangeMark.push(key);
         }
       }
+      this.nameChangeMark.push(Object.keys(data["Name"]).length);
     }
   },
   computed: {

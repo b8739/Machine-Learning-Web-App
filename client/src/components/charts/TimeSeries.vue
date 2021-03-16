@@ -165,6 +165,8 @@ export default {
         //name별 data분류, index는 가져온 상황
         for (const value in this.nameChangeMark) {
           console.log(startIndex);
+          console.log(this.nameChangeMark[value]);
+
           for (let i = startIndex; i < this.nameChangeMark[value]; i++) {
             tempArray.push(data[i]);
           }
