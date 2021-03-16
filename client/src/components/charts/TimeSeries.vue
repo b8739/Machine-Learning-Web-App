@@ -86,6 +86,10 @@ export default {
             //     }
             //   };
             // },
+            legendClick: function(chartContext, seriesIndex, config) {
+              console.log(seriesIndex);
+              // ...
+            },
             // selection events
             selection: (chartContext, { xaxis, yaxis }) => {
               let yaxisObject = { min: null, max: null };
@@ -191,10 +195,19 @@ export default {
   mounted() {
     // console.log("mount");
     if (this.firstMount == false) {
-      this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-      this.randomizeDataset(this.rawDataset, this.dataArray, this.randomIndexArray);
+      //dataset
+      this.randomIndexArray = this.getRandomArray(0, this.nameChangeMark[0]);
+      this.divideDatasetByName(this.datasetByName, this.nameChangeMark);
+      for (let i = 0; i < this.datasetByName.length; i++) {
+        this.randomizeDataset(this.datasetByName[i], this.dataArray, this.randomIndexArray);
+      }
+      // this.randomizeDataset(this.datasetByName[0], this.dataArray, this.randomIndexArray);
+
       this.updateSeriesLine(this.dataArray);
-      this.randomizeDataset(this.date, this.dateArray, this.randomIndexArray);
+      //date
+      this.divideDateByName(this.dateByName, this.nameChangeMark);
+      this.randomizeDate(this.dateByName, this.dateArray, this.randomIndexArray);
+      this.formatDate(this.dateArray);
       this.updateCategories(this.dateArray);
     }
   },
@@ -331,7 +344,9 @@ export default {
       }
     },
     resetSeries() {
+      console.log("rest");
       this.dataArray = [];
+      this.datasetByName = [];
     }
   }
 };
