@@ -65,22 +65,25 @@ export default {
           },
           events: {
             // zoom events
-            beforeZoom: (chartContext, { xaxis }) => {
-              this.updateSelection();
-              console.log(xaxis);
-              this.xaxisWhenZoomed = xaxis;
-              this.$emit("xaxis", this.xaxisWhenZoomed);
-              this.toggleDataPointSelection(xaxis);
-              return {
-                xaxis: {
-                  min: 0
-                }
-              };
-            },
+            // beforeZoom: (chartContext, { xaxis }) => {
+            //   this.updateSelection();
+            //   this.xaxisWhenZoomed = xaxis;
+            //   this.$emit("xaxis", this.xaxisWhenZoomed);
+            //   this.toggleDataPointSelection(xaxis);
+            //   return {
+            //     xaxis: {
+            //       min: 0
+            //     }
+            //   };
+            // },
             // selection events
             selection: (chartContext, { xaxis, yaxis }) => {
-              this.yaxisWhenSelected = yaxis;
-              // console.log(this.yaxisWhenSelected);
+              let yaxisObject = { min: null, max: null };
+              console.log(xaxis);
+              // yaxisObject.min = yaxis[0]["min"];
+              // yaxisObject.max = yaxis[0]["max"];
+              // this.yaxisWhenSelected = yaxisObject;
+              this.yaxisWhenSelected = xaxis;
               this.$emit("yaxis", this.yaxisWhenSelected);
             }
           }
@@ -112,7 +115,22 @@ export default {
           text: "Loading..."
         },
         xaxis: {
-          type: "datatime"
+          type: "datetime",
+          labels: {
+            minHeight: 50,
+            rotate: -30,
+            rotateAlways: true,
+            hideOverlappingLabels: false,
+            format: "yy/MM/dd",
+            style: {
+              fontSize: "10px"
+            }
+          }
+        },
+        legend: {
+          // show: true,
+          // showForSingleSeries: true,
+          // position: "bottom"
         },
         stroke: {
           width: 1
@@ -137,6 +155,7 @@ export default {
     date: function(data) {
       if (data != null) {
         this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+        this.formatDate(this.dateArray);
         this.updateCategories(this.dateArray);
       }
     },
@@ -168,6 +187,11 @@ export default {
     putIntoArray(jsonObject, targetArray, randomIndex) {
       for (let i = randomIndex[0]; i < randomIndex.length; i++) {
         targetArray.push(jsonObject[i]);
+      }
+    },
+    formatDate(dateArray) {
+      for (let i = 0; i < dateArray.length; i++) {
+        dateArray[i] = new Date(dateArray[i]).getTime();
       }
     },
     getCount(datasetLength) {

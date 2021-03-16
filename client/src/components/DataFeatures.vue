@@ -118,8 +118,8 @@ import EditModal from "./modal/EditModal";
 export default {
   data() {
     return {
-      graphWidth: "250px",
-      graphHeight: "180px",
+      graphWidth: "260px",
+      graphHeight: "200px",
       // numeric/categorical columns
       numericColumns: {},
       categoricalColumns: {},
