@@ -32,6 +32,7 @@ export default {
       xaxisWhenSelected: {},
       firstMount: true,
       datasetByName: [],
+      dateByName: [],
       options: {
         chart: {
           type: "area",
@@ -157,30 +158,19 @@ export default {
     },
     rawDataset: function(data) {
       if (data != null) {
-        this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-        this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-        this.updateSeriesLine(this.dataArray);
-        let tempArray = [];
-        let startIndex = 0;
-        //name별 data분류, index는 가져온 상황
-        for (const value in this.nameChangeMark) {
-          console.log(startIndex);
-          console.log(this.nameChangeMark[value]);
+        // this.randomIndexArray = this.getRandomArray(0, this.indexNum);
+        // this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
 
-          for (let i = startIndex; i < this.nameChangeMark[value]; i++) {
-            tempArray.push(data[i]);
-          }
-          startIndex = this.nameChangeMark[value];
-          this.datasetByName.push(tempArray);
-          tempArray = [];
-        }
+        this.divideDatasetByName(this.datasetByName, this.nameChangeMark);
+        this.updateSeriesLine(this.datasetByName[0]);
       }
     },
     date: function(data) {
       if (data != null) {
-        this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
-        this.formatDate(this.dateArray);
-        this.updateCategories(this.dateArray);
+        // this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+        this.divideDateByName(this.dateByName, this.nameChangeMark);
+        this.formatDate(this.dateByName);
+        this.updateCategories(this.dateByName);
       }
     },
     immediate: true
@@ -207,7 +197,27 @@ export default {
   },
 
   methods: {
-    divideDatasetByName(jsonObject) {},
+    divideDatasetByName(datasetByName, nameChangeMark) {
+      let tempArray = [];
+      let startIndex = 0;
+      //name별 data분류, index는 가져온 상황
+      for (const value in nameChangeMark) {
+        for (let i = startIndex; i < nameChangeMark[value]; i++) {
+          tempArray.push(this.rawDataset[i]);
+        }
+        startIndex = nameChangeMark[value];
+        datasetByName.push(tempArray);
+        tempArray = [];
+      }
+    },
+    divideDateByName(dateByName, nameChangeMark) {
+      let tempArray = [];
+      let startIndex = 0;
+      //name별 data분류, index는 가져온 상황
+      for (let i = startIndex; i < nameChangeMark[0]; i++) {
+        dateByName.push(this.date[i]);
+      }
+    },
     //preprocess methods
     putIntoArray(jsonObject, targetArray, randomIndex) {
       for (let i = 0; i < randomIndex.length; i++) {
