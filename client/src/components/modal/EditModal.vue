@@ -14,7 +14,7 @@
           :nameChangeMark="nameChangeMark"
         />
       </div>
-      <InfiniteTable :xaxis="xaxis" :columns="columns" />
+      <InfiniteTable :xaxis="xaxis" :columns="columns" :date="date" />
     </div>
   </div>
 </template>

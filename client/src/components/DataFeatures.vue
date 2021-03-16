@@ -4,13 +4,13 @@
     <table class="dataTable">
       <tbody>
         <!-- 행 -->
-        <tr
-          v-for="(numericColumn, numericIndex) in numericColumns"
-          :key="numericIndex"
-          @click="openEditModal(dataSet[numericColumns[numericIndex]], dataSet['Date'], indexNum)"
-        >
+        <tr v-for="(numericColumn, numericIndex) in numericColumns" :key="numericIndex">
           <!-- 1st column -->
-          <td>{{ numericColumn }}</td>
+          <td
+            @click="openEditModal(dataSet[numericColumns[numericIndex]], dataSet['Date'], indexNum)"
+          >
+            {{ numericColumn }}
+          </td>
           <!-- 2nd column -->
           <td>
             <tr>

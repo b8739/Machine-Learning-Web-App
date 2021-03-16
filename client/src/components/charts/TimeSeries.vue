@@ -87,7 +87,7 @@ export default {
             //   };
             // },
             legendClick: function(chartContext, seriesIndex, config) {
-              console.log(seriesIndex);
+              // console.log(seriesIndex);
               // ...
             },
             // selection events
@@ -309,11 +309,11 @@ export default {
           {
             name: "AAPL",
             data: dataArray[2]
-          },
-          {
-            name: "BA",
-            data: dataArray[3]
           }
+          // {
+          //   name: "BA",
+          //   data: dataArray[3]
+          // }
         ],
         false,
         true
@@ -344,7 +344,7 @@ export default {
       }
     },
     resetSeries() {
-      console.log("rest");
+      // console.log("rest");
       this.dataArray = [];
       this.datasetByName = [];
     }

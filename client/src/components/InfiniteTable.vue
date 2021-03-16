@@ -30,14 +30,14 @@ export default {
       tableSelectedToggles: []
     };
   },
-  props: ["xaxis", "columns"],
+  props: ["xaxis", "columns", "date"],
   components: {
     InfiniteLoading
   },
   watch: {
-    // xaxis: function(xaxis) {
-    //   this.changeTableSelectedToggle(xaxis);
-    // }
+    xaxis: function(data) {
+      this.changeTableSelectedToggle(data);
+    }
   },
   methods: {
     infiniteHandler($state) {
@@ -48,7 +48,7 @@ export default {
           }
         })
         .then(({ data }) => {
-          console.log(data);
+          // console.log(data);
           if (data.length) {
             this.limit += 10;
             this.dataSet.push(...data);
@@ -59,15 +59,16 @@ export default {
         });
     },
     changeTableSelectedToggle(xaxis) {
-      for (let i = xaxis.min; i <= xaxis.max; i++) {
-        this.tableSelectedToggles[i] = true;
+      let dateObjectLength = Object.keys(this.date).length;
+      for (const key in this.date) {
+        let dateTime = new Date(this.date[key]).getTime();
+        if (xaxis.min <= dateTime && dateTime <= xaxis.max) {
+          this.tableSelectedToggles[key] = true;
+        }
       }
     }
   },
   created() {
-    // for (let i = 0; i < Object.keys(this.dataSet[this.columns[0]]).length; i++) {
-    //   this.tableSelectedToggles.push(false);
-    // }
     axios
       .get(api, {
         params: {
