@@ -35,9 +35,9 @@ export default {
     InfiniteLoading
   },
   watch: {
-    xaxis: function(xaxis) {
-      this.changeTableSelectedToggle(xaxis);
-    }
+    // xaxis: function(xaxis) {
+    //   this.changeTableSelectedToggle(xaxis);
+    // }
   },
   methods: {
     infiniteHandler($state) {
@@ -48,7 +48,7 @@ export default {
           }
         })
         .then(({ data }) => {
-          // console.log(data);
+          console.log(data);
           if (data.length) {
             this.limit += 10;
             this.dataSet.push(...data);

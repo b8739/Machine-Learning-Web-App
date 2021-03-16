@@ -6,11 +6,10 @@
       <h1 class="title">Edit Data</h1>
       <div class="graphContainer">
         <TimeSeries
-          :dataValue="dataValue"
+          :rawDataset="dataValue"
           :date="date"
           :indexNum="indexNum"
           @xaxis="getXaxis"
-          @yaxis="getYaxis"
           :editModal_hidden="editModal_hidden"
         />
       </div>
@@ -38,9 +37,6 @@ export default {
   methods: {
     getXaxis(xaxis) {
       this.xaxis = xaxis;
-    },
-    getYaxis(yaxis) {
-      this.yaxis = yaxis;
     },
     closeEditModal() {
       const newEditModalStatus = true;

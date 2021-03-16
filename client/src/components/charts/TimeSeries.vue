@@ -14,15 +14,24 @@
 <script>
 export default {
   name: "TimeSeries",
-  props: ["graphWidth", "graphHeight", "indexNum", "dataValue", "date", "editModal_hidden"],
+  props: [
+    "graphWidth",
+    "graphHeight",
+    "indexNum",
+    "rawDataset",
+    "date",
+    "editModal_hidden",
+    "nameChangeMark"
+  ],
   data() {
     return {
       dataArray: [],
       randomIndexArray: [],
       dateArray: [],
       xaxisWhenZoomed: {},
-      yaxisWhenSelected: {},
+      xaxisWhenSelected: {},
       firstMount: true,
+      datasetByName: [],
       options: {
         chart: {
           type: "area",
@@ -83,8 +92,8 @@ export default {
               // yaxisObject.min = yaxis[0]["min"];
               // yaxisObject.max = yaxis[0]["max"];
               // this.yaxisWhenSelected = yaxisObject;
-              this.yaxisWhenSelected = xaxis;
-              this.$emit("yaxis", this.yaxisWhenSelected);
+              this.xaxisWhenSelected = xaxis;
+              this.$emit("xaxis", this.xaxisWhenSelected);
             }
           }
         },
@@ -123,14 +132,15 @@ export default {
             hideOverlappingLabels: false,
             format: "yy/MM/dd",
             style: {
-              fontSize: "10px"
+              fontSize: "10px",
+              fontWeight: 200
             }
           }
         },
         legend: {
-          // show: true,
-          // showForSingleSeries: true,
-          // position: "bottom"
+          show: true,
+          showForSingleSeries: true,
+          position: "bottom"
         },
         stroke: {
           width: 1
@@ -145,11 +155,23 @@ export default {
         this.resetSeries();
       }
     },
-    dataValue: function(data) {
+    rawDataset: function(data) {
       if (data != null) {
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-        this.putIntoArray(this.dataValue, this.dataArray, this.randomIndexArray);
+        this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
         this.updateSeriesLine(this.dataArray);
+        let tempArray = [];
+        let startIndex = 0;
+        //name별 data분류, index는 가져온 상황
+        for (const value in this.nameChangeMark) {
+          console.log(startIndex);
+          for (let i = startIndex; i < this.nameChangeMark[value]; i++) {
+            tempArray.push(data[i]);
+          }
+          startIndex = this.nameChangeMark[value];
+          this.datasetByName.push(tempArray);
+          tempArray = [];
+        }
       }
     },
     date: function(data) {
@@ -164,8 +186,8 @@ export default {
 
   created() {
     // console.log("create");
-    if (this.dataValue != null || this.dataValue != undefined) {
-      let objectLength = Object.keys(this.dataValue).length;
+    if (this.rawDataset != null || this.rawDataset != undefined) {
+      let objectLength = Object.keys(this.rawDataset).length;
       if (objectLength != 0) {
         this.firstMount = false;
       }
@@ -175,7 +197,7 @@ export default {
     // console.log("mount");
     if (this.firstMount == false) {
       this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-      this.putIntoArray(this.dataValue, this.dataArray, this.randomIndexArray);
+      this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
       this.updateSeriesLine(this.dataArray);
       this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
       this.updateCategories(this.dateArray);
@@ -183,17 +205,21 @@ export default {
   },
 
   methods: {
-    //PREPROCESS
+    divideDatasetByName(jsonObject) {},
+    //preprocess methods
     putIntoArray(jsonObject, targetArray, randomIndex) {
-      for (let i = randomIndex[0]; i < randomIndex.length; i++) {
+      for (let i = 0; i < randomIndex.length; i++) {
+        // targetArray.push(jsonObject[randomIndex[i]]); 이게 정말 randomize되는것
         targetArray.push(jsonObject[i]);
       }
     },
+    //date methods
     formatDate(dateArray) {
       for (let i = 0; i < dateArray.length; i++) {
         dateArray[i] = new Date(dateArray[i]).getTime();
       }
     },
+    //randomize methods
     getCount(datasetLength) {
       return Math.round(datasetLength * 0.1);
     },
@@ -219,7 +245,6 @@ export default {
         }
 
         randomArray.push(index);
-
         // 원하는 배열 갯수 만족 시 종료
         if (randomArray.length == count) {
           break;
@@ -230,6 +255,7 @@ export default {
       let sortedRandomArray = randomArray.sort(function(a, b) {
         return a - b;
       });
+
       return sortedRandomArray;
     },
     //APEX CHART
@@ -270,7 +296,6 @@ export default {
     },
     resetSeries() {
       this.dataArray = [];
-      console.log("reset");
     }
   }
 };

@@ -58,11 +58,12 @@
           <td>
             <span class="tdTitle">Time Series Graph</span>
             <TimeSeries
-              :dataValue="dataSet[numericColumns[numericIndex]]"
+              :rawDataset="dataSet[numericColumns[numericIndex]]"
               :date="dataSet['Date']"
               :indexNum="indexNum"
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
+              :nameChangeMark="nameChangeMark"
             />
           </td>
         </tr>
@@ -136,7 +137,9 @@ export default {
       editModal_dataValue: {},
       editModal_date: {},
       editModal_indexNum: {},
-      editModal_darkenBackground: false
+      editModal_darkenBackground: false,
+      //etc (for dataset parsing)
+      nameChangeMark: []
     };
   },
 
@@ -146,12 +149,37 @@ export default {
     Histogram
   },
   props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum", "columns"],
+  watch: {
+    dataSet: function(data) {
+      let previousName = data["Name"][0]; //첫번째꺼 넣어두기
+      for (const key in data["Name"]) {
+        let nextName = data["Name"][key];
+        if (previousName == nextName) {
+          continue;
+        } else if (previousName == null) {
+          previousName = data["Name"][key];
+        } else {
+          previousName = data["Name"][key];
+          // console.log(key);
+          this.nameChangeMark.push(key);
+        }
+      }
+    }
+  },
   computed: {
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }
   },
   methods: {
+    // divideArrayByName(jsonObject) {
+    //   let tempArray;
+    //   let name;
+    //   for (const key in jsonObject) {
+    //     name = jsonObject["Name"];
+    //     tempArray.push(jsonObject[key]);
+    //   }
+    // },
     openEditModal(dataSet, date, indexNum) {
       this.editModal_hidden = false;
       this.editModal_dataValue = dataSet;
