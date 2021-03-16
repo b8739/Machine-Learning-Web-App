@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img class="logo" src="../../assets/attic_logo.png" alt="" />
+    <a href="http://localhost:8080"><img class="logo" src="../../assets/attic_logo.png" alt=""/></a>
     <nav>
       <a href="#">Datasets</a>
       <a href="#">Preprocess</a>

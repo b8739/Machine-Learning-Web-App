@@ -47,6 +47,7 @@
           </td>
 
           <td>
+            <span class="tdTitle">Distribution</span>
             <Histogram
               :distribution="summarizedData[5][numericIndex]"
               :interval="summarizedData[6][numericIndex]"
@@ -55,10 +56,13 @@
           </td>
           <!-- 4th column -->
           <td>
+            <span class="tdTitle">Time Series Graph</span>
             <TimeSeries
               :dataValue="dataSet[numericColumns[numericIndex]]"
               :date="dataSet['Date']"
               :indexNum="indexNum"
+              :graphWidth="graphWidth"
+              :graphHeight="graphHeight"
             />
           </td>
         </tr>
@@ -114,6 +118,8 @@ import EditModal from "./modal/EditModal";
 export default {
   data() {
     return {
+      graphWidth: "250px",
+      graphHeight: "180px",
       // numeric/categorical columns
       numericColumns: {},
       categoricalColumns: {},
@@ -161,7 +167,6 @@ export default {
     }
   },
   created() {
-    console.log("created");
     this.numeric_meanJson = this.summarizedData[0]["mean"];
     this.numeric_stdJson = this.summarizedData[0]["std"];
 
@@ -180,13 +185,10 @@ export default {
     this.categoryIndex = this.summarizedData[2].length;
   },
   mounted() {
-    console.log("mounted");
     // for (const value in this.dataSet) {
     //   // console.log("mounted");
     //   console.log(this.dataSet[value]);
     // }
-    console.log(this.dataSet["ID"]);
-
     //실험
     // console.log(jsonValuesIntoArray(this.dataSet["petal_length"]));
   }
@@ -212,6 +214,11 @@ export default {
 }
 .dataTable tr {
   /* background-color: #ecf1f6; */
+}
+.dataTable .tdTitle {
+  display: inline-block;
+  text-align: center;
+  width: 95%;
 }
 .dataTable tr:hover {
   /* background-color: #b1e6d2; */

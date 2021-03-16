@@ -3,8 +3,8 @@
     <apexchart
       ref="realtimeChart"
       type="area"
-      width="250px"
-      height="180px"
+      :width="graphWidth"
+      :height="graphHeight"
       :options="options"
       :series="series"
     ></apexchart>
@@ -14,19 +14,21 @@
 <script>
 export default {
   name: "TimeSeries",
-  props: ["indexNum", "dataValue", "date", "editModal_hidden"],
+  props: ["graphWidth", "graphWidth", "indexNum", "dataValue", "date", "editModal_hidden"],
   data() {
     return {
       dataArray: [],
       randomIndexArray: [],
       dateArray: [],
       xaxis: {},
+      firstMount: true,
       options: {
         chart: {
-          toolbar: {
-            show: false
-          },
           type: "area",
+          toolbar: {
+            show: true
+          },
+          //zoom
           zoom: {
             enabled: true,
             autoScaleXaxis: false,
@@ -42,13 +44,27 @@ export default {
               }
             }
           },
-          events: {
-            zoomed: function(chartContext, { xaxis, yaxis }) {
-              // console.log(xaxis);
-              // console.log(yaxis);
+          //selection
+          selection: {
+            enabled: true,
+            type: "xy",
+            fill: {
+              color: "black",
+              opacity: 0.1
             },
+            stroke: {
+              width: 5,
+              dashArray: 3,
+              color: "black",
+              opacity: 0.4
+            }
+          },
+          events: {
+            // zoom events
+            zoomed: function(chartContext, { xaxis, yaxis }) {},
             beforeZoom: (chartContext, { xaxis }) => {
               this.updateSelection();
+              console.log(xaxis);
               this.xaxis = xaxis;
               this.$emit("xaxis", this.xaxis);
               this.toggleDataPointSelection(xaxis);
@@ -57,6 +73,10 @@ export default {
                   min: 0
                 }
               };
+            },
+            // selection events
+            selection: function(chartContext, { xaxis, yaxis }) {
+              console.log(chartContext);
             }
           }
         },
@@ -79,7 +99,7 @@ export default {
           strokeWidth: 0.1,
           strokeColor: "skyblue",
           hover: {
-            size: 1,
+            size: 2,
             strokeColor: "#fff"
           }
         },
@@ -105,7 +125,6 @@ export default {
     },
     dataValue: function(data) {
       if (data != null) {
-        console.log("data change");
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(this.dataValue, this.dataArray, this.randomIndexArray);
         this.updateSeriesLine(this.dataArray);
@@ -116,11 +135,29 @@ export default {
         this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
         this.updateCategories(this.dateArray);
       }
-    }
+    },
+    immediate: true
   },
 
-  created() {},
-  mounted() {},
+  created() {
+    console.log("create");
+    let objectLength = Object.keys(this.dataValue).length;
+    if (objectLength != 0) {
+      console.log("change firstmount to false");
+      this.firstMount = false;
+    }
+  },
+  mounted() {
+    console.log("mount");
+    console.log(this.firstMount);
+    if (this.firstMount == false) {
+      this.randomIndexArray = this.getRandomArray(0, this.indexNum);
+      this.putIntoArray(this.dataValue, this.dataArray, this.randomIndexArray);
+      this.updateSeriesLine(this.dataArray);
+      this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+      this.updateCategories(this.dateArray);
+    }
+  },
 
   methods: {
     //PREPROCESS

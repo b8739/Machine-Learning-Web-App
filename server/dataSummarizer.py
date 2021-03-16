@@ -64,7 +64,7 @@ def summarizeData(df):
     dictdata['max'] = float(df_numeric[each].max())
     interval_features.append(dictdata)
       
-    distribution_features.append(df_numeric[each].value_counts(bins=10).to_list())
+    distribution_features.append(df_numeric[each].value_counts(bins=20).to_list())
   #   배열 초기화
     dictdata = {}
     distribution_features_column = []

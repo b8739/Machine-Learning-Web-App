@@ -173,7 +173,7 @@ span.remove-file {
   width: 300px;
   height: 200px;
   border: 2px dashed #97cfb7;
-  margin: 100px auto 0;
+  margin: 120px auto 0;
   text-align: center;
   padding-top: 20px;
   font-size: 17px;

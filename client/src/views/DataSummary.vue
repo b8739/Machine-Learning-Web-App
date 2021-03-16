@@ -89,8 +89,8 @@ export default {
       axios
         .get(path)
         .then(res => {
-          console.log(typeof res.data);
-          console.log(res.data);
+          // console.log(typeof res.data);
+          // console.log(res.data);
           this.dataSet = res.data;
           // 데이터 추가 시 필요한 index number
           this.indexNum = Object.keys(this.dataSet["ID"]).length - 1; //149

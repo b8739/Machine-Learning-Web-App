@@ -3,7 +3,7 @@
     <apexchart
       ref="realtimeChart"
       width="250px"
-      height="180px"
+      height="150px"
       type="bar"
       :options="options"
       :series="series"
@@ -34,36 +34,40 @@ export default {
         title: {},
         noData: {
           text: "Loading..."
+        },
+        xaxis: {
+          floating: false
         }
       },
       series: []
     };
   },
   watch: {
-    distribution: function(data) {
-      if (data != null) {
-        // this.putIntoArray(this.intervalArray);
-        this.updateSeriesLine(this.distribution);
-      }
-    }
-    // Interval: function(data) {
+    // distribution: function(data) {
     //   if (data != null) {
-    //     this.putIntoArray(this.dataValue);
-    //     this.updateSeriesLine();
+    //     this.updateSeriesLine(this.distribution);
+    //   }
+    // },
+    // interval: function(data) {
+    //   if (data != null) {
+    //     this.putIntoArray(this.interval, this.intervalArray);
+    //     this.updateCategories(this.intervalArray);
     //   }
     // }
   },
   created() {},
   mounted() {
-    // this.putIntoArray(this.intervalArray);
+    this.putIntoArray(this.interval, this.intervalArray);
+    this.updateCategories(this.intervalArray);
     this.updateSeriesLine(this.distribution);
   },
   methods: {
-    // putIntoArray(jsonObject, targetArray) {
-    //   for (var key in jsonObject) {
-    //     targetArray.push(jsonObject[key]);
-    //   }
-    // },
+    putIntoArray(jsonObject, targetArray) {
+      for (var key in jsonObject) {
+        targetArray.push(jsonObject[key]);
+        targetArray.reverse();
+      }
+    },
     updateSeriesLine(dataValue) {
       this.$refs.realtimeChart.updateSeries(
         [
@@ -74,6 +78,20 @@ export default {
         false,
         true
       );
+    },
+    updateCategories(newCategories) {
+      this.$refs.realtimeChart.updateOptions({
+        xaxis: {
+          categories: newCategories
+        }
+      });
+    },
+    updateOptions() {
+      this.$refs.realtimeChart.updateOptions({
+        chart: {
+          width: "500px"
+        }
+      });
     }
   }
 };
