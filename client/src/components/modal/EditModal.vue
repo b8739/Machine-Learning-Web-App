@@ -10,6 +10,7 @@
           :date="date"
           :indexNum="indexNum"
           @xaxis="getXaxis"
+          @yaxis="getYaxis"
           :editModal_hidden="editModal_hidden"
         />
       </div>
@@ -24,7 +25,8 @@ import DarkBackground from "./DarkBackground";
 export default {
   data() {
     return {
-      xaxis: {}
+      xaxis: {},
+      yaxis: {}
     };
   },
   props: ["dataValue", "date", "indexNum", "columns", "editModal_hidden"],
@@ -36,6 +38,9 @@ export default {
   methods: {
     getXaxis(xaxis) {
       this.xaxis = xaxis;
+    },
+    getYaxis(yaxis) {
+      this.yaxis = yaxis;
     },
     closeEditModal() {
       const newEditModalStatus = true;

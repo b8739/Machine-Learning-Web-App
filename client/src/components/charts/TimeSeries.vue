@@ -14,13 +14,14 @@
 <script>
 export default {
   name: "TimeSeries",
-  props: ["graphWidth", "graphWidth", "indexNum", "dataValue", "date", "editModal_hidden"],
+  props: ["graphWidth", "graphHeight", "indexNum", "dataValue", "date", "editModal_hidden"],
   data() {
     return {
       dataArray: [],
       randomIndexArray: [],
       dateArray: [],
-      xaxis: {},
+      xaxisWhenZoomed: {},
+      yaxisWhenSelected: {},
       firstMount: true,
       options: {
         chart: {
@@ -59,14 +60,16 @@ export default {
               opacity: 0.4
             }
           },
+          toolbar: {
+            autoSelected: "selection"
+          },
           events: {
             // zoom events
-            zoomed: function(chartContext, { xaxis, yaxis }) {},
             beforeZoom: (chartContext, { xaxis }) => {
               this.updateSelection();
               console.log(xaxis);
-              this.xaxis = xaxis;
-              this.$emit("xaxis", this.xaxis);
+              this.xaxisWhenZoomed = xaxis;
+              this.$emit("xaxis", this.xaxisWhenZoomed);
               this.toggleDataPointSelection(xaxis);
               return {
                 xaxis: {
@@ -75,8 +78,10 @@ export default {
               };
             },
             // selection events
-            selection: function(chartContext, { xaxis, yaxis }) {
-              console.log(chartContext);
+            selection: (chartContext, { xaxis, yaxis }) => {
+              this.yaxisWhenSelected = yaxis;
+              // console.log(this.yaxisWhenSelected);
+              this.$emit("yaxis", this.yaxisWhenSelected);
             }
           }
         },
@@ -118,7 +123,6 @@ export default {
   },
   watch: {
     editModal_hidden: function(data) {
-      console.log(data);
       if (data == true) {
         this.resetSeries();
       }
@@ -140,16 +144,16 @@ export default {
   },
 
   created() {
-    console.log("create");
-    let objectLength = Object.keys(this.dataValue).length;
-    if (objectLength != 0) {
-      console.log("change firstmount to false");
-      this.firstMount = false;
+    // console.log("create");
+    if (this.dataValue != null || this.dataValue != undefined) {
+      let objectLength = Object.keys(this.dataValue).length;
+      if (objectLength != 0) {
+        this.firstMount = false;
+      }
     }
   },
   mounted() {
-    console.log("mount");
-    console.log(this.firstMount);
+    // console.log("mount");
     if (this.firstMount == false) {
       this.randomIndexArray = this.getRandomArray(0, this.indexNum);
       this.putIntoArray(this.dataValue, this.dataArray, this.randomIndexArray);
