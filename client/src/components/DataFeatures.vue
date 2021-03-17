@@ -7,7 +7,14 @@
         <tr v-for="(numericColumn, numericIndex) in numericColumns" :key="numericIndex">
           <!-- 1st column -->
           <td
-            @click="openEditModal(dataSet[numericColumns[numericIndex]], dataSet['Date'], indexNum)"
+            @click="
+              openEditModal(
+                dataSet[numericColumns[numericIndex]],
+                dataSet['Date'],
+                indexNum,
+                numericIndex
+              )
+            "
           >
             {{ numericColumn }}
           </td>
@@ -107,6 +114,7 @@
       @newEditModalStatus="closeEditModal"
       :editModal_hidden="editModal_hidden"
       :nameChangeMark="nameChangeMark"
+      :selectedColumnIndex="selectedColumnIndex"
     />
     <portal-target name="destination"> </portal-target>
   </div>
@@ -139,6 +147,7 @@ export default {
       editModal_date: {},
       editModal_indexNum: {},
       editModal_darkenBackground: false,
+      selectedColumnIndex: null,
       //etc (for dataset parsing)
       nameChangeMark: []
     };
@@ -182,11 +191,12 @@ export default {
     //     tempArray.push(jsonObject[key]);
     //   }
     // },
-    openEditModal(dataSet, date, indexNum) {
+    openEditModal(dataSet, date, indexNum, selectedColumnIndex) {
       this.editModal_hidden = false;
       this.editModal_dataValue = dataSet;
       this.editModal_date = date;
       this.editModal_indexNum = indexNum;
+      this.selectedColumnIndex = selectedColumnIndex;
     },
     closeEditModal() {
       this.editModal_hidden = true;

@@ -8,9 +8,15 @@
         <tr
           v-for="(data, trIndex) in dataSet"
           :key="trIndex"
-          :class="{ tableSelected: tableSelectedToggles[trIndex] }"
+          :class="{ rowSelected: rowSelectedFlags[trIndex] }"
         >
-          <td v-for="(column, thIndex) in columns" :key="thIndex">{{ data[columns[thIndex]] }}</td>
+          <td
+            v-for="(column, thIndex) in columns"
+            :key="thIndex"
+            :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }"
+          >
+            {{ data[columns[thIndex]] }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -27,16 +33,18 @@ export default {
     return {
       limit: 0,
       dataSet: [],
-      tableSelectedToggles: []
+      rowSelectedFlags: [],
+      columnSelectedFlags: []
     };
   },
-  props: ["xaxis", "columns", "date"],
+  props: ["xaxis", "columns", "date", "selectedColumnIndex"],
   components: {
     InfiniteLoading
   },
   watch: {
     xaxis: function(data) {
-      this.changeTableSelectedToggle(data);
+      this.toggleRowFlags(data);
+      this.toggleColumnFlags(this.selectedColumnIndex);
     }
   },
   methods: {
@@ -58,14 +66,17 @@ export default {
           }
         });
     },
-    changeTableSelectedToggle(xaxis) {
+    toggleRowFlags(xaxis) {
       let dateObjectLength = Object.keys(this.date).length;
       for (const key in this.date) {
         let dateTime = new Date(this.date[key]).getTime();
         if (xaxis.min <= dateTime && dateTime <= xaxis.max) {
-          this.tableSelectedToggles[key] = true;
+          this.rowSelectedFlags[key] = true;
         }
       }
+    },
+    toggleColumnFlags(selectedColumnIndex) {
+      this.columnSelectedFlags[selectedColumnIndex + 1] = true;
     }
   },
   created() {
@@ -83,8 +94,11 @@ export default {
 };
 </script>
 <style scoped>
-.dataTable tbody tr.tableSelected {
-  background-color: rgba(78, 73, 73, 0.603);
+.dataTable tbody tr.rowSelected {
+  background-color: rgba(154, 189, 243, 0.863);
+}
+.dataTable tbody tr td.columnSelected {
+  background-color: rgba(57, 132, 243, 0.863);
 }
 /* .datatable */
 .dataTable {
@@ -96,27 +110,27 @@ export default {
   vertical-align: middle;
 }
 .dataTable tr {
-  background-color: #ecf1f6;
+  /* background-color: #ecf1f6; */
 }
 .dataTable tr:hover {
-  background-color: #b1e6d2;
+  background-color: #b6b6b6;
   cursor: pointer;
 }
 .dataTable tr:hover tr {
-  background-color: #b1e6d2;
+  background-color: #b6b6b6;
 }
 .dataTable td:first-child {
   font-weight: 600;
 }
 .dataTable td {
-  border-right: 0.5px solid rgba(209, 229, 219, 0.8);
+  border: 0.5px solid rgba(212, 214, 213, 0.623);
   padding: 15px;
 }
 /* datatable odd,even */
 .dataTable tr:nth-child(odd) {
-  background-color: #d9e1f2;
+  /* background-color: #d9e1f2; */
 }
 .dataTable tr:nth-child(even) {
-  background-color: #f0f8ff;
+  /* background-color: #f0f8ff; */
 }
 </style>

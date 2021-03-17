@@ -14,7 +14,12 @@
           :nameChangeMark="nameChangeMark"
         />
       </div>
-      <InfiniteTable :xaxis="xaxis" :columns="columns" :date="date" />
+      <InfiniteTable
+        :xaxis="xaxis"
+        :columns="columns"
+        :date="date"
+        :selectedColumnIndex="selectedColumnIndex"
+      />
     </div>
   </div>
 </template>
@@ -29,7 +34,15 @@ export default {
       yaxis: {}
     };
   },
-  props: ["dataValue", "date", "indexNum", "columns", "editModal_hidden", "nameChangeMark"],
+  props: [
+    "dataValue",
+    "date",
+    "indexNum",
+    "columns",
+    "editModal_hidden",
+    "nameChangeMark",
+    "selectedColumnIndex"
+  ],
   components: {
     TimeSeries,
     InfiniteTable,
