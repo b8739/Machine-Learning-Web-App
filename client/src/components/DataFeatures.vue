@@ -183,7 +183,11 @@ export default {
     // }
   },
   computed: {
-    ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum }),
+    ...mapState({
+      dataset: state => state.dataset,
+      indexNum: state => state.indexNum,
+      columns: state => state.columns
+    }),
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }

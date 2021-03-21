@@ -41,12 +41,12 @@ import InfiniteTable from "../components/InfiniteTable";
 //vuex
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
+import { mapState } from "vuex";
 import { mapMutations } from "vuex";
 
 export default {
   data() {
     return {
-      columns: [],
       // dataSet: {},
       indexNum: "",
       addForm: {}, //ex. sepal-width:' ' , sepal-length: ' ' ...
@@ -67,6 +67,9 @@ export default {
     InfiniteTable
   },
   computed: {
+    ...mapState({
+      columns: state => state.columns
+    }),
     columnsWithoutIndex() {
       const idIndex = this.columns.indexOf("ID");
       let tempColumns;

@@ -181,7 +181,7 @@ export default {
       }
     }
   },
-  // c
+
   mounted() {
     if (this.firstMount == false) {
       this.randomIndexArray = this.getRandomArray(0, this.indexNum);
