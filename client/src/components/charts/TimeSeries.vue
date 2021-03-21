@@ -18,15 +18,7 @@ import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 export default {
   name: "TimeSeries",
-  props: [
-    "graphWidth",
-    "graphHeight",
-    "numericColumns",
-    "numericIndex",
-    "date",
-    "editModal_hidden",
-    "nameChangeMark"
-  ],
+  props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "nameChangeMark", "rawDataset"],
   data() {
     return {
       dataArray: [],
@@ -165,14 +157,10 @@ export default {
         this.resetSeries();
       }
     },
-    dataSet: function(data) {
+    rawDataset: function(data) {
       if (data != null) {
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-        this.putIntoArray(
-          this.dataSet[this.numericColumns[this.numericIndex]],
-          this.dataArray,
-          this.randomIndexArray
-        );
+        this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
         this.updateSeriesLine(this.dataArray);
       }
     },
@@ -193,9 +181,18 @@ export default {
       }
     }
   },
-  mounted() {},
+  // c
+  mounted() {
+    if (this.firstMount == false) {
+      this.randomIndexArray = this.getRandomArray(0, this.indexNum);
+      this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
+      this.updateSeriesLine(this.dataArray);
+      this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+      this.updateCategories(this.dateArray);
+    }
+  },
   computed: {
-    ...mapState({ dataSet: state => state.dataSet, indexNum: state => state.indexNum })
+    ...mapState({ indexNum: state => state.indexNum })
   },
   methods: {
     putIntoArray(jsonObject, targetArray, randomIndex) {

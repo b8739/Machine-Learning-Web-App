@@ -9,8 +9,8 @@
           <td
             @click="
               openEditModal(
-                dataSet[numericColumns[numericIndex]],
-                dataSet['Date'],
+                dataset[numericColumns[numericIndex]],
+                dataset['Date'],
                 indexNum,
                 numericIndex
               )
@@ -65,9 +65,8 @@
           <td>
             <span class="tdTitle">Time Series Graph</span>
             <TimeSeries
-              :numericColumns="numericColumns"
-              :numericIndex="numericIndex"
-              :date="dataSet['Date']"
+              :rawDataset="dataset[numericColumns[numericIndex]]"
+              :date="dataset['Date']"
               :indexNum="indexNum"
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
@@ -129,6 +128,7 @@ import EditModal from "./modal/EditModal";
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   data() {
@@ -163,7 +163,7 @@ export default {
     EditModal,
     Histogram
   },
-  props: ["columnsWithoutIndex", "summarizedData", "columns"], //dataSet제거
+  props: ["columnsWithoutIndex", "summarizedData", "columns"],
   watch: {
     // dataSet: function(data) {
     //   let previousName = data["Name"][0]; //첫번째꺼 넣어두기
@@ -183,13 +183,14 @@ export default {
     // }
   },
   computed: {
-    ...mapState({ dataSet: state => state.dataSet, indexNum: state => state.indexNum }),
-    // ...mapGetters([""]),
+    ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum }),
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }
   },
   methods: {
+    ...mapMutations(["setHadLoaded"]),
+    ...mapActions(["loadFundamentalData"]),
     // divideArrayByName(jsonObject) {
     //   let tempArray;
     //   let name;
@@ -198,9 +199,9 @@ export default {
     //     tempArray.push(jsonObject[key]);
     //   }
     // },
-    openEditModal(dataSet, date, indexNum, selectedColumnIndex) {
+    openEditModal(dataset, date, indexNum, selectedColumnIndex) {
       this.editModal_hidden = false;
-      this.editModal_dataValue = dataSet;
+      this.editModal_dataValue = dataset;
       this.editModal_date = date;
       this.editModal_indexNum = indexNum;
       this.selectedColumnIndex = selectedColumnIndex;

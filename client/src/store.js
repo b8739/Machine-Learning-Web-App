@@ -6,7 +6,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state:{//data
-    dataSet: {},
+    dataset: {},
     indexNum: "",
     hadLoaded: false,
     columns: [],
@@ -17,20 +17,24 @@ export default new Vuex.Store({
     },
   mutations: {
     loadDataset(state,payload){
-      state.dataSet = payload.data;
-      state.indexNum = Object.keys(payload.data["ID"]).length - 1;
+      state.dataset=payload.data;
     },
     loadIndexNum(state,payload){
-      state.indexNum = payload;
+      state.indexNum=payload;
     },
-    saveResponseData() {
-      let columnValues = Object.keys(state.dataSet);
-      for (const columnValue of columnValues) {
-        state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-        // state.updateForm[columnValue] = "";
-        // state.addForm[columnValue] = "";
-        
+    setHadLoaded(state,payload){
+      state.hadLoaded=payload;
+    },
+    saveResponseData(state) {
+      if (state.hadLoaded == false) {
+        let columnValues = Object.keys(state.dataset);
+        for (const columnValue of columnValues) {
+          state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
+          // state.updateForm[columnValue] = "";
+          // state.addForm[columnValue] = "";
+        }
       }
+
     },
   },
   actions:{
@@ -40,9 +44,10 @@ export default new Vuex.Store({
         .get(path)
         .then(res => {
           commit('loadDataset', res);
+          commit('loadIndexNum', Object.keys(res.data["ID"]).length - 1);
           // 데이터 추가 시 필요한 index number
           //'처음' 데이터를 받아올때만 columns 받아오도록 처리
-          // if (state.hadLoaded == false) this.saveResponseData();
+          commit('saveResponseData');
         })
         .catch(error => {
           console.error(error);

@@ -18,16 +18,7 @@
         :summarizedData="summarizedData"
         :indexNum="indexNum"
       />
-      <!-- :dataSet="dataSet"  -->
 
-      <!-- <DataTable
-        :class="{ visibilityHidden: showTable }"
-        :columns="columns"
-        :dataSet="dataSet"
-        :hadLoaded="hadLoaded"
-        :isHidden="isHidden"
-        :rowIndex="rowIndex"
-      /> -->
       <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
       <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
       <AddModal
@@ -50,6 +41,7 @@ import InfiniteTable from "../components/InfiniteTable";
 //vuex
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   data() {
@@ -87,6 +79,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["setHadLoaded"]),
     ...mapActions(["loadFundamentalData"]),
     loadData() {
       const path = "http://localhost:5000/loadData";
@@ -167,7 +160,7 @@ export default {
   mounted() {},
   beforeUpdate() {},
   updated() {
-    this.hadLoaded = true;
+    this.setHadLoaded(true);
   }
 };
 </script>
