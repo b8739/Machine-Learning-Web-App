@@ -2,6 +2,7 @@
   <div class="container">
     <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop">
       <label><strong> Drop A File</strong></label>
+
       <p>OR</p>
       <!-- dropzone -->
       <!-- <dropzone :dropzoneFiles="files"> </dropzone> -->

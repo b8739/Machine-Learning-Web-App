@@ -16,9 +16,9 @@
         :columnsWithoutIndex="columnsWithoutIndex"
         :columns="columns"
         :summarizedData="summarizedData"
-        :dataSet="dataSet"
         :indexNum="indexNum"
       />
+      <!-- :dataSet="dataSet"  -->
 
       <!-- <DataTable
         :class="{ visibilityHidden: showTable }"
@@ -47,12 +47,15 @@ import Sidebar from "../components/layout/Sidebar";
 import AddModal from "../components/modal/AddModal";
 import DataFeatures from "../components/DataFeatures";
 import InfiniteTable from "../components/InfiniteTable";
+//vuex
+import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   data() {
     return {
       columns: [],
-      dataSet: {},
+      // dataSet: {},
       indexNum: "",
       addForm: {}, //ex. sepal-width:' ' , sepal-length: ' ' ...
       updateForm: {},
@@ -84,13 +87,12 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["loadFundamentalData"]),
     loadData() {
       const path = "http://localhost:5000/loadData";
       axios
         .get(path)
         .then(res => {
-          // console.log(typeof res.data);
-          // console.log(res.data);
           this.dataSet = res.data;
           // 데이터 추가 시 필요한 index number
           this.indexNum = Object.keys(this.dataSet["ID"]).length - 1; //149
@@ -159,17 +161,12 @@ export default {
     }
   },
   created() {
-    this.loadData();
-    // console.log("created");
+    // this.loadData(); //store.js 실험하기 위해서 일단 주석 처리
+    this.loadFundamentalData("http://localhost:5000/loadData");
   },
-  mounted() {
-    // console.log("mounted");
-  },
-  beforeUpdate() {
-    // console.log("beforecreate");
-  },
+  mounted() {},
+  beforeUpdate() {},
   updated() {
-    // console.log("updated");
     this.hadLoaded = true;
   }
 };

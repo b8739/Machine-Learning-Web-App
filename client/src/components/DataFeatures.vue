@@ -65,7 +65,8 @@
           <td>
             <span class="tdTitle">Time Series Graph</span>
             <TimeSeries
-              :rawDataset="dataSet[numericColumns[numericIndex]]"
+              :numericColumns="numericColumns"
+              :numericIndex="numericIndex"
               :date="dataSet['Date']"
               :indexNum="indexNum"
               :graphWidth="graphWidth"
@@ -124,6 +125,10 @@
 import TimeSeries from "./charts/TimeSeries";
 import Histogram from "./charts/Histogram";
 import EditModal from "./modal/EditModal";
+//vuex
+import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
+import { mapState } from "vuex";
 
 export default {
   data() {
@@ -158,26 +163,28 @@ export default {
     EditModal,
     Histogram
   },
-  props: ["columnsWithoutIndex", "summarizedData", "dataSet", "indexNum", "columns"],
+  props: ["columnsWithoutIndex", "summarizedData", "columns"], //dataSet제거
   watch: {
-    dataSet: function(data) {
-      let previousName = data["Name"][0]; //첫번째꺼 넣어두기
-      for (const key in data["Name"]) {
-        let nextName = data["Name"][key];
-        if (previousName == nextName) {
-          continue;
-        } else if (previousName == null) {
-          previousName = data["Name"][key];
-        } else {
-          previousName = data["Name"][key];
-          // console.log(key);
-          this.nameChangeMark.push(key);
-        }
-      }
-      this.nameChangeMark.push(Object.keys(data["Name"]).length);
-    }
+    // dataSet: function(data) {
+    //   let previousName = data["Name"][0]; //첫번째꺼 넣어두기
+    //   for (const key in data["Name"]) {
+    //     let nextName = data["Name"][key];
+    //     if (previousName == nextName) {
+    //       continue;
+    //     } else if (previousName == null) {
+    //       previousName = data["Name"][key];
+    //     } else {
+    //       previousName = data["Name"][key];
+    //       // console.log(key);
+    //       this.nameChangeMark.push(key);
+    //     }
+    //   }
+    //   this.nameChangeMark.push(Object.keys(data["Name"]).length);
+    // }
   },
   computed: {
+    ...mapState({ dataSet: state => state.dataSet, indexNum: state => state.indexNum }),
+    // ...mapGetters([""]),
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }

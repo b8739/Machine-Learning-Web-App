@@ -12,13 +12,17 @@
 </template>
 
 <script>
+//vuex
+import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
+import { mapState } from "vuex";
 export default {
   name: "TimeSeries",
   props: [
     "graphWidth",
     "graphHeight",
-    "indexNum",
-    "rawDataset",
+    "numericColumns",
+    "numericIndex",
     "date",
     "editModal_hidden",
     "nameChangeMark"
@@ -156,27 +160,25 @@ export default {
   },
   watch: {
     editModal_hidden: function(data) {
+      console.log(data);
       if (data == true) {
         this.resetSeries();
       }
     },
-    rawDataset: function(data) {
+    dataSet: function(data) {
       if (data != null) {
-        this.randomIndexArray = this.getRandomArray(0, this.nameChangeMark[0]);
-        this.divideDatasetByName(this.datasetByName, this.nameChangeMark);
-        for (let i = 0; i < this.datasetByName.length; i++) {
-          this.randomizeDataset(this.datasetByName[i], this.dataArray, this.randomIndexArray);
-        }
-        // this.randomizeDataset(this.datasetByName[0], this.dataArray, this.randomIndexArray);
-
+        this.randomIndexArray = this.getRandomArray(0, this.indexNum);
+        this.putIntoArray(
+          this.dataSet[this.numericColumns[this.numericIndex]],
+          this.dataArray,
+          this.randomIndexArray
+        );
         this.updateSeriesLine(this.dataArray);
       }
     },
     date: function(data) {
       if (data != null) {
-        this.divideDateByName(this.dateByName, this.nameChangeMark);
-        this.randomizeDate(this.dateByName, this.dateArray, this.randomIndexArray);
-        this.formatDate(this.dateArray);
+        this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
         this.updateCategories(this.dateArray);
       }
     },
@@ -184,7 +186,6 @@ export default {
   },
 
   created() {
-    // console.log("create");
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
       if (objectLength != 0) {
@@ -192,27 +193,16 @@ export default {
       }
     }
   },
-  mounted() {
-    // console.log("mount");
-    if (this.firstMount == false) {
-      //dataset
-      this.randomIndexArray = this.getRandomArray(0, this.nameChangeMark[0]);
-      this.divideDatasetByName(this.datasetByName, this.nameChangeMark);
-      for (let i = 0; i < this.datasetByName.length; i++) {
-        this.randomizeDataset(this.datasetByName[i], this.dataArray, this.randomIndexArray);
-      }
-      // this.randomizeDataset(this.datasetByName[0], this.dataArray, this.randomIndexArray);
-
-      this.updateSeriesLine(this.dataArray);
-      //date
-      this.divideDateByName(this.dateByName, this.nameChangeMark);
-      this.randomizeDate(this.dateByName, this.dateArray, this.randomIndexArray);
-      this.formatDate(this.dateArray);
-      this.updateCategories(this.dateArray);
-    }
+  mounted() {},
+  computed: {
+    ...mapState({ dataSet: state => state.dataSet, indexNum: state => state.indexNum })
   },
-
   methods: {
+    putIntoArray(jsonObject, targetArray, randomIndex) {
+      for (let i = randomIndex[0]; i < randomIndex.length; i++) {
+        targetArray.push(jsonObject[i]);
+      }
+    },
     divideDatasetByName(datasetByName, nameChangeMark) {
       let tempArray = [];
       let startIndex = 0;
@@ -295,25 +285,12 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
-    updateSeriesLine(dataArray) {
+    updateSeriesLine(dataSet) {
       this.$refs.realtimeChart.updateSeries(
         [
           {
-            name: "MMM",
-            data: dataArray[0]
-          },
-          {
-            name: "AXP",
-            data: dataArray[1]
-          },
-          {
-            name: "AAPL",
-            data: dataArray[2]
+            data: dataSet
           }
-          // {
-          //   name: "BA",
-          //   data: dataArray[3]
-          // }
         ],
         false,
         true
