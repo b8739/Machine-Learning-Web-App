@@ -10,18 +10,20 @@ from app import jsonify, Response
 def summarizeData(df):
   
   ''' 1) 데이터 타입 전처리 (object -> numeric/category)'''
-  # 1-1 object로 분류된 범주형 데이터의 dtype을 'category'로 변경 
+  # 1-1 object로 분류된 category 데이터의 dtype을 'category'로 변경 
   category_features = []
   threshold = 10
  
   for each in df.columns:
     if df[each].nunique() < threshold:
         category_features.append(each)
-    elif each == 'Date' :
+    elif each == 'Date':
         category_features.append(each)
 
   for each in category_features:
     df[each] = df[each].astype('category')
+    
+  df['ID'] = df['ID'].astype('category')
 
   # 1-2 dtype에 따라서 df를 numeric과 categroical로 나눔
   df_numeric = df.select_dtypes(exclude = ['category']).copy()
@@ -82,9 +84,8 @@ def summarizeData(df):
   # 2-2-3) Info 변수에 각 변수 투입
   df_categorical_info.insert(0,'mostCommon',df_categorical_mostCommon)
   df_categorical_info.insert(1,'numOfNA',df_categorical_numOfNA)
-
+  df_categorical_info = df_categorical_info.astype({'mostCommon': 'str'})
   ''' 3) Return '''
-  print(distribution_features)
 
 
 # 반환
