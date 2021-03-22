@@ -2,7 +2,7 @@
   <div id="chart">
     <apexchart
       ref="realtimeChart"
-      type="area"
+      type="line"
       :width="graphWidth"
       :height="graphHeight"
       :options="options"

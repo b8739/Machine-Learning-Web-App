@@ -10,7 +10,7 @@
             @click="
               openEditModal(
                 dataset[numericColumns[numericIndex]],
-                dataset['Date'],
+                dataset['ts'],
                 indexNum,
                 numericIndex
               )
@@ -63,14 +63,15 @@
           </td>
           <!-- 4th column -->
           <td>
-            <span class="tdTitle">Time Series Graph</span>
+            <span class="tdTitle" @click="showTimeSeriesGraph()">Time Series Graph</span>
             <TimeSeries
               :rawDataset="dataset[numericColumns[numericIndex]]"
-              :date="dataset['Date']"
+              :date="dataset['ts']"
               :indexNum="indexNum"
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
               :nameChangeMark="nameChangeMark"
+              v-if="show_timeSeriesGraph"
             />
           </td>
         </tr>
@@ -91,10 +92,10 @@
           </td>
 
           <td>
-            <tr>
+            <!-- <tr>
               <span class="info_title">Most Common Value: </span>
               <span>{{ categorical_mostCommon[categoricalColumn] }}</span>
-            </tr>
+            </tr> -->
             <tr>
               <span class="info_title">Num. of NA: </span>
               <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span>
@@ -154,7 +155,8 @@ export default {
       editModal_darkenBackground: false,
       selectedColumnIndex: null,
       //etc (for dataset parsing)
-      nameChangeMark: []
+      nameChangeMark: [],
+      show_timeSeriesGraph: false
     };
   },
 
@@ -163,7 +165,7 @@ export default {
     EditModal,
     Histogram
   },
-  props: ["columnsWithoutIndex", "summarizedData", "columns"],
+  props: ["columnsWithoutIndex", "summarizedData"],
   watch: {
     // dataSet: function(data) {
     //   let previousName = data["Name"][0]; //첫번째꺼 넣어두기
@@ -216,8 +218,12 @@ export default {
       // this.editModal_dataValue = {};
       // this.editModal_date = {};
       // this.editModal_indexNum = {};
+    },
+    showTimeSeriesGraph() {
+      this.show_timeSeriesGraph = !this.show_timeSeriesGraph;
     }
   },
+
   created() {
     this.numeric_meanJson = this.summarizedData[0]["mean"];
     this.numeric_stdJson = this.summarizedData[0]["std"];
@@ -229,7 +235,7 @@ export default {
 
     this.numeric_numOfNaJson = this.summarizedData[0]["numOfNA"];
 
-    this.categorical_mostCommon = this.summarizedData[1]["mostCommon"];
+    // this.categorical_mostCommon = this.summarizedData[1]["mostCommon"];
     this.categorical_numOfNaJson = this.summarizedData[1]["numOfNA"];
 
     this.numericColumns = this.summarizedData[2];

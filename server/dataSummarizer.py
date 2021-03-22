@@ -17,7 +17,7 @@ def summarizeData(df):
   for each in df.columns:
     if df[each].nunique() < threshold:
         category_features.append(each)
-    elif each == 'Date':
+    elif each == 'ts':
         category_features.append(each)
 
   for each in category_features:
@@ -75,16 +75,17 @@ def summarizeData(df):
   '''2-2 Category'''
   # 2-2-1) 각 category 관련 변수 생성
   df_categorical_columns = list((df_categorical).columns)
-  df_categorical_mostCommon = df_categorical.value_counts().idxmax()
+  # df_categorical_mostCommon = df_categorical.value_counts().idxmax()//argmax오류나서 일단 주석처리
   df_categorical_numOfNA = df_categorical.isnull().sum()
 
   # 2-2-2) 모든 category 변수들을 담고 있는 종합 Info 변수 생성
   df_categorical_info = pd.DataFrame(index=list(df_categorical.columns)) 
 
   # 2-2-3) Info 변수에 각 변수 투입
-  df_categorical_info.insert(0,'mostCommon',df_categorical_mostCommon)
-  df_categorical_info.insert(1,'numOfNA',df_categorical_numOfNA)
-  df_categorical_info = df_categorical_info.astype({'mostCommon': 'str'})
+  # df_categorical_info.insert(0,'mostCommon',df_categorical_mostCommon) //argmax오류나서 일단 주석처리
+  df_categorical_info.insert(0,'numOfNA',df_categorical_numOfNA) # index 일단 0로 변경, 나중에 다시 1으로
+  # df에서 ID의 mostCommon값을 수동으로 str로 변환해주어야, 'int 64 json not serializable' 메시지가 안뜸
+  # df_categorical_info = df_categorical_info.astype({'mostCommon': 'str'})
   ''' 3) Return '''
 
 
