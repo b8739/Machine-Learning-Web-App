@@ -71,11 +71,10 @@
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
               :nameChangeMark="nameChangeMark"
-              v-if="show_timeSeriesGraph"
             />
           </td>
         </tr>
-
+        <!-- v-if="show_timeSeriesGraph" -->
         <!-- category start -->
         <tr v-for="(categoricalColumn, categoryIndex) in categoricalColumns" :key="categoryIndex">
           <!-- 열 -->

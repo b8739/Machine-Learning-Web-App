@@ -196,8 +196,8 @@ export default {
   },
   methods: {
     putIntoArray(jsonObject, targetArray, randomIndex) {
-      for (let i = randomIndex[0]; i < randomIndex.length; i++) {
-        targetArray.push(jsonObject[i]);
+      for (let i = 0; i < randomIndex.length; i++) {
+        targetArray.push(jsonObject[randomIndex[i]]);
       }
     },
     divideDatasetByName(datasetByName, nameChangeMark) {
@@ -244,7 +244,7 @@ export default {
     },
     //randomize methods
     getCount(datasetLength) {
-      return Math.round(datasetLength * 0.1);
+      return Math.round(datasetLength * 0.05);
     },
     getRandom(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
