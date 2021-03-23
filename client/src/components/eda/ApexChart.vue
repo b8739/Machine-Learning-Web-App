@@ -13,15 +13,22 @@
 
 <script>
 //vuex
+import { eventBus } from "@/main";
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 export default {
   name: "ApexChart",
+
   props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "rawDataset", "seriesName"],
   // legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
+
   data() {
     return {
+      // eventbus
+      newXaxisKey: null,
+      newYaxisKey: null,
+      // original
       dataArray: [],
       randomIndexArray: [],
       dateArray: [],
@@ -29,7 +36,7 @@ export default {
       xaxisWhenSelected: {},
       firstMount: true,
       // datasetByName: [], legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
-      dateByName: [],
+      // options
       options: {
         chart: {
           type: "area",
@@ -152,12 +159,30 @@ export default {
     };
   },
   watch: {
-    editModal_hidden: function(data) {
-      console.log(data);
-      if (data == true) {
+    newXaxisKey: function(data) {
+      if (data != null || data != undefined) {
+        const axisName = data.added.element;
+        let targetObject = this.dataset[axisName];
+        // reset
         this.resetSeries();
+        //preprocess before update graph
+        this.randomIndexArray = this.getRandomArray(0, this.indexNum);
+        this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
+        // this.updateXaxis(this.dataArray);
+        this.updateCategories(this.dateArray);
       }
     },
+    newYaxisKey: function(data) {
+      if (data != null || data != undefined) {
+        const axisName = data.added.element;
+        let targetObject = this.dataset[axisName];
+        this.resetSeries();
+        //preprocess before update graph
+        this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
+        this.updateYaxis(this.dataArray);
+      }
+    },
+
     rawDataset: function(data) {
       if (data != null) {
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
@@ -175,6 +200,14 @@ export default {
   },
 
   created() {
+    // eventbus
+    eventBus.$on("xaxisBeingDragged", newXaxisKey => {
+      this.newXaxisKey = newXaxisKey;
+    });
+    eventBus.$on("yaxisBeingDragged", newYaxisKey => {
+      this.newYaxisKey = newYaxisKey;
+    });
+    //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
       if (objectLength != 0) {
@@ -185,13 +218,6 @@ export default {
   // cons
   mounted() {
     //console.log(this.dataset);
-    if (this.firstMount == false) {
-      this.randomIndexArray = this.getRandomArray(0, this.indexNum);
-      this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-      this.updateSeriesLine(this.dataArray, this.seriesName);
-      this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
-      this.updateCategories(this.dateArray);
-    }
   },
   computed: {
     ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum })
@@ -202,27 +228,7 @@ export default {
         targetArray.push(jsonObject[randomIndex[i]]);
       }
     },
-    divideDatasetByName(datasetByName, nameChangeMark) {
-      let tempArray = [];
-      let startIndex = 0;
-      //name별 data분류, index는 가져온 상황
-      for (const value in nameChangeMark) {
-        for (let i = startIndex; i < nameChangeMark[value]; i++) {
-          tempArray.push(this.rawDataset[i]);
-        }
-        startIndex = nameChangeMark[value];
-        datasetByName.push(tempArray);
-        tempArray = [];
-      }
-    },
-    divideDateByName(dateByName, nameChangeMark) {
-      let tempArray = [];
-      let startIndex = 0;
-      //name별 data분류, index는 가져온 상황
-      for (let i = startIndex; i < nameChangeMark[0]; i++) {
-        dateByName.push(this.date[i]);
-      }
-    },
+
     //preprocess methods
     randomizeDataset(dataset_unrandomized, dataset_randomized, randomIndex) {
       let tempArray = [];
@@ -284,11 +290,25 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
-    updateSeriesLine(dataSet, seriesName) {
-      this.$refs.realtimeChart.updateSeries(
+    updateXaxis(dataSet) {
+      this.$refs.edaChart.updateSeries(
         [
           {
-            name: seriesName,
+            data: [
+              {
+                x: dataSet
+              }
+            ]
+          }
+        ],
+        false,
+        true
+      );
+    },
+    updateYaxis(dataSet) {
+      this.$refs.edaChart.updateSeries(
+        [
+          {
             data: dataSet
           }
         ],
@@ -297,14 +317,14 @@ export default {
       );
     },
     updateCategories(newCategories) {
-      this.$refs.realtimeChart.updateOptions({
+      this.$refs.edaChart.updateOptions({
         xaxis: {
           categories: newCategories
         }
       });
     },
     updateSelection() {
-      this.$refs.realtimeChart.updateOptions({
+      this.$refs.edaChart.updateOptions({
         chart: {
           selection: {
             xaxis: {
@@ -317,13 +337,12 @@ export default {
     },
     toggleDataPointSelection(xaxis) {
       for (let i = xaxis.min; i <= xaxis.max; i++) {
-        this.$refs.realtimeChart.toggleDataPointSelection(0, i);
+        this.$refs.edaChart.toggleDataPointSelection(0, i);
       }
     },
     resetSeries() {
       // console.log("rest");
       this.dataArray = [];
-      this.datasetByName = [];
     }
   }
 };

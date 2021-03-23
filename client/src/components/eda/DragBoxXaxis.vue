@@ -15,8 +15,10 @@
   </div>
 </template>
 <script>
+import { eventBus } from "@/main";
 import { mapState } from "vuex";
 import draggable from "vuedraggable";
+
 export default {
   data() {
     return {
@@ -30,7 +32,8 @@ export default {
   },
   methods: {
     onDrop(evt) {
-      console.log(evt);
+      // console.log(evt);
+      eventBus.$emit("xaxisBeingDragged", evt);
     }
   },
   computed: {
