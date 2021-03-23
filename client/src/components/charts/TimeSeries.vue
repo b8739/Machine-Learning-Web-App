@@ -18,7 +18,8 @@ import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 export default {
   name: "TimeSeries",
-  props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "nameChangeMark", "rawDataset"],
+  props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "rawDataset", "seriesName"],
+  // legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
   data() {
     return {
       dataArray: [],
@@ -27,7 +28,7 @@ export default {
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
       firstMount: true,
-      datasetByName: [],
+      // datasetByName: [], legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
       dateByName: [],
       options: {
         chart: {
@@ -161,7 +162,7 @@ export default {
       if (data != null) {
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-        this.updateSeriesLine(this.dataArray);
+        this.updateSeriesLine(this.dataArray, this.seriesName);
       }
     },
     date: function(data) {
@@ -187,7 +188,7 @@ export default {
     if (this.firstMount == false) {
       this.randomIndexArray = this.getRandomArray(0, this.indexNum);
       this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-      this.updateSeriesLine(this.dataArray);
+      this.updateSeriesLine(this.dataArray, this.seriesName);
       this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
       this.updateCategories(this.dateArray);
     }
@@ -283,10 +284,11 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
-    updateSeriesLine(dataSet) {
+    updateSeriesLine(dataSet, seriesName) {
       this.$refs.realtimeChart.updateSeries(
         [
           {
+            name: seriesName,
             data: dataSet
           }
         ],
