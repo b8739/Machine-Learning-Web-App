@@ -22,10 +22,31 @@
             </v-toolbar-items>
           </v-toolbar>
           <v-card outlined>
-            <v-row>
-              <v-col cols="2"><ColumnList /></v-col>
-              <v-col cols="6"> <ApexChart :graphHeight="500"/></v-col>
-            </v-row>
+            <v-layout>
+              <v-flex xs2>
+                <ColumnList :columns="columns" :styleObject="style_columnList">
+                  <v-subheader>{{ columns.length }} 개 열</v-subheader>
+                </ColumnList></v-flex
+              >
+              <v-divider vertical></v-divider>
+              <v-flex xs6>
+                <v-layout row>
+                  <v-flex
+                    ><DragBoxYaxis :columns="xColumns" :styleObject="style_Dragbox_yaxis"
+                  /></v-flex>
+                  <v-flex>
+                    <v-layout column
+                      ><v-flex><ApexChart :graphHeight="500"/></v-flex>
+                      <v-flex
+                        ><DragBoxXaxis
+                          :columns="xColumns"
+                          :styleObject="style_DragBox_xaxis"/></v-flex></v-layout
+                  ></v-flex>
+                </v-layout>
+              </v-flex>
+
+              <div style="height:300px;background-color:red"></div>
+            </v-layout>
           </v-card>
         </v-card>
       </v-dialog>
@@ -35,14 +56,32 @@
 <script>
 import ColumnList from "@/components/eda/ColumnList.vue";
 import ApexChart from "@/components/eda/ApexChart.vue";
+import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
+import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
 export default {
   data() {
     return {
-      dialog: false
+      dialog: false,
+      emptyColumns: ["."],
+      xColumns: [1, 2, 3],
+      style_columnList: {
+        height: "300px",
+        "overflow-y": "scroll"
+      },
+      style_DragBox_xaxis: {
+        height: "300px"
+      },
+      style_Dragbox_yaxis: {
+        height: "300px",
+        width: "40px"
+      }
     };
   },
+  props: ["columns"],
   components: {
     ColumnList,
+    DragBoxXaxis,
+    DragBoxYaxis,
     ApexChart
   }
 };
