@@ -21,32 +21,29 @@
               </v-btn>
             </v-toolbar-items>
           </v-toolbar>
-          <!-- 여기에 요소 추가 -->
-          <!-- list -->
-          <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
-            <v-list-item-content>
-              <v-list-item-title>{{ column }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
+          <v-card outlined>
+            <v-row>
+              <v-col cols="2"><ColumnList /></v-col>
+              <v-col cols="6"> <ApexChart :graphHeight="500"/></v-col>
+            </v-row>
+          </v-card>
         </v-card>
       </v-dialog>
     </v-row>
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import ColumnList from "@/components/eda/ColumnList.vue";
+import ApexChart from "@/components/eda/ApexChart.vue";
 export default {
   data() {
     return {
       dialog: false
     };
   },
-  computed: {
-    ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum,
-      columns: state => state.columns
-    })
+  components: {
+    ColumnList,
+    ApexChart
   }
 };
 </script>

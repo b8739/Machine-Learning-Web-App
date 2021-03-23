@@ -39,7 +39,7 @@ import Sidebar from "../components/layout/Sidebar";
 import AddModal from "../components/modal/AddModal";
 import DataFeatures from "../components/DataFeatures";
 import InfiniteTable from "../components/InfiniteTable";
-import GraphBuilder from "@/components/GraphBuilder.vue";
+import GraphBuilder from "./GraphBuilder.vue";
 //vuex
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
