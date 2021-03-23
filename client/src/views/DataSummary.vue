@@ -11,6 +11,7 @@
         <button class="btn-1" @click="displaySwitch()">Feature</button>
         <button class="btn-1" @click="displaySwitch()">Table</button>
       </div>
+      <GraphBuilder />
       <DataFeatures
         :class="{ visibilityHidden: showFeatures }"
         :columnsWithoutIndex="columnsWithoutIndex"
@@ -38,6 +39,7 @@ import Sidebar from "../components/layout/Sidebar";
 import AddModal from "../components/modal/AddModal";
 import DataFeatures from "../components/DataFeatures";
 import InfiniteTable from "../components/InfiniteTable";
+import GraphBuilder from "@/components/GraphBuilder.vue";
 //vuex
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
@@ -64,7 +66,8 @@ export default {
     Sidebar,
     AddModal,
     DataFeatures,
-    InfiniteTable
+    InfiniteTable,
+    GraphBuilder
   },
   computed: {
     ...mapState({

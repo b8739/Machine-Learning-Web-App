@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <GraphBuilder />
     <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop">
       <label><strong> Drop A File</strong></label>
 
@@ -30,7 +29,7 @@
 
 <script>
 import axios from "axios";
-import GraphBuilder from "@/components/GraphBuilder.vue";
+
 export default {
   /*
       Defines the data used by the component
@@ -43,7 +42,7 @@ export default {
 
   props: ["sidebarStatus"],
 
-  components: { GraphBuilder },
+  components: {},
   /*
       Defines the method used by the component
     */

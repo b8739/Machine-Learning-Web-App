@@ -2,6 +2,7 @@
   <div data-app>
     <v-row justify="center">
       <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+        <!-- Trigger 버튼 -->
         <template v-slot:activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
             Open Dialog
@@ -12,7 +13,7 @@
             <v-btn icon dark @click="dialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>Settings</v-toolbar-title>
+            <v-toolbar-title>EDA Graph Builder</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items>
               <v-btn text @click="dialog = false">
@@ -20,17 +21,32 @@
               </v-btn>
             </v-toolbar-items>
           </v-toolbar>
+          <!-- 여기에 요소 추가 -->
+          <!-- list -->
+          <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
+            <v-list-item-content>
+              <v-list-item-title>{{ column }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-card>
       </v-dialog>
     </v-row>
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
 export default {
   data() {
     return {
       dialog: false
     };
+  },
+  computed: {
+    ...mapState({
+      dataset: state => state.dataset,
+      indexNum: state => state.indexNum,
+      columns: state => state.columns
+    })
   }
 };
 </script>
