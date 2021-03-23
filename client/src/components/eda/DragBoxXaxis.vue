@@ -30,8 +30,7 @@ export default {
   },
   methods: {
     onDrop(evt) {
-      // console.log(added);
-      console.log(evt.moved.element);
+      console.log(evt);
     }
   },
   computed: {

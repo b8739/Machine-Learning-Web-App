@@ -9,7 +9,6 @@
         :options="{ group: 'dragGroup' }"
         @start="drag = true"
         @end="drag = false"
-        @change="onDrop"
         :list="columns"
       >
         <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
@@ -19,11 +18,6 @@
         </v-list-item>
       </draggable>
     </v-list>
-
-    <!-- <v-card>
-            <draggable :options="{ group: 'your-group' }"> </draggable>
-            second list
-          </v-card> -->
   </div>
 </template>
 <script>
@@ -32,10 +26,9 @@ import draggable from "vuedraggable";
 export default {
   props: ["columns", "styleObject"],
   methods: {
-    onDrop(evt) {
-      // console.log(added);
-      console.log(evt);
-    }
+    // onDrop(evt) {
+    //   console.log(evt);
+    // }
   },
   components: {
     draggable

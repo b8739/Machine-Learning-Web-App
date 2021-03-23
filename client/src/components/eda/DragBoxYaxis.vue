@@ -23,6 +23,11 @@ export default {
       columns: [1, 5, 6]
     };
   },
+  methods: {
+    onDrop(evt) {
+      console.log(evt);
+    }
+  },
   props: ["styleObject"],
 
   components: {
