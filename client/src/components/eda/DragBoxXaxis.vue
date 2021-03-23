@@ -22,7 +22,7 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: [4, 5, 6]
+      columns: ["Drag X axis Here"]
     };
   },
   props: ["styleObject"],
@@ -34,6 +34,7 @@ export default {
     onDrop(evt) {
       // console.log(evt);
       eventBus.$emit("xaxisBeingDragged", evt);
+      this.columns = [evt.added.element];
     }
   },
   computed: {

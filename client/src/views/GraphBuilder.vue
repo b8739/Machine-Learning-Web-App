@@ -23,25 +23,30 @@
           </v-toolbar>
           <v-card outlined>
             <v-layout>
+              <!-- 좌측 -->
               <v-flex xs2>
                 <ColumnList :columns="columns" :styleObject="style_columnList">
                   <v-subheader>{{ columns.length }} 개 열</v-subheader>
                 </ColumnList></v-flex
               >
               <v-divider vertical></v-divider>
+              <!-- 우측 -->
               <v-flex xs6>
-                <v-layout row>
-                  <v-flex
-                    ><DragBoxYaxis :columns="xColumns" :styleObject="style_Dragbox_yaxis"
-                  /></v-flex>
-                  <v-flex>
-                    <v-layout column
-                      ><v-flex><ApexChart :graphHeight="500"/></v-flex>
-                      <v-flex
-                        ><DragBoxXaxis
-                          :columns="xColumns"
-                          :styleObject="style_DragBox_xaxis"/></v-flex></v-layout
-                  ></v-flex>
+                <v-layout column>
+                  <!-- 우측 - 상단 -->
+                  <v-flex><GraphTypeToolbar /></v-flex>
+                  <!-- 우측 - 하단 -->
+                  <v-layout row>
+                    <!-- 우측 - 하단 - 좌측-->
+                    <v-flex xs2><DragBoxYaxis :styleObject="style_Dragbox_yaxis"/></v-flex>
+                    <!-- 우측 - 하단 - 우측-->
+                    <v-flex>
+                      <v-layout column
+                        ><v-flex><ApexChart :graphHeight="500"/></v-flex>
+                        <v-flex
+                          ><DragBoxXaxis :styleObject="style_DragBox_xaxis"/></v-flex></v-layout
+                    ></v-flex>
+                  </v-layout>
                 </v-layout>
               </v-flex>
 
@@ -58,22 +63,24 @@ import ColumnList from "@/components/eda/ColumnList.vue";
 import ApexChart from "@/components/eda/ApexChart.vue";
 import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
 import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
+import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
 export default {
   data() {
     return {
       dialog: false,
-      emptyColumns: ["."],
-      xColumns: [1, 2, 3],
       style_columnList: {
         height: "300px",
         "overflow-y": "scroll"
       },
       style_DragBox_xaxis: {
-        height: "300px"
+        // border: "1px solid lightgray",
+        // width: "100px",
+        height: "50px"
       },
       style_Dragbox_yaxis: {
-        height: "300px",
-        width: "40px"
+        // border: "1px solid lightgray",
+        height: "100px"
+        // width: "100px"
       }
     };
   },
@@ -82,7 +89,8 @@ export default {
     ColumnList,
     DragBoxXaxis,
     DragBoxYaxis,
-    ApexChart
+    ApexChart,
+    GraphTypeToolbar
   }
 };
 </script>

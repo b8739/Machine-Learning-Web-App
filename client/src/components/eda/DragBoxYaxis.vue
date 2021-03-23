@@ -21,13 +21,14 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: [1, 5, 6]
+      columns: ["Drag Y axis Here"]
     };
   },
   methods: {
     onDrop(evt) {
       // console.log(evt);
       eventBus.$emit("yaxisBeingDragged", evt);
+      this.columns = [evt.added.element];
     }
   },
   props: ["styleObject"],

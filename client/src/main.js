@@ -14,9 +14,26 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
 
+//fort-awesome
+import { library  } from '@fortawesome/fontawesome-svg-core'
+import { faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { faChartArea } from '@fortawesome/free-solid-svg-icons'
+import { faChartBar } from '@fortawesome/free-solid-svg-icons'
+import { faChartPie } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faChartLine)
+library.add(faChartArea)
+library.add(faChartBar)
+library.add(faChartPie)
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+Vue.config.productionTip = false
 
 Vue.use(PortalVue)
 Vue.use(Vuetify)
+
 
 // Vue.use(Vuetify);
 
