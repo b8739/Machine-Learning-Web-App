@@ -1,14 +1,14 @@
+# flask
 from flask import Flask, jsonify, request, render_template,request,url_for, Response
 from flask_cors import CORS
-
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
-from flask_sqlalchemy import SQLAlchemy
 
+
+# sqlalchemy
 from sqlalchemy import create_engine, MetaData, text, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from collections import OrderedDict
-
+from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 
 from config import DB_URL
@@ -24,6 +24,10 @@ import numpy as np
 
 from dataSummarizer import summarizeData
 
+# pyarrow
+import pyarrow as pa
+from pyarrow import csv
+
 # Python API
 # from model import *
 
@@ -36,7 +40,7 @@ Base = declarative_base()
 # instantiate the app
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.config["TEMPLATES_AUTO_RELOAD"] = False
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
@@ -71,25 +75,31 @@ def testing():
 # Route for our Processing and Details Page
 @app.route('/dataupload',methods=['GET','POST'])
 def dataupload():
-	if request.method == 'POST' and 'csv_data' in request.files:
-		file = request.files['csv_data']
+  if request.method == 'POST' and 'csv_data' in request.files:
+    file = request.files['csv_data']
 		# dataInfo 테이블 생성
-		Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
+    # pyarrow
+    pyarrow_table = csv.read_csv(file)
+    df = pyarrow_table.to_pandas()
 		# pandas
-		df = pd.read_csv(file)
-		df = df.reset_index().rename(columns={"index": "ID"})
-		table_name = 'dataset'
+    # df = pd.read_csv(file, dtype={"ts": "category"})
+    # df = pd.concat(tp)
+    df = df.reset_index().rename(columns={"index": "ID"})
+    table_name = 'dataset'
 		# csv to sql
-		df.to_sql (
+    df.to_sql (
 			table_name,
 			engine,
 			if_exists='replace',
 			index=False,
-			chunksize=1000,
-			method='multi'
+			chunksize=10000,
 		)  
+  # method='multi'
+  # traditional한 sql에선 method multi를 하면 더 느려진다고 함
+  
 	# return jsonify(df.to_dict())
-		return summarizeData(df)
+    return summarizeData(df)
 
 """ 
 addData: Dataset에 data를 'Add'할 때 라우팅

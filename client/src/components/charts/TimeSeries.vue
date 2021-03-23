@@ -181,8 +181,9 @@ export default {
       }
     }
   },
-  // conss
+  // cons
   mounted() {
+    //console.log(this.dataset);
     if (this.firstMount == false) {
       this.randomIndexArray = this.getRandomArray(0, this.indexNum);
       this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
@@ -192,7 +193,7 @@ export default {
     }
   },
   computed: {
-    ...mapState({ indexNum: state => state.indexNum })
+    ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum })
   },
   methods: {
     putIntoArray(jsonObject, targetArray, randomIndex) {
@@ -244,7 +245,7 @@ export default {
     },
     //randomize methods
     getCount(datasetLength) {
-      return Math.round(datasetLength * 0.05);
+      return Math.round(datasetLength * 0.02);
     },
     getRandom(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
