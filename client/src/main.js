@@ -11,12 +11,12 @@ import BootstrapVue from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 // vuetify
-// import Vuetify from 'vuetify';
-// import 'vuetify/dist/vuetify.min.css';
+import Vuetify from 'vuetify';
+import 'vuetify/dist/vuetify.min.css';
 
 
 Vue.use(PortalVue)
-
+Vue.use(Vuetify)
 
 // Vue.use(Vuetify);
 
@@ -27,5 +27,6 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
+  vuetify : new Vuetify(),
   render: (h) => h(App),
 }).$mount('#app');
