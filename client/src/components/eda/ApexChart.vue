@@ -28,6 +28,7 @@ export default {
       // eventbus
       newXaxisKey: null,
       newYaxisKey: null,
+      graphType: null,
       // original
       dataArray: [],
       randomIndexArray: [],
@@ -168,7 +169,6 @@ export default {
         //preprocess before update graph
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
-        // this.updateXaxis(this.dataArray);
         this.updateCategories(this.dateArray);
       }
     },
@@ -180,6 +180,12 @@ export default {
         //preprocess before update graph
         this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
         this.updateYaxis(this.dataArray);
+      }
+    },
+    graphType: function(data) {
+      if (data != null || data != undefined) {
+        this.updateGraphType(data);
+        console.log(data);
       }
     },
 
@@ -206,6 +212,9 @@ export default {
     });
     eventBus.$on("yaxisBeingDragged", newYaxisKey => {
       this.newYaxisKey = newYaxisKey;
+    });
+    eventBus.$on("graphTypeBeingSent", graphType => {
+      this.graphType = graphType;
     });
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
@@ -290,21 +299,7 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
-    updateXaxis(dataSet) {
-      this.$refs.edaChart.updateSeries(
-        [
-          {
-            data: [
-              {
-                x: dataSet
-              }
-            ]
-          }
-        ],
-        false,
-        true
-      );
-    },
+
     updateYaxis(dataSet) {
       this.$refs.edaChart.updateSeries(
         [
@@ -320,6 +315,13 @@ export default {
       this.$refs.edaChart.updateOptions({
         xaxis: {
           categories: newCategories
+        }
+      });
+    },
+    updateGraphType(graphType) {
+      this.$refs.edaChart.updateOptions({
+        chart: {
+          type: graphType
         }
       });
     },
