@@ -5,7 +5,7 @@
         <!-- Trigger 버튼 -->
         <template v-slot:activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
-            Open Dialog
+            EDA
           </v-btn>
         </template>
         <v-card>
