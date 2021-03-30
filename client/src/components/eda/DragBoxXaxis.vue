@@ -7,7 +7,7 @@
         @start="drag = true"
         @end="drag = false"
         :list="columns"
-        @change="onDrop"
+        @change="onDragEvent"
       >
         <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex">{{ column }}</v-chip>
       </draggable>
@@ -22,7 +22,7 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: []
+      columns: [""]
     };
   },
   props: ["styleObject", "axisPosition"],
@@ -31,7 +31,7 @@ export default {
     draggable
   },
   methods: {
-    onDrop(evt) {
+    onDragEvent(evt) {
       // console.log(evt);
       eventBus.$emit("xaxisBeingDragged", evt);
       this.columns = [evt.added.element];

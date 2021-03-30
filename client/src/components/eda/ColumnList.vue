@@ -27,7 +27,10 @@ export default {
   props: ["columns", "styleObject"],
   methods: {
     // onDrop(evt) {
-    //   console.log(evt);
+    //   let axisInfo = { evt: evt, axisPosition: this.axisPosition };
+    //   eventBus.$emit("yaxisBeingDragged", axisInfo);
+    //   //드래그 박스에 chip 하나만 유지하도록 초기화
+    //   this.columns = [evt.added.element];
     // }
   },
   components: {

@@ -6,7 +6,7 @@
         :options="{ group: 'dragGroup' }"
         @start="drag = true"
         @end="drag = false"
-        @change="onDrop"
+        @change="onDragEvent"
         :list="columns"
       >
         <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex">{{ column }}</v-chip>
@@ -21,15 +21,23 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: []
+      columns: [""]
     };
   },
   methods: {
-    onDrop(evt) {
-      let axisInfo = { evt: evt, axisPosition: this.axisPosition };
-      eventBus.$emit("yaxisBeingDragged", axisInfo);
-      //드래그 박스에 chip 하나만 유지하도록 초기화
-      this.columns = [evt.added.element];
+    onDragEvent(evt) {
+      let eventName = Object.keys(evt)[0];
+      console.log(eventName);
+      switch (eventName) {
+        case "added":
+          let axisInfo = { evt: evt, axisPosition: this.axisPosition };
+          eventBus.$emit("yaxisBeingDragged", axisInfo);
+          //드래그 박스에 chip 하나만 유지하도록 초기화
+          this.columns = [evt.added.element];
+          break;
+        case "removed":
+          break;
+      }
     }
   },
   props: ["styleObject", "axisPosition"],
