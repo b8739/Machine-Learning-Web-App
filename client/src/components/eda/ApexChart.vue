@@ -8,7 +8,7 @@
       :options="options"
       :series="series"
     ></apexchart>
-    <!-- <apexchart :options="otherOption"> </apexchart> -->
+    <apexchart ref="secondChart" v-if="axisMoreThanOne" :options="otherOption"> </apexchart>
   </div>
 </template>
 
@@ -30,6 +30,7 @@ export default {
       newXaxisKey: null,
       newYaxisKey: null,
       graphType: null,
+      axisMoreThanOne: false,
       // original
       dataArray: [],
       randomIndexArray: [],
@@ -237,6 +238,10 @@ export default {
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
     });
+    eventBus.$on("yaxisPosition", axisPosition => {
+      this.axisMoreThanOne = true;
+      this.updateAllGraphSize();
+    });
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
@@ -355,6 +360,18 @@ export default {
               max: undefined
             }
           }
+        }
+      });
+    },
+    updateAllGraphSize() {
+      this.$refs.edaChart.updateOptions({
+        chart: {
+          height: "250px"
+        }
+      });
+      this.$refs.secondChart.updateOptions({
+        chart: {
+          height: "250px"
         }
       });
     },

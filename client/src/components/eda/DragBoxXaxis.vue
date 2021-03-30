@@ -22,10 +22,10 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: ["Drag X axis Here"]
+      columns: []
     };
   },
-  props: ["styleObject"],
+  props: ["styleObject", "axisPosition"],
 
   components: {
     draggable
@@ -48,7 +48,6 @@ export default {
 </script>
 <style scoped>
 .dragXaxisBox {
-  border: 1px solid rgb(90, 47, 47);
-  margin: 0 auto;
+  /* border: 1px solid rgb(90, 47, 47); */
 }
 </style>

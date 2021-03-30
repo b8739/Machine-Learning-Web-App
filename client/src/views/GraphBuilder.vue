@@ -39,21 +39,25 @@
                 <!-- 우측 - 하단 - 좌측-->
                 <v-container>
                   <v-row>
-                    <v-col cols="2"
-                      ><DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
-                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
-                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                    <v-col cols="2" class="axisTitle"
+                      ><DragBoxYaxis :styleObject="style_Dragbox_yaxis" axisPosition="top" />
+                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" axisPosition="middle">
+                        Y
+                      </DragBoxYaxis>
+                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" axisPosition="bottom" />
                     </v-col>
                     <v-col cols="10"> <ApexChart :graphHeight="500"/></v-col>
-                    <v-col cols="3"></v-col>
+                    <v-col cols="2"></v-col>
                     <v-col cols="3">
-                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" />
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="left" />
+                    </v-col>
+                    <v-col cols="4" class="axisTitle">
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="middle">
+                        X
+                      </DragBoxXaxis>
                     </v-col>
                     <v-col cols="3">
-                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" />
-                    </v-col>
-                    <v-col cols="3">
-                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" />
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="right" />
                     </v-col>
                   </v-row>
                 </v-container>
@@ -96,7 +100,9 @@ export default {
         // border: "1px solid lightgray",
         height: "100px"
         // width: "100px"
-      }
+      },
+      xColumns: ["Drag X axis Here"],
+      yColumns: ["Drag Y axis Here"]
     };
   },
   props: ["columns"],
@@ -114,3 +120,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.axisTitle {
+  text-align: center;
+}
+</style>

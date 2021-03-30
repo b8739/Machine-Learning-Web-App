@@ -21,17 +21,25 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: ["Drag Y axis Here"]
+      columns: []
     };
   },
   methods: {
     onDrop(evt) {
-      // console.log(evt);
-      eventBus.$emit("yaxisBeingDragged", evt);
-      this.columns = [evt.added.element];
+      switch (this.axisPosition) {
+        case "top":
+          break;
+        case "middle":
+          eventBus.$emit("yaxisBeingDragged", evt);
+          this.columns = [evt.added.element];
+          break;
+        case "bottom":
+          eventBus.$emit("yaxisPosition", this.axisPosition);
+          break;
+      }
     }
   },
-  props: ["styleObject"],
+  props: ["styleObject", "axisPosition"],
 
   components: {
     draggable
@@ -47,7 +55,7 @@ export default {
 </script>
 <style scoped>
 .dragYaxisBox {
-  border: 1px solid rgb(90, 47, 47);
+  /* border: 1px solid rgb(90, 47, 47); */
   margin: 40px 0;
 }
 </style>
