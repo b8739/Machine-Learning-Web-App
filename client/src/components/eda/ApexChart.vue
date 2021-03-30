@@ -60,6 +60,7 @@ export default {
       multipleXaxis: false,
       // original
       dataArray: [],
+      dataArray2: [],
       randomIndexArray: [],
       dateArray: [],
       xaxisWhenZoomed: {},
@@ -418,12 +419,12 @@ export default {
           let axisName = newYaxisInfo["evt"].added.element;
           let targetObject = this.dataset[axisName];
           //preprocess before update graph
-          this.resetDataArray();
+          // this.resetDataArray();
           //preprocess before update graph
-          this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
+          this.putIntoArray(targetObject, this.dataArray2, this.randomIndexArray);
 
           this.updateCategories("secondChart", this.dateArray);
-          this.updateYaxis("secondChart", this.dataArray);
+          this.updateYaxis("secondChart", this.dataArray2);
           this.updateVerticalSplitGraphs();
 
           break;
