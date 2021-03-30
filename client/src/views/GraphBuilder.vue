@@ -57,7 +57,7 @@
                     </v-col>
                   </v-row>
                 </v-container>
-
+                <!-- layout 변경 -->
                 <!-- 우측 - 하단 - 우측-->
                 <v-flex>
                   <v-layout column> <v-flex></v-flex></v-layout
