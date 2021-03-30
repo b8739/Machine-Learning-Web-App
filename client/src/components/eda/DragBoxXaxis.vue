@@ -32,9 +32,19 @@ export default {
   },
   methods: {
     onDragEvent(evt) {
-      // console.log(evt);
-      eventBus.$emit("xaxisBeingDragged", evt);
-      this.columns = [evt.added.element];
+      let eventName = Object.keys(evt)[0];
+      console.log(eventName);
+      switch (eventName) {
+        case "added":
+          let axisInfo = { evt: evt, axisPosition: this.axisPosition };
+          eventBus.$emit("xaxisBeingDragged", axisInfo);
+          //드래그 박스에 chip 하나만 유지하도록 초기화
+          this.columns = [evt.added.element];
+          break;
+        case "removed":
+          eventBus.$emit("xaxisBeingRemoved", false);
+          break;
+      }
     }
   },
   computed: {

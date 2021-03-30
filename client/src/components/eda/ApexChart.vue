@@ -8,12 +8,20 @@
       :options="options"
     ></apexchart>
     <apexchart
-      v-show="axisMoreThanOne"
+      v-show="multipleYaxis"
       ref="secondChart"
       type="line"
       :width="graphWidth"
       :height="graphHeight"
-      :options="otherOptions"
+      :options="options"
+    >
+    </apexchart>
+    <apexchart
+      ref="thirdChart"
+      type="line"
+      :width="graphWidth"
+      :height="graphHeight"
+      :options="options"
     >
     </apexchart>
   </div>
@@ -34,10 +42,11 @@ export default {
   data() {
     return {
       // eventbus
-      newXaxisKey: null,
+      newXaxisInfo: null,
       newYaxisInfo: null,
       graphType: null,
-      axisMoreThanOne: false,
+      multipleYaxis: false,
+      multipleXaxis: false,
       // original
       dataArray: [],
       randomIndexArray: [],
@@ -45,7 +54,6 @@ export default {
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
       firstMount: true,
-
       options: {
         chart: {
           id: "cc",
@@ -159,130 +167,17 @@ export default {
         stroke: {
           width: 1
         }
-      },
-      otherOptions: {
-        chart: {
-          id: "dd",
-          group: "social",
-          type: "area",
-          toolbar: {
-            show: true
-          },
-          //zoom
-          zoom: {
-            type: "xy",
-            enabled: true,
-            autoScaleYaxis: true,
-            zoomedArea: {
-              fill: {
-                color: "#90CAF9",
-                opacity: 0.4
-              },
-              stroke: {
-                color: "#0D47A1",
-                opacity: 0.4,
-                width: 1
-              }
-            }
-          },
-          //selection
-          selection: {
-            enabled: true,
-            type: "xy",
-            fill: {
-              color: "black",
-              opacity: 0.1
-            },
-            stroke: {
-              width: 5,
-              dashArray: 3,
-              color: "black",
-              opacity: 0.4
-            }
-          },
-          toolbar: {
-            autoSelected: "selection"
-          },
-          events: {
-            legendClick: function(chartContext, seriesIndex, config) {
-              // console.log(seriesIndex);
-              // ...
-            },
-            // selection events
-            selection: (chartContext, { xaxis, yaxis }) => {
-              let yaxisObject = { min: null, max: null };
-              console.log(xaxis);
-              // yaxisObject.min = yaxis[0]["min"];
-              // yaxisObject.max = yaxis[0]["max"];
-              // this.yaxisWhenSelected = yaxisObject;
-              this.xaxisWhenSelected = xaxis;
-              this.$emit("xaxis", this.xaxisWhenSelected);
-            }
-          }
-        },
-        states: {
-          active: {
-            allowMultipleDataPointsSelection: true,
-            filter: {
-              type: "darken",
-              value: 0.35
-            }
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-
-        title: {},
-        markers: {
-          size: 1,
-          strokeWidth: 0.1,
-          strokeColor: "skyblue",
-          hover: {
-            size: 2,
-            strokeColor: "#fff"
-          }
-        },
-        noData: {
-          text: "Loading..."
-        },
-        xaxis: {
-          type: "datetime",
-          labels: {
-            minHeight: 50,
-            rotate: -30,
-            rotateAlways: true,
-            hideOverlappingLabels: false,
-            format: "yy/MM/dd",
-            style: {
-              fontSize: "10px",
-              fontWeight: 200
-            }
-          }
-        },
-        yaxis: {
-          labels: {
-            minWidth: 40
-          }
-        },
-        legend: {
-          show: true,
-          showForSingleSeries: true,
-          position: "bottom"
-        },
-        stroke: {
-          width: 1
-        }
       }
     };
   },
   watch: {
-    newXaxisKey: function(data) {
-      if (data != null || data != undefined) {
-        const axisName = data.added.element;
+    newXaxisInfo: function(data) {
+      if ((data != null || data != undefined) && this.newXaxisInfo["axisPosition"] == "middle") {
+        // console.log(`newXaxisInfo: ${this.newXaxisInfo["axisPosition"]}`);
+        let axisName = this.newXaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
         // reset
-        this.resetSeries();
+        this.resetDataArray();
         //preprocess before update graph
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
@@ -291,13 +186,15 @@ export default {
     },
     newYaxisInfo: function(data) {
       if ((data != null || data != undefined) && this.newYaxisInfo["axisPosition"] == "middle") {
+        // console.log(`newYaxisInfo: ${this.newYaxisInfo["axisPosition"]}`);
         console.log(this.newYaxisInfo["axisPosition"]);
         let axisName = this.newYaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
-        this.resetSeries();
+        this.resetDataArray();
         //preprocess before update graph
         this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
         this.updateYaxis("edaChart", this.dataArray);
+        this.updateYaxis("thirdChart", this.dataArray);
       }
     },
     graphType: function(data) {
@@ -312,20 +209,21 @@ export default {
 
   created() {
     // eventbus
-    eventBus.$on("xaxisBeingDragged", newXaxisKey => {
-      this.newXaxisKey = newXaxisKey;
+    eventBus.$on("xaxisBeingDragged", newXaxisInfo => {
+      this.newXaxisInfo = newXaxisInfo;
+      this.checkXaxisPosition(this.newXaxisInfo);
     });
     eventBus.$on("yaxisBeingDragged", newYaxisInfo => {
       this.newYaxisInfo = newYaxisInfo;
-      this.checkAxisPosition(this.newYaxisInfo);
+      this.checkYaxisPosition(this.newYaxisInfo);
     });
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
     });
     eventBus.$on("yaxisBeingRemoved", status => {
-      console.log(status);
-      this.axisMoreThanOne = status; //false
-      this.$refs.secondChart.resetSeries();
+      // console.log(status);
+      this.multipleYaxis = status; //false
+      this.$refs.secondChart.resetDataArray();
       this.$refs.edaChart.updateOptions({
         chart: {
           height: "500px"
@@ -417,7 +315,7 @@ export default {
     //APEX CHART
 
     updateYaxis(chartRefs, dataSet) {
-      console.log(chartRefs);
+      // console.log(chartRefs);
       this.$refs[chartRefs].updateSeries(
         [
           {
@@ -454,7 +352,7 @@ export default {
         }
       });
     },
-    updateSplitGraphs() {
+    updateVerticalSplitGraphs() {
       this.$refs.edaChart.updateOptions({
         chart: {
           // sync graph info
@@ -474,25 +372,71 @@ export default {
         }
       });
     },
-    checkAxisPosition(newYaxisInfo) {
+    updateHorizontalSplitGraphs() {
+      this.$refs.edaChart.updateOptions({
+        chart: {
+          // id: "ab",
+          group: "",
+
+          width: "250px"
+        }
+      });
+      this.$refs.thirdChart.updateOptions({
+        chart: {
+          id: "ef",
+          group: "social1",
+
+          width: "250px"
+        },
+        xaxis: {
+          type: "numeric"
+        }
+      });
+      // this.graphWidth = "250px";
+    },
+    checkYaxisPosition(newYaxisInfo) {
       switch (newYaxisInfo["axisPosition"]) {
         case "top":
-          this.updateSplitGraphs();
+          this.updateVerticalSplitGraphs();
           break;
         case "middle":
           break;
         case "bottom":
-          this.axisMoreThanOne = true;
+          this.multipleYaxis = true;
           let axisName = newYaxisInfo["evt"].added.element;
           let targetObject = this.dataset[axisName];
           //preprocess before update graph
-          this.resetSeries();
+          this.resetDataArray();
           //preprocess before update graph
           this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
 
           this.updateCategories("secondChart", this.dateArray);
           this.updateYaxis("secondChart", this.dataArray);
-          this.updateSplitGraphs();
+          this.updateVerticalSplitGraphs();
+
+          break;
+      }
+    },
+    checkXaxisPosition(newXaxisInfo) {
+      switch (newXaxisInfo["axisPosition"]) {
+        case "left":
+          // this.updateHorizontalSplitGraphs();
+          break;
+        case "middle":
+          break;
+        case "right":
+          this.updateHorizontalSplitGraphs();
+          this.multipleXaxis = true;
+
+          let axisName = newXaxisInfo["evt"].added.element;
+          let targetObject = this.dataset[axisName];
+          // reset
+          this.resetDateArray();
+          //preprocess before update graphs
+          this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
+
+          this.updateCategories("thirdChart", this.dateArray);
+          this.updateYaxis("thirdChart", this.dataArray);
 
           break;
       }
@@ -502,9 +446,13 @@ export default {
         this.$refs.edaChart.toggleDataPointSelection(0, i);
       }
     },
-    resetSeries() {
+    resetDataArray() {
       // console.log("rest");
       this.dataArray = [];
+    },
+    resetDateArray() {
+      // console.log("rest");
+      this.dateArray = [];
     }
   }
 };
