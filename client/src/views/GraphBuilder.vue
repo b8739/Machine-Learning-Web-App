@@ -28,27 +28,40 @@
               <v-flex xs2>
                 <ColumnList :columns="columns" :styleObject="style_columnList">
                   <v-subheader>{{ columns.length }} 개 열</v-subheader>
-                </ColumnList></v-flex
-              >
+                </ColumnList>
+              </v-flex>
               <v-divider vertical></v-divider>
               <!-- 우측 -->
               <v-flex xs6>
-                <v-layout column>
-                  <!-- 우측 - 상단 -->
-                  <v-flex><GraphTypeToolbar /></v-flex>
-                  <!-- 우측 - 하단 -->
-                  <v-layout row>
-                    <!-- 우측 - 하단 - 좌측-->
-                    <v-flex xs2><DragBoxYaxis :styleObject="style_Dragbox_yaxis"/></v-flex>
-                    <!-- 우측 - 하단 - 우측-->
-                    <v-flex>
-                      <v-layout column
-                        ><v-flex><ApexChart :graphHeight="500"/></v-flex>
-                        <v-flex
-                          ><DragBoxXaxis :styleObject="style_DragBox_xaxis"/></v-flex></v-layout
-                    ></v-flex>
-                  </v-layout>
-                </v-layout>
+                <!-- 우측 - 상단 -->
+                <v-flex><GraphTypeToolbar /></v-flex>
+                <!-- 우측 - 하단 -->
+                <!-- 우측 - 하단 - 좌측-->
+                <v-container>
+                  <v-row>
+                    <v-col cols="2"
+                      ><DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                    </v-col>
+                    <v-col cols="10"> <ApexChart :graphHeight="500"/></v-col>
+                    <v-col cols="3"></v-col>
+                    <v-col cols="3">
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" />
+                    </v-col>
+                    <v-col cols="3">
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" />
+                    </v-col>
+                    <v-col cols="3">
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" />
+                    </v-col>
+                  </v-row>
+                </v-container>
+
+                <!-- 우측 - 하단 - 우측-->
+                <v-flex>
+                  <v-layout column> <v-flex></v-flex></v-layout
+                ></v-flex>
               </v-flex>
 
               <div style="height:300px;background-color:red"></div>
@@ -94,13 +107,10 @@ export default {
     ApexChart,
     GraphTypeToolbar
   },
-  created(){
+  created() {
     eventBus.$on("openDialogue", dialogStatus => {
-      
-        this.dialog = dialogStatus;
-    })
-  },
-
-  
+      this.dialog = dialogStatus;
+    });
+  }
 };
 </script>

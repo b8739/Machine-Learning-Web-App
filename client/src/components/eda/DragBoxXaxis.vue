@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dragXaxisBox">
     <slot></slot>
     <v-chip-group :style="styleObject" row>
       <draggable
@@ -46,3 +46,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.dragXaxisBox {
+  border: 1px solid rgb(90, 47, 47);
+  margin: 0 auto;
+}
+</style>

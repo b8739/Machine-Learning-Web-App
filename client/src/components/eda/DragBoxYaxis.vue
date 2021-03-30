@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dragYaxisBox">
     <slot></slot>
     <v-chip-group :style="styleObject" column>
       <draggable
@@ -45,3 +45,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.dragYaxisBox {
+  border: 1px solid rgb(90, 47, 47);
+  margin: 40px 0;
+}
+</style>

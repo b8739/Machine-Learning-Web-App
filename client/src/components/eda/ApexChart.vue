@@ -8,6 +8,7 @@
       :options="options"
       :series="series"
     ></apexchart>
+    <!-- <apexchart :options="otherOption"> </apexchart> -->
   </div>
 </template>
 
@@ -38,15 +39,29 @@ export default {
       firstMount: true,
       // datasetByName: [], legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
       // options
+      otherOption: {
+        chart: {
+          id: "id1",
+          group: "samegroup",
+          type: "area"
+        },
+        yaxis: {
+          labels: {
+            minWidth: 40
+          }
+        }
+      },
       options: {
         chart: {
+          id: "id2",
+          group: "samegroup",
           type: "area",
           toolbar: {
             show: true
           },
           //zoom
           zoom: {
-            type:'xy',
+            type: "xy",
             enabled: true,
             autoScaleYaxis: true,
             zoomedArea: {
@@ -146,6 +161,11 @@ export default {
               fontSize: "10px",
               fontWeight: 200
             }
+          }
+        },
+        yaxis: {
+          labels: {
+            minWidth: 40
           }
         },
         legend: {
