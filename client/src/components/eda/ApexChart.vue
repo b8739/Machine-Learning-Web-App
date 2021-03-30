@@ -1,29 +1,40 @@
 <template>
   <div id="container">
-    <apexchart
-      ref="edaChart"
-      type="line"
-      :width="graphWidth"
-      :height="graphHeight"
-      :options="options"
-    ></apexchart>
-    <apexchart
-      v-show="multipleYaxis"
-      ref="secondChart"
-      type="line"
-      :width="graphWidth"
-      :height="graphHeight"
-      :options="options"
-    >
-    </apexchart>
-    <apexchart
-      ref="thirdChart"
-      type="line"
-      :width="graphWidth"
-      :height="graphHeight"
-      :options="options"
-    >
-    </apexchart>
+    <v-layout row>
+      <v-flex xs8>
+        <v-layout row>
+          <v-flex>
+            <apexchart
+              ref="edaChart"
+              type="line"
+              :width="graphWidth"
+              :height="graphHeight"
+              :options="options"
+            ></apexchart>
+          </v-flex>
+          <v-flex v-show="multipleXaxis">
+            <apexchart
+              ref="thirdChart"
+              type="line"
+              :width="graphWidth"
+              :height="graphHeight"
+              :options="options"
+            >
+            </apexchart>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+      <v-flex xs8 v-show="multipleYaxis"
+        ><apexchart
+          ref="secondChart"
+          type="line"
+          :width="graphWidth"
+          :height="graphHeight"
+          :options="options"
+        >
+        </apexchart
+      ></v-flex>
+    </v-layout>
   </div>
 </template>
 
@@ -222,8 +233,9 @@ export default {
     });
     eventBus.$on("yaxisBeingRemoved", status => {
       // console.log(status);
-      this.multipleYaxis = status; //false
-      this.$refs.secondChart.resetDataArray();
+      this.multipleYaxis = status;
+      //false
+      // this.$refs.secondChart.resetDataArray();
       this.$refs.edaChart.updateOptions({
         chart: {
           height: "500px"
@@ -378,7 +390,7 @@ export default {
           // id: "ab",
           group: "",
 
-          width: "250px"
+          width: "300px"
         }
       });
       this.$refs.thirdChart.updateOptions({
@@ -386,7 +398,7 @@ export default {
           id: "ef",
           group: "social1",
 
-          width: "250px"
+          width: "300px"
         },
         xaxis: {
           type: "numeric"

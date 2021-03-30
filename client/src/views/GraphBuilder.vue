@@ -32,7 +32,7 @@
               </v-flex>
               <v-divider vertical></v-divider>
               <!-- 우측 -->
-              <v-flex xs6>
+              <v-flex xs8>
                 <!-- 우측 - 상단 -->
                 <v-flex><GraphTypeToolbar /></v-flex>
                 <!-- 우측 - 하단 -->
