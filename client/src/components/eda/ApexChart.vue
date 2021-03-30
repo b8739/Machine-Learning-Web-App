@@ -28,7 +28,7 @@ export default {
     return {
       // eventbus
       newXaxisKey: null,
-      newYaxisKey: null,
+      newYaxisInfo: null,
       graphType: null,
       axisMoreThanOne: false,
       // original
@@ -96,18 +96,6 @@ export default {
             autoSelected: "selection"
           },
           events: {
-            // zoom events
-            // beforeZoom: (chartContext, { xaxis }) => {
-            //   this.updateSelection();
-            //   this.xaxisWhenZoomed = xaxis;
-            //   this.$emit("xaxis", this.xaxisWhenZoomed);
-            //   this.toggleDataPointSelection(xaxis);
-            //   return {
-            //     xaxis: {
-            //       min: 0
-            //     }
-            //   };
-            // },
             legendClick: function(chartContext, seriesIndex, config) {
               // console.log(seriesIndex);
               // ...
@@ -194,9 +182,9 @@ export default {
         this.updateCategories(this.dateArray);
       }
     },
-    newYaxisKey: function(data) {
+    newYaxisInfo: function(data) {
       if (data != null || data != undefined) {
-        const axisName = data.added.element;
+        const axisName = this.newYaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
         this.resetSeries();
         //preprocess before update graph
@@ -232,15 +220,23 @@ export default {
     eventBus.$on("xaxisBeingDragged", newXaxisKey => {
       this.newXaxisKey = newXaxisKey;
     });
-    eventBus.$on("yaxisBeingDragged", newYaxisKey => {
-      this.newYaxisKey = newYaxisKey;
+    eventBus.$on("yaxisBeingDragged", newYaxisInfo => {
+      this.newYaxisInfo = newYaxisInfo;
+      switch (this.newYaxisInfo["axisPosition"]) {
+        case "top":
+          this.updateAllGraphSize();
+
+          break;
+        case "middle":
+          break;
+        case "bottom":
+          this.updateAllGraphSize();
+
+          break;
+      }
     });
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
-    });
-    eventBus.$on("yaxisPosition", axisPosition => {
-      this.axisMoreThanOne = true;
-      this.updateAllGraphSize();
     });
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {

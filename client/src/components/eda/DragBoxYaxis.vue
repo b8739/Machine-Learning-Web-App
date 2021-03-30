@@ -26,17 +26,10 @@ export default {
   },
   methods: {
     onDrop(evt) {
-      switch (this.axisPosition) {
-        case "top":
-          break;
-        case "middle":
-          eventBus.$emit("yaxisBeingDragged", evt);
-          this.columns = [evt.added.element];
-          break;
-        case "bottom":
-          eventBus.$emit("yaxisPosition", this.axisPosition);
-          break;
-      }
+      let axisInfo = { evt: evt, axisPosition: this.axisPosition };
+      eventBus.$emit("yaxisBeingDragged", axisInfo);
+      //드래그 박스에 chip 하나만 유지하도록 초기화
+      this.columns = [evt.added.element];
     }
   },
   props: ["styleObject", "axisPosition"],
