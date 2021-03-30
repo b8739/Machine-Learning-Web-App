@@ -21,7 +21,7 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: [""]
+      columns: []
     };
   },
   methods: {

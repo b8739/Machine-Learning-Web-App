@@ -22,7 +22,7 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: [""]
+      columns: []
     };
   },
   props: ["styleObject", "axisPosition"],

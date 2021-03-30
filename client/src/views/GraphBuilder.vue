@@ -14,6 +14,7 @@
             <v-btn icon dark @click="dialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
+            <v-spacer></v-spacer>
             <v-toolbar-title>EDA Graph Builder</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items>
@@ -34,6 +35,7 @@
               <!-- 우측 -->
               <v-flex xs8>
                 <!-- 우측 - 상단 -->
+
                 <v-flex><GraphTypeToolbar /></v-flex>
                 <!-- 우측 - 하단 -->
                 <!-- 우측 - 하단 - 좌측-->
@@ -48,12 +50,12 @@
                     </v-col>
                     <v-col cols="10"> <ApexChart :graphHeight="500"/></v-col>
                     <v-col cols="2"></v-col>
-                    <v-col cols="3">
+                    <v-col cols="2">
                       <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="left" />
                     </v-col>
-                    <v-col cols="4" class="axisTitle">
-                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="middle">
-                        X
+                    <v-col cols="3" class="axisTitle">
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="middle"
+                        ><span> X</span>
                       </DragBoxXaxis>
                     </v-col>
                     <v-col cols="3">
