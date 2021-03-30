@@ -33,7 +33,7 @@ def summarizeData(df):
   for each in df_numeric:
     df[each] = pd.to_numeric(df[each], downcast="unsigned")
   
-  ''' 2) Numeric 정보 담은 변수 생성 과정 '''
+  ''' 2) Numeric 정보를 담고 있는 변수 생성 과정 '''
   '''2-1 Numeric'''
   # 2-1-1) 각 numeric 관련 변수 생성
   df_numeric_columns = list((df_numeric).columns)

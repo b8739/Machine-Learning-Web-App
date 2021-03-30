@@ -31,6 +31,7 @@ export default {
       // datasetByName: [], legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
       dateByName: [],
       options: {
+        // chart
         chart: {
           type: "area",
           toolbar: {
@@ -38,8 +39,9 @@ export default {
           },
           //zoom
           zoom: {
+            type:'xy',
             enabled: true,
-            autoScaleXaxis: false,
+            autoScaleYaxis: true,  
             zoomedArea: {
               fill: {
                 color: "#90CAF9",

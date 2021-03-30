@@ -4,13 +4,27 @@
     <nav>
       <a href="#">Datasets</a>
       <a href="#">Preprocess</a>
-      <a href="#">EDA</a>
+      <a href="#" @click="openDialogue()">EDA</a>
       <a href="#">Modeling</a>
       <a href="#">Optimize</a>
     </nav>
   </div>
 </template>
+<script>
+import { eventBus } from "@/main";
+export default {
+  data(){
+return{
+}
+  },
+  methods:{
+  openDialogue(){
+    eventBus.$emit("openDialogue",true);
+  }
+  }
 
+}
+</script>
 <style scoped>
 /* reset */
 

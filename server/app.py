@@ -9,6 +9,7 @@ from sqlalchemy import create_engine, MetaData, text, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from flask_sqlalchemy import SQLAlchemy
+import mysql.connector
 from flask_mysqldb import MySQL
 
 from config import DB_URL
@@ -57,7 +58,7 @@ class DataInfo(Base):
     numofna = Column(String(300))
     
 # engine
-engine = create_engine('mysql+mysqldb://root:root@localhost/newdatabase',echo = False)
+engine = create_engine('mysql+mysqldb://root:0000@localhost/newdatabase',echo = False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -82,6 +83,7 @@ def dataupload():
     # pyarrow
     pyarrow_table = csv.read_csv(file)
     df = pyarrow_table.to_pandas()
+    # df = pd.read_csv(file)
 		# pandas
     # df = pd.read_csv(file, dtype={"ts": "category"})
     # df = pd.concat(tp)

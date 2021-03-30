@@ -3,11 +3,12 @@
     <v-row justify="center">
       <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
         <!-- Trigger 버튼 -->
-        <template v-slot:activator="{ on, attrs }">
+        <!-- <template v-slot:activator="{ on, attrs }">
+          <button v-on="on">hi</button>
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
             EDA
           </v-btn>
-        </template>
+        </template> -->
         <v-card>
           <v-toolbar color="primary">
             <v-btn icon dark @click="dialog = false">
@@ -64,6 +65,7 @@ import ApexChart from "@/components/eda/ApexChart.vue";
 import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
 import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
 import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
+import { eventBus } from "@/main";
 export default {
   data() {
     return {
@@ -91,6 +93,14 @@ export default {
     DragBoxYaxis,
     ApexChart,
     GraphTypeToolbar
-  }
+  },
+  created(){
+    eventBus.$on("openDialogue", dialogStatus => {
+      
+        this.dialog = dialogStatus;
+    })
+  },
+
+  
 };
 </script>

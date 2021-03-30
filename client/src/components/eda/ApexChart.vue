@@ -46,8 +46,9 @@ export default {
           },
           //zoom
           zoom: {
+            type:'xy',
             enabled: true,
-            autoScaleXaxis: false,
+            autoScaleYaxis: true,
             zoomedArea: {
               fill: {
                 color: "#90CAF9",
