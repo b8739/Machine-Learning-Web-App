@@ -36,6 +36,7 @@ export default {
           this.columns = [evt.added.element];
           break;
         case "removed":
+          eventBus.$emit("yaxisBeingRemoved", false);
           break;
       }
     }

@@ -322,6 +322,16 @@ export default {
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
     });
+    eventBus.$on("yaxisBeingRemoved", status => {
+      console.log(status);
+      this.axisMoreThanOne = status; //false
+      this.$refs.secondChart.resetSeries();
+      this.$refs.edaChart.updateOptions({
+        chart: {
+          height: "500px"
+        }
+      });
+    });
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
