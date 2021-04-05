@@ -351,18 +351,25 @@ export default {
     },
     //APEX CHART
 
-    updateYaxis(chartRefs, columnName, dataSet) {
+    updateYaxis(chartRefs, axisName, dataSet) {
       // console.log(chartRefs);
       this.$refs[chartRefs].updateSeries(
         [
           {
-            name: columnName,
+            name: axisName,
             data: dataSet
           }
         ],
         false,
         true
       );
+      this.$refs[chartRefs].updateOptions({
+        yaxis: {
+          title: {
+            text: axisName
+          }
+        }
+      });
     },
     updateCategories(chartRefs, newCategories) {
       this.$refs[chartRefs].updateOptions({
