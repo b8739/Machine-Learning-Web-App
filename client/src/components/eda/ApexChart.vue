@@ -216,10 +216,20 @@ export default {
 
         let axisName = this.newYaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
+        let numOfDragElement = this.newYaxisInfo["numOfDragElement"];
         this.resetDataArray();
         //preprocess before update graph
         this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
-        this.updateYaxis("edaChart", axisName, this.dataArray);
+        if (numOfDragElement == 0) {
+          this.updateYaxis("edaChart", axisName, this.dataArray);
+          console.log();
+          console.log(axisName);
+          console.log(this.dataArray);
+        } else {
+          this.appendSeries("edaChart", axisName, this.dataArray);
+          console.log(axisName);
+          // console.log(this.dataArray);
+        }
       }
     },
     graphType: function(data) {
@@ -350,6 +360,12 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
+    appendSeries(chartRefs, seriesName, dataSet) {
+      this.$refs[chartRefs].appendSeries({
+        name: seriesName,
+        data: dataSet
+      });
+    },
 
     updateYaxis(chartRefs, axisName, dataSet) {
       // console.log(chartRefs);
@@ -364,11 +380,13 @@ export default {
         true
       );
       this.$refs[chartRefs].updateOptions({
-        yaxis: {
-          title: {
-            text: axisName
+        yaxis: [
+          {
+            title: {
+              text: axisName
+            }
           }
-        }
+        ]
       });
     },
     updateCategories(chartRefs, newCategories) {
@@ -489,7 +507,7 @@ export default {
     },
     resetDataArray() {
       // console.log("rest");
-      this.dataArray2 = [];
+      this.dataArray = [];
     },
     resetDateArray() {
       // console.log("rest");

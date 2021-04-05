@@ -21,20 +21,28 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: []
+      columns: [],
+      numOfDragElement: 0
     };
   },
   methods: {
     onDragEvent(evt) {
       let eventName = Object.keys(evt)[0];
+      console.log(evt);
       switch (eventName) {
         case "added":
-          let axisInfo = { evt: evt, axisPosition: this.axisPosition };
+          let axisInfo = {
+            evt: evt,
+            axisPosition: this.axisPosition,
+            numOfDragElement: this.numOfDragElement
+          };
           eventBus.$emit("yaxisBeingDragged", axisInfo);
+          this.numOfDragElement++;
           //드래그 박스에 chip 하나만 유지하도록 초기화
-          this.columns = [evt.added.element];
+          // this.columns = [evt.added.element];
           break;
         case "removed":
+          numOfDragElement--;
           eventBus.$emit("yaxisBeingRemoved", false);
           break;
       }
