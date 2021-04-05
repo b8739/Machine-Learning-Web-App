@@ -243,6 +243,17 @@ export default {
         }
       });
     });
+    eventBus.$on("xaxisBeingRemoved", status => {
+      // console.log(status);
+      this.multipleXaxis = status;
+      //false
+      // this.$refs.secondChart.resetDataArray();
+      this.$refs.edaChart.updateOptions({
+        chart: {
+          width: "500px"
+        }
+      });
+    });
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
@@ -388,8 +399,8 @@ export default {
     updateHorizontalSplitGraphs() {
       this.$refs.edaChart.updateOptions({
         chart: {
-          // id: "ab",
-          group: "",
+          id: "ab",
+          group: "social1",
 
           width: "300px"
         }
@@ -419,7 +430,7 @@ export default {
           let axisName = newYaxisInfo["evt"].added.element;
           let targetObject = this.dataset[axisName];
           //preprocess before update graph
-          // this.resetDataArray();
+          this.resetDataArray();
           //preprocess before update graph
           this.putIntoArray(targetObject, this.dataArray2, this.randomIndexArray);
 
@@ -461,7 +472,7 @@ export default {
     },
     resetDataArray() {
       // console.log("rest");
-      this.dataArray = [];
+      this.dataArray2 = [];
     },
     resetDateArray() {
       // console.log("rest");
