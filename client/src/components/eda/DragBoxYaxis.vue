@@ -27,7 +27,6 @@ export default {
   methods: {
     onDragEvent(evt) {
       let eventName = Object.keys(evt)[0];
-      console.log(eventName);
       switch (eventName) {
         case "added":
           let axisInfo = { evt: evt, axisPosition: this.axisPosition };

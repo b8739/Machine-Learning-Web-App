@@ -12,7 +12,7 @@
               :options="options"
             ></apexchart>
           </v-flex>
-          <v-flex v-show="multipleXaxis">
+          <!-- <v-flex v-show="multipleXaxis">
             <apexchart
               ref="thirdChart"
               type="line"
@@ -21,10 +21,10 @@
               :options="options"
             >
             </apexchart>
-          </v-flex>
+          </v-flex> -->
         </v-layout>
       </v-flex>
-      <v-flex xs8 v-show="multipleYaxis"
+      <!-- <v-flex xs8 v-show="multipleYaxis"
         ><apexchart
           ref="secondChart"
           type="line"
@@ -33,7 +33,7 @@
           :options="options"
         >
         </apexchart
-      ></v-flex>
+      ></v-flex> -->
     </v-layout>
   </div>
 </template>
@@ -70,9 +70,25 @@ export default {
         chart: {
           id: "cc",
           group: "social",
-          type: "area",
+          type: "line",
+          stacked: false,
           toolbar: {
-            show: true
+            show: true,
+            autoSelected: "selection",
+            tools: {
+              download: false,
+              customIcons: [
+                {
+                  icon: '<p  width="20"> G<p>',
+                  index: 6,
+                  title: "tooltip of the icon",
+                  class: "custom-icon",
+                  click: function(chart, options, e) {
+                    console.log(chart);
+                  }
+                }
+              ]
+            }
           },
           //zoom
           zoom: {
@@ -106,9 +122,7 @@ export default {
               opacity: 0.4
             }
           },
-          toolbar: {
-            autoSelected: "selection"
-          },
+
           events: {
             legendClick: function(chartContext, seriesIndex, config) {
               // console.log(seriesIndex);
@@ -199,14 +213,13 @@ export default {
     newYaxisInfo: function(data) {
       if ((data != null || data != undefined) && this.newYaxisInfo["axisPosition"] == "middle") {
         // console.log(`newYaxisInfo: ${this.newYaxisInfo["axisPosition"]}`);
-        console.log(this.newYaxisInfo["axisPosition"]);
+
         let axisName = this.newYaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
         this.resetDataArray();
         //preprocess before update graph
         this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
-        this.updateYaxis("edaChart", this.dataArray);
-        this.updateYaxis("thirdChart", this.dataArray);
+        this.updateYaxis("edaChart", axisName, this.dataArray);
       }
     },
     graphType: function(data) {
@@ -338,11 +351,12 @@ export default {
     },
     //APEX CHART
 
-    updateYaxis(chartRefs, dataSet) {
+    updateYaxis(chartRefs, columnName, dataSet) {
       // console.log(chartRefs);
       this.$refs[chartRefs].updateSeries(
         [
           {
+            name: columnName,
             data: dataSet
           }
         ],
@@ -435,7 +449,7 @@ export default {
           this.putIntoArray(targetObject, this.dataArray2, this.randomIndexArray);
 
           this.updateCategories("secondChart", this.dateArray);
-          this.updateYaxis("secondChart", this.dataArray2);
+          this.updateYaxis("secondChart", axisName, this.dataArray2);
           this.updateVerticalSplitGraphs();
 
           break;
@@ -458,10 +472,6 @@ export default {
           this.resetDateArray();
           //preprocess before update graphs
           this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
-
-          this.updateCategories("thirdChart", this.dateArray);
-          this.updateYaxis("thirdChart", this.dataArray);
-
           break;
       }
     },

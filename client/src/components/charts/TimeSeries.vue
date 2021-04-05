@@ -35,13 +35,29 @@ export default {
         chart: {
           type: "area",
           toolbar: {
-            show: true
+            show: true,
+            autoSelected: "selection",
+
+            tools: {
+              download: false,
+              customIcons: [
+                {
+                  icon: '<p  width="20"> G<p>',
+                  index: 6,
+                  title: "tooltip of the icon",
+                  class: "custom-icon",
+                  click: function(chart, options, e) {
+                    console.log(options);
+                  }
+                }
+              ]
+            }
           },
           //zoom
           zoom: {
-            type:'xy',
+            type: "xy",
             enabled: true,
-            autoScaleYaxis: true,  
+            autoScaleYaxis: true,
             zoomedArea: {
               fill: {
                 color: "#90CAF9",
@@ -69,9 +85,7 @@ export default {
               opacity: 0.4
             }
           },
-          toolbar: {
-            autoSelected: "selection"
-          },
+
           events: {
             // zoom events
             // beforeZoom: (chartContext, { xaxis }) => {
