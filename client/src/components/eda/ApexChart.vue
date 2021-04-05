@@ -65,6 +65,7 @@ export default {
       dateArray: [],
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
+      axisName: [],
       firstMount: true,
       options: {
         chart: {
@@ -213,21 +214,19 @@ export default {
     newYaxisInfo: function(data) {
       if ((data != null || data != undefined) && this.newYaxisInfo["axisPosition"] == "middle") {
         // console.log(`newYaxisInfo: ${this.newYaxisInfo["axisPosition"]}`);
-
-        let axisName = this.newYaxisInfo["evt"].added.element;
+        this.axisName.push(this.newYaxisInfo["evt"].added.element);
+        let axisName = this.axisName[this.axisName.length - 1];
         let targetObject = this.dataset[axisName];
         let numOfDragElement = this.newYaxisInfo["numOfDragElement"];
         this.resetDataArray();
         //preprocess before update graph
         this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
         if (numOfDragElement == 0) {
-          this.updateYaxis("edaChart", axisName, this.dataArray);
-          console.log();
-          console.log(axisName);
-          console.log(this.dataArray);
+          this.updateSeries("edaChart", axisName, this.dataArray);
         } else {
           this.appendSeries("edaChart", axisName, this.dataArray);
-          console.log(axisName);
+          this.updateYaxis("edaChart", this.axisName);
+
           // console.log(this.dataArray);
         }
       }
@@ -367,7 +366,7 @@ export default {
       });
     },
 
-    updateYaxis(chartRefs, axisName, dataSet) {
+    updateSeries(chartRefs, axisName, dataSet) {
       // console.log(chartRefs);
       this.$refs[chartRefs].updateSeries(
         [
@@ -384,6 +383,23 @@ export default {
           {
             title: {
               text: axisName
+            }
+          }
+        ]
+      });
+    },
+    updateYaxis(chartRefs, axisName) {
+      this.$refs[chartRefs].updateOptions({
+        yaxis: [
+          {
+            title: {
+              text: axisName[0]
+            }
+          },
+          {
+            opposite: true,
+            title: {
+              text: axisName[1]
             }
           }
         ]
@@ -474,7 +490,7 @@ export default {
           this.putIntoArray(targetObject, this.dataArray2, this.randomIndexArray);
 
           this.updateCategories("secondChart", this.dateArray);
-          this.updateYaxis("secondChart", axisName, this.dataArray2);
+          this.updateSeries("secondChart", axisName, this.dataArray2);
           this.updateVerticalSplitGraphs();
 
           break;
