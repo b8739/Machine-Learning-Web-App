@@ -52,6 +52,9 @@ export default {
       //mainfirstChartOption
       firstChartOption: {
         chart: {
+          toolbar: {
+            show: false
+          },
           sparkline: {
             enabled: false
           },
@@ -102,8 +105,10 @@ export default {
           }
         },
         yaxis: {
-          decimalsInFloat: 0
-
+          decimalsInFloat: 0,
+          axisTicks: {
+            show: true
+          }
           // floating: true,
           // labels: {
           //   offsetX: 20,
@@ -185,6 +190,19 @@ export default {
               this.xaxisWhenSelected = xaxis;
               this.$emit("xaxis", this.xaxisWhenSelected);
             }
+          }
+        },
+        subtitle: {
+          text: "hello",
+          align: "center",
+
+          floating: true,
+          offsetY: 5,
+          style: {
+            // fontSize: "12px",
+            fontWeight: "normal",
+            fontFamily: undefined,
+            color: "#9699a2"
           }
         },
         // colors: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
