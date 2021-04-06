@@ -48,7 +48,8 @@
                       </DragBoxYaxis>
                       <DragBoxYaxis :styleObject="style_Dragbox_yaxis" axisPosition="bottom" />
                     </v-col>
-                    <v-col cols="10"> <ApexChart :graphHeight="500"/></v-col>
+                    <v-col cols="10"> <ApexChart /></v-col>
+                    <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
                     <v-col cols="2"></v-col>
                     <v-col cols="2">
                       <DragBoxXaxis :styleObject="style_DragBox_xaxis" axisPosition="left" />

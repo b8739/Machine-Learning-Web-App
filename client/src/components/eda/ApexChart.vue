@@ -1,40 +1,20 @@
 <template>
   <div id="container">
-    <v-layout row>
-      <v-flex xs8>
-        <v-layout row>
-          <v-flex>
+    <v-container>
+      <v-row no-gutters>
+        <v-col v-for="(eachChart, index) in numOfChart" :key="index" cols="12" sm="3">
+          <v-card>
             <apexchart
               ref="edaChart"
               type="line"
               :width="graphWidth"
               :height="graphHeight"
-              :options="options"
+              :options="index === 0 ? firstChartOption : options"
             ></apexchart>
-          </v-flex>
-          <!-- <v-flex v-show="multipleXaxis">
-            <apexchart
-              ref="thirdChart"
-              type="line"
-              :width="graphWidth"
-              :height="graphHeight"
-              :options="options"
-            >
-            </apexchart>
-          </v-flex> -->
-        </v-layout>
-      </v-flex>
-      <!-- <v-flex xs8 v-show="multipleYaxis"
-        ><apexchart
-          ref="secondChart"
-          type="line"
-          :width="graphWidth"
-          :height="graphHeight"
-          :options="options"
-        >
-        </apexchart
-      ></v-flex> -->
-    </v-layout>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -52,6 +32,7 @@ export default {
 
   data() {
     return {
+      numOfChart: [1, 1, 1, 1],
       // eventbus
       newXaxisInfo: null,
       newYaxisInfo: null,
@@ -67,14 +48,79 @@ export default {
       xaxisWhenSelected: {},
       axisName: [],
       firstMount: true,
+
+      //mainfirstChartOption
+      firstChartOption: {
+        chart: {
+          sparkline: {
+            enabled: false
+          },
+          type: "line"
+        },
+        toolbar: {
+          show: false
+        },
+
+        markers: {
+          size: 1,
+          strokeWidth: 0.1,
+          strokeColor: "skyblue",
+          hover: {
+            size: 2,
+            strokeColor: "#fff"
+          }
+        },
+        grid: {
+          show: false
+        },
+        legend: {
+          show: false,
+          showForSingleSeries: true,
+          position: "bottom"
+        },
+        stroke: {
+          width: 1
+        },
+        noData: {
+          text: "Loading..."
+        },
+        xaxis: {
+          type: "datetime",
+          // floating: true,
+          labels: {
+            offsetX: 0,
+            // show: false,
+            minHeight: 50,
+            rotate: -30,
+            rotateAlways: true,
+            hideOverlappingLabels: false,
+            format: "yy/MM/dd",
+            style: {
+              fontSize: "10px",
+              fontWeight: 200
+            }
+          }
+        },
+        yaxis: {
+          decimalsInFloat: 0
+
+          // floating: true,
+          // labels: {
+          //   offsetX: 20,
+          //   offsetY: -10
+          // }
+        }
+      },
+      // mainoptions
       options: {
         chart: {
-          id: "cc",
-          group: "social",
+          sparkline: {
+            enabled: false
+          },
           type: "line",
           stacked: false,
           toolbar: {
-            show: true,
+            show: false,
             autoSelected: "selection",
             tools: {
               download: false,
@@ -85,7 +131,7 @@ export default {
                   title: "tooltip of the icon",
                   class: "custom-icon",
                   click: function(chart, options, e) {
-                    console.log(chart);
+                    // console.log(chart.w.config.yaxis);
                   }
                 }
               ]
@@ -141,6 +187,7 @@ export default {
             }
           }
         },
+        // colors: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
         states: {
           active: {
             allowMultipleDataPointsSelection: true,
@@ -168,8 +215,13 @@ export default {
           text: "Loading..."
         },
         xaxis: {
+          // floating: true,
+          labels: {
+            // offsetX: 0
+          },
           type: "datetime",
           labels: {
+            // show: false,
             minHeight: 50,
             rotate: -30,
             rotateAlways: true,
@@ -181,13 +233,18 @@ export default {
             }
           }
         },
+        // mainYaxis
         yaxis: {
+          floating: true,
           labels: {
-            minWidth: 40
+            offsetX: -50
           }
         },
+        grid: {
+          show: false
+        },
         legend: {
-          show: true,
+          show: false,
           showForSingleSeries: true,
           position: "bottom"
         },
@@ -208,7 +265,7 @@ export default {
         //preprocess before update graph
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
-        this.updateCategories("edaChart", this.dateArray);
+        this.updateCategories(this.dateArray);
       }
     },
     newYaxisInfo: function(data) {
@@ -218,15 +275,31 @@ export default {
         let axisName = this.axisName[this.axisName.length - 1];
         let targetObject = this.dataset[axisName];
         let numOfDragElement = this.newYaxisInfo["numOfDragElement"];
-        this.resetDataArray();
-        //preprocess before update graph
-        this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
-        if (numOfDragElement == 0) {
-          this.updateSeries("edaChart", axisName, this.dataArray);
-        } else {
-          this.appendSeries("edaChart", axisName, this.dataArray);
-          this.updateYaxis("edaChart", this.axisName);
 
+        //yaxis를 처음 추가할 때
+        if (numOfDragElement == 0) {
+          this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
+          this.updateSeries(axisName, this.dataArray);
+        }
+        //yaxis가 이미 1개 이상 존재할 때
+        else {
+          let gapOfDatasets = Math.abs(this.dataArray[0] - targetObject[0]);
+          this.resetDataArray();
+          this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
+
+          //2개의 데이터셋의 격차가 커서, yaxis를 양쪽으로 나누어야 할 경우
+          if (gapOfDatasets >= 10) {
+            let minOfDataset = Math.round(
+              Math.min.apply(null, this.dataArray) - Math.min.apply(null, this.dataArray) * 0.5
+            );
+            // console.log(minOfDataset);
+            this.updateYaxis(this.axisName, minOfDataset);
+            this.appendSeries(axisName, this.dataArray);
+
+            //2개의 데이터셋의 격차가 적어서, yaxis를 공유하는 경우
+          } else {
+            this.appendSeries(axisName, this.dataArray);
+          }
           // console.log(this.dataArray);
         }
       }
@@ -359,58 +432,109 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
-    appendSeries(chartRefs, seriesName, dataSet) {
-      this.$refs[chartRefs].appendSeries({
-        name: seriesName,
-        data: dataSet
-      });
+    appendSeries(seriesName, dataSet) {
+      for (let i = 0; i < this.numOfChart.length; i++) {
+        this.$refs.edaChart[i].appendSeries({
+          name: seriesName,
+          data: dataSet
+        });
+      }
     },
 
-    updateSeries(chartRefs, axisName, dataSet) {
-      // console.log(chartRefs);
-      this.$refs[chartRefs].updateSeries(
-        [
+    updateSeries(axisName, dataSet) {
+      for (let i = 0; i < this.numOfChart.length; i++) {
+        this.$refs.edaChart[i].updateOptions(
           {
-            name: axisName,
-            data: dataSet
-          }
-        ],
-        false,
-        true
-      );
-      this.$refs[chartRefs].updateOptions({
-        yaxis: [
-          {
-            title: {
-              text: axisName
-            }
-          }
-        ]
-      });
-    },
-    updateYaxis(chartRefs, axisName) {
-      this.$refs[chartRefs].updateOptions({
-        yaxis: [
-          {
-            title: {
-              text: axisName[0]
-            }
+            series: [
+              {
+                name: axisName,
+                data: dataSet
+              }
+            ]
+            // yaxis: [
+            //   {
+            //     seriesName: axisName,
+            //     axisBorder: {
+            //       color: "#2E93fA"
+            //     },
+            //     labels: {
+            //       style: {
+            //         colors: "#2E93fA"
+            //       }
+            //     },
+            //     title: {
+            //       text: axisName,
+            //       style: {
+            //         color: "#2E93fA"
+            //       }
+            //     }
+            //   }
+            // ]
           },
-          {
-            opposite: true,
-            title: {
-              text: axisName[1]
-            }
-          }
-        ]
-      });
+          false,
+          false
+        );
+      }
     },
-    updateCategories(chartRefs, newCategories) {
-      this.$refs[chartRefs].updateOptions({
-        xaxis: {
-          categories: newCategories
-        }
-      });
+    updateYaxis(axisName, minOfDataset) {
+      for (let i = 0; i < this.numOfChart.length; i++) {
+        this.$refs[edaChart[i]].updateOptions(
+          {
+            yaxis: [
+              {
+                seriesName: axisName[0],
+                // tickAmount: 3,
+                axisBorder: {
+                  color: "#2E93fA"
+                },
+                labels: {
+                  style: {
+                    colors: "#2E93fA"
+                  }
+                },
+                title: {
+                  text: axisName[0],
+                  style: {
+                    color: "#2E93fA"
+                  }
+                }
+              },
+
+              {
+                seriesName: axisName[1],
+
+                opposite: true,
+                // min: minOfDataset,
+                labels: {
+                  style: {
+                    colors: "#00E396"
+                  }
+                },
+                axisBorder: {
+                  color: "#00E396"
+                },
+                title: {
+                  text: axisName[1],
+                  style: {
+                    color: "#00E396"
+                  }
+                }
+              }
+            ]
+          },
+          false,
+          false
+        );
+      }
+    },
+    updateCategories(newCategories) {
+      for (let i = 0; i < this.numOfChart.length; i++) {
+        this.$refs.edaChart[i].updateOptions({
+          xaxis: {
+            categories: newCategories
+          }
+        });
+      }
     },
     updateGraphType(graphType) {
       this.$refs.edaChart.updateOptions({
@@ -431,48 +555,7 @@ export default {
         }
       });
     },
-    updateVerticalSplitGraphs() {
-      this.$refs.edaChart.updateOptions({
-        chart: {
-          // sync graph info
-          id: "ab",
-          group: "social",
-          //size
-          height: "250px"
-        }
-      });
-      this.$refs.secondChart.updateOptions({
-        chart: {
-          // sync graph info
-          id: "cd",
-          group: "social",
-          //size
-          height: "250px"
-        }
-      });
-    },
-    updateHorizontalSplitGraphs() {
-      this.$refs.edaChart.updateOptions({
-        chart: {
-          id: "ab",
-          group: "social1",
 
-          width: "300px"
-        }
-      });
-      this.$refs.thirdChart.updateOptions({
-        chart: {
-          id: "ef",
-          group: "social1",
-
-          width: "300px"
-        },
-        xaxis: {
-          type: "numeric"
-        }
-      });
-      // this.graphWidth = "250px";
-    },
     checkYaxisPosition(newYaxisInfo) {
       switch (newYaxisInfo["axisPosition"]) {
         case "top":
@@ -532,3 +615,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+v-col {
+  background-color: #000;
+  border: 1px solid #000;
+}
+</style>
