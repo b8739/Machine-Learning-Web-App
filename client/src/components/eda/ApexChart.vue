@@ -2,14 +2,22 @@
   <div id="container">
     <v-container>
       <v-row no-gutters>
-        <v-col v-for="(eachChart, index) in numOfChart" :key="index" cols="12" sm="3">
+        <v-col
+          v-for="(eachChart, index) in quantileInfo"
+          :key="index"
+          cols="12"
+          :sm="quantileInfo.length === 1 ? 10 : 3"
+        >
           <v-card>
+            <v-card-subtitle v-if="quantileInfo.length > 1" class="justify-center">
+              {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }}
+            </v-card-subtitle>
             <apexchart
               ref="edaChart"
               type="line"
               :width="graphWidth"
               :height="graphHeight"
-              :options="index === 0 ? firstChartOption : options"
+              :options="index === 0 ? firstGroupingChartOption : groupingChartOption"
             ></apexchart>
           </v-card>
         </v-col>
@@ -27,43 +35,45 @@ import { mapState } from "vuex";
 export default {
   name: "ApexChart",
 
-  props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "rawDataset", "seriesName"],
+  props: [
+    "graphWidth",
+    "graphHeight",
+    "date",
+    "editModal_hidden",
+    "rawDataset",
+    "seriesName",
+    "summarizedData"
+  ],
   // legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
 
   data() {
     return {
-      numOfChart: [1, 1, 1, 1],
+      quantileInfo: [1],
       // eventbus
       newXaxisInfo: null,
       newYaxisInfo: null,
       graphType: null,
-      multipleYaxis: false,
-      multipleXaxis: false,
+      xGroupInfo: null,
       // original
       dataArray: [],
-      dataArray2: [],
       randomIndexArray: [],
       dateArray: [],
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
       axisName: [],
       firstMount: true,
-
       //mainfirstChartOption
-      firstChartOption: {
+      firstGroupingChartOption: {
         chart: {
           toolbar: {
-            show: false
+            //Grouping시 변경
+            show: true
           },
           sparkline: {
             enabled: false
           },
           type: "line"
         },
-        toolbar: {
-          show: false
-        },
-
         markers: {
           size: 1,
           strokeWidth: 0.1,
@@ -77,7 +87,8 @@ export default {
           show: false
         },
         legend: {
-          show: false,
+          //Grouping시 변경
+          show: true,
           showForSingleSeries: true,
           position: "bottom"
         },
@@ -105,19 +116,22 @@ export default {
           }
         },
         yaxis: {
-          decimalsInFloat: 0,
+          decimalsInFloat: 1,
+
           axisTicks: {
             show: true
-          }
+          },
+          axisBorder: {
+            show: true
+          },
           // floating: true,
-          // labels: {
-          //   offsetX: 20,
-          //   offsetY: -10
-          // }
+          labels: {
+            show: true
+          }
         }
       },
       // mainoptions
-      options: {
+      groupingChartOption: {
         chart: {
           sparkline: {
             enabled: false
@@ -192,19 +206,19 @@ export default {
             }
           }
         },
-        subtitle: {
-          text: "hello",
-          align: "center",
+        // subtitle: {
+        //   text: "hello",
+        //   align: "center",
 
-          floating: true,
-          offsetY: 5,
-          style: {
-            // fontSize: "12px",
-            fontWeight: "normal",
-            fontFamily: undefined,
-            color: "#9699a2"
-          }
-        },
+        //   floating: true,
+        //   offsetY: 5,
+        //   style: {
+        //     // fontSize: "12px",
+        //     fontWeight: "normal",
+        //     fontFamily: undefined,
+        //     color: "#9699a2"
+        //   }
+        // },
         // colors: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
         states: {
           active: {
@@ -272,9 +286,10 @@ export default {
       }
     };
   },
+
   watch: {
     newXaxisInfo: function(data) {
-      if ((data != null || data != undefined) && this.newXaxisInfo["axisPosition"] == "middle") {
+      if (data != null || data != undefined) {
         // console.log(`newXaxisInfo: ${this.newXaxisInfo["axisPosition"]}`);
         let axisName = this.newXaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
@@ -287,7 +302,7 @@ export default {
       }
     },
     newYaxisInfo: function(data) {
-      if ((data != null || data != undefined) && this.newYaxisInfo["axisPosition"] == "middle") {
+      if (data != null || data != undefined) {
         // console.log(`newYaxisInfo: ${this.newYaxisInfo["axisPosition"]}`);
         this.axisName.push(this.newYaxisInfo["evt"].added.element);
         let axisName = this.axisName[this.axisName.length - 1];
@@ -322,6 +337,18 @@ export default {
         }
       }
     },
+    xGroupInfo: function(data) {
+      if (data != null || data != undefined) {
+        let xGroupName = this.xGroupInfo["evt"].added.element;
+        // console.log(`xGroupName: ${xGroupName}`);
+        this.quantileInfo = [];
+        this.quantileInfo.push(this.summarizedData.quantile1[xGroupName]);
+        this.quantileInfo.push(this.summarizedData.quantile2[xGroupName]);
+        this.quantileInfo.push(this.summarizedData.quantile3[xGroupName]);
+        this.quantileInfo.push(this.summarizedData.quantile4[xGroupName]);
+        this.updateGroupingOption();
+      }
+    },
     graphType: function(data) {
       if (data != null || data != undefined) {
         this.updateGraphType(data);
@@ -336,37 +363,33 @@ export default {
     // eventbus
     eventBus.$on("xaxisBeingDragged", newXaxisInfo => {
       this.newXaxisInfo = newXaxisInfo;
-      this.checkXaxisPosition(this.newXaxisInfo);
     });
+
     eventBus.$on("yaxisBeingDragged", newYaxisInfo => {
       this.newYaxisInfo = newYaxisInfo;
-      this.checkYaxisPosition(this.newYaxisInfo);
+    });
+    eventBus.$on("xGroupBeingDragged", xGroupInfo => {
+      this.xGroupInfo = xGroupInfo;
     });
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
     });
-    eventBus.$on("yaxisBeingRemoved", status => {
-      // console.log(status);
-      this.multipleYaxis = status;
-      //false
-      // this.$refs.secondChart.resetDataArray();
-      this.$refs.edaChart.updateOptions({
-        chart: {
-          height: "500px"
-        }
-      });
-    });
     eventBus.$on("xaxisBeingRemoved", status => {
-      // console.log(status);
-      this.multipleXaxis = status;
-      //false
-      // this.$refs.secondChart.resetDataArray();
       this.$refs.edaChart.updateOptions({
         chart: {
           width: "500px"
         }
       });
     });
+
+    eventBus.$on("yaxisBeingRemoved", status => {
+      this.$refs.edaChart.updateOptions({
+        chart: {
+          height: "500px"
+        }
+      });
+    });
+
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
@@ -383,6 +406,13 @@ export default {
     ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum })
   },
   methods: {
+    quantilePrevIndex(index) {
+      if (index == 0) {
+        return 0;
+      } else {
+        return this.quantileInfo[index - 1];
+      }
+    },
     putIntoArray(jsonObject, targetArray, randomIndex) {
       for (let i = 0; i < randomIndex.length; i++) {
         targetArray.push(jsonObject[randomIndex[i]]);
@@ -451,7 +481,7 @@ export default {
     },
     //APEX CHART
     appendSeries(seriesName, dataSet) {
-      for (let i = 0; i < this.numOfChart.length; i++) {
+      for (let i = 0; i < this.quantileInfo.length; i++) {
         this.$refs.edaChart[i].appendSeries({
           name: seriesName,
           data: dataSet
@@ -460,7 +490,7 @@ export default {
     },
 
     updateSeries(axisName, dataSet) {
-      for (let i = 0; i < this.numOfChart.length; i++) {
+      for (let i = 0; i < this.quantileInfo.length; i++) {
         this.$refs.edaChart[i].updateOptions(
           {
             series: [
@@ -469,34 +499,32 @@ export default {
                 data: dataSet
               }
             ]
-            // yaxis: [
-            //   {
-            //     seriesName: axisName,
-            //     axisBorder: {
-            //       color: "#2E93fA"
-            //     },
-            //     labels: {
-            //       style: {
-            //         colors: "#2E93fA"
-            //       }
-            //     },
-            //     title: {
-            //       text: axisName,
-            //       style: {
-            //         color: "#2E93fA"
-            //       }
-            //     }
-            //   }
-            // ]
           },
           false,
           false
         );
       }
     },
+    updateGroupingOption() {
+      this.$refs.edaChart[0].updateOptions({
+        chart: {
+          toolbar: {
+            show: false
+          }
+        },
+        // yaxis: {
+        //   labels: {
+        //     show: false
+        //   }
+        // },
+        legend: {
+          show: false
+        }
+      });
+    },
     updateYaxis(axisName, minOfDataset) {
-      for (let i = 0; i < this.numOfChart.length; i++) {
-        this.$refs[edaChart[i]].updateOptions(
+      for (let i = 0; i < this.quantileInfo.length; i++) {
+        this.$refs.edaChart[i].updateOptions(
           {
             yaxis: [
               {
@@ -546,7 +574,7 @@ export default {
       }
     },
     updateCategories(newCategories) {
-      for (let i = 0; i < this.numOfChart.length; i++) {
+      for (let i = 0; i < this.quantileInfo.length; i++) {
         this.$refs.edaChart[i].updateOptions({
           xaxis: {
             categories: newCategories
@@ -574,49 +602,6 @@ export default {
       });
     },
 
-    checkYaxisPosition(newYaxisInfo) {
-      switch (newYaxisInfo["axisPosition"]) {
-        case "top":
-          this.updateVerticalSplitGraphs();
-          break;
-        case "middle":
-          break;
-        case "bottom":
-          this.multipleYaxis = true;
-          let axisName = newYaxisInfo["evt"].added.element;
-          let targetObject = this.dataset[axisName];
-          //preprocess before update graph
-          this.resetDataArray();
-          //preprocess before update graph
-          this.putIntoArray(targetObject, this.dataArray2, this.randomIndexArray);
-
-          this.updateCategories("secondChart", this.dateArray);
-          this.updateSeries("secondChart", axisName, this.dataArray2);
-          this.updateVerticalSplitGraphs();
-
-          break;
-      }
-    },
-    checkXaxisPosition(newXaxisInfo) {
-      switch (newXaxisInfo["axisPosition"]) {
-        case "left":
-          // this.updateHorizontalSplitGraphs();
-          break;
-        case "middle":
-          break;
-        case "right":
-          this.updateHorizontalSplitGraphs();
-          this.multipleXaxis = true;
-
-          let axisName = newXaxisInfo["evt"].added.element;
-          let targetObject = this.dataset[axisName];
-          // reset
-          this.resetDateArray();
-          //preprocess before update graphs
-          this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
-          break;
-      }
-    },
     toggleDataPointSelection(xaxis) {
       for (let i = xaxis.min; i <= xaxis.max; i++) {
         this.$refs.edaChart.toggleDataPointSelection(0, i);

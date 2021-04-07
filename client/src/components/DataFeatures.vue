@@ -131,6 +131,8 @@ import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 import { mapMutations } from "vuex";
 
+import { eventBus } from "@/main";
+
 export default {
   data() {
     return {
@@ -142,8 +144,13 @@ export default {
       //summary contents
       numeric_meanJson: {},
       numeric_stdJson: {},
-      numeric_quantileJson: {},
+      // numeric_quantileJson: {},
       numeric_numOfNaJson: {},
+      // quantile
+      numeric_quantile1: null,
+      numeric_quantile2: null,
+      numeric_quantile3: null,
+      numeric_quantile4: null,
       categorical_mostCommon: {},
       categorical_numOfNaJson: {},
       categoryIndex: 0,
@@ -166,24 +173,7 @@ export default {
     Histogram
   },
   props: ["columnsWithoutIndex", "summarizedData"],
-  watch: {
-    // dataSet: function(data) {
-    //   let previousName = data["Name"][0]; //첫번째꺼 넣어두기
-    //   for (const key in data["Name"]) {
-    //     let nextName = data["Name"][key];
-    //     if (previousName == nextName) {
-    //       continue;
-    //     } else if (previousName == null) {
-    //       previousName = data["Name"][key];
-    //     } else {
-    //       previousName = data["Name"][key];
-    //       // console.log(key);
-    //       this.nameChangeMark.push(key);
-    //     }
-    //   }
-    //   this.nameChangeMark.push(Object.keys(data["Name"]).length);
-    // }
-  },
+
   computed: {
     ...mapState({
       dataset: state => state.dataset,

@@ -1,17 +1,21 @@
 <template>
   <div class="dragYaxisBox">
-    <slot></slot>
-    <v-chip-group :style="styleObject" column>
-      <draggable
-        :options="{ group: 'dragGroup' }"
-        @start="drag = true"
-        @end="drag = false"
-        @change="onDragEvent"
-        :list="columns"
-      >
-        <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex">{{ column }}</v-chip>
-      </draggable>
-    </v-chip-group>
+    <v-row class="vrow" align="center">
+      <v-col>
+        <draggable
+          :options="{ group: 'dragGroup' }"
+          @start="drag = true"
+          @end="drag = false"
+          @change="onDragEvent"
+          :list="columns"
+        >
+          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small>{{
+            column
+          }}</v-chip>
+        </draggable>
+      </v-col>
+    </v-row>
+    <!-- <slot></slot> -->
   </div>
 </template>
 <script>
@@ -33,7 +37,7 @@ export default {
         case "added":
           let axisInfo = {
             evt: evt,
-            axisPosition: this.axisPosition,
+            type: "axis",
             numOfDragElement: this.numOfDragElement
           };
           eventBus.$emit("yaxisBeingDragged", axisInfo);
@@ -65,6 +69,6 @@ export default {
 <style scoped>
 .dragYaxisBox {
   /* border: 1px solid rgb(90, 47, 47); */
-  margin: 40px 0;
+  /* margin: 50px 0; */
 }
 </style>

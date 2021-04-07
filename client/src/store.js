@@ -1,29 +1,30 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from "vue";
+import Vuex from "vuex";
 import axios from "axios";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state:{//data
+  state: {
+    //data
     dataset: {},
     indexNum: "",
     hadLoaded: false,
-    columns: [],
+    columns: []
   },
-  getters:{
+  getters: {
     // vuexTestGetters:state=>{
     //   return state.vuexTest+1;
-    },
+  },
   mutations: {
-    loadDataset(state,payload){
-      state.dataset=payload.data;
+    loadDataset(state, payload) {
+      state.dataset = payload.data;
     },
-    loadIndexNum(state,payload){
-      state.indexNum=payload;
+    loadIndexNum(state, payload) {
+      state.indexNum = payload;
     },
-    setHadLoaded(state,payload){
-      state.hadLoaded=payload;
+    setHadLoaded(state, payload) {
+      state.hadLoaded = payload;
     },
     saveResponseData(state) {
       if (state.hadLoaded == false) {
@@ -34,24 +35,24 @@ export default new Vuex.Store({
           // state.addForm[columnValue] = "";
         }
       }
-
-    },
+    }
   },
-  actions:{
-    loadFundamentalData({commit}, path) {
+  actions: {
+    loadFundamentalData({ commit }, path) {
       // const path = "http://localhost:5000/loadData";
       axios
         .get(path)
         .then(res => {
-          commit('loadDataset', res);
-          commit('loadIndexNum', Object.keys(res.data["ID"]).length - 1);
+          commit("loadDataset", res);
+          console.log(res);
+          commit("loadIndexNum", Object.keys(res.data["ID"]).length - 1);
           // 데이터 추가 시 필요한 index number
           //'처음' 데이터를 받아올때만 columns 받아오도록 처리
-          commit('saveResponseData');
+          commit("saveResponseData");
         })
         .catch(error => {
           console.error(error);
         });
-    },
+    }
   }
-})
+});

@@ -1,21 +1,17 @@
 <template>
-  <div class="dragXaxisBox">
+  <div class="xGroup">
     <slot></slot>
-    <v-row class="vrow" justify="center">
-      <v-col>
-        <draggable
-          :options="{ group: 'dragGroup' }"
-          @start="drag = true"
-          @end="drag = false"
-          :list="columns"
-          @change="onDragEvent"
-        >
-          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small>{{
-            column
-          }}</v-chip>
-        </draggable>
-      </v-col>
-    </v-row>
+    <v-chip-group :style="styleObject" row>
+      <draggable
+        :options="{ group: 'dragGroup' }"
+        @start="drag = true"
+        @end="drag = false"
+        :list="columns"
+        @change="onDragEvent"
+      >
+        <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex">{{ column }}</v-chip>
+      </draggable>
+    </v-chip-group>
   </div>
 </template>
 <script>
@@ -40,13 +36,13 @@ export default {
       console.log(eventName);
       switch (eventName) {
         case "added":
-          let axisInfo = { evt: evt, type: "axis" };
-          eventBus.$emit("xaxisBeingDragged", axisInfo);
+          let axisInfo = { evt: evt, type: "xGroup" };
+          eventBus.$emit("xGroupBeingDragged", axisInfo);
           //드래그 박스에 chip 하나만 유지하도록 초기화
           this.columns = [evt.added.element];
           break;
         case "removed":
-          eventBus.$emit("xaxisBeingRemoved", false);
+          eventBus.$emit("xGroupBeingRemoved", false);
           break;
       }
     }
@@ -61,10 +57,7 @@ export default {
 };
 </script>
 <style scoped>
-.dragXaxisBox {
+.xGroup {
   /* border: 1px solid rgb(90, 47, 47); */
-}
-.vrow {
-  /* background-color: red; */
 }
 </style>

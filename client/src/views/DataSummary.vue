@@ -11,7 +11,7 @@
         <button class="btn-1" @click="displaySwitch()">Feature</button>
         <button class="btn-1" @click="displaySwitch()">Table</button>
       </div>
-      <GraphBuilder :columns="columns" />
+      <GraphBuilder :columns="columns" :summarizedData="summarizedData[0]" />
       <DataFeatures
         :class="{ visibilityHidden: showFeatures }"
         :columnsWithoutIndex="columnsWithoutIndex"
