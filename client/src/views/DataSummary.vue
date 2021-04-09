@@ -11,12 +11,11 @@
         <button class="btn-1" @click="displaySwitch()">Feature</button>
         <button class="btn-1" @click="displaySwitch()">Table</button>
       </div>
-      <GraphBuilder :columns="columns" :summarizedData="summarizedData[0]" />
+      <GraphBuilder :columns="columns" />
       <DataFeatures
         :class="{ visibilityHidden: showFeatures }"
         :columnsWithoutIndex="columnsWithoutIndex"
         :columns="columns"
-        :summarizedData="summarizedData"
         :indexNum="indexNum"
       />
 
@@ -71,7 +70,8 @@ export default {
   },
   computed: {
     ...mapState({
-      columns: state => state.columns
+      columns: state => state.columns,
+      summarizedInfo: state => state.summarizedInfo
     }),
     columnsWithoutIndex() {
       const idIndex = this.columns.indexOf("ID");

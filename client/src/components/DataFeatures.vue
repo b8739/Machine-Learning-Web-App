@@ -56,8 +56,8 @@
           <td>
             <span class="tdTitle">Distribution</span>
             <Histogram
-              :distribution="summarizedData[5][numericIndex]"
-              :interval="summarizedData[6][numericIndex]"
+              :distribution="summarizedInfo[5][numericIndex]"
+              :interval="summarizedInfo[6][numericIndex]"
               :indexNum="indexNum"
             />
           </td>
@@ -172,13 +172,14 @@ export default {
     EditModal,
     Histogram
   },
-  props: ["columnsWithoutIndex", "summarizedData"],
+  props: ["columnsWithoutIndex"],
 
   computed: {
     ...mapState({
       dataset: state => state.dataset,
       indexNum: state => state.indexNum,
-      columns: state => state.columns
+      columns: state => state.columns,
+      summarizedInfo: state => state.summarizedInfo
     }),
     categoryIndexAddOne() {
       return this.categoryIndex++;
@@ -215,22 +216,22 @@ export default {
   },
 
   created() {
-    this.numeric_meanJson = this.summarizedData[0]["mean"];
-    this.numeric_stdJson = this.summarizedData[0]["std"];
+    this.numeric_meanJson = this.summarizedInfo[0]["mean"];
+    this.numeric_stdJson = this.summarizedInfo[0]["std"];
 
-    this.numeric_quantile1 = this.summarizedData[0]["quantile1"];
-    this.numeric_quantile2 = this.summarizedData[0]["quantile2"];
-    this.numeric_quantile3 = this.summarizedData[0]["quantile3"];
-    this.numeric_quantile4 = this.summarizedData[0]["quantile4"];
+    this.numeric_quantile1 = this.summarizedInfo[0]["quantile1"];
+    this.numeric_quantile2 = this.summarizedInfo[0]["quantile2"];
+    this.numeric_quantile3 = this.summarizedInfo[0]["quantile3"];
+    this.numeric_quantile4 = this.summarizedInfo[0]["quantile4"];
 
-    this.numeric_numOfNaJson = this.summarizedData[0]["numOfNA"];
+    this.numeric_numOfNaJson = this.summarizedInfo[0]["numOfNA"];
 
-    // this.categorical_mostCommon = this.summarizedData[1]["mostCommon"];
-    this.categorical_numOfNaJson = this.summarizedData[1]["numOfNA"];
+    // this.categorical_mostCommon = this.summarizedInfo[1]["mostCommon"];
+    this.categorical_numOfNaJson = this.summarizedInfo[1]["numOfNA"];
 
-    this.numericColumns = this.summarizedData[2];
-    this.categoricalColumns = this.summarizedData[3];
-    this.categoryIndex = this.summarizedData[2].length;
+    this.numericColumns = this.summarizedInfo[2];
+    this.categoricalColumns = this.summarizedInfo[3];
+    this.categoryIndex = this.summarizedInfo[2].length;
   },
   mounted() {
     // for (const value in this.dataSet) {

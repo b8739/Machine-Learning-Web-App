@@ -23,45 +23,45 @@
               </v-btn>
             </v-toolbar-items>
           </v-toolbar>
-          <v-card outlined>
-            <v-container>
-              <!-- 좌측 -->
-              <v-row>
-                <v-col cols="2">
-                  <ColumnList :columns="columns" :styleObject="style_columnList">
-                    <v-subheader>{{ columns.length }} 개 열</v-subheader>
-                  </ColumnList>
-                </v-col>
-                <v-divider vertical></v-divider>
 
-                <v-col cols="10">
-                  <v-col><GraphTypeToolbar /></v-col>
-                  <v-col cols="3" offset="3" class="axisTitle"
-                    ><Xgroup :styleObject="style_DragBox_xaxis"><span>Group X</span> </Xgroup>
+          <v-container fluid>
+            <!-- 좌측 -->
+            <v-row>
+              <v-col cols="2">
+                <ColumnList :columns="columns" :styleObject="style_columnList">
+                  <v-subheader>{{ columns.length }} 개 열</v-subheader>
+                </ColumnList>
+              </v-col>
+              <v-divider vertical></v-divider>
+
+              <v-col cols="10">
+                <v-col><GraphTypeToolbar /></v-col>
+                <v-col cols="3" offset="3" class="axisTitle">
+                  <span class="xLabel"> Group X</span>
+                  <Xgroup :styleObject="style_DragBox_xaxis" />
+                </v-col>
+                <v-row justify="center">
+                  <v-col cols="1" class="axisTitle" align-self="center">
+                    <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
                   </v-col>
-                  <v-row justify="center">
-                    <v-col cols="1" class="axisTitle" align-self="center">
-                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
-                    </v-col>
 
-                    <v-col cols="8" class="apexChartWrapper">
-                      <span class="yLabel">Y</span>
-                      <ApexChart :summarizedData="summarizedData"
-                    /></v-col>
-                    <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
-                  </v-row>
-                  <v-row justify="center">
-                    <v-col cols="3" offset="3" class="axisTitle" :style="{ width: '500px' }">
-                      <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
-                      <span class="xLabel"> X</span>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
+                  <v-col cols="8" class="apexChartWrapper">
+                    <span class="yLabel">Y</span>
+                    <ApexChart
+                  /></v-col>
+                  <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
+                </v-row>
+                <v-row justify="center">
+                  <v-col cols="3" offset="3" class="axisTitle" :style="{ width: '500px' }">
+                    <span class="xLabel"> X</span>
+                    <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
 
-              <!-- 우측 -->
-            </v-container>
-          </v-card>
+            <!-- 우측 -->
+          </v-container>
         </v-card>
       </v-dialog>
     </v-row>
@@ -75,6 +75,11 @@ import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
 import Xgroup from "@/components/eda/Xgroup.vue";
 import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
 import { eventBus } from "@/main";
+// vuex
+import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
+import { mapState } from "vuex";
+import { mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -97,7 +102,10 @@ export default {
       yColumns: ["Drag Y axis Here"]
     };
   },
-  props: ["columns", "summarizedData"],
+  props: ["columns"],
+  computed: {
+    ...mapState({})
+  },
   components: {
     ColumnList,
     DragBoxXaxis,
@@ -119,7 +127,7 @@ export default {
   text-align: center;
 }
 .apexChartWrapper {
-  position: relative;
+  /* position: relative; */
 }
 .yLabel {
   position: absolute;

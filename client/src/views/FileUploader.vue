@@ -29,6 +29,11 @@
 
 <script>
 import axios from "axios";
+//vuex
+import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
+import { mapState } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   /*
@@ -47,6 +52,7 @@ export default {
       Defines the method used by the component
     */
   methods: {
+    ...mapMutations(["loadSummarizedInfo"]),
     /*
         Submits files to the server
       */
@@ -73,8 +79,9 @@ export default {
           }
         })
         .then(res => {
-          console.log(res);
-          this.$router.push({ path: "dataSummary" });
+          // console.log(res);
+          this.loadSummarizedInfo(res);
+          // this.$router.push({ path: "dataSummary" });
         })
         .catch(ex => {
           console.log("ERR!!!!! : ", ex);
@@ -132,7 +139,9 @@ export default {
         })
         .then(response => {
           this.result = response.data;
-          this.$router.push({ name: "dataSummary", params: { summarizedData: this.result } });
+          this.loadSummarizedInfo(this.result);
+          // this.$router.push({ name: "dataSummary", params: { summarizedData: this.result } });
+          this.$router.push({ name: "dataSummary" });
         })
         .catch(ex => {
           console.log("ERR!!!!! : ", ex);

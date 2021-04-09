@@ -10,7 +10,7 @@
         >
           <v-card>
             <v-card-subtitle v-if="quantileInfo.length > 1" class="justify-center">
-              {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }}
+              <!-- {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }} -->
             </v-card-subtitle>
             <apexchart
               ref="edaChart"
@@ -35,19 +35,12 @@ import { mapState } from "vuex";
 export default {
   name: "ApexChart",
 
-  props: [
-    "graphWidth",
-    "graphHeight",
-    "date",
-    "editModal_hidden",
-    "rawDataset",
-    "seriesName",
-    "summarizedData"
-  ],
+  props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "rawDataset", "seriesName"],
   // legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
 
   data() {
     return {
+      numOfDragElement: 0,
       quantileInfo: [1],
       // eventbus
       newXaxisInfo: null,
@@ -67,7 +60,20 @@ export default {
         chart: {
           toolbar: {
             //Grouping시 변경
-            show: true
+            show: true,
+            tools: {
+              customIcons: [
+                {
+                  icon: '<p  width="20">R<p>',
+                  index: 6,
+                  title: "tooltip of the icon",
+                  class: "custom-icon",
+                  click: (chart, options, e) => {
+                    this.resetSeries();
+                  }
+                }
+              ]
+            }
           },
           sparkline: {
             enabled: false
@@ -117,7 +123,7 @@ export default {
         },
         yaxis: {
           decimalsInFloat: 1,
-
+          // floating:true,
           axisTicks: {
             show: true
           },
@@ -145,13 +151,11 @@ export default {
               download: false,
               customIcons: [
                 {
-                  icon: '<p  width="20"> G<p>',
+                  icon: '<p  width="20">G<p>',
                   index: 6,
                   title: "tooltip of the icon",
                   class: "custom-icon",
-                  click: function(chart, options, e) {
-                    // console.log(chart.w.config.yaxis);
-                  }
+                  click: function(chart, options, e) {}
                 }
               ]
             }
@@ -206,19 +210,19 @@ export default {
             }
           }
         },
-        // subtitle: {
-        //   text: "hello",
-        //   align: "center",
+        subtitle: {
+          text: undefined,
+          align: "center",
 
-        //   floating: true,
-        //   offsetY: 5,
-        //   style: {
-        //     // fontSize: "12px",
-        //     fontWeight: "normal",
-        //     fontFamily: undefined,
-        //     color: "#9699a2"
-        //   }
-        // },
+          floating: true,
+          offsetY: 5,
+          style: {
+            // fontSize: "12px",
+            fontWeight: "normal",
+            fontFamily: undefined,
+            color: "#9699a2"
+          }
+        },
         // colors: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
         states: {
           active: {
@@ -247,9 +251,9 @@ export default {
           text: "Loading..."
         },
         xaxis: {
-          // floating: true,
+          floating: false,
           labels: {
-            // offsetX: 0
+            offsetX: 0
           },
           type: "datetime",
           labels: {
@@ -307,10 +311,10 @@ export default {
         this.axisName.push(this.newYaxisInfo["evt"].added.element);
         let axisName = this.axisName[this.axisName.length - 1];
         let targetObject = this.dataset[axisName];
-        let numOfDragElement = this.newYaxisInfo["numOfDragElement"];
+        this.numOfDragElement = this.newYaxisInfo["numOfDragElement"];
 
         //yaxis를 처음 추가할 때
-        if (numOfDragElement == 0) {
+        if (this.numOfDragElement == 0) {
           this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
           this.updateSeries(axisName, this.dataArray);
         }
@@ -342,10 +346,10 @@ export default {
         let xGroupName = this.xGroupInfo["evt"].added.element;
         // console.log(`xGroupName: ${xGroupName}`);
         this.quantileInfo = [];
-        this.quantileInfo.push(this.summarizedData.quantile1[xGroupName]);
-        this.quantileInfo.push(this.summarizedData.quantile2[xGroupName]);
-        this.quantileInfo.push(this.summarizedData.quantile3[xGroupName]);
-        this.quantileInfo.push(this.summarizedData.quantile4[xGroupName]);
+        this.quantileInfo.push(this.summarizedInfo[0].quantile1[xGroupName]);
+        this.quantileInfo.push(this.summarizedInfo[0].quantile2[xGroupName]);
+        this.quantileInfo.push(this.summarizedInfo[0].quantile3[xGroupName]);
+        this.quantileInfo.push(this.summarizedInfo[0].quantile4[xGroupName]);
         this.updateGroupingOption();
       }
     },
@@ -375,7 +379,7 @@ export default {
       this.graphType = graphType;
     });
     eventBus.$on("xaxisBeingRemoved", status => {
-      this.$refs.edaChart.updateOptions({
+      this.$refs.edaChart[0].updateOptions({
         chart: {
           width: "500px"
         }
@@ -403,7 +407,11 @@ export default {
     //console.log(this.dataset);
   },
   computed: {
-    ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum })
+    ...mapState({
+      dataset: state => state.dataset,
+      indexNum: state => state.indexNum,
+      summarizedInfo: state => state.summarizedInfo
+    })
   },
   methods: {
     quantilePrevIndex(index) {
@@ -480,6 +488,17 @@ export default {
       return sortedRandomArray;
     },
     //APEX CHART
+    resetSeries() {
+      this.numOfDragElement = 0;
+      this.$refs.edaChart[0].updateOptions(
+        {
+          series: [{}]
+        },
+        false,
+        false
+      );
+      console.log("reset");
+    },
     appendSeries(seriesName, dataSet) {
       for (let i = 0; i < this.quantileInfo.length; i++) {
         this.$refs.edaChart[i].appendSeries({

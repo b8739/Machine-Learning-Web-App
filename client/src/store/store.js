@@ -1,13 +1,17 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  // plugins: [createPersistedState()],
+  //standard vuex
   state: {
     //data
     dataset: {},
+    summarizedInfo: [],
     indexNum: "",
     hadLoaded: false,
     columns: []
@@ -35,6 +39,9 @@ export default new Vuex.Store({
           // state.addForm[columnValue] = "";
         }
       }
+    },
+    loadSummarizedInfo(state, payload) {
+      state.summarizedInfo = payload;
     }
   },
   actions: {

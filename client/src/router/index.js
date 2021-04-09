@@ -1,36 +1,35 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import Vue from "vue";
+import VueRouter from "vue-router";
 import FileUploader from "../views/FileUploader";
 import DataSummary from "../views/DataSummary";
-import '../assets/css/main.css';
+import "../assets/css/main.css";
 
 // import Login from "../views/Login";
 
 Vue.use(VueRouter); //View Router를 사용했다고 선언
 
 const router = new VueRouter({
-    mode:"history",
+  mode: "history",
 
-    routes:[
+  routes: [
     // {
-    //     path:"/", 
-    //     name:"login", 
+    //     path:"/",
+    //     name:"login",
     //     component: Login,
     //     props:true
     // },
     {
-        path:"/", 
-        component: FileUploader,
-        props:true
+      path: "/",
+      component: FileUploader,
+      props: true
     },
     {
-        path:"/dataSummary", 
-        name:"dataSummary", 
-        component: DataSummary,
-        props:true
-    },
-
-    ]
+      path: "/dataSummary",
+      name: "dataSummary",
+      component: DataSummary,
+      props: true
+    }
+  ]
 });
 
 export default router;

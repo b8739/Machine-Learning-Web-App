@@ -9,7 +9,7 @@
           @change="onDragEvent"
           :list="columns"
         >
-          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small>{{
+          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small outlined>{{
             column
           }}</v-chip>
         </draggable>

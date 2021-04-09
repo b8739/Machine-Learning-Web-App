@@ -1,17 +1,20 @@
 <template>
   <div class="xGroup">
-    <slot></slot>
-    <v-chip-group :style="styleObject" row>
-      <draggable
-        :options="{ group: 'dragGroup' }"
-        @start="drag = true"
-        @end="drag = false"
-        :list="columns"
-        @change="onDragEvent"
-      >
-        <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex">{{ column }}</v-chip>
-      </draggable>
-    </v-chip-group>
+    <v-row class="vrow" justify="center">
+      <v-col>
+        <draggable
+          :options="{ group: 'dragGroup' }"
+          @start="drag = true"
+          @end="drag = false"
+          :list="columns"
+          @change="onDragEvent"
+        >
+          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small outlined>{{
+            column
+          }}</v-chip>
+        </draggable>
+      </v-col>
+    </v-row>
   </div>
 </template>
 <script>
