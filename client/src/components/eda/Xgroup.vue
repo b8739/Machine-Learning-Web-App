@@ -1,21 +1,20 @@
 <template>
-  <div class="xGroup">
-    <v-row class="vrow" justify="center">
-      <v-col>
-        <draggable
-          :options="{ group: 'dragGroup' }"
-          @start="drag = true"
-          @end="drag = false"
-          :list="columns"
-          @change="onDragEvent"
-        >
-          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small outlined>{{
-            column
-          }}</v-chip>
-        </draggable>
-      </v-col>
-    </v-row>
-  </div>
+  <v-row class="vrow xGroup" justify="center">
+    <v-col>
+      <span>Group X</span>
+      <draggable
+        :options="{ group: 'dragGroup' }"
+        @start="drag = true"
+        @end="drag = false"
+        :list="columns"
+        @change="onDragEvent"
+      >
+        <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small outlined>{{
+          column
+        }}</v-chip>
+      </draggable>
+    </v-col>
+  </v-row>
 </template>
 <script>
 import { eventBus } from "@/main";

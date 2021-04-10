@@ -33,28 +33,41 @@
                 </ColumnList>
               </v-col>
               <v-divider vertical></v-divider>
-
+              <!-- 우측 -->
               <v-col cols="10">
-                <v-col><GraphTypeToolbar /></v-col>
-                <v-col cols="3" offset="3" class="axisTitle">
-                  <span class="xLabel"> Group X</span>
-                  <Xgroup :styleObject="style_DragBox_xaxis" />
-                </v-col>
-                <v-row justify="center">
+                <!-- 우측 상단 -->
+                <v-row>
+                  <v-col cols="12"><GraphTypeToolbar /></v-col>
+                  <v-col cols="7" offset="1" class="axisTitle">
+                    <v-card min-height="50px">
+                      <!-- <span> Group X</span> -->
+                      <Xgroup :styleObject="style_DragBox_xaxis" />
+                    </v-card>
+                  </v-col>
+                </v-row>
+                <!-- 우측 중앙 -->
+                <v-row>
                   <v-col cols="1" class="axisTitle" align-self="center">
-                    <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                    <v-card height="400px">
+                      <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                    </v-card>
                   </v-col>
 
-                  <v-col cols="8" class="apexChartWrapper">
-                    <span class="yLabel">Y</span>
-                    <ApexChart
-                  /></v-col>
+                  <v-col cols="7" class="apexChartWrapper">
+                    <!-- <span class="yLabel">Y</span> -->
+
+                    <ApexChart />
+                  </v-col>
+
                   <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
                 </v-row>
+                <!-- 우측 하단 -->
                 <v-row justify="center">
-                  <v-col cols="3" offset="3" class="axisTitle" :style="{ width: '500px' }">
-                    <span class="xLabel"> X</span>
-                    <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
+                  <v-col cols="7" offset="1" class="axisTitle" :style="{ width: '500px' }">
+                    <v-card height="50px">
+                      <!-- <span class="xLabel"> X</span> -->
+                      <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
+                    </v-card>
                   </v-col>
                 </v-row>
               </v-col>
@@ -137,6 +150,11 @@ export default {
 .xLabel {
   position: absolute;
   top: -40%;
+  left: 45%;
+}
+.groupXlabel {
+  position: absolute;
+  top: 40%;
   left: 45%;
 }
 </style>

@@ -1,20 +1,40 @@
 <template>
   <div class="dragYaxisBox">
-    <v-row class="vrow" align="center">
-      <v-col>
-        <draggable
-          :options="{ group: 'dragGroup' }"
-          @start="drag = true"
-          @end="drag = false"
-          @change="onDragEvent"
-          :list="columns"
-        >
-          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small outlined>{{
-            column
-          }}</v-chip>
-        </draggable>
-      </v-col>
-    </v-row>
+    <draggable
+      class="draggable"
+      :options="{ group: 'dragGroup' }"
+      @start="drag = true"
+      @end="drag = false"
+      :list="topColumns"
+    >
+      <v-chip v-for="(column, columnIndex) in topColumns" :key="columnIndex" small outlined>{{
+        column
+      }}</v-chip>
+    </draggable>
+    <draggable
+      class="draggable"
+      :options="{ group: 'dragGroup' }"
+      @start="drag = true"
+      @end="drag = false"
+      @change="onDragEvent"
+      :list="middleColumns"
+    >
+      <span class="yLabel">Y</span>
+      <v-chip v-for="(column, columnIndex) in middleColumns" :key="columnIndex" small outlined>{{
+        column
+      }}</v-chip>
+    </draggable>
+    <draggable
+      class="draggable"
+      :options="{ group: 'dragGroup' }"
+      @start="drag = true"
+      @end="drag = false"
+      :list="bottomColumns"
+    >
+      <v-chip v-for="(column, columnIndex) in bottomColumns" :key="columnIndex" small outlined>{{
+        column
+      }}</v-chip>
+    </draggable>
     <!-- <slot></slot> -->
   </div>
 </template>
@@ -25,7 +45,9 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: [],
+      topColumns: [],
+      middleColumns: [],
+      bottomColumns: [],
       numOfDragElement: 0
     };
   },
@@ -43,7 +65,7 @@ export default {
           eventBus.$emit("yaxisBeingDragged", axisInfo);
           this.numOfDragElement++;
           //드래그 박스에 chip 하나만 유지하도록 초기화
-          // this.columns = [evt.added.element];
+          // this.topColumns = [evt.added.element];
           break;
         case "removed":
           numOfDragElement--;
@@ -61,7 +83,7 @@ export default {
     ...mapState({
       dataset: state => state.dataset,
       indexNum: state => state.indexNum
-      // columns: state => state.columns
+      // topColumns: state => state.topColumns
     })
   }
 };
@@ -70,5 +92,17 @@ export default {
 .dragYaxisBox {
   /* border: 1px solid rgb(90, 47, 47); */
   /* margin: 50px 0; */
+  height: 100%;
+}
+.yLabel {
+  position: absolute;
+  top: 45%;
+}
+.draggable {
+  height: 33.333%;
+  border-bottom: 1px solid lightgray;
+}
+.draggable:nth-child(3) {
+  border-bottom: none;
 }
 </style>

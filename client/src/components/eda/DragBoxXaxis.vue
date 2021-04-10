@@ -1,16 +1,47 @@
 <template>
   <div class="dragXaxisBox">
-    <slot></slot>
-    <v-row class="vrow" justify="center">
-      <v-col>
+    <v-row class="dragXaxisBox">
+      <v-col cols="4">
         <draggable
+          class="draggable"
           :options="{ group: 'dragGroup' }"
           @start="drag = true"
           @end="drag = false"
-          :list="columns"
+          :list="leftColumns"
+        >
+          <v-chip v-for="(column, columnIndex) in leftColumns" :key="columnIndex" small outlined>{{
+            column
+          }}</v-chip>
+        </draggable>
+      </v-col>
+      <v-col cols="4">
+        <span class="xLabel">X</span>
+        <draggable
+          class="draggable"
+          :options="{ group: 'dragGroup' }"
+          @start="drag = true"
+          @end="drag = false"
+          :list="centerColumns"
           @change="onDragEvent"
         >
-          <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" small outlined>{{
+          <v-chip
+            v-for="(column, columnIndex) in centerColumns"
+            :key="columnIndex"
+            small
+            outlined
+            >{{ column }}</v-chip
+          >
+        </draggable>
+      </v-col>
+      <v-col cols="4">
+        <draggable
+          class="draggable"
+          :options="{ group: 'dragGroup' }"
+          @start="drag = true"
+          @end="drag = false"
+          :list="rightColumns"
+        >
+          <v-chip v-for="(column, columnIndex) in rightColumns" :key="columnIndex" small outlined>{{
             column
           }}</v-chip>
         </draggable>
@@ -26,7 +57,9 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
-      columns: []
+      leftColumns: [],
+      centerColumns: [],
+      rightColumns: []
     };
   },
   props: ["styleObject", "axisPosition"],
@@ -43,7 +76,7 @@ export default {
           let axisInfo = { evt: evt, type: "axis" };
           eventBus.$emit("xaxisBeingDragged", axisInfo);
           //드래그 박스에 chip 하나만 유지하도록 초기화
-          this.columns = [evt.added.element];
+          this.leftColumns = [evt.added.element];
           break;
         case "removed":
           eventBus.$emit("xaxisBeingRemoved", false);
@@ -55,16 +88,26 @@ export default {
     ...mapState({
       dataset: state => state.dataset,
       indexNum: state => state.indexNum
-      // columns: state => state.columns
+      // leftColumns: state => state.leftColumns
     })
   }
 };
 </script>
 <style scoped>
 .dragXaxisBox {
-  /* border: 1px solid rgb(90, 47, 47); */
+  height: 100%;
 }
-.vrow {
-  /* background-color: red; */
+.draggable {
+  /* width: 33.333%; */
+  height: 100%;
+  border-right: 1px solid lightgray;
+}
+.draggable:nth-child(3) {
+  border-right: none;
+}
+.xLabel {
+  position: absolute;
+  top: 25%;
+  left: 50%;
 }
 </style>

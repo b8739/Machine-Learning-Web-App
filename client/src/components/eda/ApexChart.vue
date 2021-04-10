@@ -6,11 +6,11 @@
           v-for="(eachChart, index) in quantileInfo"
           :key="index"
           cols="12"
-          :sm="quantileInfo.length === 1 ? 10 : 3"
+          :sm="quantileInfo.length === 1 ? 12 : 3"
         >
           <v-card>
             <v-card-subtitle v-if="quantileInfo.length > 1" class="justify-center">
-              <!-- {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }} -->
+              {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }}
             </v-card-subtitle>
             <apexchart
               ref="edaChart"
@@ -492,7 +492,10 @@ export default {
       this.numOfDragElement = 0;
       this.$refs.edaChart[0].updateOptions(
         {
-          series: [{}]
+          series: [{}],
+          xaxis: {
+            categories: []
+          }
         },
         false,
         false
