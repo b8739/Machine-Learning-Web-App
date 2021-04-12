@@ -2,13 +2,6 @@
   <div data-app>
     <v-row class="vrowContainer">
       <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-        <!-- Trigger 버튼 -->
-        <!-- <template v-slot:activator="{ on, attrs }">
-          <button v-on="on">hi</button>
-          <v-btn color="primary" dark v-bind="attrs" v-on="on">
-            EDA
-          </v-btn>
-        </template> -->
         <v-card>
           <v-toolbar color="primary">
             <v-btn icon dark @click="dialog = false">
@@ -56,7 +49,8 @@
                   <v-col cols="7" class="apexChartWrapper">
                     <!-- <span class="yLabel">Y</span> -->
 
-                    <ApexChart />
+                    <ApexChart v-show="apexChartRender" />
+                    <!-- <SyncChart v-show="syncChartRender" /> -->
                   </v-col>
 
                   <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
@@ -87,6 +81,7 @@ import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
 import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
 import Xgroup from "@/components/eda/Xgroup.vue";
 import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
+import SyncChart from "@/components/eda/SyncChart.vue";
 import { eventBus } from "@/main";
 // vuex
 import { mapActions } from "vuex";
@@ -112,7 +107,9 @@ export default {
         // width: "100px"
       },
       xColumns: ["Drag X axis Here"],
-      yColumns: ["Drag Y axis Here"]
+      yColumns: ["Drag Y axis Here"],
+      apexChartRender: true,
+      syncChartRender: false
     };
   },
   props: ["columns"],
@@ -125,7 +122,8 @@ export default {
     DragBoxYaxis,
     Xgroup,
     ApexChart,
-    GraphTypeToolbar
+    GraphTypeToolbar,
+    SyncChart
   },
   created() {
     eventBus.$on("openDialogue", dialogStatus => {

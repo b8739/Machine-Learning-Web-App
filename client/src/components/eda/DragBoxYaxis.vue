@@ -29,6 +29,7 @@
       :options="{ group: 'dragGroup' }"
       @start="drag = true"
       @end="drag = false"
+      @change="onDragBottomEvent"
       :list="bottomColumns"
     >
       <v-chip v-for="(column, columnIndex) in bottomColumns" :key="columnIndex" small outlined>{{
@@ -70,6 +71,23 @@ export default {
         case "removed":
           numOfDragElement--;
           eventBus.$emit("yaxisBeingRemoved", false);
+          break;
+      }
+    },
+    onDragBottomEvent(evt) {
+      let eventName = Object.keys(evt)[0];
+      switch (eventName) {
+        case "added":
+          let axisInfo = {
+            evt: evt,
+            type: "axis"
+          };
+          eventBus.$emit("addSyncBottom", axisInfo);
+          //드래그 박스에 chip 하나만 유지하도록 초기화
+          // this.topColumns = [evt.added.element];
+          break;
+        case "removed":
+          eventBus.$emit("removeSyncBottom", false);
           break;
       }
     }

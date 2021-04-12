@@ -1,25 +1,15 @@
 <template>
   <div id="container">
-    <button @click="something()">hi</button>
     <v-container>
-      <v-row no-gutters v-for="(eachChart, IndexSyncChart) in numOfSyncChart" :key="IndexSyncChart">
-        <v-col
-          v-for="(eachChart, index) in quantileInfo"
-          :key="index"
-          cols="12"
-          :sm="quantileInfo.length === 1 ? 12 : 3"
-        >
+      <v-row no-gutters>
+        <v-col v-for="(eachChart, index) in numOfSyncChart" :key="index" cols="12" :sm="12">
           <v-card>
-            <v-card-subtitle v-if="quantileInfo.length > 1" class="justify-center">
-              {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }}
-            </v-card-subtitle>
             <apexchart
               ref="edaChart"
               type="line"
               :width="graphWidth"
-              :height="numOfSyncChart.length === 2 ? 200 : auto"
-              :options="index === 0 ? firstGroupingChartOption : groupingChartOption"
-              :series="series[IndexSyncChart]"
+              :height="200"
+              :options="syncChartOption"
             ></apexchart>
           </v-card>
         </v-col>
@@ -42,17 +32,15 @@ export default {
 
   data() {
     return {
-      series: [[{ data: [] }]],
       numOfDragElement: 0,
       numOfSyncChart: [1],
-      quantileInfo: [1],
       // eventbus
       newXaxisInfo: null,
       newYaxisInfo: null,
       graphType: null,
       xGroupInfo: null,
       // original
-      dataArrays: {},
+      dataArray: [],
       randomIndexArray: [],
       dateArray: [],
       xaxisWhenZoomed: {},
@@ -60,31 +48,10 @@ export default {
       axisName: [],
       firstMount: true,
       //mainfirstChartOption
-      firstGroupingChartOption: {
+      syncChartOption: {
         chart: {
-          id: "syncChartId",
-          group: "syncChartGroup",
-          toolbar: {
-            //Grouping시 변경
-            show: true,
-            tools: {
-              customIcons: [
-                {
-                  icon: '<p  width="20">R<p>',
-                  index: 6,
-                  title: "tooltip of the icon",
-                  class: "custom-icon",
-                  click: (chart, options, e) => {
-                    this.resetSeries();
-                  }
-                }
-              ]
-            }
-          },
-          sparkline: {
-            enabled: false
-          },
-          type: "line"
+          type: "line",
+          group: "syncChartGroup"
         },
         markers: {
           size: 1,
@@ -112,10 +79,8 @@ export default {
         },
         xaxis: {
           type: "datetime",
-          // floating: true,
           labels: {
             offsetX: 0,
-            // show: false,
             minHeight: 50,
             rotate: -30,
             rotateAlways: true,
@@ -129,169 +94,15 @@ export default {
         },
         yaxis: {
           decimalsInFloat: 1,
-          // floating:true,
           axisTicks: {
             show: true
           },
           axisBorder: {
             show: true
           },
-          // floating: true,
           labels: {
-            show: true
+            minWidth: 40
           }
-        }
-      },
-      // mainoptions
-      groupingChartOption: {
-        chart: {
-          sparkline: {
-            enabled: false
-          },
-          type: "line",
-          stacked: false,
-          toolbar: {
-            show: false,
-            autoSelected: "selection",
-            tools: {
-              download: false,
-              customIcons: [
-                {
-                  icon: '<p  width="20">G<p>',
-                  index: 6,
-                  title: "tooltip of the icon",
-                  class: "custom-icon",
-                  click: function(chart, options, e) {}
-                }
-              ]
-            }
-          },
-          //zoom
-          zoom: {
-            type: "xy",
-            enabled: true,
-            autoScaleYaxis: true,
-            zoomedArea: {
-              fill: {
-                color: "#90CAF9",
-                opacity: 0.4
-              },
-              stroke: {
-                color: "#0D47A1",
-                opacity: 0.4,
-                width: 1
-              }
-            }
-          },
-          //selection
-          selection: {
-            enabled: true,
-            type: "xy",
-            fill: {
-              color: "black",
-              opacity: 0.1
-            },
-            stroke: {
-              width: 5,
-              dashArray: 3,
-              color: "black",
-              opacity: 0.4
-            }
-          },
-
-          events: {
-            legendClick: function(chartContext, seriesIndex, config) {
-              // console.log(seriesIndex);
-              // ...
-            },
-            // selection events
-            selection: (chartContext, { xaxis, yaxis }) => {
-              let yaxisObject = { min: null, max: null };
-              console.log(xaxis);
-              // yaxisObject.min = yaxis[0]["min"];
-              // yaxisObject.max = yaxis[0]["max"];
-              // this.yaxisWhenSelected = yaxisObject;
-              this.xaxisWhenSelected = xaxis;
-              this.$emit("xaxis", this.xaxisWhenSelected);
-            }
-          }
-        },
-        subtitle: {
-          text: undefined,
-          align: "center",
-
-          floating: true,
-          offsetY: 5,
-          style: {
-            // fontSize: "12px",
-            fontWeight: "normal",
-            fontFamily: undefined,
-            color: "#9699a2"
-          }
-        },
-        // colors: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
-        states: {
-          active: {
-            allowMultipleDataPointsSelection: true,
-            filter: {
-              type: "darken",
-              value: 0.35
-            }
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        series: [],
-        title: {},
-        markers: {
-          size: 1,
-          strokeWidth: 0.1,
-          strokeColor: "skyblue",
-          hover: {
-            size: 2,
-            strokeColor: "#fff"
-          }
-        },
-        noData: {
-          text: "Loading..."
-        },
-        xaxis: {
-          floating: false,
-          labels: {
-            offsetX: 0
-          },
-          type: "datetime",
-          labels: {
-            // show: false,
-            minHeight: 50,
-            rotate: -30,
-            rotateAlways: true,
-            hideOverlappingLabels: false,
-            format: "yy/MM/dd",
-            style: {
-              fontSize: "10px",
-              fontWeight: 200
-            }
-          }
-        },
-        // mainYaxis
-        yaxis: {
-          floating: true,
-          labels: {
-            offsetX: -50
-          }
-        },
-        grid: {
-          show: false
-        },
-        legend: {
-          show: false,
-          showForSingleSeries: true,
-          position: "bottom"
-        },
-        stroke: {
-          width: 1
         }
       }
     };
@@ -304,7 +115,7 @@ export default {
         let axisName = this.newXaxisInfo["evt"].added.element;
         let targetObject = this.dataset[axisName];
         // reset
-        this.resetdataArrays();
+        this.resetDataArray();
         //preprocess before update graph
         this.randomIndexArray = this.getRandomArray(0, this.indexNum);
         this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
@@ -321,52 +132,30 @@ export default {
 
         //yaxis를 처음 추가할 때
         if (this.numOfDragElement == 0) {
-          this.dataArrays[axisName] = [];
-          this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
-          this.updateSeries(axisName, this.dataArrays[axisName]);
+          this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
+          this.updateSeries(axisName, this.dataArray);
         }
         //yaxis가 이미 1개 이상 존재할 때
         else {
-          let gapOfDatasets = Math.abs(this.dataArrays[axisName][0] - targetObject[0]);
-          this.resetdataArrays();
-          this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
+          let gapOfDatasets = Math.abs(this.dataArray[0] - targetObject[0]);
+          this.resetDataArray();
+          this.putIntoArray(targetObject, this.dataArray, this.randomIndexArray);
 
           //2개의 데이터셋의 격차가 커서, yaxis를 양쪽으로 나누어야 할 경우
           if (gapOfDatasets >= 10) {
             let minOfDataset = Math.round(
-              Math.min.apply(null, this.dataArrays[axisName]) -
-                Math.min.apply(null, this.dataArrays[axisName]) * 0.5
+              Math.min.apply(null, this.dataArray) - Math.min.apply(null, this.dataArray) * 0.5
             );
             // console.log(minOfDataset);
             this.updateYaxis(this.axisName, minOfDataset);
-            this.appendSeries(axisName, this.dataArrays[axisName]);
+            this.appendSeries(axisName, this.dataArray);
 
             //2개의 데이터셋의 격차가 적어서, yaxis를 공유하는 경우
           } else {
-            this.appendSeries(axisName, this.dataArrays[axisName]);
+            this.appendSeries(axisName, this.dataArray);
           }
-          // console.log(this.dataArrays);
+          // console.log(this.dataArray);
         }
-      }
-    },
-    xGroupInfo: function(data) {
-      if (data != null || data != undefined) {
-        let xGroupName = this.xGroupInfo["evt"].added.element;
-        // console.log(`xGroupName: ${xGroupName}`);
-        this.quantileInfo = [];
-        this.quantileInfo.push(this.summarizedInfo[0].quantile1[xGroupName]);
-        this.quantileInfo.push(this.summarizedInfo[0].quantile2[xGroupName]);
-        this.quantileInfo.push(this.summarizedInfo[0].quantile3[xGroupName]);
-        this.quantileInfo.push(this.summarizedInfo[0].quantile4[xGroupName]);
-        this.updateGroupingOption();
-      }
-    },
-    numOfSyncChart: function(data) {
-      this.firstGroupingChartOption.xaxis.categories = this.dateArray;
-      this.series.push([{ data: [] }]);
-      for (let i = 0; i < this.series.length; i++) {
-        this.series[i][0].name = this.axisName[i];
-        this.series[i][0].data = this.dataArrays[this.axisName[i]];
       }
     },
     graphType: function(data) {
@@ -407,14 +196,6 @@ export default {
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
     });
-    eventBus.$on("addSyncBottom", axisInfo => {
-      this.numOfSyncChart.push(0);
-      let axisName = axisInfo["evt"].added.element;
-      this.axisName.push(axisName);
-      let targetObject = this.dataset[axisName];
-      this.dataArrays[axisName] = [];
-      this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
-    });
 
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
@@ -436,17 +217,11 @@ export default {
     })
   },
   methods: {
-    something() {
-      this.makeSyncChart();
-    },
-    makeSyncChart() {
-      this.updateCategories(this.dateArray);
-    },
     quantilePrevIndex(index) {
       if (index == 0) {
         return 0;
       } else {
-        return this.quantileInfo[index - 1];
+        return this.numOfSyncChart[index - 1];
       }
     },
     putIntoArray(jsonObject, targetArray, randomIndex) {
@@ -531,7 +306,7 @@ export default {
       console.log("reset");
     },
     appendSeries(seriesName, dataSet) {
-      for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      for (let i = 0; i < this.numOfSyncChart.length; i++) {
         this.$refs.edaChart[i].appendSeries({
           name: seriesName,
           data: dataSet
@@ -540,7 +315,7 @@ export default {
     },
 
     updateSeries(axisName, dataSet) {
-      for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      for (let i = 0; i < this.numOfSyncChart.length; i++) {
         this.$refs.edaChart[i].updateOptions(
           {
             series: [
@@ -573,7 +348,7 @@ export default {
       });
     },
     updateYaxis(axisName, minOfDataset) {
-      for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      for (let i = 0; i < this.numOfSyncChart.length; i++) {
         this.$refs.edaChart[i].updateOptions(
           {
             yaxis: [
@@ -624,7 +399,7 @@ export default {
       }
     },
     updateCategories(newCategories) {
-      for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      for (let i = 0; i < this.numOfSyncChart.length; i++) {
         this.$refs.edaChart[i].updateOptions({
           xaxis: {
             categories: newCategories
@@ -657,9 +432,9 @@ export default {
         this.$refs.edaChart.toggleDataPointSelection(0, i);
       }
     },
-    resetdataArrays() {
+    resetDataArray() {
       // console.log("rest");
-      this.dataArrays = {};
+      this.dataArray = [];
     },
     resetDateArray() {
       // console.log("rest");

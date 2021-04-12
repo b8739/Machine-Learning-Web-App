@@ -76,7 +76,7 @@ export default {
           let axisInfo = { evt: evt, type: "axis" };
           eventBus.$emit("xaxisBeingDragged", axisInfo);
           //드래그 박스에 chip 하나만 유지하도록 초기화
-          this.leftColumns = [evt.added.element];
+          this.centerColumns = [evt.added.element];
           break;
         case "removed":
           eventBus.$emit("xaxisBeingRemoved", false);
@@ -108,6 +108,6 @@ export default {
 .xLabel {
   position: absolute;
   top: 25%;
-  left: 50%;
+  left: 45%;
 }
 </style>
