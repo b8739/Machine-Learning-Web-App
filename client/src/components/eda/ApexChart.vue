@@ -42,6 +42,7 @@ export default {
 
   data() {
     return {
+      removedYaxisName: null,
       series: [[{ data: [] }]],
       numOfDragElement: 0,
       numOfSyncChart: [1],
@@ -362,6 +363,7 @@ export default {
         this.updateGroupingOption();
       }
     },
+
     numOfSyncChart: function(data) {
       this.firstGroupingChartOption.xaxis.categories = this.dateArray;
       this.series.push([{ data: [] }]);
@@ -395,13 +397,17 @@ export default {
     eventBus.$on("yaxisBeingDragged", newYaxisInfo => {
       this.newYaxisInfo = newYaxisInfo;
     });
-    eventBus.$on("yaxisBeingRemoved", status => {
-      this.$refs.edaChart.updateOptions({
-        chart: {
-          height: "500px"
-        }
-      });
+    eventBus.$on("yaxisBeingRemoved", removedYaxisName => {
+      // this.removedYaxisName = removedYaxisName;
+      this.deleteSeries(removedYaxisName);
     });
+    // eventBus.$on("yaxisBeingRemoved", status => {
+    //   this.$refs.edaChart.updateOptions({
+    //     chart: {
+    //       height: "500px"
+    //     }
+    //   });
+    // });
     eventBus.$on("xGroupBeingDragged", xGroupInfo => {
       this.xGroupInfo = xGroupInfo;
     });
@@ -416,6 +422,7 @@ export default {
       this.dataArrays[axisName] = [];
       this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
     });
+    eventBus.$on("removeSyncBottom", axisInfo => {});
 
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
@@ -438,8 +445,12 @@ export default {
   },
   methods: {
     something() {
-      this.makeSyncChart();
+      console.log(Object.keys(this.dataArrays).indexOf(this.axisName[0]));
+      // this.makeSyncChart();
+      // this.series[0][0].data = [];
+      // console.log(this.series);
     },
+
     makeSyncChart() {
       this.updateCategories(this.dateArray);
     },
@@ -532,29 +543,48 @@ export default {
       console.log("reset");
     },
     appendSeries(seriesName, dataSet) {
-      for (let i = 0; i < this.$refs.edaChart.length; i++) {
-        this.$refs.edaChart[i].appendSeries({
-          name: seriesName,
-          data: dataSet
-        });
-      }
-    },
+      // for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      //   this.$refs.edaChart[i].appendSeries({
+      //     name: seriesName,
+      //     data: dataSet
+      //   });
 
+      // }
+      let newSeries = { name: seriesName, data: dataSet };
+      this.series[0].push(newSeries);
+    },
+    deleteSeries(axisName) {
+      // for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      //   this.$refs.edaChart[i].updateSeries([
+      //     {
+      //       name: axisName,
+      //       data: []
+      //     }
+      //   ]);
+      // }
+      let indexNum = Object.keys(this.dataArrays).indexOf(axisName);
+      console.log(axisName);
+
+      this.series[0].splice(indexNum, 1);
+    },
     updateSeries(axisName, dataSet) {
-      for (let i = 0; i < this.$refs.edaChart.length; i++) {
-        this.$refs.edaChart[i].updateOptions(
-          {
-            series: [
-              {
-                name: axisName,
-                data: dataSet
-              }
-            ]
-          },
-          false,
-          false
-        );
-      }
+      // for (let i = 0; i < this.$refs.edaChart.length; i++) {
+      //   this.$refs.edaChart[i].updateOptions(
+      //     {
+      //       series: [
+      //         {
+      //           name: axisName,
+      //           data: dataSet
+      //         }
+      //       ]
+      //     },
+      //     false,
+      //     false
+      //   );
+      // }
+      this.series[0].shift();
+      let newSeries = { name: axisName, data: dataSet };
+      this.series[0].push(newSeries);
     },
     updateGroupingOption() {
       this.$refs.edaChart[0].updateOptions({

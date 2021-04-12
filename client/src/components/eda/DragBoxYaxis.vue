@@ -11,6 +11,7 @@
         column
       }}</v-chip>
     </draggable>
+
     <draggable
       class="draggable"
       :options="{ group: 'dragGroup' }"
@@ -19,7 +20,6 @@
       @change="onDragEvent"
       :list="middleColumns"
     >
-      <span class="yLabel">Y</span>
       <v-chip v-for="(column, columnIndex) in middleColumns" :key="columnIndex" small outlined>{{
         column
       }}</v-chip>
@@ -36,6 +36,7 @@
         column
       }}</v-chip>
     </draggable>
+    <span class="yLabel">Y</span>
     <!-- <slot></slot> -->
   </div>
 </template>
@@ -56,6 +57,7 @@ export default {
     onDragEvent(evt) {
       let eventName = Object.keys(evt)[0];
       console.log(evt);
+
       switch (eventName) {
         case "added":
           let axisInfo = {
@@ -69,25 +71,27 @@ export default {
           // this.topColumns = [evt.added.element];
           break;
         case "removed":
-          numOfDragElement--;
-          eventBus.$emit("yaxisBeingRemoved", false);
+          this.numOfDragElement--;
+          eventBus.$emit("yaxisBeingRemoved", evt);
           break;
       }
     },
     onDragBottomEvent(evt) {
       let eventName = Object.keys(evt)[0];
+
       switch (eventName) {
         case "added":
           let axisInfo = {
             evt: evt,
-            type: "axis"
+            type: "axis",
+            numOfDragElement: this.numOfDragElement
           };
           eventBus.$emit("addSyncBottom", axisInfo);
           //드래그 박스에 chip 하나만 유지하도록 초기화
           // this.topColumns = [evt.added.element];
           break;
         case "removed":
-          eventBus.$emit("removeSyncBottom", false);
+          eventBus.$emit("removeSyncBottom", evt);
           break;
       }
     }
