@@ -316,21 +316,22 @@ export default {
         // console.log(`newYaxisInfo: ${this.newYaxisInfo["axisPosition"]}`);
         this.axisName.push(this.newYaxisInfo["evt"].added.element);
         let axisName = this.axisName[this.axisName.length - 1];
+        this.dataArrays[axisName] = [];
         let targetObject = this.dataset[axisName];
         this.numOfDragElement = this.newYaxisInfo["numOfDragElement"];
 
         //yaxis를 처음 추가할 때
         if (this.numOfDragElement == 0) {
-          this.dataArrays[axisName] = [];
           this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
           this.updateSeries(axisName, this.dataArrays[axisName]);
         }
         //yaxis가 이미 1개 이상 존재할 때
         else {
-          let gapOfDatasets = Math.abs(this.dataArrays[axisName][0] - targetObject[0]);
-          this.resetdataArrays();
+          console.log(this.dataArrays[axisName].length);
           this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
+          let gapOfDatasets = Math.abs(this.dataArrays[axisName][0] - targetObject[0]);
 
+          console.log(gapOfDatasets);
           //2개의 데이터셋의 격차가 커서, yaxis를 양쪽으로 나누어야 할 경우
           if (gapOfDatasets >= 10) {
             let minOfDataset = Math.round(
