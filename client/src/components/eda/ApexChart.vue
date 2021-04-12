@@ -76,7 +76,7 @@ export default {
                   title: "tooltip of the icon",
                   class: "custom-icon",
                   click: (chart, options, e) => {
-                    this.resetSeries();
+                    console.log(options);
                   }
                 }
               ]
@@ -332,9 +332,6 @@ export default {
           let gapOfDatasets = Math.abs(
             this.dataArrays[this.axisName[this.axisName.length - 2]][0] - targetObject[0]
           );
-          console.log(this.dataArrays[axisName][0]);
-          console.log(targetObject[0]);
-          console.log(gapOfDatasets);
           //2개의 데이터셋의 격차가 커서, yaxis를 양쪽으로 나누어야 할 경우
           if (gapOfDatasets >= 10) {
             let minOfDataset = Math.round(
@@ -400,16 +397,9 @@ export default {
       this.newYaxisInfo = newYaxisInfo;
     });
     eventBus.$on("yaxisBeingRemoved", removedYaxisName => {
-      // this.removedYaxisName = removedYaxisName;
       this.deleteSeries(removedYaxisName);
     });
-    // eventBus.$on("yaxisBeingRemoved", status => {
-    //   this.$refs.edaChart.updateOptions({
-    //     chart: {
-    //       height: "500px"
-    //     }
-    //   });
-    // });
+
     eventBus.$on("xGroupBeingDragged", xGroupInfo => {
       this.xGroupInfo = xGroupInfo;
     });
@@ -448,6 +438,7 @@ export default {
   methods: {
     something() {
       console.log(Object.keys(this.dataArrays).indexOf(this.axisName[0]));
+
       // this.makeSyncChart();
       // this.series[0][0].data = [];
       // console.log(this.series);
@@ -556,6 +547,13 @@ export default {
       this.series[0].push(newSeries);
     },
     deleteSeries(axisName) {
+      // data 초기화
+      let indexNumOfAxis = Object.keys(this.dataArrays).indexOf(axisName);
+      this.series[0].splice(indexNumOfAxis, 1); //series에서 제거 (그래프 시각적 반영)
+      delete this.dataArrays[axisName]; // dataArray에서 제거
+      this.axisName.splice(indexNumOfAxis, 1); //axisName에서 제거
+      this.resetYaxis();
+      console.log(this.firstGroupingChartOption.yaxis);
       // for (let i = 0; i < this.$refs.edaChart.length; i++) {
       //   this.$refs.edaChart[i].updateSeries([
       //     {
@@ -564,11 +562,8 @@ export default {
       //     }
       //   ]);
       // }
-      let indexNum = Object.keys(this.dataArrays).indexOf(axisName);
 
-      this.series[0].splice(indexNum, 1); //series에서 제거 (그래프 시각적 반영)
-      delete this.dataArray[axisName]; // dataArray에서 제거
-      this.axisName.splice(indexNum, 1); //axisName에서 제거
+      // this.firstGroupingChartOption.yaxis.splice(indexNumOfAxis, 1);
     },
     updateSeries(axisName, dataSet) {
       // for (let i = 0; i < this.$refs.edaChart.length; i++) {
@@ -596,15 +591,17 @@ export default {
             show: false
           }
         },
-        // yaxis: {
-        //   labels: {
-        //     show: false
-        //   }
-        // },
         legend: {
           show: false
         }
       });
+    },
+    resetYaxis() {
+      for (let i = 0; i < this.$refs.edaChart.length; i++) {
+        this.$refs.edaChart[i].updateOptions({
+          yaxis: {}
+        });
+      }
     },
     updateYaxis(axisName, minOfDataset) {
       for (let i = 0; i < this.$refs.edaChart.length; i++) {
