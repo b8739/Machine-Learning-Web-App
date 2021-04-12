@@ -328,10 +328,12 @@ export default {
         }
         //yaxis가 이미 1개 이상 존재할 때
         else {
-          console.log(this.dataArrays[axisName].length);
           this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
-          let gapOfDatasets = Math.abs(this.dataArrays[axisName][0] - targetObject[0]);
-
+          let gapOfDatasets = Math.abs(
+            this.dataArrays[this.axisName[this.axisName.length - 2]][0] - targetObject[0]
+          );
+          console.log(this.dataArrays[axisName][0]);
+          console.log(targetObject[0]);
           console.log(gapOfDatasets);
           //2개의 데이터셋의 격차가 커서, yaxis를 양쪽으로 나누어야 할 경우
           if (gapOfDatasets >= 10) {
@@ -563,9 +565,10 @@ export default {
       //   ]);
       // }
       let indexNum = Object.keys(this.dataArrays).indexOf(axisName);
-      console.log(axisName);
 
-      this.series[0].splice(indexNum, 1);
+      this.series[0].splice(indexNum, 1); //series에서 제거 (그래프 시각적 반영)
+      delete this.dataArray[axisName]; // dataArray에서 제거
+      this.axisName.splice(indexNum, 1); //axisName에서 제거
     },
     updateSeries(axisName, dataSet) {
       // for (let i = 0; i < this.$refs.edaChart.length; i++) {
