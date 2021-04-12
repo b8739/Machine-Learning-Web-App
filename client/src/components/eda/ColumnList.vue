@@ -7,8 +7,8 @@
     <v-list :style="styleObject">
       <draggable
         :options="{ group: 'dragGroup' }"
-        @start="drag = true"
-        @end="drag = false"
+        @start="hoverOnDrag"
+        @end="hoverOnDrag"
         :list="columns"
       >
         <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
@@ -23,15 +23,19 @@
 <script>
 import { mapState } from "vuex";
 import draggable from "vuedraggable";
+import { eventBus } from "@/main";
 export default {
+  data() {
+    return {
+      hoverStatus: true
+    };
+  },
   props: ["columns", "styleObject"],
   methods: {
-    // onDrop(evt) {
-    //   let axisInfo = { evt: evt, axisPosition: this.axisPosition };
-    //   eventBus.$emit("yaxisBeingDragged", axisInfo);
-    //   //드래그 박스에 chip 하나만 유지하도록 초기화
-    //   this.columns = [evt.added.element];
-    // }
+    hoverOnDrag() {
+      eventBus.$emit("hoverEffect", this.hoverStatus);
+      this.hoverStatus = !this.hoverStatus;
+    }
   },
   components: {
     draggable

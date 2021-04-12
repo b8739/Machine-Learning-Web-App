@@ -1,13 +1,14 @@
 <template>
   <div class="dragYaxisBox">
     <draggable
+      small
+      outlined
       class="draggable"
       :options="{ group: 'dragGroup' }"
-      @start="drag = true"
-      @end="drag = false"
       :list="topColumns"
+      :class="{ hoverEffectOn: hoverStatus }"
     >
-      <v-chip v-for="(column, columnIndex) in topColumns" :key="columnIndex" small outlined>{{
+      <v-chip v-for="(column, columnIndex) in columns[index]" :key="columnIndex" small outlined>{{
         column
       }}</v-chip>
     </draggable>
@@ -15,10 +16,9 @@
     <draggable
       class="draggable"
       :options="{ group: 'dragGroup' }"
-      @start="drag = true"
-      @end="drag = false"
       @change="onDragEvent"
       :list="middleColumns"
+      :class="{ hoverEffectOn: hoverStatus }"
     >
       <v-chip v-for="(column, columnIndex) in middleColumns" :key="columnIndex" small outlined>{{
         column
@@ -27,10 +27,9 @@
     <draggable
       class="draggable"
       :options="{ group: 'dragGroup' }"
-      @start="drag = true"
-      @end="drag = false"
       @change="onDragBottomEvent"
       :list="bottomColumns"
+      :class="{ hoverEffectOn: hoverStatus }"
     >
       <v-chip v-for="(column, columnIndex) in bottomColumns" :key="columnIndex" small outlined>{{
         column
@@ -47,6 +46,8 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
+      hoverStatus: false,
+      columns: { topColumns: [], middleColumns: [], bottomColumns: [] },
       topColumns: [],
       middleColumns: [],
       bottomColumns: [],
@@ -107,9 +108,15 @@ export default {
       indexNum: state => state.indexNum
       // topColumns: state => state.topColumns
     })
+  },
+  created() {
+    eventBus.$on("hoverEffect", hoverStatus => {
+      this.hoverStatus = hoverStatus;
+    });
   }
 };
 </script>
+
 <style scoped>
 .dragYaxisBox {
   /* border: 1px solid rgb(90, 47, 47); */
@@ -126,5 +133,10 @@ export default {
 }
 .draggable:nth-child(3) {
   border-bottom: none;
+}
+
+.hoverEffectOn {
+  margin-top: 2px;
+  background-color: rgba(205, 205, 205, 0.695);
 }
 </style>

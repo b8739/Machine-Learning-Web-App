@@ -1,7 +1,7 @@
 <template>
-  <v-row class="vrow xGroup" justify="center">
-    <v-col>
-      <span>Group X</span>
+  <v-row :class="{ hoverEffectOn: hoverStatus }" class="vrow xGroup" no-gutters justify="center">
+    <v-col cols="12">
+      <span class="groupXlabel">Group X</span>
       <draggable
         :options="{ group: 'dragGroup' }"
         @start="drag = true"
@@ -24,6 +24,7 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
+      hoverStatus: false,
       columns: []
     };
   },
@@ -49,6 +50,11 @@ export default {
       }
     }
   },
+  created() {
+    eventBus.$on("hoverEffect", hoverStatus => {
+      this.hoverStatus = hoverStatus;
+    });
+  },
   computed: {
     ...mapState({
       dataset: state => state.dataset,
@@ -59,7 +65,19 @@ export default {
 };
 </script>
 <style scoped>
+.hoverEffectOn {
+  background-color: rgba(205, 205, 205, 0.695);
+}
 .xGroup {
-  /* border: 1px solid rgb(90, 47, 47); */
+  height: 100%;
+}
+.draggable {
+  /* width: 33.333%; */
+  height: 100%;
+}
+.groupXlabel {
+  position: absolute;
+  top: 25%;
+  left: 45%;
 }
 </style>

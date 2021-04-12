@@ -1,7 +1,7 @@
 <template>
   <div class="dragXaxisBox">
-    <v-row class="dragXaxisBox">
-      <v-col cols="4">
+    <v-row class="dragXaxisBox" no-gutters>
+      <v-col cols="4" :class="{ hoverEffectOn: hoverStatus }">
         <draggable
           class="draggable"
           :options="{ group: 'dragGroup' }"
@@ -14,7 +14,7 @@
           }}</v-chip>
         </draggable>
       </v-col>
-      <v-col cols="4">
+      <v-col cols="4" :class="{ hoverEffectOn: hoverStatus }">
         <span class="xLabel">X</span>
         <draggable
           class="draggable"
@@ -33,7 +33,7 @@
           >
         </draggable>
       </v-col>
-      <v-col cols="4">
+      <v-col cols="4" :class="{ hoverEffectOn: hoverStatus }">
         <draggable
           class="draggable"
           :options="{ group: 'dragGroup' }"
@@ -57,6 +57,8 @@ import draggable from "vuedraggable";
 export default {
   data() {
     return {
+      // columns: { leftColumns: [], centerColumns: [], rightColumns: [] },
+      hoverStatus: false,
       leftColumns: [],
       centerColumns: [],
       rightColumns: []
@@ -84,6 +86,11 @@ export default {
       }
     }
   },
+  created() {
+    eventBus.$on("hoverEffect", hoverStatus => {
+      this.hoverStatus = hoverStatus;
+    });
+  },
   computed: {
     ...mapState({
       dataset: state => state.dataset,
@@ -109,5 +116,9 @@ export default {
   position: absolute;
   top: 25%;
   left: 45%;
+}
+.hoverEffectOn {
+  border: 1px solid white;
+  background-color: rgba(205, 205, 205, 0.695);
 }
 </style>

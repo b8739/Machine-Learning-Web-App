@@ -32,8 +32,8 @@
                 <v-row>
                   <v-col cols="12"><GraphTypeToolbar /></v-col>
                   <v-col cols="7" offset="1" class="axisTitle">
-                    <v-card min-height="50px">
-                      <!-- <span> Group X</span> -->
+                    <!-- <span> Group X</span> -->
+                    <v-card height="50px">
                       <Xgroup :styleObject="style_DragBox_xaxis" />
                     </v-card>
                   </v-col>

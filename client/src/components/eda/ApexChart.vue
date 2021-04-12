@@ -397,7 +397,7 @@ export default {
       this.newYaxisInfo = newYaxisInfo;
     });
     eventBus.$on("yaxisBeingRemoved", removedYaxisName => {
-      this.deleteSeries(removedYaxisName);
+      this.deleteSeries(removedYaxisName.removed.element);
     });
 
     eventBus.$on("xGroupBeingDragged", xGroupInfo => {
@@ -553,7 +553,7 @@ export default {
       delete this.dataArrays[axisName]; // dataArray에서 제거
       this.axisName.splice(indexNumOfAxis, 1); //axisName에서 제거
       this.resetYaxis();
-      console.log(this.firstGroupingChartOption.yaxis);
+      console.log(`indexNumOfAxis:${indexNumOfAxis}`);
       // for (let i = 0; i < this.$refs.edaChart.length; i++) {
       //   this.$refs.edaChart[i].updateSeries([
       //     {
