@@ -10,7 +10,10 @@
           :sm="quantileInfo.length === 1 ? 12 : 3"
         >
           <v-card>
-            <v-card-subtitle v-if="quantileInfo.length > 1" class="justify-center">
+            <v-card-subtitle
+              v-if="quantileInfo.length > 1 && IndexSyncChart == 0"
+              class="justify-center"
+            >
               {{ quantilePrevIndex(index) }} ~ {{ quantileInfo[index] }}
             </v-card-subtitle>
             <apexchart
@@ -18,7 +21,7 @@
               type="line"
               :width="graphWidth"
               :height="numOfSyncChart.length === 2 ? 200 : auto"
-              :options="index === 0 ? firstGroupingChartOption : groupingChartOption"
+              :options="firstGroupingChartOption"
               :series="series[IndexSyncChart]"
             ></apexchart>
           </v-card>
@@ -146,26 +149,11 @@ export default {
       // mainoptions
       groupingChartOption: {
         chart: {
-          sparkline: {
-            enabled: false
-          },
           type: "line",
           stacked: false,
           toolbar: {
             show: false,
-            autoSelected: "selection",
-            tools: {
-              download: false,
-              customIcons: [
-                {
-                  icon: '<p  width="20">G<p>',
-                  index: 6,
-                  title: "tooltip of the icon",
-                  class: "custom-icon",
-                  click: function(chart, options, e) {}
-                }
-              ]
-            }
+            autoSelected: "selection"
           },
           //zoom
           zoom: {
@@ -243,7 +231,6 @@ export default {
         dataLabels: {
           enabled: false
         },
-        series: [],
         title: {},
         markers: {
           size: 1,
@@ -354,12 +341,12 @@ export default {
       if (data != null || data != undefined) {
         let xGroupName = this.xGroupInfo["evt"].added.element;
         // console.log(`xGroupName: ${xGroupName}`);
+        this.updateGroupingOption();
         this.quantileInfo = [];
         this.quantileInfo.push(this.summarizedInfo[0].quantile1[xGroupName]);
         this.quantileInfo.push(this.summarizedInfo[0].quantile2[xGroupName]);
         this.quantileInfo.push(this.summarizedInfo[0].quantile3[xGroupName]);
         this.quantileInfo.push(this.summarizedInfo[0].quantile4[xGroupName]);
-        this.updateGroupingOption();
       }
     },
 
@@ -403,6 +390,10 @@ export default {
     eventBus.$on("xGroupBeingDragged", xGroupInfo => {
       this.xGroupInfo = xGroupInfo;
     });
+
+    eventBus.$on("xGroupBeingRemoved", xGroupInfo => {
+      this.quantileInfo = [1];
+    });
     eventBus.$on("graphTypeBeingSent", graphType => {
       this.graphType = graphType;
     });
@@ -414,7 +405,9 @@ export default {
       this.dataArrays[axisName] = [];
       this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
     });
-    eventBus.$on("removeSyncBottom", axisInfo => {});
+    eventBus.$on("removeSyncBottom", axisInfo => {
+      this.numOfSyncChart.pop();
+    });
 
     //first mount 감지
     if (this.rawDataset != null || this.rawDataset != undefined) {
@@ -585,16 +578,17 @@ export default {
       this.series[0].push(newSeries);
     },
     updateGroupingOption() {
-      this.$refs.edaChart[0].updateOptions({
-        chart: {
-          toolbar: {
-            show: false
-          }
-        },
-        legend: {
-          show: false
-        }
-      });
+      this.firstGroupingChartOption.legend["show"] = false;
+      this.firstGroupingChartOption.chart.toolbar["show"] = false;
+      // this.firstGroupingChartOption.xaxis.labels["show"] = false;
+      this.firstGroupingChartOption.yaxis.labels["show"] = false;
+      // this.$refs.edaChart[0].updateOptions({
+      //   yaxis: {
+      //     labels: {
+      //       show: true
+      //     }
+      //   }
+      // });
     },
     resetYaxis() {
       for (let i = 0; i < this.$refs.edaChart.length; i++) {
