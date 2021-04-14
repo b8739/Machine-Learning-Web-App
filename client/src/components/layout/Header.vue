@@ -13,17 +13,15 @@
 <script>
 import { eventBus } from "@/main";
 export default {
-  data(){
-return{
-}
+  data() {
+    return {};
   },
-  methods:{
-  openDialogue(){
-    eventBus.$emit("openDialogue",true);
+  methods: {
+    openDialogue() {
+      eventBus.$emit("openDialogue", true);
+    }
   }
-  }
-
-}
+};
 </script>
 <style scoped>
 /* reset */
@@ -31,9 +29,7 @@ return{
 body {
   background-color: #f0f0f0;
 }
-a {
-  text-decoration: none;
-}
+
 /* base.html */
 .logo {
   width: 4%;

@@ -32,15 +32,14 @@
                 <v-row>
                   <v-col cols="12"><GraphTypeToolbar /></v-col>
                   <v-col cols="7" offset="1" class="axisTitle">
-                    <!-- <span> Group X</span> -->
-                    <v-card height="50px">
+                    <v-card class="ml-5" height="50px">
                       <Xgroup :styleObject="style_DragBox_xaxis" />
                     </v-card>
                   </v-col>
                 </v-row>
                 <!-- 우측 중앙 -->
-                <v-row>
-                  <v-col cols="1" class="axisTitle" align-self="center">
+                <v-row dense>
+                  <v-col cols="1" class=" ml-4 axisTitle" align-self="center">
                     <v-card height="400px">
                       <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
                     </v-card>
@@ -50,15 +49,14 @@
                     <!-- <span class="yLabel">Y</span> -->
 
                     <ApexChart v-show="apexChartRender" />
-                    <!-- <SyncChart v-show="syncChartRender" /> -->
                   </v-col>
 
                   <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
                 </v-row>
                 <!-- 우측 하단 -->
-                <v-row justify="center">
+                <v-row dense justify="center">
                   <v-col cols="7" offset="1" class="axisTitle" :style="{ width: '500px' }">
-                    <v-card height="50px">
+                    <v-card class="ml-5" height="50px">
                       <!-- <span class="xLabel"> X</span> -->
                       <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
                     </v-card>
@@ -81,7 +79,7 @@ import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
 import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
 import Xgroup from "@/components/eda/Xgroup.vue";
 import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
-import SyncChart from "@/components/eda/SyncChart.vue";
+
 import { eventBus } from "@/main";
 // vuex
 import { mapActions } from "vuex";
@@ -122,8 +120,7 @@ export default {
     DragBoxYaxis,
     Xgroup,
     ApexChart,
-    GraphTypeToolbar,
-    SyncChart
+    GraphTypeToolbar
   },
   created() {
     eventBus.$on("openDialogue", dialogStatus => {

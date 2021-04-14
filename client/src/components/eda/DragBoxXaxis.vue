@@ -115,7 +115,7 @@ export default {
 .xLabel {
   position: absolute;
   top: 25%;
-  left: 45%;
+  left: 50%;
 }
 .hoverEffectOn {
   border: 1px solid white;

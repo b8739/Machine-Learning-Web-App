@@ -1,6 +1,5 @@
 <template>
   <v-toolbar :elevation="0">
-    <v-spacer />
     <v-btn v-model="graphType[0]" @click="sendGraphType(graphType[0])">
       <font-awesome-icon icon="chart-line" />
     </v-btn>

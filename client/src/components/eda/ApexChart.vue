@@ -1,6 +1,6 @@
 <template>
   <div id="container">
-    <button @click="something()">hi</button>
+    <!-- <button @click="something()">hi</button> -->
     <v-container>
       <v-row no-gutters v-for="(eachChart, IndexSyncChart) in numOfSyncChart" :key="IndexSyncChart">
         <v-col
@@ -32,6 +32,8 @@
 </template>
 
 <script>
+// randomize function
+import * as randomizer from "@/assets/js/randomizer.js";
 //vuex
 import { eventBus } from "@/main";
 import { mapActions } from "vuex";
@@ -294,7 +296,7 @@ export default {
         // reset
         this.resetdataArrays();
         //preprocess before update graph
-        this.randomIndexArray = this.getRandomArray(0, this.indexNum);
+        this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
         this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
         this.updateCategories(this.dateArray);
       }
@@ -453,66 +455,13 @@ export default {
       }
     },
 
-    //preprocess methods
-    randomizeDataset(dataset_unrandomized, dataset_randomized, randomIndex) {
-      let tempArray = [];
-      for (let i = 0; i < randomIndex.length; i++) {
-        tempArray.push(dataset_unrandomized[randomIndex[i]]); //이게 정말 randomize되는것
-        // targetArray.push(dataset_unrandomized[i]);
-      }
-      dataset_randomized.push(tempArray);
-    },
-    randomizeDate(dataset_unrandomized, dataset_randomized, randomIndex) {
-      for (let i = 0; i < randomIndex.length; i++) {
-        dataset_randomized.push(dataset_unrandomized[randomIndex[i]]); //이게 정말 randomize되는것
-        // targetArray.push(dataset_unrandomized[i]);
-      }
-    },
     //date methods
     formatDate(dateArray) {
       for (let i = 0; i < dateArray.length; i++) {
         dateArray[i] = new Date(dateArray[i]).getTime();
       }
     },
-    //randomize methods
-    getCount(datasetLength) {
-      return Math.round(datasetLength * 0.02);
-    },
-    getRandom(min, max) {
-      return Math.floor(Math.random() * (max - min + 1) + min);
-    },
 
-    getRandomArray(min, max) {
-      let count = this.getCount(max);
-      // console.log(max * 5);
-      // const count = 150 * 0.5;
-      if (max - min + 1 < count) return;
-
-      // 배열 생성
-      let randomArray = [];
-
-      while (1) {
-        let index = this.getRandom(min, max);
-
-        // 중복 여부 체크
-        if (randomArray.indexOf(index) > -1) {
-          continue;
-        }
-
-        randomArray.push(index);
-        // 원하는 배열 갯수 만족 시 종료
-        if (randomArray.length == count) {
-          break;
-        }
-      }
-
-      // 정렬
-      let sortedRandomArray = randomArray.sort(function(a, b) {
-        return a - b;
-      });
-
-      return sortedRandomArray;
-    },
     //APEX CHART
     resetSeries() {
       this.numOfDragElement = 0;

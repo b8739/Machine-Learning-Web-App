@@ -78,6 +78,6 @@ export default {
 .groupXlabel {
   position: absolute;
   top: 25%;
-  left: 45%;
+  left: 47%;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper">
     <table class="dataTable">
       <thead>
         <th v-for="(column, thIndex) in columns" :key="thIndex">{{ columns[thIndex] }}</th>
@@ -94,6 +94,9 @@ export default {
 };
 </script>
 <style scoped>
+.wrapper {
+  width: 1000px;
+}
 .dataTable tbody tr.rowSelected {
   background-color: rgba(154, 189, 243, 0.863);
 }

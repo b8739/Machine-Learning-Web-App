@@ -2,6 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store/store.js";
+
 // apex charts
 import VueApexCharts from "vue-apexcharts";
 // portal
@@ -45,6 +46,7 @@ export const eventBus = new Vue();
 new Vue({
   router,
   store,
+
   vuetify: new Vuetify(),
   render: h => h(App)
 }).$mount("#app");

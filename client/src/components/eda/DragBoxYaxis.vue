@@ -20,9 +20,14 @@
       :list="middleColumns"
       :class="{ hoverEffectOn: hoverStatus }"
     >
-      <v-chip v-for="(column, columnIndex) in middleColumns" :key="columnIndex" small outlined>{{
-        column
-      }}</v-chip>
+      <v-chip
+        class="rotating"
+        v-for="(column, columnIndex) in middleColumns"
+        :key="columnIndex"
+        small
+        outlined
+        >{{ column }}</v-chip
+      >
     </draggable>
     <draggable
       class="draggable"
@@ -118,6 +123,9 @@ export default {
 </script>
 
 <style scoped>
+.rotating {
+  /* transform: translateY(50px) rotate(90deg); */
+}
 .dragYaxisBox {
   /* border: 1px solid rgb(90, 47, 47); */
   /* margin: 50px 0; */
@@ -125,7 +133,7 @@ export default {
 }
 .yLabel {
   position: absolute;
-  top: 45%;
+  top: 47%;
 }
 .draggable {
   height: 33.333%;
