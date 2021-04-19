@@ -75,7 +75,7 @@ export default {
       showTable: true
     };
   },
-  props: ["summarizedData"],
+
   components: {
     DataTable,
     Sidebar,
@@ -87,8 +87,8 @@ export default {
   },
   computed: {
     ...mapState({
-      columns: state => state.columns,
-      summarizedInfo: state => state.summarizedInfo
+      columns: state => state.initialData.columns,
+      summarizedInfo: state => state.initialData.summarizedInfo
     }),
     columnsWithoutIndex() {
       const idIndex = this.columns.indexOf("ID");
@@ -102,8 +102,8 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setHadLoaded"]),
-    ...mapActions(["loadFundamentalData"]),
+    ...mapMutations("initialData", ["setHadLoaded"]),
+    ...mapActions("initialData", ["loadFundamentalData"]),
     // showDrawer() {
     //   eventBus.$emit("showDrawer", true);
     // },

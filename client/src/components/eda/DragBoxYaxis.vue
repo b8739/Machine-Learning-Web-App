@@ -109,8 +109,8 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum
+      dataset: state => state.initialData.dataset,
+      indexNum: state => state.initialData.indexNum
       // topColumns: state => state.topColumns
     })
   },

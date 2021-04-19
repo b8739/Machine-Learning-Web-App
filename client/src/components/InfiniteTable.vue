@@ -59,8 +59,7 @@
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
 import vClickOutside from "v-click-outside";
-// vuex
-import { mapActions } from "vuex";
+
 export default {
   directives: {
     clickOutside: vClickOutside.directive
@@ -115,7 +114,6 @@ export default {
     }
   },
   methods: {
-    // ...mapActions(["loadFundamentalData"]),
     onClickOutside() {
       if (this.showTableOption === true) {
         this.showTableOption = false;

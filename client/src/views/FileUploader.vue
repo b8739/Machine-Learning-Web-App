@@ -52,7 +52,7 @@ export default {
       Defines the method used by the component
     */
   methods: {
-    ...mapMutations(["loadSummarizedInfo"]),
+    ...mapMutations("initialData", ["loadSummarizedInfo"]),
     /*
         Submits files to the server
       */
@@ -93,7 +93,7 @@ export default {
       */
     handleFilesUpload() {
       let uploadedFiles = this.$refs.files.files;
-      console.log(uploadedFiles);
+      // console.log(uploadedFiles);
       /*
           Adds the uploaded file to the files array
         */

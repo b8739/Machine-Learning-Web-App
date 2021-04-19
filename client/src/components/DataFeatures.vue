@@ -56,8 +56,8 @@
           <td>
             <span class="tdTitle">Distribution</span>
             <Histogram
-              :distribution="summarizedInfo[5][numericIndex]"
-              :interval="summarizedInfo[6][numericIndex]"
+              :distribution="summarizedInfo[4][numericIndex]"
+              :interval="summarizedInfo[5][numericIndex]"
               :indexNum="indexNum"
             />
           </td>
@@ -173,18 +173,18 @@ export default {
 
   computed: {
     ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum,
-      columns: state => state.columns,
-      summarizedInfo: state => state.summarizedInfo
+      dataset: state => state.initialData.dataset,
+      indexNum: state => state.initialData.indexNum,
+      columns: state => state.initialData.columns,
+      summarizedInfo: state => state.initialData.summarizedInfo
     }),
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }
   },
   methods: {
-    ...mapMutations(["setHadLoaded"]),
-    ...mapActions(["loadFundamentalData"]),
+    ...mapMutations("initialData", ["setHadLoaded"]),
+    ...mapActions("initialData", ["loadFundamentalData"]),
     // divideArrayByName(jsonObject) {
     //   let tempArray;
     //   let name;

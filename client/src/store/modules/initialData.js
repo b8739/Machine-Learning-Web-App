@@ -1,4 +1,5 @@
 //src/store/moduleName.js
+import axios from "axios";
 export default {
   namespaced: true,
   state: {
@@ -44,7 +45,7 @@ export default {
         .get(path)
         .then(res => {
           commit("loadDataset", res);
-          console.log(res);
+          // console.log(res);
           commit("loadIndexNum", Object.keys(res.data["ID"]).length - 1);
           // 데이터 추가 시 필요한 index number
           //'처음' 데이터를 받아올때만 columns 받아오도록 처리
