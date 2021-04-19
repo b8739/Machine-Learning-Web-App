@@ -3,18 +3,18 @@
     <!-- v-menu -->
     <div class="tableOption" :style="tableOptionStyle">
       <ul>
-        <li>열 삭제</li>
+        <li @click="deleteColumn">열 삭제</li>
       </ul>
     </div>
     <!-- dataTable -->
     <table class="dataTable">
-      <thead>
+      <thead @click="locateTableOption">
         <th
           v-for="(column, thIndex) in columns"
           :key="thIndex"
           @mouseover="assignHoveredIndex(thIndex)"
           @mouseleave="resetHoverEffect"
-          @click="[locateTableOption, getColumnInfo(thIndex)]"
+          @click="getColumnInfo(thIndex)"
           :class="{ columnHoverEffect: checkHoveredColumn(thIndex) }"
         >
           {{ columns[thIndex] }}
@@ -52,14 +52,14 @@
 <script>
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
-const api = "http://localhost:5000/infiniteLoading";
 
 export default {
   data() {
     return {
       // v-menu
-      selectedItem: 1,
-      items: [{ text: "열 삭제" }, { text: "열 복사" }],
+      // selectedItem: 1,
+      // items: [{ text: "열 삭제" }, { text: "열 복사" }],
+
       // InfiniteLoading
       limit: 0,
       // dataset
@@ -73,8 +73,8 @@ export default {
         position: "absolute",
         top: 0,
         left: 0
-      }
-
+      },
+      columnToDelete: null
       // v-menu
       // items: [{ title: "열 삭제" }, { title: "열 복사" }],
       // closeOnClick: true
@@ -101,22 +101,28 @@ export default {
     }
   },
   methods: {
+    deleteColumn() {
+      let api = "http://localhost:5000/deleteColumn";
+      console.log(this.columnToDelete);
+      axios
+        .get(api, {
+          params: {
+            columnToDelete: this.columnToDelete
+          }
+        })
+        .then(res => {})
+        .catch(error => {});
+    },
     locateTableOption(event) {
-      // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
-      console.log(event.clientX); // x coordinate
-      console.log(event.clientY); // y coordinate
       this.tableOptionStyle.left = event.clientX - 320 + "px";
       this.tableOptionStyle.top = event.clientY - 60 + "px";
-      // pageX/Y gives the coordinates relative to the <html> element in CSS pixels.
-      // console.log(event.pageX);
-      // console.log(event.pagey);
 
       // // screenX/Y gives the coordinates relative to the screen in device pixels.
       // console.log(event.screenX);
       // console.log(event.screenY);
     },
     getColumnInfo(thIndex) {
-      alert(thIndex);
+      this.columnToDelete = this.columns[thIndex];
     },
     showTableOption() {},
     // hovering Effect
@@ -134,7 +140,21 @@ export default {
       this.hoveredColumn = null;
     },
     // infinteLoading
+    infiniteLoadingCreated() {
+      let api = "http://localhost:5000/infiniteLoading";
+      axios
+        .get(api, {
+          params: {
+            limit: this.limit
+          }
+        })
+        .then(({ data }) => {
+          this.limit += 25; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
+          this.dataSet.push(...data);
+        });
+    },
     infiniteHandler($state) {
+      let api = "http://localhost:5000/infiniteLoading";
       axios
         .get(api, {
           params: {
@@ -166,16 +186,7 @@ export default {
     }
   },
   created() {
-    axios
-      .get(api, {
-        params: {
-          limit: this.limit
-        }
-      })
-      .then(({ data }) => {
-        this.limit += 25; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
-        this.dataSet.push(...data);
-      });
+    this.infiniteLoadingCreated();
   }
 };
 </script>

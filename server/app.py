@@ -198,5 +198,14 @@ def dataSummarize():
   df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
   return (summarizeData(df))
 
+@app.route('/deleteColumn',methods=['GET'])
+def deleteColumn():
+  columnToDelete = request.args.get('columnToDelete')
+  sql = "alter table dataset drop column "+ columnToDelete+";"
+  session.execute(sql)
+  session.commit()
+  session.close()
+  return jsonify ("hello world")
+
 if __name__ == '__main__':
     app.run(debug=True)
