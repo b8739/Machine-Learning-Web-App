@@ -162,7 +162,6 @@ export default {
       editModal_darkenBackground: false,
       selectedColumnIndex: null,
       //etc (for dataset parsing)
-      nameChangeMark: [],
       show_timeSeriesGraph: false
     };
   },

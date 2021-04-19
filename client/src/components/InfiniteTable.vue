@@ -52,7 +52,8 @@
 <script>
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
-
+// vuex
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -101,6 +102,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["loadFundamentalData"]),
     deleteColumn() {
       let api = "http://localhost:5000/deleteColumn";
       console.log(this.columnToDelete);
@@ -110,7 +112,11 @@ export default {
             columnToDelete: this.columnToDelete
           }
         })
-        .then(res => {})
+        .then(res => {
+          this.dataSet = [];
+          this.limit = 0;
+          this.infiniteLoadingCreated();
+        })
         .catch(error => {});
     },
     locateTableOption(event) {
@@ -192,6 +198,7 @@ export default {
 </script>
 <style scoped>
 .wrapper {
+  min-height: 80vh;
   max-height: 85vh;
   overflow: scroll;
 }
