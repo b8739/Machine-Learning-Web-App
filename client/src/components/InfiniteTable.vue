@@ -1,8 +1,24 @@
 <template>
   <div class="wrapper">
+    <!-- v-menu -->
+    <div class="tableOption" :style="tableOptionStyle">
+      <ul>
+        <li>열 삭제</li>
+      </ul>
+    </div>
+    <!-- dataTable -->
     <table class="dataTable">
       <thead>
-        <th v-for="(column, thIndex) in columns" :key="thIndex">{{ columns[thIndex] }}</th>
+        <th
+          v-for="(column, thIndex) in columns"
+          :key="thIndex"
+          @mouseover="assignHoveredIndex(thIndex)"
+          @mouseleave="resetHoverEffect"
+          @click="[locateTableOption, getColumnInfo(thIndex)]"
+          :class="{ columnHoverEffect: checkHoveredColumn(thIndex) }"
+        >
+          {{ columns[thIndex] }}
+        </th>
       </thead>
       <tbody>
         <tr
@@ -13,16 +29,26 @@
           <td
             v-for="(column, thIndex) in columns"
             :key="thIndex"
-            :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }"
+            @mouseover="assignHoveredIndex(thIndex)"
+            @mouseleave="resetHoverEffect"
+            :class="{ columnHoverEffect: checkHoveredColumn(thIndex) }"
           >
             {{ data[columns[thIndex]] }}
           </td>
         </tr>
       </tbody>
     </table>
+    <!-- <v-data-table
+      :headers="headers"
+      :items="dataSet"
+      class="elevation-1"
+      disable-pagination="true"
+      dense="true"
+    ></v-data-table> -->
     <infinite-loading @infinite="infiniteHandler" spinner="waveDots"></infinite-loading>
   </div>
 </template>
+<!-- :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }" -->
 <script>
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
@@ -31,11 +57,38 @@ const api = "http://localhost:5000/infiniteLoading";
 export default {
   data() {
     return {
+      // v-menu
+      selectedItem: 1,
+      items: [{ text: "열 삭제" }, { text: "열 복사" }],
+      // InfiniteLoading
       limit: 0,
+      // dataset
       dataSet: [],
+      // hovering & selection
       rowSelectedFlags: [],
-      columnSelectedFlags: []
+      columnSelectedFlags: [],
+      hoveredColumn: null,
+      // menu
+      tableOptionStyle: {
+        position: "absolute",
+        top: 0,
+        left: 0
+      }
+
+      // v-menu
+      // items: [{ title: "열 삭제" }, { title: "열 복사" }],
+      // closeOnClick: true
     };
+  },
+  computed: {
+    headers() {
+      let headers = [];
+      this.columns.forEach(element => {
+        let header = { text: element, value: element };
+        headers.push(header);
+      });
+      return headers;
+    }
   },
   props: ["xaxis", "columns", "date", "selectedColumnIndex"],
   components: {
@@ -48,6 +101,39 @@ export default {
     }
   },
   methods: {
+    locateTableOption(event) {
+      // clientX/Y gives the coordinates relative to the viewport in CSS pixels.
+      console.log(event.clientX); // x coordinate
+      console.log(event.clientY); // y coordinate
+      this.tableOptionStyle.left = event.clientX - 320 + "px";
+      this.tableOptionStyle.top = event.clientY - 60 + "px";
+      // pageX/Y gives the coordinates relative to the <html> element in CSS pixels.
+      // console.log(event.pageX);
+      // console.log(event.pagey);
+
+      // // screenX/Y gives the coordinates relative to the screen in device pixels.
+      // console.log(event.screenX);
+      // console.log(event.screenY);
+    },
+    getColumnInfo(thIndex) {
+      alert(thIndex);
+    },
+    showTableOption() {},
+    // hovering Effect
+    assignHoveredIndex(thIndex) {
+      this.hoveredColumn = thIndex;
+    },
+    checkHoveredColumn(thIndex) {
+      if (thIndex === this.hoveredColumn) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    resetHoverEffect() {
+      this.hoveredColumn = null;
+    },
+    // infinteLoading
     infiniteHandler($state) {
       axios
         .get(api, {
@@ -87,7 +173,7 @@ export default {
         }
       })
       .then(({ data }) => {
-        this.limit += 17; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
+        this.limit += 25; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
         this.dataSet.push(...data);
       });
   }
@@ -118,9 +204,6 @@ export default {
   background-color: #b6b6b6;
   cursor: pointer;
 }
-.dataTable tr:hover tr {
-  background-color: #b6b6b6;
-}
 .dataTable td:first-child {
   font-weight: 600;
 }
@@ -140,5 +223,15 @@ export default {
 }
 .dataTable tr:nth-child(even) {
   /* background-color: #f0f8ff; */
+}
+.columnHoverEffect {
+  background-color: #b6b6b6;
+  cursor: pointer;
+}
+/* options */
+.tableOption {
+  width: 100px;
+  border: 1px solid gray;
+  background-color: #fff;
 }
 </style>
