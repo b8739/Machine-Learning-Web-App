@@ -2,12 +2,7 @@
   <v-container>
     <v-navigation-drawer v-model="drawer" absolute>
       <v-list-item class="px-2">
-        <v-list-item-avatar>
-          <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
-        </v-list-item-avatar>
-
-        <v-list-item-title>John Leider</v-list-item-title>
-
+        <v-list-item-title>Options</v-list-item-title>
         <v-btn icon @click.stop="mini = !mini">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
@@ -37,8 +32,8 @@ export default {
     return {
       drawer: true,
       items: [
-        { title: "Home", icon: "mdi-view-dashboard" },
-        { title: "About", icon: "mdi-forum" }
+        { title: "Add Column", icon: "mdi-view-dashboard" },
+        { title: "Update Column", icon: "mdi-forum" }
       ]
     };
   },

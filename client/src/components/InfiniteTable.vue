@@ -2,13 +2,19 @@
   <div class="wrapper">
     <!-- v-menu -->
     <div class="tableOption" :style="tableOptionStyle">
-      <ul>
-        <li @click="deleteColumn">열 삭제</li>
-      </ul>
+      <v-card v-if="showTableOption" class="mx-auto" max-width="300" tile>
+        <v-list dense dark>
+          <v-list-item-group>
+            <v-list-item active-class="white" color="#fff">열 삽입</v-list-item>
+            <v-list-item color="#fff" @click="deleteColumn">열 삭제</v-list-item>
+            <v-list-item color="#fff">열 정보</v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-card>
     </div>
     <!-- dataTable -->
     <table class="dataTable">
-      <thead @click="locateTableOption">
+      <thead @click="locateTableOption" v-click-outside="onClickOutside">
         <th
           v-for="(column, thIndex) in columns"
           :key="thIndex"
@@ -52,9 +58,13 @@
 <script>
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
+import vClickOutside from "v-click-outside";
 // vuex
 import { mapActions } from "vuex";
 export default {
+  directives: {
+    clickOutside: vClickOutside.directive
+  },
   data() {
     return {
       // v-menu
@@ -70,12 +80,15 @@ export default {
       columnSelectedFlags: [],
       hoveredColumn: null,
       // menu
+
       tableOptionStyle: {
         position: "absolute",
         top: 0,
         left: 0
       },
-      columnToDelete: null
+      showTableOption: false,
+      columnToDelete: null,
+      vListItemInputValue: false
       // v-menu
       // items: [{ title: "열 삭제" }, { title: "열 복사" }],
       // closeOnClick: true
@@ -103,6 +116,11 @@ export default {
   },
   methods: {
     ...mapActions(["loadFundamentalData"]),
+    onClickOutside() {
+      if (this.showTableOption === true) {
+        this.showTableOption = false;
+      }
+    },
     deleteColumn() {
       let api = "http://localhost:5000/deleteColumn";
       console.log(this.columnToDelete);
@@ -118,8 +136,10 @@ export default {
           this.infiniteLoadingCreated();
         })
         .catch(error => {});
+      this.showTableOption = !this.showTableOption;
     },
     locateTableOption(event) {
+      this.showTableOption = true;
       this.tableOptionStyle.left = event.clientX - 320 + "px";
       this.tableOptionStyle.top = event.clientY - 60 + "px";
 
@@ -248,8 +268,8 @@ export default {
 }
 /* options */
 .tableOption {
-  width: 100px;
-  border: 1px solid gray;
-  background-color: #fff;
+}
+.white {
+  background-color: rgb(0, 0, 0);
 }
 </style>
