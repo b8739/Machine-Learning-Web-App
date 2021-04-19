@@ -1,50 +1,66 @@
 <template>
   <div id="wrap">
-    <div class="sidebar">
+    <!-- <div class="sidebar">
       <div class="editData">
         <button class="editButton btn-1" type="button" v-b-modal.add-modal>Add Row</button>
         <button class="editButton btn-1" type="button" @click="showElement()">Update Row</button>
       </div>
-    </div>
-    <div id="mainContents">
-      <div class="toggle-summary">
-        <button class="btn-1" @click="displaySwitch()">Feature</button>
-        <button class="btn-1" @click="displaySwitch()">Table</button>
-      </div>
-      <GraphBuilder :columns="columns" />
-      <DataFeatures
-        :class="{ visibilityHidden: showFeatures }"
-        :columnsWithoutIndex="columnsWithoutIndex"
-        :columns="columns"
-        :indexNum="indexNum"
-      />
+    </div> -->
+    <v-container id="mainWrapper" fluid>
+      <v-row>
+        <!-- 화면 좌측 -->
+        <v-col cols="2"><SideMenu /></v-col>
+        <!-- 화면 우측 -->
+        <v-col cols="10">
+          <v-row class="mainContainer">
+            <!-- DataSummary/Table 교체 버튼 -->
+            <v-col>
+              <div class="toggle-summary">
+                <button class="btn-1" @click="displaySwitch()">Feature</button>
+                <button class="btn-1" @click="displaySwitch()">Table</button>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row>
+            <GraphBuilder :columns="columns" />
+            <DataFeatures
+              :class="{ visibilityHidden: showFeatures }"
+              :columnsWithoutIndex="columnsWithoutIndex"
+              :columns="columns"
+              :indexNum="indexNum"
+            />
 
-      <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
-      <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
-      <AddModal
-        :columnsWithoutIndex="columnsWithoutIndex"
-        :addForm="addForm"
-        :indexNum="indexNum"
-        @loadDataStatus="loadData"
-      />
-    </div>
+            <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
+            <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
+            <AddModal
+              :columnsWithoutIndex="columnsWithoutIndex"
+              :addForm="addForm"
+              :indexNum="indexNum"
+              @loadDataStatus="loadData"
+            />
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 <script>
 import axios from "axios";
 //components
-import DataTable from "../components/DataTable";
-import Sidebar from "../components/layout/Sidebar";
-import AddModal from "../components/modal/AddModal";
-import DataFeatures from "../components/DataFeatures";
-import InfiniteTable from "../components/InfiniteTable";
+import DataTable from "@/components/DataTable";
+import Sidebar from "@/components/layout/Sidebar";
+import AddModal from "@/components/modal/AddModal";
+import DataFeatures from "@/components/DataFeatures";
+import InfiniteTable from "@/components/InfiniteTable";
 import GraphBuilder from "./GraphBuilder.vue";
+import SideMenu from "@/components/layout/SideMenu.vue";
 //vuex
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 import { mapMutations } from "vuex";
-
+// eventbus
+import { eventBus } from "@/main";
 export default {
   data() {
     return {
@@ -66,7 +82,8 @@ export default {
     AddModal,
     DataFeatures,
     InfiniteTable,
-    GraphBuilder
+    GraphBuilder,
+    SideMenu
   },
   computed: {
     ...mapState({
@@ -87,6 +104,9 @@ export default {
   methods: {
     ...mapMutations(["setHadLoaded"]),
     ...mapActions(["loadFundamentalData"]),
+    // showDrawer() {
+    //   eventBus.$emit("showDrawer", true);
+    // },
     loadData() {
       const path = "http://localhost:5000/loadData";
       axios
@@ -182,15 +202,20 @@ export default {
   float: left;
 }
 
-#mainContents {
-  width: 70%;
-  float: left;
-  padding: 20px;
+#mainWrapper {
+  /* width: 70%; */
+  /* float: left; */
+  /* padding: 20px; */
+}
+.mainContainer {
+  min-width: 1200px;
+  max-width: 1900px;
+  margin: 0 auto;
 }
 .toggle-summary button {
-  width: 90px;
+  width: 8%;
+  height: 8%;
   margin-left: 5px;
-
   background: #d8d6d6;
   border: none;
   border-radius: 5px;

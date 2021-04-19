@@ -189,7 +189,7 @@ infinite-loading Test:
 def infiniteLoading():
 	limit = request.args.get('limit')
 	conn = engine.connect()
-	df = pd.read_sql_query("select * from dataset limit "+limit+",10;", conn)
+	df = pd.read_sql_query("select * from dataset limit "+limit+",17;", conn)
 	return Response(df.to_json( orient='records'), mimetype='application/json')
 
 

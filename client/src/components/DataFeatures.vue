@@ -246,12 +246,14 @@ export default {
 <style scoped>
 .container {
   max-width: 1200px;
+  max-height: 100vh;
+  overflow: scroll;
 }
 .dataTable {
   text-transform: capitalize;
   font-size: 15px;
-  margin: 0 auto;
-  margin-top: 100px;
+  /* margin: 0 auto; */
+  margin-top: 50px;
   text-align: left;
   vertical-align: middle;
   border-collapse: collapse;

@@ -87,7 +87,7 @@ export default {
         }
       })
       .then(({ data }) => {
-        this.limit += 10;
+        this.limit += 17; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
         this.dataSet.push(...data);
       });
   }
@@ -95,7 +95,16 @@ export default {
 </script>
 <style scoped>
 .wrapper {
-  width: 1000px;
+  max-height: 85vh;
+  overflow: scroll;
+}
+.dataTable {
+  text-transform: capitalize;
+  font-size: 11px;
+  margin: 0 auto;
+  margin-top: 50px;
+  text-align: center;
+  vertical-align: middle;
 }
 .dataTable tbody tr.rowSelected {
   background-color: rgba(154, 189, 243, 0.863);
@@ -104,17 +113,7 @@ export default {
   background-color: rgba(57, 132, 243, 0.863);
 }
 /* .datatable */
-.dataTable {
-  text-transform: capitalize;
-  font-size: 15px;
-  margin: 0 auto;
-  margin-top: 100px;
-  text-align: center;
-  vertical-align: middle;
-}
-.dataTable tr {
-  /* background-color: #ecf1f6; */
-}
+
 .dataTable tr:hover {
   background-color: #b6b6b6;
   cursor: pointer;
@@ -127,8 +126,14 @@ export default {
 }
 .dataTable td {
   border: 0.5px solid rgba(212, 214, 213, 0.623);
-  padding: 15px;
 }
+.dataTable th {
+  min-width: 70px;
+  border: 0.5px solid rgba(212, 214, 213, 0.623);
+  background-color: rgba(239, 239, 239, 0.907);
+  padding: 5px 10px;
+}
+
 /* datatable odd,even */
 .dataTable tr:nth-child(odd) {
   /* background-color: #d9e1f2; */

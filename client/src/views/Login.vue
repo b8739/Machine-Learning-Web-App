@@ -11,7 +11,7 @@
 <script>
 export default {};
 </script>
-<style>
+<style scoped>
 .wrapper {
   width: 300px;
   height: 200px;
