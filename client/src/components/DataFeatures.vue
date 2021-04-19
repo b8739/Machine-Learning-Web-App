@@ -70,7 +70,6 @@
               :indexNum="indexNum"
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
-              :nameChangeMark="nameChangeMark"
               :seriesName="numericColumns[numericIndex]"
             />
           </td>
