@@ -113,7 +113,6 @@
       :columns="columns"
       @newEditModalStatus="closeEditModal"
       :editModal_hidden="editModal_hidden"
-      :nameChangeMark="nameChangeMark"
       :selectedColumnIndex="selectedColumnIndex"
     />
     <portal-target name="destination"> </portal-target>

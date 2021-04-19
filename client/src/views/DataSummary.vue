@@ -182,6 +182,8 @@ export default {
   created() {
     // this.loadData(); //store.js 실험하기 위해서 일단 주석 처리
     this.loadFundamentalData("http://localhost:5000/loadData");
+    // this.$store.dispatch("loadFundamentalData", "http://localhost:5000/loadData");
+    // this.loadData();
   },
   mounted() {},
   beforeUpdate() {},
