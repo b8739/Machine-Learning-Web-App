@@ -1,15 +1,7 @@
-import Vue from "vue";
-import Vuex from "vuex";
-import createPersistedState from "vuex-persistedstate";
+//src/store/moduleName.js
 import axios from "axios";
-import initialData from "./initialData.js";
-
-Vue.use(Vuex);
-
-export default new Vuex.Store({
-  modules: {
-    initialData: initialData
-  },
+export default {
+  namespaced: true,
   state: {
     //data
     dataset: {},
@@ -23,7 +15,7 @@ export default new Vuex.Store({
 
   mutations: {
     loadDataset(state, payload) {
-      state.dataset = payload.data;
+      state.dataset = Object.freeze(payload.data);
     },
     loadIndexNum(state, payload) {
       state.indexNum = payload;
@@ -42,7 +34,7 @@ export default new Vuex.Store({
       }
     },
     loadSummarizedInfo(state, payload) {
-      state.summarizedInfo = payload;
+      state.summarizedInfo = Object.freeze(payload);
     }
   },
 
@@ -53,7 +45,7 @@ export default new Vuex.Store({
         .get(path)
         .then(res => {
           commit("loadDataset", res);
-          console.log(res);
+          // console.log(res);
           commit("loadIndexNum", Object.keys(res.data["ID"]).length - 1);
           // 데이터 추가 시 필요한 index number
           //'처음' 데이터를 받아올때만 columns 받아오도록 처리
@@ -63,7 +55,5 @@ export default new Vuex.Store({
           console.error(error);
         });
     }
-  },
-
-  plugins: [createPersistedState({ paths: ["initialData"] })]
-});
+  }
+};

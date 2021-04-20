@@ -34,7 +34,6 @@ import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 import { mapMutations } from "vuex";
-
 export default {
   /*
       Defines the data used by the component
@@ -44,9 +43,7 @@ export default {
       files: []
     };
   },
-
   props: ["sidebarStatus"],
-
   components: {},
   /*
       Defines the method used by the component
@@ -93,7 +90,7 @@ export default {
       */
     handleFilesUpload() {
       let uploadedFiles = this.$refs.files.files;
-      console.log(uploadedFiles);
+      // console.log(uploadedFiles);
       /*
           Adds the uploaded file to the files array
         */
@@ -189,12 +186,10 @@ span.remove-file {
   font-size: 17px;
   background-color: #fff;
 }
-
 .dropBox p {
   color: #333333;
   font-size: 14px;
 }
-
 .dropBox button {
   background-color: #97cfb7;
   border: none;

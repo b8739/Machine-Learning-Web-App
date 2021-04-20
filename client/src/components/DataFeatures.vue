@@ -56,8 +56,8 @@
           <td>
             <span class="tdTitle">Distribution</span>
             <Histogram
-              :distribution="summarizedInfo[5][numericIndex]"
-              :interval="summarizedInfo[6][numericIndex]"
+              :distribution="summarizedInfo[4][numericIndex]"
+              :interval="summarizedInfo[5][numericIndex]"
               :indexNum="indexNum"
             />
           </td>
@@ -70,7 +70,6 @@
               :indexNum="indexNum"
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
-              :nameChangeMark="nameChangeMark"
               :seriesName="numericColumns[numericIndex]"
             />
           </td>
@@ -114,7 +113,6 @@
       :columns="columns"
       @newEditModalStatus="closeEditModal"
       :editModal_hidden="editModal_hidden"
-      :nameChangeMark="nameChangeMark"
       :selectedColumnIndex="selectedColumnIndex"
     />
     <portal-target name="destination"> </portal-target>
@@ -130,9 +128,7 @@ import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 import { mapMutations } from "vuex";
-
 import { eventBus } from "@/main";
-
 export default {
   data() {
     return {
@@ -165,14 +161,12 @@ export default {
       show_timeSeriesGraph: false
     };
   },
-
   components: {
     TimeSeries,
     EditModal,
     Histogram
   },
   props: ["columnsWithoutIndex"],
-
   computed: {
     ...mapState({
       dataset: state => state.dataset,
@@ -185,8 +179,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setHadLoaded"]),
-    ...mapActions(["loadFundamentalData"]),
+    // ...mapMutations("initialData", ["setHadLoaded"]),
+    // ...mapActions("initialData", ["loadFundamentalData"]),
+
     // divideArrayByName(jsonObject) {
     //   let tempArray;
     //   let name;
@@ -204,7 +199,6 @@ export default {
     },
     closeEditModal() {
       this.editModal_hidden = true;
-
       // this.editModal_dataValue = {};
       // this.editModal_date = {};
       // this.editModal_indexNum = {};
@@ -213,21 +207,16 @@ export default {
       this.show_timeSeriesGraph = !this.show_timeSeriesGraph;
     }
   },
-
   created() {
     this.numeric_meanJson = this.summarizedInfo[0]["mean"];
     this.numeric_stdJson = this.summarizedInfo[0]["std"];
-
     this.numeric_quantile1 = this.summarizedInfo[0]["quantile1"];
     this.numeric_quantile2 = this.summarizedInfo[0]["quantile2"];
     this.numeric_quantile3 = this.summarizedInfo[0]["quantile3"];
     this.numeric_quantile4 = this.summarizedInfo[0]["quantile4"];
-
     this.numeric_numOfNaJson = this.summarizedInfo[0]["numOfNA"];
-
     // this.categorical_mostCommon = this.summarizedInfo[1]["mostCommon"];
     this.categorical_numOfNaJson = this.summarizedInfo[1]["numOfNA"];
-
     this.numericColumns = this.summarizedInfo[2];
     this.categoricalColumns = this.summarizedInfo[3];
     this.categoryIndex = this.summarizedInfo[2].length;

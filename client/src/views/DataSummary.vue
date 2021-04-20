@@ -75,7 +75,6 @@ export default {
       showTable: true
     };
   },
-  props: ["summarizedData"],
   components: {
     DataTable,
     Sidebar,
@@ -87,8 +86,8 @@ export default {
   },
   computed: {
     ...mapState({
-      columns: state => state.columns,
-      summarizedInfo: state => state.summarizedInfo
+      columns: state => state.columns
+      // summarizedInfo: state => state.initialData.summarizedInfo
     }),
     columnsWithoutIndex() {
       const idIndex = this.columns.indexOf("ID");
@@ -134,9 +133,7 @@ export default {
         this.addForm[columnValue] = "";
       }
     },
-
     // 변형시켜야 하는 메소드들
-
     getIndexForUpdate(targetIndex) {
       console.log(`targetIndex: ${targetIndex}`);
       this.updateForm["ID"] = targetIndex;
@@ -146,7 +143,6 @@ export default {
       evt.preventDefault();
       this.$refs.updateDataModal.hide();
       this.updateData(this.updateForm);
-
       // this.updateBook(payload, this.updateForm);
     },
     onResetUpdate(evt) {
@@ -182,6 +178,8 @@ export default {
   created() {
     // this.loadData(); //store.js 실험하기 위해서 일단 주석 처리
     this.loadFundamentalData("http://localhost:5000/loadData");
+    // this.$store.dispatch("loadFundamentalData", "http://localhost:5000/loadData");
+    // this.loadData();
   },
   mounted() {},
   beforeUpdate() {},
@@ -201,7 +199,6 @@ export default {
   border-right: 1px solid #dee4ea;
   float: left;
 }
-
 #mainWrapper {
   /* width: 70%; */
   /* float: left; */
@@ -228,7 +225,6 @@ export default {
   position: relative;
   text-transform: capitalize;
 }
-
 /* button styling */
 /* GENERAL BUTTON STYLING */
 .toggle-summary button,
@@ -238,7 +234,6 @@ export default {
   -o-transition: all 0.3s;
   transition: all 0.3s;
 }
-
 .toggle-summary button::before,
 .toggle-summary button::after {
   background: rgb(13, 189, 113);
@@ -247,12 +242,10 @@ export default {
   z-index: -1;
   border-radius: 5px;
 }
-
 .toggle-summary button:hover {
   color: #fff;
   background: none;
 }
-
 /* BUTTON 1 */
 .btn-1::after {
   height: 0;
@@ -260,11 +253,9 @@ export default {
   top: 0;
   width: 100%;
 }
-
 .btn-1:hover:after {
   height: 100%;
 }
-
 /* editData */
 .editData button {
   /* top: 10px; */
@@ -274,7 +265,6 @@ export default {
   border: 0.5px solid #d8d6d6;
   position: relative;
 }
-
 .editData button::before,
 .editData button::after {
   background: rgb(13, 189, 113);
@@ -283,7 +273,6 @@ export default {
   z-index: -1;
   border-radius: 5px;
 }
-
 .editData button:hover {
   color: #fff;
   background: none;

@@ -91,5 +91,5 @@ def summarizeData(df):
 
 # 반환
   summarizedDF = (df_numeric_info.to_dict(), df_categorical_info.to_dict())
-  return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns,distribution_features, distribution_features,interval_features)
+  return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns, distribution_features,interval_features)
   # return Response(df_numeric_info.to_json(), df_categorical_info.to_json(),df_numeric_columns.to_json(),df_categorical_columns.to_json(), mimetype='application/json')

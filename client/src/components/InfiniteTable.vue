@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+    <!-- <SaveChange /> -->
     <!-- v-menu -->
     <div class="tableOption" :style="tableOptionStyle">
       <v-card v-if="showTableOption" class="mx-auto" max-width="300" tile>
@@ -52,15 +53,16 @@
       dense="true"
     ></v-data-table> -->
     <infinite-loading @infinite="infiniteHandler" spinner="waveDots"></infinite-loading>
+    <!-- <SaveChange /> -->
   </div>
 </template>
 <!-- :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }" -->
 <script>
+import { eventBus } from "@/main";
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
 import vClickOutside from "v-click-outside";
-// vuex
-import { mapActions } from "vuex";
+import SaveChange from "@/components/modal/SaveChange";
 export default {
   directives: {
     clickOutside: vClickOutside.directive
@@ -70,7 +72,6 @@ export default {
       // v-menu
       // selectedItem: 1,
       // items: [{ text: "열 삭제" }, { text: "열 복사" }],
-
       // InfiniteLoading
       limit: 0,
       // dataset
@@ -80,15 +81,16 @@ export default {
       columnSelectedFlags: [],
       hoveredColumn: null,
       // menu
-
       tableOptionStyle: {
         position: "absolute",
         top: 0,
         left: 0
       },
       showTableOption: false,
-      columnToDelete: null,
+      columnToDeleteInfo: { name: null, index: null },
+      deleteDetector: 0,
       vListItemInputValue: false
+
       // v-menu
       // items: [{ title: "열 삭제" }, { title: "열 복사" }],
       // closeOnClick: true
@@ -106,7 +108,8 @@ export default {
   },
   props: ["xaxis", "columns", "date", "selectedColumnIndex"],
   components: {
-    InfiniteLoading
+    InfiniteLoading,
+    SaveChange
   },
   watch: {
     xaxis: function(data) {
@@ -115,7 +118,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["loadFundamentalData"]),
     onClickOutside() {
       if (this.showTableOption === true) {
         this.showTableOption = false;
@@ -123,16 +125,19 @@ export default {
     },
     deleteColumn() {
       let api = "http://localhost:5000/deleteColumn";
-      console.log(this.columnToDelete);
+      console.log(this.columnToDeleteInfo.name);
       axios
         .get(api, {
           params: {
-            columnToDelete: this.columnToDelete
+            columnToDelete: this.columnToDeleteInfo.name
           }
         })
         .then(res => {
+          //초기화 해주어야 v-for가 반응해서 화면이 변경됨
           this.dataSet = [];
           this.limit = 0;
+          this.columns.splice(this.columnToDeleteInfo.index, 1);
+          this.deleteDetector++;
           this.infiniteLoadingCreated();
         })
         .catch(error => {});
@@ -142,15 +147,14 @@ export default {
       this.showTableOption = true;
       this.tableOptionStyle.left = event.clientX - 320 + "px";
       this.tableOptionStyle.top = event.clientY - 60 + "px";
-
       // // screenX/Y gives the coordinates relative to the screen in device pixels.
       // console.log(event.screenX);
       // console.log(event.screenY);
     },
     getColumnInfo(thIndex) {
-      this.columnToDelete = this.columns[thIndex];
+      this.columnToDeleteInfo.name = this.columns[thIndex];
+      this.columnToDeleteInfo.index = thIndex;
     },
-    showTableOption() {},
     // hovering Effect
     assignHoveredIndex(thIndex) {
       this.hoveredColumn = thIndex;
@@ -175,7 +179,7 @@ export default {
           }
         })
         .then(({ data }) => {
-          this.limit += 25; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
+          this.limit += 45; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
           this.dataSet.push(...data);
         });
     },
@@ -190,7 +194,7 @@ export default {
         .then(({ data }) => {
           // console.log(data);
           if (data.length) {
-            this.limit += 10;
+            this.limit += 45;
             this.dataSet.push(...data);
             $state.loaded();
           } else {
@@ -209,16 +213,30 @@ export default {
     },
     toggleColumnFlags(selectedColumnIndex) {
       this.columnSelectedFlags[selectedColumnIndex + 1] = true;
+    },
+    openSaveChangeDialog: function(event) {
+      event.preventDefault();
+      event.returnValue = "";
+      eventBus.$emit("openSaveChange", true);
+      console.log("dialog");
+      return undefined;
     }
   },
   created() {
     this.infiniteLoadingCreated();
-  }
+    window.addEventListener("beforeunload", this.openSaveChangeDialog);
+  },
+  mounted() {},
+  beforeUnmount() {
+    window.removeEventListener("beforeunload", this.openSaveChangeDialog);
+  },
+  beforeDestroy() {}
 };
 </script>
 <style scoped>
 .wrapper {
-  min-height: 80vh;
+  min-width: 95%;
+  min-height: 50vh;
   max-height: 85vh;
   overflow: scroll;
 }
@@ -237,7 +255,6 @@ export default {
   background-color: rgba(57, 132, 243, 0.863);
 }
 /* .datatable */
-
 .dataTable tr:hover {
   background-color: #b6b6b6;
   cursor: pointer;
@@ -250,11 +267,11 @@ export default {
 }
 .dataTable th {
   min-width: 70px;
+  max-width: 75px;
   border: 0.5px solid rgba(212, 214, 213, 0.623);
   background-color: rgba(239, 239, 239, 0.907);
   padding: 5px 10px;
 }
-
 /* datatable odd,even */
 .dataTable tr:nth-child(odd) {
   /* background-color: #d9e1f2; */
