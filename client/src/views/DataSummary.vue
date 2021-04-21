@@ -55,10 +55,8 @@ import InfiniteTable from "@/components/InfiniteTable";
 import GraphBuilder from "./GraphBuilder.vue";
 import SideMenu from "@/components/layout/SideMenu.vue";
 //vuex
-import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+
 // eventbus
 import { eventBus } from "@/main";
 export default {
@@ -84,9 +82,10 @@ export default {
     GraphBuilder,
     SideMenu
   },
+  // props: ["summarizedInfo"],
   computed: {
     ...mapState({
-      columns: state => state.columns
+      columns: state => state.initialData.columns
       // summarizedInfo: state => state.initialData.summarizedInfo
     }),
     columnsWithoutIndex() {
@@ -101,8 +100,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setHadLoaded"]),
-    ...mapActions(["loadFundamentalData"]),
+    ...mapMutations("initialData", ["setHadLoaded"]),
+    // ...mapMutations("initialData", ["loadSummarizedInfo"]),
+    ...mapActions("initialData", ["loadFundamentalData"]),
     // showDrawer() {
     //   eventBus.$emit("showDrawer", true);
     // },
@@ -178,6 +178,8 @@ export default {
   created() {
     // this.loadData(); //store.js 실험하기 위해서 일단 주석 처리
     this.loadFundamentalData("http://localhost:5000/loadData");
+    // this.loadSummarizedInfo(this.summarizedData);
+
     // this.$store.dispatch("loadFundamentalData", "http://localhost:5000/loadData");
     // this.loadData();
   },

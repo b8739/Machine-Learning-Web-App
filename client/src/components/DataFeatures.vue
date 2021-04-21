@@ -53,6 +53,7 @@
             </tr>
           </td>
 
+          <!-- 4th column -->
           <td>
             <span class="tdTitle">Distribution</span>
             <Histogram
@@ -61,13 +62,12 @@
               :indexNum="indexNum"
             />
           </td>
-          <!-- 4th column -->
+          <!-- 5th column -->
           <td>
             <span class="tdTitle" @click="showTimeSeriesGraph()">Time Series Graph</span>
             <TimeSeries
               :rawDataset="dataset[numericColumns[numericIndex]]"
               :date="dataset['ts']"
-              :indexNum="indexNum"
               :graphWidth="graphWidth"
               :graphHeight="graphHeight"
               :seriesName="numericColumns[numericIndex]"
@@ -105,7 +105,7 @@
         </tr>
       </tbody>
     </table>
-    <EditModal
+    <!-- <EditModal
       :class="{ visibilityHidden: editModal_hidden }"
       :dataValue="editModal_dataValue"
       :date="editModal_date"
@@ -114,7 +114,7 @@
       @newEditModalStatus="closeEditModal"
       :editModal_hidden="editModal_hidden"
       :selectedColumnIndex="selectedColumnIndex"
-    />
+    /> -->
     <portal-target name="destination"> </portal-target>
   </div>
 </template>
@@ -124,10 +124,7 @@ import TimeSeries from "./charts/TimeSeries";
 import Histogram from "./charts/Histogram";
 import EditModal from "./modal/EditModal";
 //vuex
-import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 export default {
   data() {
@@ -169,27 +166,16 @@ export default {
   props: ["columnsWithoutIndex"],
   computed: {
     ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum,
-      columns: state => state.columns,
-      summarizedInfo: state => state.summarizedInfo
+      dataset: state => state.initialData.dataset,
+      indexNum: state => state.initialData.indexNum,
+      columns: state => state.initialData.columns,
+      summarizedInfo: state => state.initialData.summarizedInfo
     }),
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }
   },
   methods: {
-    // ...mapMutations("initialData", ["setHadLoaded"]),
-    // ...mapActions("initialData", ["loadFundamentalData"]),
-
-    // divideArrayByName(jsonObject) {
-    //   let tempArray;
-    //   let name;
-    //   for (const key in jsonObject) {
-    //     name = jsonObject["Name"];
-    //     tempArray.push(jsonObject[key]);
-    //   }
-    // },
     openEditModal(dataset, date, indexNum, selectedColumnIndex) {
       this.editModal_hidden = false;
       this.editModal_dataValue = dataset;
@@ -215,7 +201,7 @@ export default {
     this.numeric_quantile3 = this.summarizedInfo[0]["quantile3"];
     this.numeric_quantile4 = this.summarizedInfo[0]["quantile4"];
     this.numeric_numOfNaJson = this.summarizedInfo[0]["numOfNA"];
-    // this.categorical_mostCommon = this.summarizedInfo[1]["mostCommon"];
+    this.categorical_mostCommon = this.summarizedInfo[1]["mostCommon"];
     this.categorical_numOfNaJson = this.summarizedInfo[1]["numOfNA"];
     this.numericColumns = this.summarizedInfo[2];
     this.categoricalColumns = this.summarizedInfo[3];
@@ -225,7 +211,7 @@ export default {
     // for (const value in this.dataSet) {
     //   // console.log("mounted");
     //   console.log(this.dataSet[value]);
-    // }
+    //
     //실험
     // console.log(jsonValuesIntoArray(this.dataSet["petal_length"]));
   }

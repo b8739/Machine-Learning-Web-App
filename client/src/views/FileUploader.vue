@@ -49,7 +49,7 @@ export default {
       Defines the method used by the component
     */
   methods: {
-    ...mapMutations(["loadSummarizedInfo"]),
+    ...mapMutations("initialData", ["loadSummarizedInfo"]),
     /*
         Submits files to the server
       */
@@ -76,13 +76,10 @@ export default {
           }
         })
         .then(res => {
-          // console.log(res);
           this.loadSummarizedInfo(res);
-          // this.$router.push({ path: "dataSummary" });
         })
         .catch(ex => {
           console.log("ERR!!!!! : ", ex);
-          // this.$router.push('/dataSummary'); //delete later
         });
     },
     /*
@@ -108,14 +105,9 @@ export default {
     onDrop(event) {
       const uploadedFiles = event.dataTransfer.files;
       // Do something with the dropped file
-      // console.log(uploadedFiles);
       for (var i = 0; i < uploadedFiles.length; i++) {
         this.files.push(uploadedFiles[i]);
       }
-      //일단 바로 submit (추후 수정)
-      /*
-  Initialize the form data
-*/
       let formData = new FormData();
       /*
   Iteate over any file sent over appending the files
@@ -137,7 +129,7 @@ export default {
         .then(response => {
           this.result = response.data;
           this.loadSummarizedInfo(this.result);
-          // this.$router.push({ name: "dataSummary", params: { summarizedData: this.result } });
+
           this.$router.push({ name: "dataSummary" });
         })
         .catch(ex => {
@@ -148,15 +140,6 @@ export default {
     //실험
     created() {
       console.log("Datatable created");
-    },
-    beforeUpdate() {
-      console.log("Datatable beforecreate");
-    },
-    updated() {
-      console.log("Datatable updated");
-    },
-    mounted() {
-      console.log("Datatable mounted");
     }
   }
 };

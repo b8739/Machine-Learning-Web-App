@@ -7,33 +7,25 @@ export function getRandom(min, max) {
 
 export function getRandomArray(min, max) {
   let count = this.getCount(max);
-  // console.log(max * 5);
-  // const count = 150 * 0.5;
   if (max - min + 1 < count) return;
-
   // 배열 생성
   let randomArray = [];
-
   while (1) {
     let index = this.getRandom(min, max);
-
     // 중복 여부 체크
     if (randomArray.indexOf(index) > -1) {
       continue;
     }
-
     randomArray.push(index);
     // 원하는 배열 갯수 만족 시 종료
     if (randomArray.length == count) {
       break;
     }
   }
-
   // 정렬
   let sortedRandomArray = randomArray.sort(function(a, b) {
     return a - b;
   });
-
   return sortedRandomArray;
 }
 //preprocess methods

@@ -7,9 +7,6 @@ import initialData from "./initialData.js";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  modules: {
-    initialData: initialData
-  },
   state: {
     //data
     dataset: {},
@@ -63,7 +60,7 @@ export default new Vuex.Store({
           console.error(error);
         });
     }
-  },
+  }
 
-  plugins: [createPersistedState({ paths: ["initialData"] })]
+  // plugins: [createPersistedState({ paths: ["initialData"] })]
 });

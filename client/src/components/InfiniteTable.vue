@@ -62,7 +62,7 @@ import { eventBus } from "@/main";
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
 import vClickOutside from "v-click-outside";
-import SaveChange from "@/components/modal/SaveChange";
+// import SaveChange from "@/components/modal/SaveChange";
 export default {
   directives: {
     clickOutside: vClickOutside.directive
@@ -108,8 +108,8 @@ export default {
   },
   props: ["xaxis", "columns", "date", "selectedColumnIndex"],
   components: {
-    InfiniteLoading,
-    SaveChange
+    InfiniteLoading
+    // SaveChange
   },
   watch: {
     xaxis: function(data) {
@@ -224,12 +224,9 @@ export default {
   },
   created() {
     this.infiniteLoadingCreated();
-    window.addEventListener("beforeunload", this.openSaveChangeDialog);
   },
   mounted() {},
-  beforeUnmount() {
-    window.removeEventListener("beforeunload", this.openSaveChangeDialog);
-  },
+  beforeUnmount() {},
   beforeDestroy() {}
 };
 </script>

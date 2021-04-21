@@ -11,7 +11,6 @@
           :indexNum="indexNum"
           @xaxis="getXaxis"
           :editModal_hidden="editModal_hidden"
-          :nameChangeMark="nameChangeMark"
         />
       </div>
       <InfiniteTable
@@ -34,15 +33,7 @@ export default {
       yaxis: {}
     };
   },
-  props: [
-    "dataValue",
-    "date",
-    "indexNum",
-    "columns",
-    "editModal_hidden",
-    "nameChangeMark",
-    "selectedColumnIndex"
-  ],
+  props: ["dataValue", "date", "indexNum", "columns", "editModal_hidden", "selectedColumnIndex"],
   components: {
     TimeSeries,
     InfiniteTable,

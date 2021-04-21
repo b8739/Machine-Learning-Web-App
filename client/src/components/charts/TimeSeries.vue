@@ -21,8 +21,8 @@ import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 export default {
   name: "TimeSeries",
-  props: ["graphWidth", "graphHeight", "date", "editModal_hidden", "rawDataset", "seriesName"],
-  // legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
+  props: ["graphWidth", "graphHeight", "date", "rawDataset", "seriesName"],
+
   data() {
     return {
       dataArray: [],
@@ -31,7 +31,7 @@ export default {
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
       firstMount: true,
-      // datasetByName: [], legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
+
       dateByName: [],
       options: {
         // chart
@@ -201,9 +201,7 @@ export default {
       }
     }
   },
-  // cons
   mounted() {
-    //console.log(this.dataset);
     if (this.firstMount == false) {
       this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
       this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
@@ -213,7 +211,10 @@ export default {
     }
   },
   computed: {
-    ...mapState({ dataset: state => state.dataset, indexNum: state => state.indexNum })
+    ...mapState({
+      dataset: state => state.initialData.dataset,
+      indexNum: state => state.initialData.indexNum
+    })
   },
   methods: {
     putIntoArray(jsonObject, targetArray, randomIndex) {
@@ -221,28 +222,6 @@ export default {
         targetArray.push(jsonObject[randomIndex[i]]);
       }
     },
-    divideDatasetByName(datasetByName, nameChangeMark) {
-      let tempArray = [];
-      let startIndex = 0;
-      //name별 data분류, index는 가져온 상황
-      for (const value in nameChangeMark) {
-        for (let i = startIndex; i < nameChangeMark[value]; i++) {
-          tempArray.push(this.rawDataset[i]);
-        }
-        startIndex = nameChangeMark[value];
-        datasetByName.push(tempArray);
-        tempArray = [];
-      }
-    },
-    divideDateByName(dateByName, nameChangeMark) {
-      let tempArray = [];
-      let startIndex = 0;
-      //name별 data분류, index는 가져온 상황
-      for (let i = startIndex; i < nameChangeMark[0]; i++) {
-        dateByName.push(this.date[i]);
-      }
-    },
-
     //date methods
     formatDate(dateArray) {
       for (let i = 0; i < dateArray.length; i++) {
