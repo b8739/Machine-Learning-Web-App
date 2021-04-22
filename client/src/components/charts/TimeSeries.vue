@@ -30,7 +30,7 @@ export default {
       dateArray: [],
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
-      firstMount: true,
+      firstMount: false,
 
       dateByName: [],
       options: {
@@ -197,18 +197,18 @@ export default {
     if (this.rawDataset != null || this.rawDataset != undefined) {
       let objectLength = Object.keys(this.rawDataset).length;
       if (objectLength != 0) {
-        this.firstMount = false;
+        this.firstMount = true;
       }
     }
   },
   mounted() {
-    if (this.firstMount == false) {
-      this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
-      this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-      this.updateSeriesLine(this.dataArray, this.seriesName);
-      this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
-      this.updateCategories(this.dateArray);
-    }
+    // if (this.firstMount == true) {
+    //   this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
+    //   this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
+    //   this.updateSeriesLine(this.dataArray, this.seriesName);
+    //   this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+    //   this.updateCategories(this.dateArray);
+    // }
   },
   computed: {
     ...mapState({
@@ -268,7 +268,6 @@ export default {
     resetSeries() {
       // console.log("rest");
       this.dataArray = [];
-      this.datasetByName = [];
     }
   }
 };
