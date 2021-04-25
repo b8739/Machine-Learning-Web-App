@@ -5,7 +5,7 @@ const state = {
   dataset: {},
   summarizedInfo: [],
   indexNum: "",
-  hadLoaded: false,
+
   columns: []
 };
 
@@ -16,17 +16,14 @@ const mutations = {
   loadIndexNum(state, payload) {
     state.indexNum = payload;
   },
-  setHadLoaded(state, payload) {
-    state.hadLoaded = payload;
-  },
+
   saveResponseData(state) {
-    if (state.hadLoaded == false) {
-      let columnValues = Object.keys(state.dataset);
-      for (const columnValue of columnValues) {
-        state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-        // state.updateForm[columnValue] = "";
-        // state.addForm[columnValue] = "";
-      }
+    state.columns = [];
+    let columnValues = Object.keys(state.dataset);
+    for (const columnValue of columnValues) {
+      state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
+      // state.updateForm[columnValue] = "";
+      // state.addForm[columnValue] = "";
     }
   },
   loadSummarizedInfo(state, payload) {

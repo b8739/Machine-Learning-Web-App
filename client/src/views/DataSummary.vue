@@ -6,42 +6,49 @@
         <button class="editButton btn-1" type="button" @click="showElement()">Update Row</button>
       </div>
     </div> -->
-    <v-container id="mainWrapper" fluid>
-      <v-row>
-        <!-- 화면 좌측 -->
-        <v-col cols="2"><SideMenu /></v-col>
-        <!-- 화면 우측 -->
-        <v-col cols="10">
-          <v-row class="mainContainer">
-            <!-- DataSummary/Table 교체 버튼 -->
-            <v-col>
-              <div class="toggle-summary">
-                <button class="btn-1" @click="displaySwitch()">Feature</button>
-                <button class="btn-1" @click="displaySwitch()">Table</button>
-              </div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <GraphBuilder :columns="columns" />
-            <DataFeatures
-              :class="{ visibilityHidden: showFeatures }"
-              :columnsWithoutIndex="columnsWithoutIndex"
-              :columns="columns"
-              :indexNum="indexNum"
-            />
+    <v-app>
+      <v-container id="mainWrapper" fluid>
+        <v-row>
+          <!-- 화면 좌측 -->
+          <v-col cols="2"><SideMenu /></v-col>
+          <!-- 화면 우측 -->
+          <v-col cols="10">
+            <v-row class="mainContainer">
+              <!-- DataSummary/Table 교체 버튼 -->
+              <v-col>
+                <v-btn @click="displaySwitch()">Feature</v-btn
+                ><v-btn @click="displaySwitch()">Table</v-btn>
+              </v-col>
 
-            <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
-            <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
-            <AddModal
-              :columnsWithoutIndex="columnsWithoutIndex"
-              :addForm="addForm"
-              :indexNum="indexNum"
-              @loadDataStatus="loadData"
-            />
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
+              <v-spacer></v-spacer>
+              <!-- <v-btn elevation="2" @click="openSaveChangeDialog">Save Changes</v-btn>
+             -->
+              <v-col>
+                <SaveMenu />
+              </v-col>
+            </v-row>
+            <v-row>
+              <GraphBuilder :columns="columns" />
+              <DataFeatures
+                :class="{ visibilityHidden: showFeatures }"
+                :columnsWithoutIndex="columnsWithoutIndex"
+                :columns="columns"
+                :indexNum="indexNum"
+              />
+
+              <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
+              <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
+              <AddModal
+                :columnsWithoutIndex="columnsWithoutIndex"
+                :addForm="addForm"
+                :indexNum="indexNum"
+                @loadDataStatus="loadData"
+              />
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-app>
   </div>
 </template>
 <script>
@@ -54,11 +61,13 @@ import DataFeatures from "@/components/DataFeatures";
 import InfiniteTable from "@/components/InfiniteTable";
 import GraphBuilder from "./GraphBuilder.vue";
 import SideMenu from "@/components/layout/SideMenu.vue";
+import SaveMenu from "@/components/save/SaveMenu.vue";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 // eventbus
 import { eventBus } from "@/main";
+
 export default {
   data() {
     return {
@@ -80,7 +89,8 @@ export default {
     DataFeatures,
     InfiniteTable,
     GraphBuilder,
-    SideMenu
+    SideMenu,
+    SaveMenu
   },
   // props: ["summarizedInfo"],
   computed: {
@@ -120,6 +130,12 @@ export default {
         .catch(error => {
           console.error(error);
         });
+    },
+    duplicateTable() {
+      const path = "http://localhost:5000/duplicateTable";
+      axios.get(path).catch(error => {
+        console.error(error);
+      });
     },
     displaySwitch() {
       this.showFeatures = !this.showFeatures;
@@ -173,6 +189,9 @@ export default {
       for (let i = 0; i < Object.keys(this.dataSet[this.columns[0]]).length; i++) {
         this.rowIndex.push(false);
       }
+    },
+    openSaveChangeDialog() {
+      eventBus.$emit("openSaveChange", true);
     }
   },
   created() {
@@ -185,9 +204,7 @@ export default {
   },
   mounted() {},
   beforeUpdate() {},
-  updated() {
-    this.setHadLoaded(true);
-  }
+  updated() {}
 };
 </script>
 

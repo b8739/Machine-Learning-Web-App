@@ -22,7 +22,7 @@
 </template>
 <script>
 import { eventBus } from "@/main";
-import SaveSpecification from "@/components/modal/SaveSpecification";
+import SaveSpecification from "@/components/save/SaveSpecification";
 export default {
   data() {
     return {

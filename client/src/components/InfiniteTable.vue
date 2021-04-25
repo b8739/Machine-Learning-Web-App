@@ -53,7 +53,7 @@
       dense="true"
     ></v-data-table> -->
     <infinite-loading @infinite="infiniteHandler" spinner="waveDots"></infinite-loading>
-    <!-- <SaveChange /> -->
+    <SaveChange />
   </div>
 </template>
 <!-- :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }" -->
@@ -62,7 +62,7 @@ import { eventBus } from "@/main";
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
 import vClickOutside from "v-click-outside";
-// import SaveChange from "@/components/modal/SaveChange";
+import SaveChange from "@/components/save/SaveChange";
 export default {
   directives: {
     clickOutside: vClickOutside.directive
@@ -108,8 +108,8 @@ export default {
   },
   props: ["xaxis", "columns", "date", "selectedColumnIndex"],
   components: {
-    InfiniteLoading
-    // SaveChange
+    InfiniteLoading,
+    SaveChange
   },
   watch: {
     xaxis: function(data) {
@@ -215,11 +215,7 @@ export default {
       this.columnSelectedFlags[selectedColumnIndex + 1] = true;
     },
     openSaveChangeDialog: function(event) {
-      event.preventDefault();
-      event.returnValue = "";
       eventBus.$emit("openSaveChange", true);
-      console.log("dialog");
-      return undefined;
     }
   },
   created() {
