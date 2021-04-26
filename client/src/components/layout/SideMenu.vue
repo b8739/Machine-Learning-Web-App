@@ -21,11 +21,13 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <DeleteRowModal />
     </v-navigation-drawer>
   </v-container>
 </template>
 
 <script>
+import DeleteRowModal from "@/components/modal/DeleteRowModal";
 import { eventBus } from "@/main";
 export default {
   data() {
@@ -33,9 +35,13 @@ export default {
       drawer: true,
       items: [
         { title: "Add Column", icon: "mdi-view-dashboard" },
-        { title: "Update Column", icon: "mdi-forum" }
+        { title: "Update Column", icon: "mdi-forum" },
+        { title: "Delete Column", icon: "mdi-forum" }
       ]
     };
+  },
+  components: {
+    DeleteRowModal
   },
   // methods: {
   //   hideDrawer() {

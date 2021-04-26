@@ -19,10 +19,8 @@
         <th
           v-for="(column, thIndex) in columns"
           :key="thIndex"
-          @mouseover="assignHoveredIndex(thIndex)"
-          @mouseleave="resetHoverEffect"
+          :class="{ grayBackground: thCompareClickedColumns(thIndex) }"
           @click="getColumnInfo(thIndex)"
-          :class="{ columnHoverEffect: checkHoveredColumn(thIndex) }"
         >
           {{ columns[thIndex] }}
         </th>
@@ -36,9 +34,8 @@
           <td
             v-for="(column, thIndex) in columns"
             :key="thIndex"
-            @mouseover="assignHoveredIndex(thIndex)"
-            @mouseleave="resetHoverEffect"
-            :class="{ columnHoverEffect: checkHoveredColumn(thIndex) }"
+            :class="{ grayBackground: tdCompareClickedColumns(trIndex, thIndex) }"
+            @click="saveClickedColumnInfo(trIndex, thIndex)"
           >
             {{ data[columns[thIndex]] }}
           </td>
@@ -79,7 +76,8 @@ export default {
       // hovering & selection
       rowSelectedFlags: [],
       columnSelectedFlags: [],
-      hoveredColumn: null,
+      clickedColumnInfo: { rowIndex: null, columnIndex: null },
+
       // menu
       tableOptionStyle: {
         position: "absolute",
@@ -90,10 +88,7 @@ export default {
       columnToDeleteInfo: { name: null, index: null },
       deleteDetector: 0,
       vListItemInputValue: false
-
-      // v-menu
-      // items: [{ title: "열 삭제" }, { title: "열 복사" }],
-      // closeOnClick: true
+      // style
     };
   },
   computed: {
@@ -118,10 +113,26 @@ export default {
     }
   },
   methods: {
-    onClickOutside() {
-      if (this.showTableOption === true) {
-        this.showTableOption = false;
+    saveClickedColumnInfo(rowIndex, columnIndex) {
+      this.clickedColumnInfo.rowIndex = rowIndex;
+      this.clickedColumnInfo.columnIndex = columnIndex;
+    },
+    tdCompareClickedColumns(trIndex, thIndex) {
+      if (
+        (trIndex == this.clickedColumnInfo.rowIndex &&
+          thIndex == this.clickedColumnInfo.columnIndex) ||
+        (thIndex == 0 && trIndex == this.clickedColumnInfo.rowIndex)
+      ) {
+        return true;
+      } else return false;
+    },
+    thCompareClickedColumns(thIndex) {
+      if (thIndex == this.clickedColumnInfo.columnIndex) {
+        return true;
       }
+    },
+    onClickOutside() {
+      this.showTableOption = false;
     },
     deleteColumn() {
       let api = "http://localhost:5000/deleteColumn";
@@ -156,18 +167,18 @@ export default {
       this.columnToDeleteInfo.index = thIndex;
     },
     // hovering Effect
-    assignHoveredIndex(thIndex) {
-      this.hoveredColumn = thIndex;
+    assignClickColumn(thIndex) {
+      this.clickedColumn = thIndex;
     },
-    checkHoveredColumn(thIndex) {
-      if (thIndex === this.hoveredColumn) {
-        return true;
-      } else {
-        return false;
-      }
-    },
+    // checkClickedColumn(tdIndex) {
+    //   if (tdIndex != this.clickedColumn) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // },
     resetHoverEffect() {
-      this.hoveredColumn = null;
+      this.clickedColumn = null;
     },
     // infinteLoading
     infiniteLoadingCreated() {
@@ -248,10 +259,13 @@ export default {
   background-color: rgba(57, 132, 243, 0.863);
 }
 /* .datatable */
-.dataTable tr:hover {
+
+/* row hovering effect */
+
+/* .dataTable tr:hover {
   background-color: #b6b6b6;
   cursor: pointer;
-}
+} */
 .dataTable td:first-child {
   font-weight: 600;
 }
@@ -262,7 +276,7 @@ export default {
   min-width: 70px;
   max-width: 75px;
   border: 0.5px solid rgba(212, 214, 213, 0.623);
-  background-color: rgba(239, 239, 239, 0.907);
+  /* background-color: rgba(239, 239, 239, 0.907); */
   padding: 5px 10px;
 }
 /* datatable odd,even */
@@ -272,8 +286,12 @@ export default {
 .dataTable tr:nth-child(even) {
   /* background-color: #f0f8ff; */
 }
-.columnHoverEffect {
+.grayBackground {
   background-color: #b6b6b6;
+  cursor: pointer;
+}
+.blueBackground {
+  background-color: #7390ee;
   cursor: pointer;
 }
 /* options */
