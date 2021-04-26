@@ -25,12 +25,14 @@
             <div class="my-4 subtitle-1">
               Date
             </div>
+
             <v-row>
               <v-col v-for="(formField, indexOfFormFields) in formFields" :key="indexOfFormFields">
                 <v-autocomplete
                   v-model="dateValues[indexOfFormFields]"
                   :items="getFormFieldItem(indexOfFormFields)"
                   outlined
+                  clearable
                   dense
                   :label="labels[indexOfFormFields]"
                 ></v-autocomplete>
