@@ -250,15 +250,39 @@ def saveTable():
   session.close()
   return jsonify ("overwrited")
 
-@app.route('/deleteRow',methods=['GET'])
+@app.route('/deleteRowByDate',methods=['GET'])
 def deleteRow():
   timeSeriesText = request.args.get('timeSeriesText')
-  sql = "delete from temp_dataset where ts like '%"+timeSeriesText+"%'"
+  sql = "delete from temp_dataset where ts like '%"+timeSeriesText+"%';"
   session.execute(sql)
   session.commit()
   session.close()
   print (sql)
   return jsonify (timeSeriesText)
+
+@app.route('/deleteRowByPeriod',methods=['GET'])
+def deleteRowByPeriod():
+
+  getFullTimeSeries_from = request.args.get('getFullTimeSeries_from')
+  getFullTimeSeries_to = request.args.get('getFullTimeSeries_to')
+
+#  query
+  
+  getFirstIndexQuery="select ID from temp_dataset where ts like '%"+getFullTimeSeries_from+"%' limit 1;"
+  startIndex =  str(session.execute(getFirstIndexQuery).fetchall()[0][0])
+  # print(startIndex)
+
+  getEndIndexQuery="select ID from temp_dataset where ts like '%"+getFullTimeSeries_to+"%' order by id DESC LIMIT 1;"
+  endIndex =  str(session.execute(getEndIndexQuery).fetchall()[0][0])
+  print(endIndex)
+
+  deleteRowByIndexQuery="delete from temp_dataset where ID >= " +startIndex+ " && ID <= "+endIndex  
+  session.execute(deleteRowByIndexQuery)
+
+  session.commit()
+  session.close()
+
+  return jsonify (getFullTimeSeries_from)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -133,6 +133,7 @@ export default {
     // mode
     dateMode: true,
     periodMode: false,
+    modeFlag: true, //true == dateMode, false ==periodMode
     fullTime_from: "",
     fullTime_to: "",
     fullDate_from: "",
@@ -168,14 +169,9 @@ export default {
     },
     getHour() {
       let hourArray = ["0"];
-      let addZeroAtFront;
+
       for (let i = 1; i <= 12; i++) {
-        if (i < 10) {
-          addZeroAtFront = "0" + i;
-        } else {
-          addZeroAtFront = i;
-        }
-        hourArray.push(addZeroAtFront);
+        hourArray.push(i);
       }
       return hourArray;
     },
@@ -237,10 +233,14 @@ export default {
       if (mode == "date") {
         this.periodMode = false;
         this.dateMode = true;
+        this.modeFlag = true;
       } else if (mode == "period") {
         this.dateMode = false;
         this.periodMode = true;
-        this.closeModalEvent();
+        this.modeFlag = false;
+        //초기화
+        this.fromDateValues = ["", "", "", "", ""];
+        this.toDateValues = ["", "", "", "", ""];
       }
     },
     getFormFieldItem(indexOfFormFields) {
@@ -257,21 +257,40 @@ export default {
       }
     },
     clickDeleteEvent() {
-      const path = "http://localhost:5000/deleteRow";
-      axios
-        .get(path, {
-          params: {
-            timeSeriesText: this.getFullTimeSeries_from
-          }
-        })
-        .then(res => {})
-        .catch(error => {
-          console.error(error);
-        });
+      // date mode 일 때
+      if (this.modeFlag == true) {
+        const path = "http://localhost:5000/deleteRowByDate";
+        axios
+          .get(path, {
+            params: {
+              timeSeriesText: this.getFullTimeSeries_from
+            }
+          })
+          .then(res => {})
+          .catch(error => {
+            console.error(error);
+          });
+      }
+      // period mode 일 때
+      else {
+        const path = "http://localhost:5000/deleteRowByPeriod";
+        axios
+          .get(path, {
+            params: {
+              getFullTimeSeries_from: this.getFullTimeSeries_from,
+              getFullTimeSeries_to: this.getFullTimeSeries_to
+            }
+          })
+          .then(res => {})
+          .catch(error => {
+            console.error(error);
+          });
+      }
     },
     closeModalEvent() {
       this.fromDateValues = ["", "", "", "", ""];
       this.toDateValues = ["", "", "", "", ""];
+      this.dialog = false;
     }
   }
 };
