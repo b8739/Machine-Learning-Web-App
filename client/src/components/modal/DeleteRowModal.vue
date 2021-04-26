@@ -25,11 +25,10 @@
             <div class="my-4 subtitle-1">
               Date
             </div>
-
             <v-row>
               <v-col v-for="(formField, indexOfFormFields) in formFields" :key="indexOfFormFields">
                 <v-autocomplete
-                  v-model="dateValues[indexOfFormFields]"
+                  v-model="fromDateValues[indexOfFormFields]"
                   :items="getFormFieldItem(indexOfFormFields)"
                   outlined
                   clearable
@@ -39,14 +38,15 @@
               </v-col>
             </v-row>
             <v-row justify="center"
-              ><div>
+              ><div class="fullTimeSeries">
                 <input
                   disabled
-                  v-model="getFullTimeSeries"
+                  v-model="getFullTimeSeries_from"
                   style="text-align:center; color:gray"
                 /></div
             ></v-row>
           </div>
+
           <!-- period mode -->
           <div v-show="periodMode">
             <v-card-subtitle
@@ -61,12 +61,21 @@
               <v-col v-for="(formField, indexOfFormFields) in formFields" :key="indexOfFormFields">
                 <v-autocomplete
                   :items="getFormFieldItem(indexOfFormFields)"
+                  v-model="fromDateValues[indexOfFormFields]"
                   outlined
                   dense
                   :label="labels[indexOfFormFields]"
                 ></v-autocomplete>
               </v-col>
             </v-row>
+            <v-row justify="center"
+              ><div class="fullTimeSeries">
+                <input
+                  disabled
+                  v-model="getFullTimeSeries_from"
+                  style="text-align:center; color:gray"
+                /></div
+            ></v-row>
             <v-divider></v-divider>
             <!-- 하단 Title -->
             <div class="my-4 subtitle-1">
@@ -77,18 +86,27 @@
               <v-col v-for="(formField, indexOfFormFields) in formFields" :key="indexOfFormFields">
                 <v-autocomplete
                   :items="getFormFieldItem(indexOfFormFields)"
+                  v-model="toDateValues[indexOfFormFields]"
                   outlined
                   dense
                   :label="labels[indexOfFormFields]"
                 ></v-autocomplete>
               </v-col>
             </v-row>
+            <v-row justify="center"
+              ><div class="fullTimeSeries">
+                <input
+                  disabled
+                  v-model="getFullTimeSeries_to"
+                  style="text-align:center; color:gray"
+                /></div
+            ></v-row>
           </div>
         </v-container>
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="gray darken-1" text @click="dialog = false">
+          <v-btn color="gray darken-1" text @click="closeModalEvent">
             Close
           </v-btn>
           <v-btn color="red darken-1" text @click="clickDeleteEvent">
@@ -109,15 +127,19 @@ export default {
     year: ["2016"],
 
     // v-model values
-    dateValues: ["", "", "", "", ""],
+    fromDateValues: ["", "", "", "", ""],
+    toDateValues: ["", "", "", "", ""],
 
     // mode
     dateMode: true,
     periodMode: false,
-    fullTime: "",
-    fillDate: ""
+    fullTime_from: "",
+    fullTime_to: "",
+    fullDate_from: "",
+    fullDate_to: ""
   }),
   computed: {
+    // autocomplete items
     getMonth() {
       let monthArray = [];
       let addZeroAtFront;
@@ -170,23 +192,44 @@ export default {
       }
       return minuteArray;
     },
-    getFullDate() {
-      let dateValues = this.dateValues;
+    // get specific time
+    getFullDate_from() {
+      let fromDateValues = this.fromDateValues;
       let formatter = "";
-      if (dateValues[1] != "") formatter = "-";
-      this.fullDate = dateValues[0] + formatter + dateValues[1] + formatter + dateValues[2];
-      return this.fullDate;
+      if (fromDateValues[1] != "") formatter = "-";
+      this.fullDate_from =
+        fromDateValues[0] + formatter + fromDateValues[1] + formatter + fromDateValues[2];
+      return this.fullDate_from;
     },
-    getFullTime() {
-      let dateValues = this.dateValues;
+    getFullTime_from() {
+      let fromDateValues = this.fromDateValues;
       let formatter = "";
-      if (dateValues[3] != "") formatter = ":";
-      this.fullTime = dateValues[3] + formatter + dateValues[4];
-      return this.fullTime;
+      if (fromDateValues[3] != "") formatter = ":";
+      this.fullTime_from = fromDateValues[3] + formatter + fromDateValues[4];
+      return this.fullTime_from;
     },
 
-    getFullTimeSeries() {
-      return this.getFullDate + " " + this.getFullTime;
+    getFullTimeSeries_from() {
+      return this.getFullDate_from + " " + this.getFullTime_from;
+    },
+    getFullDate_to() {
+      let toDateValues = this.toDateValues;
+      let formatter = "";
+      if (toDateValues[1] != "") formatter = "-";
+      this.fullDate_to =
+        toDateValues[0] + formatter + toDateValues[1] + formatter + toDateValues[2];
+      return this.fullDate_to;
+    },
+    getFullTime_to() {
+      let toDateValues = this.toDateValues;
+      let formatter = "";
+      if (toDateValues[3] != "") formatter = ":";
+      this.fullTime_to = toDateValues[3] + formatter + toDateValues[4];
+      return this.fullTime_to;
+    },
+
+    getFullTimeSeries_to() {
+      return this.getFullDate_to + " " + this.getFullTime_to;
     }
   },
   methods: {
@@ -197,6 +240,7 @@ export default {
       } else if (mode == "period") {
         this.dateMode = false;
         this.periodMode = true;
+        this.closeModalEvent();
       }
     },
     getFormFieldItem(indexOfFormFields) {
@@ -217,13 +261,17 @@ export default {
       axios
         .get(path, {
           params: {
-            timeSeriesText: this.getFullTimeSeries
+            timeSeriesText: this.getFullTimeSeries_from
           }
         })
         .then(res => {})
         .catch(error => {
           console.error(error);
         });
+    },
+    closeModalEvent() {
+      this.fromDateValues = ["", "", "", "", ""];
+      this.toDateValues = ["", "", "", "", ""];
     }
   }
 };
