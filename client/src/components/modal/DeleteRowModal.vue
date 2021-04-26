@@ -189,25 +189,41 @@ export default {
       return minuteArray;
     },
     // get specific time
+
+    // from
     getFullDate_from() {
       let fromDateValues = this.fromDateValues;
-      let formatter = "";
-      if (fromDateValues[1] != "") formatter = "-";
-      this.fullDate_from =
-        fromDateValues[0] + formatter + fromDateValues[1] + formatter + fromDateValues[2];
+      this.fullDate_from = "";
+      for (let i = 0; i < 3; i++) {
+        if (fromDateValues[i] != null && fromDateValues[i] != "") {
+          if (i != 0) {
+            this.fullDate_from = this.fullDate_from + "-";
+          }
+          this.fullDate_from = this.fullDate_from.concat(fromDateValues[i]);
+        }
+      }
       return this.fullDate_from;
     },
     getFullTime_from() {
       let fromDateValues = this.fromDateValues;
-      let formatter = "";
-      if (fromDateValues[3] != "") formatter = ":";
-      this.fullTime_from = fromDateValues[3] + formatter + fromDateValues[4];
+      this.fullTime_from = "";
+      for (let i = 3; i < 5; i++) {
+        if (fromDateValues[i] != null && fromDateValues[i] != "") {
+          if (i != 3) {
+            this.fullTime_from = this.fullTime_from + ":";
+          }
+          this.fullTime_from = this.fullTime_from.concat(fromDateValues[i]);
+        }
+      }
       return this.fullTime_from;
     },
 
     getFullTimeSeries_from() {
-      return this.getFullDate_from + " " + this.getFullTime_from;
+      let fullTimeSeries = this.getFullDate_from + " " + this.getFullTime_from;
+      console.log(fullTimeSeries);
+      return fullTimeSeries;
     },
+    // to
     getFullDate_to() {
       let toDateValues = this.toDateValues;
       let formatter = "";
