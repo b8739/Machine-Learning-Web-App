@@ -284,5 +284,15 @@ def deleteRowByPeriod():
 
   return jsonify (getFullTimeSeries_from)
 
+@app.route('/showTables',methods=['GET'])
+def showTables():
+  sql="show tables;"
+  tableList=[]
+  tableInfo = list(session.execute(sql).fetchall())
+  for index,tableName in enumerate(tableInfo):
+    tableList.append(str(tableName[0]))
+  print(tableList)
+  return jsonify(tableList)
+
 if __name__ == '__main__':
     app.run(debug=True)

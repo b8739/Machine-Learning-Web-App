@@ -1,14 +1,14 @@
 <template>
   <v-row justify="center">
     <v-dialog v-model="dialog" persistent max-width="800px">
-      <template v-slot:activator="{ on, attrs }">
+      <!-- <template v-slot:activator="{ on, attrs }">
         <v-btn color="" v-bind="attrs" v-on="on">
           Delete Column
         </v-btn>
-      </template>
+      </template> -->
       <v-card>
         <v-container fluid>
-          <span class="headline">Delete Row Condition</span>
+          <span class="headline">Delete Row by Date</span>
           <!-- 최상단 메뉴 탭 -->
           <v-tabs>
             <v-tab @click="changeDeleteMode('date')">날짜 선택</v-tab>
@@ -119,6 +119,8 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "@/main";
+
 export default {
   data: () => ({
     dialog: false,
@@ -308,6 +310,11 @@ export default {
       this.toDateValues = ["", "", "", "", ""];
       this.dialog = false;
     }
+  },
+  created() {
+    eventBus.$on("openDeleteRowModal", modalStatus => {
+      this.dialog = modalStatus;
+    });
   }
 };
 </script>

@@ -24,6 +24,9 @@
         <button v-on:click="submitFiles()">Submit</button>
       </div>
     </div>
+    <v-app>
+      <DefineDataset />
+    </v-app>
   </div>
 </template>
 
@@ -34,6 +37,9 @@ import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
 import { mapMutations } from "vuex";
+import { eventBus } from "@/main";
+
+import DefineDataset from "@/components/modal/DefineDataset";
 export default {
   /*
       Defines the data used by the component
@@ -44,7 +50,7 @@ export default {
     };
   },
   props: ["sidebarStatus"],
-  components: {},
+  components: { DefineDataset },
   /*
       Defines the method used by the component
     */
@@ -120,22 +126,8 @@ export default {
       /*
   Make the request to the POST /select-files URL
 */
-      axios
-        .post("http://localhost:5000/dataupload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        })
-        .then(response => {
-          this.result = response.data;
-          this.loadSummarizedInfo(this.result);
-
-          this.$router.push({ name: "dataSummary" });
-        })
-        .catch(ex => {
-          console.log("ERR!!!!! : ", ex);
-          // this.$router.push('/dataSummary'); //delete later
-        });
+      eventBus.$emit("openDefineDataset", true);
+      eventBus.$emit("formData", formData);
     },
     //실험
     created() {
