@@ -12,7 +12,7 @@
           <!-- 최상단 메뉴 탭 -->
 
           <v-text-field
-            v-model="datasetName"
+            v-model="tableName"
             :counter="10"
             label="Name of Dataset"
             required
@@ -22,7 +22,7 @@
             <v-btn color="gray darken-1" text>
               Close
             </v-btn>
-            <v-btn color="blue darken-1" @click="dataUpload" text>
+            <v-btn color="blue darken-1" @click.once="dataUpload" text>
               Confirm
             </v-btn>
           </v-card-actions>
@@ -40,7 +40,7 @@ export default {
   data() {
     return {
       dialog: false,
-      datasetName: "",
+      tableName: "",
       formData: null
     };
   },
@@ -53,7 +53,7 @@ export default {
             "Content-Type": "multipart/form-data"
           },
           params: {
-            datasetName: this.datasetName
+            tableName: this.tableName
           }
         })
         .then(response => {

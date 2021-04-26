@@ -81,6 +81,10 @@ def testing():
 @app.route('/dataupload',methods=['GET','POST'])
 def dataupload():
   if request.method == 'POST' and 'csv_data' in request.files:
+    # 테이블 이름 받아오기
+    tableName = request.args.get('tableName')
+    print(tableName)
+
     file = request.files['csv_data']
 	# dataInfo 테이블 생성
     Base.metadata.create_all(engine)
@@ -92,10 +96,9 @@ def dataupload():
     # df = pd.read_csv(file, dtype={"ts": "category"})
     # df = pd.concat(tp)
     df = df.reset_index().rename(columns={"index": "ID"})
-    table_name = 'dataset'
 		# csv to sql
     df.to_sql (
-			table_name,
+			tableName,
 			engine,
 			if_exists='replace',
 			index=False,
@@ -127,9 +130,9 @@ def addData():
 	# .to_sql를 사용하기 위해서 dict 데이터를 dataframe으로 변환함
 	dictToDf = pd.DataFrame(post_data, index=[0])
 	# 변환한 dataframe을 to_sql을 사용해서 mysql에 append함
-	table_name = 'dataset'
+	tableName = 'dataset'
 	dictToDf.to_sql (
-				table_name,
+				tableName,
 				engine,
 				if_exists='append',
 				index=False,
@@ -292,6 +295,8 @@ def showTables():
   for index,tableName in enumerate(tableInfo):
     tableList.append(str(tableName[0]))
   print(tableList)
+  session.commit()
+  session.close()
   return jsonify(tableList)
 
 if __name__ == '__main__':

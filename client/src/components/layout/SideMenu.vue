@@ -64,16 +64,23 @@ export default {
       if (title == "Delete Row") {
         eventBus.$emit("openDeleteRowModal", true);
       }
+    },
+    showTables() {
+      let path = "http://localhost:5000/showTables";
+      axios
+        .get(path)
+        .then(res => {
+          this.tableList = res.data;
+        })
+        .catch(error => {});
     }
   },
   created() {
-    let path = "http://localhost:5000/showTables";
-    axios
-      .get(path)
-      .then(res => {
-        this.tableList = res.data;
-      })
-      .catch(error => {});
+    this.showTables();
+  },
+  mounted() {
+    console.log("d");
+    this.showTables();
   }
 };
 </script>
