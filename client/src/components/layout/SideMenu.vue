@@ -35,8 +35,7 @@ export default {
       drawer: true,
       items: [
         { title: "Add Column", icon: "mdi-view-dashboard" },
-        { title: "Update Column", icon: "mdi-forum" },
-        { title: "Delete Column", icon: "mdi-forum" }
+        { title: "Update Column", icon: "mdi-forum" }
       ]
     };
   },

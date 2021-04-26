@@ -59,8 +59,12 @@ class DataInfo(Base):
     
 # engine
 engine = create_engine('mysql+mysqldb://root:0000@localhost/newdatabase',echo = False)
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine,autocommit=False)
 session = Session()
+
+# autocommit = 0 (false)
+# sql = "SET AUTOCOMMIT = 0;"
+# session.execute(sql)
 
 # john = DataInfo(columnName = '2')
 # session.add(john)
@@ -78,7 +82,7 @@ def testing():
 def dataupload():
   if request.method == 'POST' and 'csv_data' in request.files:
     file = request.files['csv_data']
-		# dataInfo 테이블 생성
+	# dataInfo 테이블 생성
     Base.metadata.create_all(engine)
     # pyarrow
     pyarrow_table = csv.read_csv(file)
@@ -96,7 +100,16 @@ def dataupload():
 			if_exists='replace',
 			index=False,
 			chunksize=10000,
-		)  
+		) 
+    # duplicate table
+    sql = "drop table if exists temp_dataset;"
+    session.execute(sql)
+
+    sql = "create table temp_dataset as select * from dataset;"
+    session.execute(sql)
+    session.commit()
+    session.close
+
   # method='multi'
   # traditional한 sql에선 method multi를 하면 더 느려진다고 함
   
@@ -137,16 +150,20 @@ loadData: Frontend에서 Dataset을 로드해오는 라우팅
 @app.route('/loadData',methods=['GET','POST'])
 def loadData():
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
-	data = pd.read_sql_table('dataset', session.bind)
-	session.close()
-	# return jsonify(data.to_dict())
-	return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
+    data = pd.read_sql_table('temp_dataset', session.bind)
+    # return jsonify(data.to_dict())
+    return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
 
   # ### 2) CSV 파일을 읽어서 DICT 형태로 RETURN해주는 방식 (1번 방식이 속도가 느려서 일단 2번으로 진행) ###
   # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
   # return jsonify(df.to_dict())
 
+@app.route('/duplicateTable',methods=['GET','POST'])
+def duplicateTable():
+  #테이블 복제
 
+
+  return jsonify("hello")
 
 """ 
 updateData: Dataset의 data을 수정할때의 라우팅
@@ -179,9 +196,6 @@ def updateData():
 		session.close()
 	return jsonify("hello")
 
-
-
-
 """ 
 infinite-loading Test: 
 """
@@ -189,7 +203,8 @@ infinite-loading Test:
 def infiniteLoading():
 	limit = request.args.get('limit')
 	conn = engine.connect()
-	df = pd.read_sql_query("select * from dataset limit "+limit+",45;", conn)
+	df = pd.read_sql_query("select * from temp_dataset limit "+limit+",45;", conn)
+	conn.close
 	return Response(df.to_json( orient='records'), mimetype='application/json')
 
 
@@ -201,11 +216,49 @@ def dataSummarize():
 @app.route('/deleteColumn',methods=['GET'])
 def deleteColumn():
   columnToDelete = request.args.get('columnToDelete')
-  sql = "alter table dataset drop column "+ columnToDelete+";"
+  sql = "alter table temp_dataset drop column "+ columnToDelete+";"
+  session.execute(sql)
+#   session.commit()
+  session.close()
+  return jsonify ("hello world")
+
+@app.route('/saveTable',methods=['GET'])
+def saveTable():
+  saveOption = request.args.get('saveOption')
+  print (saveOption)
+
+  if saveOption == 'overwrite':
+    sql = "drop table dataset"
+    session.execute(sql)
+    
+    sql = "rename table temp_dataset to dataset"
+    session.execute(sql)
+
+    sql = "create table temp_dataset as select * from dataset;"
+    session.execute(sql)
+
+#     sql = "truncate table dataset"
+#     session.execute(sql)
+#     sql = "create table dataset (select * from temp_dataset)"
+#     session.execute(sql)
+
+#   elif saveOption == 'newDataset':
+#     sql = 'Create Table newDataset ( select * from dataset );'
+#     session.execute(sql)
+  
+  session.commit()
+  session.close()
+  return jsonify ("overwrited")
+
+@app.route('/deleteRow',methods=['GET'])
+def deleteRow():
+  timeSeriesText = request.args.get('timeSeriesText')
+  sql = "delete from temp_dataset where ts like '%"+timeSeriesText+"%'"
   session.execute(sql)
   session.commit()
   session.close()
-  return jsonify ("hello world")
+  print (sql)
+  return jsonify (timeSeriesText)
 
 if __name__ == '__main__':
     app.run(debug=True)
