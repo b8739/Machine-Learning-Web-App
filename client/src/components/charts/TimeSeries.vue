@@ -178,6 +178,7 @@ export default {
       }
     },
     rawDataset: function(data) {
+      this.resetSeries();
       if (data != null) {
         this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
         this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
@@ -268,6 +269,7 @@ export default {
     resetSeries() {
       // console.log("rest");
       this.dataArray = [];
+      this.dateArray = [];
     }
   }
 };

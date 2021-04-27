@@ -22,7 +22,7 @@
             <v-btn color="gray darken-1" text>
               Close
             </v-btn>
-            <v-btn color="blue darken-1" @click.once="dataUpload" text>
+            <v-btn color="blue darken-1" @click.once="eventHandler" text>
               Confirm
             </v-btn>
           </v-card-actions>
@@ -41,11 +41,25 @@ export default {
     return {
       dialog: false,
       tableName: "",
-      formData: null
+      formData: null,
+      // flag
+      dataUploadFlag: false,
+      saveNewFileFlag: false
     };
   },
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
+    ...mapActions("initialData", ["loadFundamentalData"]),
+    eventHandler() {
+      if (this.dataUploadFlag == true) {
+        this.dataUpload();
+        this.dataUploadFlag = false;
+      } else if (this.saveNewFileFlag == true) {
+        this.saveNewFile(this.tableName);
+        this.saveNewFileFlag = false;
+      }
+      this.dialog = false;
+    },
     dataUpload() {
       axios
         .post("http://localhost:5000/dataupload", this.formData, {
@@ -66,11 +80,29 @@ export default {
           console.log("ERR!!!!! : ", ex);
           // this.$router.push('/dataSummary'); //delete later
         });
+    },
+    saveNewFile(tableName) {
+      let api = "http://localhost:5000/duplicateTable";
+      axios
+        .get(api, {
+          params: {
+            newTableName: tableName
+          }
+        })
+        .then(response => {})
+        .catch(ex => {
+          console.log("ERR!!!!! : ", ex);
+        });
     }
   },
   created() {
-    eventBus.$on("openDefineDataset", modalStatus => {
+    eventBus.$on("dataUploadMode", modalStatus => {
       this.dialog = modalStatus;
+      this.dataUploadFlag = true;
+    });
+    eventBus.$on("saveNewFileMode", modalStatus => {
+      this.dialog = modalStatus;
+      this.saveNewFileFlag = true;
     });
     eventBus.$on("formData", formData => {
       this.formData = formData;

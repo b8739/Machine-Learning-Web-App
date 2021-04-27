@@ -31,7 +31,7 @@
       <v-list dense>
         <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
           <v-list-item-content>
-            <v-list-item-title>{{ tableName }}</v-list-item-title>
+            <v-list-item-title @click="clickTableNameEvent">{{ tableName }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -41,6 +41,7 @@
 
 <script>
 import DeleteRowModal from "@/components/modal/DeleteRowModal";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 import axios from "axios";
 export default {
@@ -60,6 +61,10 @@ export default {
     DeleteRowModal
   },
   methods: {
+    ...mapActions("initialData", ["loadFundamentalData"]),
+    clickTableNameEvent() {
+      this.loadFundamentalData("http://localhost:5000/loadData");
+    },
     callOption(title) {
       if (title == "Delete Row") {
         eventBus.$emit("openDeleteRowModal", true);
@@ -79,7 +84,6 @@ export default {
     this.showTables();
   },
   mounted() {
-    console.log("d");
     this.showTables();
   }
 };

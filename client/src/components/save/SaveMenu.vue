@@ -17,22 +17,30 @@
         </v-list-item>
       </v-list>
     </v-menu>
+
+    <DefineDataset />
   </div>
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "@/main";
+import DefineDataset from "@/components/modal/DefineDataset";
 export default {
   data() {
     return {
-      items: [{ title: "Overwrite" }, { title: "Save as New Dataset" }]
+      items: [{ title: "Overwrite" }, { title: "Save as New Dataset" }],
+      dialog: false
     };
   },
+  components: { DefineDataset },
   methods: {
     clickSaveOptionEvent(index) {
       if (index == 0) {
         this.saveTableAxios("overwrite");
       } else {
-        this.saveTableAxios("newDataset");
+        // this.saveTableAxios("newDataset");
+        this.dialog = true;
+        eventBus.$emit("saveNewFileMode", this.dialog);
       }
     },
     saveTableAxios(saveOption) {

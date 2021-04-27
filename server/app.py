@@ -161,16 +161,7 @@ def loadData():
   # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
   # return jsonify(df.to_dict())
 
-@app.route('/duplicateTable',methods=['GET','POST'])
-def duplicateTable():
-  #테이블 복제
 
-
-  return jsonify("hello")
-
-""" 
-updateData: Dataset의 data을 수정할때의 라우팅
-"""
 
 @app.route('/updateData', methods=['PUT', 'DELETE'])
 def updateData():
@@ -225,33 +216,29 @@ def deleteColumn():
   session.close()
   return jsonify ("hello world")
 
-@app.route('/saveTable',methods=['GET'])
-def saveTable():
-  saveOption = request.args.get('saveOption')
-  print (saveOption)
-
-  if saveOption == 'overwrite':
-    sql = "drop table dataset"
-    session.execute(sql)
+@app.route('/overwriteTable',methods=['GET'])
+def overwriteTable():
+  sql = "drop table dataset"
+  session.execute(sql)
     
-    sql = "rename table temp_dataset to dataset"
-    session.execute(sql)
+  sql = "rename table temp_dataset to dataset"
+  session.execute(sql)
 
-    sql = "create table temp_dataset as select * from dataset;"
-    session.execute(sql)
-
-#     sql = "truncate table dataset"
-#     session.execute(sql)
-#     sql = "create table dataset (select * from temp_dataset)"
-#     session.execute(sql)
-
-#   elif saveOption == 'newDataset':
-#     sql = 'Create Table newDataset ( select * from dataset );'
-#     session.execute(sql)
+  sql = "create table temp_dataset as select * from dataset;"
+  session.execute(sql)
   
   session.commit()
   session.close()
   return jsonify ("overwrited")
+
+@app.route('/duplicateTable',methods=['GET'])
+def duplicateTable():
+  newTableName = request.args.get('newTableName')
+  sql = "create table "+newTableName+" as select * from temp_dataset;"
+  session.execute(sql)
+  session.commit()
+  session.close()
+  return jsonify ("duplicateTable")
 
 @app.route('/deleteRowByDate',methods=['GET'])
 def deleteRow():

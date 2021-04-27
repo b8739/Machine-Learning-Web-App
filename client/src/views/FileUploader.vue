@@ -33,10 +33,8 @@
 <script>
 import axios from "axios";
 //vuex
-import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+
 import { eventBus } from "@/main";
 
 import DefineDataset from "@/components/modal/DefineDataset";
@@ -56,6 +54,7 @@ export default {
     */
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
+
     /*
         Submits files to the server
       */
@@ -126,7 +125,7 @@ export default {
       /*
   Make the request to the POST /select-files URL
 */
-      eventBus.$emit("openDefineDataset", true);
+      eventBus.$emit("dataUploadMode", true);
       eventBus.$emit("formData", formData);
     },
     //실험
