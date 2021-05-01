@@ -21,7 +21,7 @@
             <!-- 좌측 -->
             <v-row>
               <v-col cols="2">
-                <ColumnList :columns="columns" :styleObject="style_columnList">
+                <ColumnList :style="style_columnList">
                   <v-subheader>{{ columns.length }} 개 열</v-subheader>
                 </ColumnList>
               </v-col>

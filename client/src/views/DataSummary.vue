@@ -29,6 +29,7 @@
             </v-row>
             <v-row>
               <GraphBuilder :columns="columns" />
+              <DeleteStepper />
               <DataFeatures
                 :class="{ visibilityHidden: showFeatures }"
                 :columnsWithoutIndex="columnsWithoutIndex"
@@ -64,6 +65,8 @@ import SideMenu from "@/components/layout/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+//임시
+import DeleteStepper from "@/components/modal/DeleteStepper.vue";
 
 // eventbus
 import { eventBus } from "@/main";
@@ -90,7 +93,8 @@ export default {
     InfiniteTable,
     GraphBuilder,
     SideMenu,
-    SaveMenu
+    SaveMenu,
+    DeleteStepper
   },
   // props: ["summarizedInfo"],
   computed: {

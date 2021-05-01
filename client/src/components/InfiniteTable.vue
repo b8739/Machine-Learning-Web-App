@@ -145,10 +145,9 @@ export default {
         })
         .then(res => {
           //초기화 해주어야 v-for가 반응해서 화면이 변경됨
-          this.dataSet = [];
-          this.limit = 0;
+          this.resetTableData();
           this.columns.splice(this.columnToDeleteInfo.index, 1);
-          this.deleteDetector++;
+
           this.infiniteLoadingCreated();
         })
         .catch(error => {});
@@ -227,10 +226,18 @@ export default {
     },
     openSaveChangeDialog: function(event) {
       eventBus.$emit("openSaveChange", true);
+    },
+    resetTableData() {
+      this.dataSet = [];
+      this.limit = 0;
     }
   },
   created() {
     this.infiniteLoadingCreated();
+    eventBus.$on("reloadInfiniteTable", reloadStatus => {
+      this.resetTableData();
+      this.infiniteLoadingCreated();
+    });
   },
   mounted() {},
   beforeUnmount() {},

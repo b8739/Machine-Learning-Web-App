@@ -2,9 +2,11 @@
   <div>
     <!-- 여기에 요소 추가 -->
     <!-- column list -->
+
     <slot></slot>
+
     <!-- <v-divider></v-divider> -->
-    <v-list :style="styleObject">
+    <v-list>
       <draggable
         :options="{ group: 'dragGroup' }"
         @start="hoverOnDrag"
@@ -30,7 +32,7 @@ export default {
       hoverStatus: true
     };
   },
-  props: ["columns", "styleObject"],
+  props: [],
   methods: {
     hoverOnDrag() {
       eventBus.$emit("hoverEffect", this.hoverStatus);
@@ -42,8 +44,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum
+      dataset: state => state.initialDatadataset,
+      indexNum: state => state.initialData.indexNum,
+      columns: state => state.initialData.columns
       // columns: state => state.columns
     })
   }
