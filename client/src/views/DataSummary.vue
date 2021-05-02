@@ -54,19 +54,19 @@
 </template>
 <script>
 import axios from "axios";
+//views
+import GraphBuilder from "./GraphBuilder.vue";
+import DeleteStepper from "./DeleteStepper.vue";
 //components
 import DataTable from "@/components/DataTable";
 import Sidebar from "@/components/layout/Sidebar";
 import AddModal from "@/components/modal/AddModal";
 import DataFeatures from "@/components/DataFeatures";
 import InfiniteTable from "@/components/InfiniteTable";
-import GraphBuilder from "./GraphBuilder.vue";
 import SideMenu from "@/components/layout/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
-//임시
-import DeleteStepper from "@/components/modal/DeleteStepper.vue";
 
 // eventbus
 import { eventBus } from "@/main";

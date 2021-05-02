@@ -99,11 +99,11 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="gray darken-1" text @click="resetValues">
-        Reset
+      <v-btn color="primary" text @click="addCondition_timeSeries">
+        Add Condition
       </v-btn>
-      <v-btn color="red darken-1" text @click="clickDeleteEvent">
-        Delete
+      <v-btn color="red darken-1" text @click="resetValues">
+        Reset
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -212,6 +212,9 @@ export default {
 
     getFullTimeSeries_from() {
       let fullTimeSeries = this.getFullDate_from + " " + this.getFullTime_from;
+      if (this.getFullTime_from == "") {
+        fullTimeSeries = fullTimeSeries.slice(0, -1);
+      }
 
       return fullTimeSeries;
     },
@@ -237,6 +240,16 @@ export default {
     }
   },
   methods: {
+    addCondition_timeSeries() {
+      if (this.modeFlag == true) {
+        eventBus.$emit("tsCondition_from", this.getFullTimeSeries_from);
+      }
+      // period mode 일 때
+      else {
+        eventBus.$emit("fullTimeSeries_from", this.getFullTimeSeries_from);
+        eventBus.$emit("fullTimeSeries_to", this.getFullTimeSeries_to);
+      }
+    },
     changeDeleteMode(mode) {
       if (mode == "date") {
         this.periodMode = false;

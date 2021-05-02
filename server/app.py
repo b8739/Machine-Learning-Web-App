@@ -240,15 +240,23 @@ def duplicateTable():
   session.close()
   return jsonify ("duplicateTable")
 
-@app.route('/deleteRowByDate',methods=['GET'])
+@app.route('/deleteRow',methods=['GET'])
 def deleteRow():
-  timeSeriesText = request.args.get('timeSeriesText')
-  sql = "delete from temp_dataset where ts like '%"+timeSeriesText+"%';"
+  timeSeriesCondition = request.args.get('timeSeriesCondition')
+  featureConditions = request.args.getlist('featureConditions[]')
+  sql = "delete from temp_dataset where"
+  if (timeSeriesCondition!=None):
+    tsConditionQuery = " ts like '%"+timeSeriesCondition+"%'"
+    sql+=tsConditionQuery
+  if (featureConditions!=[]):
+    for featureCondition in featureConditions:
+      featureConditionQuery = ' And '+featureCondition
+      sql += featureConditionQuery
+  print (sql)
   session.execute(sql)
   session.commit()
   session.close()
-  print (sql)
-  return jsonify (timeSeriesText)
+  return jsonify (sql)
 
 @app.route('/deleteRowByPeriod',methods=['GET'])
 def deleteRowByPeriod():
