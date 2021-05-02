@@ -1,46 +1,50 @@
 <template>
-  <v-stepper v-model="stepper" vertical non-linear>
-    <!-- step 1 (Title) -->
-    <v-stepper-step editable step="1">
-      Time Series 조건 설정
-    </v-stepper-step>
-    <!-- step 1 (Contents) -->
-    <v-stepper-content step="1">
-      <TsCondition />
-      <v-btn color="primary" @click="stepper = 2">
-        Continue
-      </v-btn>
-      <v-btn text @click="deleteRow">
-        Delete
-      </v-btn>
-    </v-stepper-content>
-    <!-- step 2 (Title) -->
-    <v-stepper-step editable :complete="stepper > 2" step="2">
-      Feature 조건 설정
-    </v-stepper-step>
-    <!-- step 2 (Contents) -->
-    <v-stepper-content step="2">
-      <FeatureCondition>
-        <!-- chip group -->
-        <v-chip-group>
-          <v-chip
-            v-for="(featureCondition, IndexFeatureCondition) in featureConditions"
-            :key="IndexFeatureCondition"
-            small
-            outlined
-          >
-            {{ featureCondition }}
-          </v-chip>
-        </v-chip-group>
-      </FeatureCondition>
-      <v-btn color="primary" @click="stepper = 3">
-        Continue
-      </v-btn>
-      <v-btn text @click="deleteRow">
-        Delete
-      </v-btn>
-    </v-stepper-content>
-  </v-stepper>
+  <v-dialog v-model="dialog" persistent max-width="800px">
+    <v-stepper v-model="stepper" vertical non-linear>
+      <!-- step 1 (Title) -->
+      <v-stepper-step editable step="1">
+        Time Series 조건 설정
+      </v-stepper-step>
+      <!-- step 1 (Contents) -->
+      <v-stepper-content step="1">
+        <TsCondition />
+        <v-btn color="primary" @click="stepper = 2">
+          Continue
+        </v-btn>
+        <v-btn text @click="deleteRow">
+          Delete
+        </v-btn>
+      </v-stepper-content>
+      <!-- step 2 (Title) -->
+      <v-stepper-step editable :complete="stepper > 2" step="2">
+        Feature 조건 설정
+      </v-stepper-step>
+      <!-- step 2 (Contents) -->
+      <v-stepper-content step="2">
+        <FeatureCondition>
+          <!-- chip group -->
+          <v-chip-group>
+            <v-chip
+              v-for="(featureCondition, IndexFeatureCondition) in featureConditions"
+              :key="IndexFeatureCondition"
+              close
+              @click:close="featureConditions.splice(IndexFeatureCondition, 1)"
+              small
+              outlined
+            >
+              {{ featureCondition }}
+            </v-chip>
+          </v-chip-group>
+        </FeatureCondition>
+        <v-btn color="primary" @click="stepper = 3">
+          Continue
+        </v-btn>
+        <v-btn text @click="deleteRow">
+          Delete
+        </v-btn>
+      </v-stepper-content>
+    </v-stepper>
+  </v-dialog>
 </template>
 <script>
 import TsCondition from "@/components/delete/TsCondition.vue";
@@ -54,6 +58,7 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      dialog: false,
       stepper: 1,
       tsCondition_from: null,
       featureConditions: []
@@ -103,6 +108,9 @@ export default {
 
   components: { TsCondition, ColumnList, FeatureCondition },
   created() {
+    eventBus.$on("openDeleteRowModal", modalStatus => {
+      this.dialog = modalStatus;
+    });
     eventBus.$on("tsCondition_from", tsCondition_from => {
       this.tsCondition_from = tsCondition_from;
     });

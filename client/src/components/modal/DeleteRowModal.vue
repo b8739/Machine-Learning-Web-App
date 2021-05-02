@@ -314,9 +314,9 @@ export default {
     }
   },
   created() {
-    eventBus.$on("openDeleteRowModal", modalStatus => {
-      this.dialog = modalStatus;
-    });
+    // eventBus.$on("openDeleteRowModal", modalStatus => {
+    //   this.dialog = modalStatus;
+    // });
   }
 };
 </script>
