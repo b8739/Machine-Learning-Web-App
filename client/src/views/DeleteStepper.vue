@@ -1,5 +1,27 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="800px">
+    <!-- chip group -->
+    <v-chip-group>
+      <v-chip
+        v-for="(featureCondition, IndexFeatureCondition) in featureConditions"
+        :key="IndexFeatureCondition"
+        close
+        @click:close="featureConditions.splice(IndexFeatureCondition, 1)"
+        small
+        outlined
+      >
+        {{ featureCondition }}
+      </v-chip>
+      <v-chip
+        v-if="tsCondition_from != null"
+        close
+        @click:close="tsCondition_from = null"
+        small
+        outlined
+      >
+        {{ tsCondition_from }}
+      </v-chip>
+    </v-chip-group>
     <v-stepper v-model="stepper" vertical non-linear>
       <!-- step 1 (Title) -->
       <v-stepper-step editable step="1">
@@ -11,9 +33,6 @@
         <v-btn color="primary" @click="stepper = 2">
           Continue
         </v-btn>
-        <v-btn text @click="deleteRow">
-          Delete
-        </v-btn>
       </v-stepper-content>
       <!-- step 2 (Title) -->
       <v-stepper-step editable :complete="stepper > 2" step="2">
@@ -21,29 +40,16 @@
       </v-stepper-step>
       <!-- step 2 (Contents) -->
       <v-stepper-content step="2">
-        <FeatureCondition>
-          <!-- chip group -->
-          <v-chip-group>
-            <v-chip
-              v-for="(featureCondition, IndexFeatureCondition) in featureConditions"
-              :key="IndexFeatureCondition"
-              close
-              @click:close="featureConditions.splice(IndexFeatureCondition, 1)"
-              small
-              outlined
-            >
-              {{ featureCondition }}
-            </v-chip>
-          </v-chip-group>
-        </FeatureCondition>
+        <FeatureCondition> </FeatureCondition>
         <v-btn color="primary" @click="stepper = 3">
           Continue
         </v-btn>
-        <v-btn text @click="deleteRow">
-          Delete
-        </v-btn>
       </v-stepper-content>
     </v-stepper>
+    <v-spacer></v-spacer>
+    <v-btn v-bind="dynamicDeleteButtonProps" color="error darken-1" @click="deleteRow">
+      Delete
+    </v-btn>
   </v-dialog>
 </template>
 <script>
@@ -61,10 +67,24 @@ export default {
       dialog: false,
       stepper: 1,
       tsCondition_from: null,
-      featureConditions: []
+      featureConditions: [],
+      deleteButtonProps: {
+        disabled: true
+      }
     };
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      columns: state => state.initialData.columns
+      // columns: state => state.columns
+    }),
+    dynamicDeleteButtonProps() {
+      if (this.tsCondition_from != null || this.featureConditions.length != 0) {
+        this.deleteButtonProps.disabled = false;
+      } else this.deleteButtonProps.disabled = true;
+      return this.deleteButtonProps;
+    }
+  },
   methods: {
     clickSkipEvent(step) {
       if (step == 1) {
@@ -98,12 +118,6 @@ export default {
       // eventBus.$emit("reloadInfiniteTable", true);
       // this.resetValues();
     }
-  },
-  computed: {
-    ...mapState({
-      columns: state => state.initialData.columns
-      // columns: state => state.columns
-    })
   },
 
   components: { TsCondition, ColumnList, FeatureCondition },
