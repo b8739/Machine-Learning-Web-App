@@ -4,14 +4,19 @@
     <table class="dataTable">
       <tbody>
         <!-- 행 -->
-        <draggable tag="tbody" v-model="numericColumns">
+        <draggable
+          tag="tbody"
+          v-model="categoricalColumns"
+          group="columnGroup"
+          @change="onDragEvent"
+        >
           <!-- category start -->
           <tr v-for="(categoricalColumn, categoryIndex) in categoricalColumns" :key="categoryIndex">
             <!-- 열 -->
             <td>
               <v-row>
                 <v-col cols="1"
-                  ><v-icon x-small @click="saveClickedIconIndex(categoryIndex)"
+                  ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(categoryIndex)"
                     >mdi-pencil</v-icon
                   ></v-col
                 >
@@ -27,7 +32,7 @@
             <td>
               <tr>
                 <span class="info_title">Col #: </span>
-                <span> {{ categoryIndexAddOne }} </span>
+                <span> {{ categoryIndex }} </span>
               </tr>
               <tr>
                 <span class="info_title">Type: </span>
@@ -42,12 +47,17 @@
             </tr> -->
               <tr>
                 <span class="info_title">Num. of NA: </span>
-                <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span>
+                <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span
+                ><br />
+                <span class="info_title">Most Frequent Value: </span>
               </tr>
             </td>
 
             <td></td>
           </tr>
+        </draggable>
+
+        <draggable tag="tbody" v-model="numericColumns" group="columnGroup" @change="onDragEvent">
           <tr v-for="(numericColumn, numericIndex) in numericColumns" :key="numericIndex">
             <!-- 1st column -->
             <td
@@ -79,7 +89,7 @@
             <td>
               <tr>
                 <span class="info_title">Col #: </span>
-                <span> {{ numericIndex }} </span>
+                <span> {{ numericIndex + 2 }} </span>
               </tr>
               <tr>
                 <span class="info_title">Type: </span>
@@ -172,7 +182,7 @@ export default {
         dense: true
       },
       clickedIconIndex: null,
-
+      totalColumns: [],
       graphWidth: "260px",
       graphHeight: "200px",
       // numeric/categorical columns
@@ -231,6 +241,34 @@ export default {
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
 
+    onDragEvent(evt) {
+      let movedColumnName = evt.moved.element;
+      let oldIndex = evt.moved.oldIndex + 3;
+      let newIndex = evt.moved.newIndex + 3;
+      //컬럼 left 이동
+      if (oldIndex > newIndex) {
+        this.changeColumnOrder("left", movedColumnName, newIndex);
+      }
+      //컬럼 right 이동
+      else {
+        this.changeColumnOrder("right", movedColumnName, newIndex);
+      }
+    },
+    changeColumnOrder(position, movedColumnName, newIndex) {
+      const api = "http://localhost:5000/changeColumnOrder";
+      axios
+        .get(api, {
+          params: {
+            position: position,
+            movedColumnName: movedColumnName,
+            newIndex: newIndex
+          }
+        })
+        .then(res => {})
+        .catch(error => {
+          console.error(error);
+        });
+    },
     changeColumnName(columnName, columnIndex) {
       const api = "http://localhost:5000/changeColumnName";
       axios
@@ -250,14 +288,14 @@ export default {
       if (this.clickedIconIndex == index) {
         this.clickedIconIndex = null;
         // category 일 때
-        if (index < 2) {
+        if (index < 2 && this.categoricalColumns[index]) {
+          console.log(this.columns[index]);
           this.changeColumnName(this.categoricalColumns[index], index);
         }
         //numeric 일 때
-        else {
+        else if (index >= 2 && this.numericColumns[index]) {
           this.changeColumnName(this.numericColumns[index - 2], index);
         }
-
         this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
         this.loadSummarizedData();
       } // v-icon click ON
@@ -303,8 +341,10 @@ export default {
   },
   created() {
     this.loadDataSummary();
+    this.totalColumns = this.columns;
   },
   mounted() {
+    console.log("datafeature mounted");
     // for (const value in this.dataSet) {
     //   // console.log("mounted");
     //   console.log(this.dataSet[value]);

@@ -306,13 +306,33 @@ def changeColumnName():
   originalType=session.execute(getOriginalTypeQuery).fetchall()[0][0]
 
   changeNameQuery = 'ALTER TABLE temp_dataset CHANGE '+ originalName +' '+ newName+' '+originalType
-  print(newName)
-  print(columnIndex)
-  print(originalName)
+
   session.execute(changeNameQuery)
   session.commit()
   session.close()
   return jsonify(newName)
+
+@app.route('/changeColumnOrder',methods=['GET'])
+def changeColumnOrder():
+  position = request.args.get('position')
+  movedColumnName = request.args.get('movedColumnName')
+  newIndex = request.args.get('newIndex')
+  print(newIndex)
+  # get original name
+  getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'temp_dataset' and ordinal_position = "+newIndex
+  originalName=session.execute(getOriginalNameQuery).fetchall()[0][0]
+  # get original type
+  getOriginalTypeQuery="select data_type from information_schema.columns where table_name = 'temp_dataset' and column_name = '"+originalName+"'"
+  originalType=session.execute(getOriginalTypeQuery).fetchall()[0][0]
+  # position (right/left)에 따라서 구분
+  if (position == 'left'):
+    sql = "ALTER TABLE temp_dataset MODIFY COLUMN " +movedColumnName+ ' ' +originalType+ ' BEFORE '+ originalName
+  elif (position == 'right'):
+    sql = "ALTER TABLE temp_dataset MODIFY COLUMN " +movedColumnName+ ' ' +originalType+ ' AFTER '+ originalName
+  session.execute(sql)
+  session.commit()
+  session.close()
+  return jsonify('hello')
 
 @app.route('/loadSummarizedData',methods=['GET'])
 def loadSummarizedData():
