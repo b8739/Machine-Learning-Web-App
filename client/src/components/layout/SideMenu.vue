@@ -52,7 +52,8 @@ export default {
       items: [
         { title: "Add Column", icon: "mdi-plus-circle-outline" },
         { title: "Update Column", icon: "mdi-select-drag" },
-        { title: "Delete Row", icon: "mdi-trash-can-outline" }
+        { title: "Delete Row", icon: "mdi-trash-can-outline" },
+        { title: "Change Order", icon: "mdi-swap-vertical" }
       ],
       tableList: []
     };

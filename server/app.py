@@ -112,7 +112,7 @@ def dataupload():
     session.execute(sql)
     session.commit()
     session.close
-
+    print(df)
   # method='multi'
   # traditional한 sql에선 method multi를 하면 더 느려진다고 함
   
@@ -293,6 +293,32 @@ def showTables():
   session.commit()
   session.close()
   return jsonify(tableList)
+
+@app.route('/changeColumnName',methods=['GET'])
+def changeColumnName():
+  newName = request.args.get('columnName')
+  columnIndex = str(int(request.args.get('columnIndex'))+1)
+  # sql
+  getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'temp_dataset' and ordinal_position = "+columnIndex
+  originalName = session.execute(getOriginalNameQuery).fetchall()[0][0]
+  
+  getOriginalTypeQuery="select data_type from information_schema.columns where table_name = 'temp_dataset' and column_name = '"+originalName+"'"
+  originalType=session.execute(getOriginalTypeQuery).fetchall()[0][0]
+
+  changeNameQuery = 'ALTER TABLE temp_dataset CHANGE '+ originalName +' '+ newName+' '+originalType
+  print(newName)
+  print(columnIndex)
+  print(originalName)
+  session.execute(changeNameQuery)
+  session.commit()
+  session.close()
+  return jsonify(newName)
+
+@app.route('/loadSummarizedData',methods=['GET'])
+def loadSummarizedData():
+  df = pd.read_sql_table('temp_dataset', session.bind)
+  print(df)
+  return (summarizeData(df))
 
 if __name__ == '__main__':
     app.run(debug=True)

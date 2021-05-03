@@ -22,7 +22,14 @@
         {{ tsCondition_from }}
       </v-chip>
     </v-chip-group>
+
     <v-stepper v-model="stepper" vertical non-linear>
+      <v-stepper-header>
+        <v-card-title>Delete Row by Condition</v-card-title> <v-spacer></v-spacer
+        ><v-btn x-small min-width="20" min-height="30" @click="closeStepper"
+          ><v-icon small>mdi-close</v-icon>
+        </v-btn></v-stepper-header
+      >
       <!-- step 1 (Title) -->
       <v-stepper-step editable step="1">
         Time Series 조건 설정
@@ -86,6 +93,9 @@ export default {
     }
   },
   methods: {
+    closeStepper() {
+      this.dialog = false;
+    },
     clickSkipEvent(step) {
       if (step == 1) {
         this.stepper = 2;

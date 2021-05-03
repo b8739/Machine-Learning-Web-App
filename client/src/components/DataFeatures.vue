@@ -4,105 +4,135 @@
     <table class="dataTable">
       <tbody>
         <!-- 행 -->
-        <tr v-for="(numericColumn, numericIndex) in numericColumns" :key="numericIndex">
-          <!-- 1st column -->
-          <td
-            @click="
-              openEditModal(
-                dataset[numericColumns[numericIndex]],
-                dataset['ts'],
-                indexNum,
-                numericIndex
-              )
-            "
-          >
-            {{ numericColumn }}
-          </td>
-          <!-- 2nd column -->
-          <td>
-            <tr>
-              <span class="info_title">Col #: </span>
-              <span> {{ numericIndex }} </span>
-            </tr>
-            <tr>
-              <span class="info_title">Type: </span>
-              <span> Numeric </span>
-            </tr>
-          </td>
+        <draggable tag="tbody" v-model="numericColumns">
+          <!-- category start -->
+          <tr v-for="(categoricalColumn, categoryIndex) in categoricalColumns" :key="categoryIndex">
+            <!-- 열 -->
+            <td>
+              <v-row>
+                <v-col cols="1"
+                  ><v-icon x-small @click="saveClickedIconIndex(categoryIndex)"
+                    >mdi-pencil</v-icon
+                  ></v-col
+                >
+                <v-col
+                  ><v-text-field
+                    v-bind="checkClickedIconIndex(categoryIndex)"
+                    :value="categoricalColumn"
+                    v-model="categoricalColumns[categoryIndex]"
+                  ></v-text-field
+                ></v-col>
+              </v-row>
+            </td>
+            <td>
+              <tr>
+                <span class="info_title">Col #: </span>
+                <span> {{ categoryIndexAddOne }} </span>
+              </tr>
+              <tr>
+                <span class="info_title">Type: </span>
+                <span> Categorical </span>
+              </tr>
+            </td>
 
-          <!-- 3rd column -->
-          <td>
-            <tr>
-              <span class="info_title">Mean: </span>
-              <span>{{ numeric_meanJson[numericColumn] }}</span>
-            </tr>
-            <tr>
-              <span class="info_title">Standard Deviation: </span>
-              <span>{{ numeric_stdJson[numericColumn] }}</span>
-            </tr>
-            <tr>
-              <span class="info_title">Quantile: </span>
-              <span>{{ numeric_quantile1[numericColumn] }}, </span>
-              <span>{{ numeric_quantile2[numericColumn] }}, </span>
-              <span>{{ numeric_quantile3[numericColumn] }}, </span>
-              <span>{{ numeric_quantile4[numericColumn] }}</span>
-            </tr>
-            <tr>
-              <span class="info_title">Num. of NA: </span>
-              <span>{{ numeric_numOfNaJson[numericColumn] }}</span>
-            </tr>
-          </td>
-
-          <!-- 4th column -->
-          <td>
-            <span class="tdTitle">Distribution</span>
-            <Histogram
-              :distribution="summarizedInfo[4][numericIndex]"
-              :interval="summarizedInfo[5][numericIndex]"
-              :indexNum="indexNum"
-            />
-          </td>
-          <!-- 5th column -->
-          <td>
-            <span class="tdTitle" @click="showTimeSeriesGraph()">Time Series Graph</span>
-            <TimeSeries
-              :rawDataset="dataset[numericColumns[numericIndex]]"
-              :date="dataset['ts']"
-              :graphWidth="graphWidth"
-              :graphHeight="graphHeight"
-              :seriesName="numericColumns[numericIndex]"
-            />
-          </td>
-        </tr>
-        <!-- v-if="show_timeSeriesGraph" -->
-        <!-- category start -->
-        <tr v-for="(categoricalColumn, categoryIndex) in categoricalColumns" :key="categoryIndex">
-          <!-- 열 -->
-          <td>{{ categoricalColumn }}</td>
-          <td>
-            <tr>
-              <span class="info_title">Col #: </span>
-              <span> {{ categoryIndexAddOne }} </span>
-            </tr>
-            <tr>
-              <span class="info_title">Type: </span>
-              <span> Categorical </span>
-            </tr>
-          </td>
-
-          <td>
-            <!-- <tr>
+            <td>
+              <!-- <tr>
               <span class="info_title">Most Common Value: </span>
               <span>{{ categorical_mostCommon[categoricalColumn] }}</span>
             </tr> -->
-            <tr>
-              <span class="info_title">Num. of NA: </span>
-              <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span>
-            </tr>
-          </td>
+              <tr>
+                <span class="info_title">Num. of NA: </span>
+                <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span>
+              </tr>
+            </td>
 
-          <td></td>
-        </tr>
+            <td></td>
+          </tr>
+          <tr v-for="(numericColumn, numericIndex) in numericColumns" :key="numericIndex">
+            <!-- 1st column -->
+            <td
+              @click="
+                openEditModal(
+                  dataset[numericColumns[numericIndex]],
+                  dataset['ts'],
+                  indexNum,
+                  numericIndex
+                )
+              "
+            >
+              <v-row>
+                <v-col cols="1" class="pt-5">
+                  <v-icon x-small @click="saveClickedIconIndex(numericIndex + 2)"
+                    >mdi-pencil</v-icon
+                  ></v-col
+                >
+                <v-col>
+                  <v-text-field
+                    v-bind="checkClickedIconIndex(numericIndex + 2)"
+                    :value="numericColumn"
+                    v-model="numericColumns[numericIndex]"
+                  ></v-text-field
+                ></v-col>
+              </v-row>
+            </td>
+            <!-- 2nd column -->
+            <td>
+              <tr>
+                <span class="info_title">Col #: </span>
+                <span> {{ numericIndex }} </span>
+              </tr>
+              <tr>
+                <span class="info_title">Type: </span>
+                <span> Numeric </span>
+              </tr>
+            </td>
+
+            <!-- 3rd column -->
+            <td>
+              <tr>
+                <span class="info_title">Mean: </span>
+                <span>{{ numeric_meanJson[numericColumn] }}</span>
+              </tr>
+              <tr>
+                <span class="info_title">Standard Deviation: </span>
+                <span>{{ numeric_stdJson[numericColumn] }}</span>
+              </tr>
+              <tr>
+                <span class="info_title">Quantile: </span>
+                <span>{{ numeric_quantile1[numericColumn] }}, </span>
+                <span>{{ numeric_quantile2[numericColumn] }}, </span>
+                <span>{{ numeric_quantile3[numericColumn] }}, </span>
+                <span>{{ numeric_quantile4[numericColumn] }}</span>
+              </tr>
+              <tr>
+                <span class="info_title">Num. of NA: </span>
+                <span>{{ numeric_numOfNaJson[numericColumn] }}</span>
+              </tr>
+            </td>
+
+            <!-- 4th column -->
+            <td>
+              <span class="tdTitle">Distribution</span>
+              <Histogram
+                :distribution="summarizedInfo[4][numericIndex]"
+                :interval="summarizedInfo[5][numericIndex]"
+                :indexNum="indexNum"
+              />
+            </td>
+            <!-- 5th column -->
+            <td>
+              <span class="tdTitle" @click="showTimeSeriesGraph()">Time Series Graph</span>
+              <TimeSeries
+                :rawDataset="dataset[numericColumns[numericIndex]]"
+                :date="dataset['ts']"
+                :graphWidth="graphWidth"
+                :graphHeight="graphHeight"
+                :seriesName="numericColumns[numericIndex]"
+              />
+            </td>
+          </tr>
+          <!-- v-if="show_timeSeriesGraph" -->
+        </draggable>
       </tbody>
     </table>
     <!-- <EditModal
@@ -123,12 +153,26 @@
 import TimeSeries from "./charts/TimeSeries";
 import Histogram from "./charts/Histogram";
 import EditModal from "./modal/EditModal";
+import draggable from "vuedraggable";
+import axios from "axios";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      disabledTextFieldProps: {
+        disabled: true,
+        "hide-details": true,
+        dense: true
+      },
+      abledTextFieldProps: {
+        disabled: false,
+        "hide-details": true,
+        dense: true
+      },
+      clickedIconIndex: null,
+
       graphWidth: "260px",
       graphHeight: "200px",
       // numeric/categorical columns
@@ -161,9 +205,15 @@ export default {
   components: {
     TimeSeries,
     EditModal,
-    Histogram
+    Histogram,
+    draggable
   },
   props: ["columnsWithoutIndex"],
+  watch: {
+    summarizedInfo: function(data) {
+      deep: true, this.loadDataSummary();
+    }
+  },
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset,
@@ -171,11 +221,55 @@ export default {
       columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo
     }),
+
     categoryIndexAddOne() {
       return this.categoryIndex++;
     }
   },
   methods: {
+    ...mapActions("initialData", ["loadSummarizedData"]),
+    ...mapMutations("initialData", ["changeColumnName_vuex"]),
+    ...mapActions("initialData", ["loadFundamentalData"]),
+
+    changeColumnName(columnName, columnIndex) {
+      const api = "http://localhost:5000/changeColumnName";
+      axios
+        .get(api, {
+          params: {
+            columnName: columnName,
+            columnIndex: columnIndex
+          }
+        })
+        .then(res => {})
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    saveClickedIconIndex(index) {
+      // v-icon click OFF
+      if (this.clickedIconIndex == index) {
+        this.clickedIconIndex = null;
+        // category 일 때
+        if (index < 2) {
+          this.changeColumnName(this.categoricalColumns[index], index);
+        }
+        //numeric 일 때
+        else {
+          this.changeColumnName(this.numericColumns[index - 2], index);
+        }
+
+        this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
+        this.loadSummarizedData();
+      } // v-icon click ON
+      else {
+        this.clickedIconIndex = index;
+      }
+    },
+    checkClickedIconIndex(index) {
+      if (this.clickedIconIndex == index) {
+        return this.abledTextFieldProps;
+      } else return this.disabledTextFieldProps;
+    },
     openEditModal(dataset, date, indexNum, selectedColumnIndex) {
       this.editModal_hidden = false;
       this.editModal_dataValue = dataset;
@@ -191,21 +285,24 @@ export default {
     },
     showTimeSeriesGraph() {
       this.show_timeSeriesGraph = !this.show_timeSeriesGraph;
+    },
+    loadDataSummary() {
+      this.numeric_meanJson = this.summarizedInfo[0]["mean"];
+      this.numeric_stdJson = this.summarizedInfo[0]["std"];
+      this.numeric_quantile1 = this.summarizedInfo[0]["quantile1"];
+      this.numeric_quantile2 = this.summarizedInfo[0]["quantile2"];
+      this.numeric_quantile3 = this.summarizedInfo[0]["quantile3"];
+      this.numeric_quantile4 = this.summarizedInfo[0]["quantile4"];
+      this.numeric_numOfNaJson = this.summarizedInfo[0]["numOfNA"];
+      this.categorical_mostCommon = this.summarizedInfo[1]["mostCommon"];
+      this.categorical_numOfNaJson = this.summarizedInfo[1]["numOfNA"];
+      this.numericColumns = this.summarizedInfo[2];
+      this.categoricalColumns = this.summarizedInfo[3];
+      this.categoryIndex = this.summarizedInfo[2].length;
     }
   },
   created() {
-    this.numeric_meanJson = this.summarizedInfo[0]["mean"];
-    this.numeric_stdJson = this.summarizedInfo[0]["std"];
-    this.numeric_quantile1 = this.summarizedInfo[0]["quantile1"];
-    this.numeric_quantile2 = this.summarizedInfo[0]["quantile2"];
-    this.numeric_quantile3 = this.summarizedInfo[0]["quantile3"];
-    this.numeric_quantile4 = this.summarizedInfo[0]["quantile4"];
-    this.numeric_numOfNaJson = this.summarizedInfo[0]["numOfNA"];
-    this.categorical_mostCommon = this.summarizedInfo[1]["mostCommon"];
-    this.categorical_numOfNaJson = this.summarizedInfo[1]["numOfNA"];
-    this.numericColumns = this.summarizedInfo[2];
-    this.categoricalColumns = this.summarizedInfo[3];
-    this.categoryIndex = this.summarizedInfo[2].length;
+    this.loadDataSummary();
   },
   mounted() {
     // for (const value in this.dataSet) {
@@ -225,7 +322,7 @@ export default {
 }
 .dataTable {
   text-transform: capitalize;
-  font-size: 15px;
+  font-size: 14px;
   /* margin: 0 auto; */
   margin-top: 50px;
   text-align: left;

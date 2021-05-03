@@ -7,7 +7,7 @@
         <v-col>
           <v-subheader>{{ columns.length }} 개 열</v-subheader>
         </v-col>
-        <v-col> <slot></slot></v-col>
+        <!-- <v-col> <slot></slot></v-col> -->
       </v-row>
       <!-- 하단 (컨텐츠) -->
       <v-row align="center">

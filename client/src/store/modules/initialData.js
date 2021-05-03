@@ -28,6 +28,9 @@ const mutations = {
   },
   loadSummarizedInfo(state, payload) {
     state.summarizedInfo = Object.freeze(payload);
+  },
+  changeColumnName_vuex(state, payload) {
+    state.columns[payload.columnIndex] = payload.columnName;
   }
 };
 
@@ -43,6 +46,17 @@ const actions = {
         // 데이터 추가 시 필요한 index number
         //'처음' 데이터를 받아올때만 columns 받아오도록 처리
         commit("saveResponseData");
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  },
+  loadSummarizedData({ commit }) {
+    const path = "http://localhost:5000/loadSummarizedData";
+    axios
+      .get(path)
+      .then(res => {
+        commit("loadSummarizedInfo", res.data);
       })
       .catch(error => {
         console.error(error);
