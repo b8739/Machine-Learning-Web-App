@@ -21,7 +21,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <DeleteRowModal />
+
       <v-divider></v-divider>
       <v-list-item class="px-2">
         <v-list-item-title>List of Datasets</v-list-item-title>
@@ -40,7 +40,6 @@
 </template>
 
 <script>
-import DeleteRowModal from "@/components/modal/DeleteRowModal";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 import axios from "axios";
@@ -59,9 +58,7 @@ export default {
       tableList: []
     };
   },
-  components: {
-    DeleteRowModal
-  },
+  components: {},
   methods: {
     ...mapActions("initialData", ["loadFundamentalData"]),
     clickTableNameEvent() {
@@ -70,6 +67,8 @@ export default {
     callOption(title) {
       if (title == "Delete Row") {
         eventBus.$emit("openDeleteRowModal", true);
+      } else if (title == "Moving Average") {
+        eventBus.$emit("openMovingAverageModal", true);
       }
     },
     showTables() {

@@ -30,6 +30,7 @@
             <v-row>
               <GraphBuilder :columns="columns" />
               <DeleteStepper />
+              <AverageModal />
               <DataFeatures
                 :class="{ visibilityHidden: showFeatures }"
                 :columnsWithoutIndex="columnsWithoutIndex"
@@ -57,6 +58,7 @@ import axios from "axios";
 //views
 import GraphBuilder from "./GraphBuilder.vue";
 import DeleteStepper from "./DeleteStepper.vue";
+import AverageModal from "@/components/average/AverageModal.vue";
 //components
 import DataTable from "@/components/DataTable";
 import Sidebar from "@/components/layout/Sidebar";
@@ -94,7 +96,8 @@ export default {
     GraphBuilder,
     SideMenu,
     SaveMenu,
-    DeleteStepper
+    DeleteStepper,
+    AverageModal
   },
   // props: ["summarizedInfo"],
   computed: {
