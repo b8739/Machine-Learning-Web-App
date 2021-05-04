@@ -36,7 +36,7 @@
       </v-stepper-step>
       <!-- step 1 (Contents) -->
       <v-stepper-content step="1">
-        <TsCondition />
+        <TimeCondition />
         <v-btn color="primary" @click="stepper = 2">
           Continue
         </v-btn>
@@ -60,7 +60,7 @@
   </v-dialog>
 </template>
 <script>
-import TsCondition from "@/components/delete/TsCondition.vue";
+import TimeCondition from "@/components/delete/TimeCondition.vue";
 import ColumnList from "@/components/delete/ColumnList.vue";
 import FeatureCondition from "@/components/delete/FeatureCondition.vue";
 import axios from "axios";
@@ -130,7 +130,7 @@ export default {
     }
   },
 
-  components: { TsCondition, ColumnList, FeatureCondition },
+  components: { TimeCondition, ColumnList, FeatureCondition },
   created() {
     eventBus.$on("openDeleteRowModal", modalStatus => {
       this.dialog = modalStatus;

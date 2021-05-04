@@ -160,9 +160,9 @@
 </template>
 
 <script>
-import TimeSeries from "./charts/TimeSeries";
-import Histogram from "./charts/Histogram";
-import EditModal from "./modal/EditModal";
+import TimeSeries from "@/components/charts/TimeSeries";
+import Histogram from "@/components/charts/Histogram";
+import EditModal from "@/components/modal/EditModal";
 import draggable from "vuedraggable";
 import axios from "axios";
 //vuex

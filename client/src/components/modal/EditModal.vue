@@ -1,6 +1,5 @@
 <template>
   <div class="outerWrap">
-    <DarkBackground />
     <div class="innerWrap">
       <button class="exitButton" @click="closeEditModal()">Close</button>
       <h1 class="title">Edit Data</h1>
@@ -23,9 +22,9 @@
   </div>
 </template>
 <script>
-import TimeSeries from "../charts/TimeSeries";
-import InfiniteTable from "../InfiniteTable";
-import DarkBackground from "./DarkBackground";
+import TimeSeries from "@/components/charts/TimeSeries";
+import InfiniteTable from "@/components/layout/InfiniteTable";
+
 export default {
   data() {
     return {
@@ -36,8 +35,7 @@ export default {
   props: ["dataValue", "date", "indexNum", "columns", "editModal_hidden", "selectedColumnIndex"],
   components: {
     TimeSeries,
-    InfiniteTable,
-    DarkBackground
+    InfiniteTable
   },
   methods: {
     getXaxis(xaxis) {

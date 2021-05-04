@@ -61,8 +61,8 @@ import DeleteStepper from "./DeleteStepper.vue";
 import DataTable from "@/components/DataTable";
 import Sidebar from "@/components/layout/Sidebar";
 import AddModal from "@/components/modal/AddModal";
-import DataFeatures from "@/components/DataFeatures";
-import InfiniteTable from "@/components/InfiniteTable";
+import DataFeatures from "@/components/layout/DataFeatures";
+import InfiniteTable from "@/components/layout/InfiniteTable";
 import SideMenu from "@/components/layout/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 //vuex

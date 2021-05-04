@@ -425,9 +425,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum,
-      summarizedInfo: state => state.summarizedInfo
+      dataset: state => state.initialData.dataset,
+      indexNum: state => state.initialData.indexNum,
+      summarizedInfo: state => state.initialData.summarizedInfo
     })
   },
   methods: {

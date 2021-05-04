@@ -3,7 +3,7 @@
     <v-row class="vrowContainer">
       <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
         <v-card>
-          <v-toolbar color="primary">
+          <v-toolbar color="light">
             <v-btn icon dark @click="dialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -54,7 +54,7 @@
                   <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
                 </v-row>
                 <!-- 우측 하단 -->
-                <v-row dense justify="center">
+                <v-row dense>
                   <v-col cols="7" offset="1" class="axisTitle" :style="{ width: '500px' }">
                     <v-card class="ml-5" height="50px">
                       <!-- <span class="xLabel"> X</span> -->
