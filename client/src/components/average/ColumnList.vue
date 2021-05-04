@@ -3,9 +3,16 @@
     <slot></slot>
 
     <v-list>
-      <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
-        <v-list-item-content>
-          <v-list-item-title>{{ column }}</v-list-item-title>
+      <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex" dense>
+        <v-list-item-content class="pa-0">
+          <v-list-item
+            color="dark"
+            class="columnItem"
+            @click="changeColor(columnIndex)"
+            :style="dynamicColumnStyle(columnIndex)"
+          >
+            {{ column }}
+          </v-list-item>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -13,14 +20,31 @@
 </template>
 <script>
 import { mapState } from "vuex";
-
 import { eventBus } from "@/main";
 export default {
   data() {
-    return {};
+    return {
+      clickedColumnIndex: null,
+      unClickedColumnItemStyle: {
+        // "background-color": "none"
+      },
+      clickedColumnItemStyle: {
+        "background-color": "lightgrey"
+      }
+    };
   },
   props: [],
-  methods: {},
+
+  methods: {
+    changeColor(columnIndex) {
+      this.clickedColumnIndex = columnIndex;
+    },
+    dynamicColumnStyle(columnIndex) {
+      if (this.clickedColumnIndex == columnIndex) {
+        return this.clickedColumnItemStyle;
+      } else return this.unClickedColumnItemStyle;
+    }
+  },
   components: {},
   computed: {
     ...mapState({
@@ -32,3 +56,4 @@ export default {
   }
 };
 </script>
+<style scoped></style>

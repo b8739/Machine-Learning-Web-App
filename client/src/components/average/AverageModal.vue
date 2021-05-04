@@ -24,7 +24,7 @@
               Continue
             </v-btn>
 
-            <v-btn text>
+            <v-btn text @click="dialog = false">
               Cancel
             </v-btn>
           </v-card-actions>

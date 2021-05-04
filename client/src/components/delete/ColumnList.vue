@@ -2,7 +2,7 @@
   <v-card>
     <slot></slot>
 
-    <v-list>
+    <v-list dense>
       <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
         <v-list-item-content @click="clickFeatureEvent(column)">
           <v-list-item-title>{{ column }}</v-list-item-title>
