@@ -82,10 +82,7 @@ import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
 
 import { eventBus } from "@/main";
 // vuex
-import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {

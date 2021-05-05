@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" persistent max-width="800">
+    <v-dialog v-model="dialog" non-linear persistent max-width="800">
       <v-stepper v-model="e1">
         <!-- title -->
         <v-card-title class="headline">
@@ -17,17 +17,7 @@
         </v-stepper-header>
         <!-- contents -->
         <v-stepper-content step="1">
-          <ColumnList :style="style_columnList" />
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" @click="e1 = 2">
-              Continue
-            </v-btn>
-
-            <v-btn text @click="dialog = false">
-              Cancel
-            </v-btn>
-          </v-card-actions>
+          <ColumnList />
         </v-stepper-content>
         <v-stepper-content step="2">
           <v-card>
@@ -49,11 +39,11 @@
             <v-card-actions>
               <v-spacer></v-spacer>
 
-              <v-btn color="primary" @click="e1 = 2">
-                Continue
+              <v-btn color="primary" @click="getMovingAverage">
+                Confirm
               </v-btn>
 
-              <v-btn text>
+              <v-btn text @click="dialog = false">
                 Cancel
               </v-btn>
             </v-card-actions>
@@ -65,6 +55,7 @@
 </template>
 <script>
 import { eventBus } from "@/main";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import ColumnList from "@/components/average/ColumnList.vue";
 export default {
   data() {
@@ -75,20 +66,26 @@ export default {
       labels: ["Hour", "Minute"],
       year: ["2016"],
       dateValues: ["", ""],
-      style_columnList: {
-        height: "230px",
-        "overflow-y": "scroll"
-      }
+      selectedColumns: [],
+      newDataset: {},
+      counter: 0,
+      total: 0
     };
   },
   components: {
     ColumnList
   },
   computed: {
+    ...mapState({
+      dataset: state => state.initialData.dataset,
+
+      columns: state => state.initialData.columns
+    }),
     fullTime() {
       let fullDate = "";
 
       fullDate += parseInt(this.getHour) + parseInt(this.dateValues[1]);
+      fullDate = parseInt(fullDate);
       return fullDate;
     },
     getHour() {
@@ -96,6 +93,27 @@ export default {
     }
   },
   methods: {
+    getMovingAverage() {
+      let selectedColumns = this.selectedColumns;
+      for (let i = 0; i < selectedColumns.length; i++) {
+        let targetDataset = this.dataset[selectedColumns[i]];
+        this.counter = 1;
+        this.total = 0;
+
+        this.newDataset[selectedColumns[i]] = [];
+        for (let j = 0; j < Object.keys(targetDataset).length; j++) {
+          if ((this.counter / this.fullTime) % 1 != 0) {
+            this.total += targetDataset[j];
+            this.counter++;
+          } else if ((this.counter / this.fullTime) % 1 === 0) {
+            let mean = this.total / this.fullTime;
+            this.newDataset[selectedColumns[i]].push(mean.toFixed(3)); // 소수점 3번째 자리까지
+            this.counter++;
+            this.total = 0;
+          }
+        }
+      }
+    },
     getFormFieldItem(indexOfFormFields) {
       if (indexOfFormFields == 0) {
         return this.year;
@@ -114,6 +132,12 @@ export default {
   created() {
     eventBus.$on("openMovingAverageModal", dialogStatus => {
       this.dialog = dialogStatus;
+    });
+    eventBus.$on("selectedColumns", selectedColumns => {
+      this.selectedColumns = selectedColumns;
+    });
+    eventBus.$on("toStepTwo", step => {
+      this.e1 = step;
     });
   }
 };

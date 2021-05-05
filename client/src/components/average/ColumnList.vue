@@ -1,22 +1,30 @@
 <template>
-  <v-card>
-    <slot></slot>
+  <v-row>
+    <v-col>
+      <div class="columnList">
+        <v-checkbox
+          v-for="(column, columnIndex) in columns"
+          :key="columnIndex"
+          :label="column"
+          v-model="selected[columnIndex]"
+          :value="column"
+          dense
+        >
+        </v-checkbox>
+      </div>
 
-    <v-list>
-      <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex" dense>
-        <v-list-item-content class="pa-0">
-          <v-list-item
-            color="dark"
-            class="columnItem"
-            @click="changeColor(columnIndex)"
-            :style="dynamicColumnStyle(columnIndex)"
-          >
-            {{ column }}
-          </v-list-item>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-  </v-card>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="stepOneComplete">
+          Continue
+        </v-btn>
+
+        <v-btn text @click="dialog = false">
+          Cancel
+        </v-btn>
+      </v-card-actions>
+    </v-col>
+  </v-row>
 </template>
 <script>
 import { mapState } from "vuex";
@@ -30,12 +38,17 @@ export default {
       },
       clickedColumnItemStyle: {
         "background-color": "lightgrey"
-      }
+      },
+      selected: []
     };
   },
   props: [],
 
   methods: {
+    stepOneComplete() {
+      eventBus.$emit("toStepTwo", 2);
+      eventBus.$emit("selectedColumns", this.selectedWithoutNull);
+    },
     changeColor(columnIndex) {
       this.clickedColumnIndex = columnIndex;
     },
@@ -47,6 +60,15 @@ export default {
   },
   components: {},
   computed: {
+    selectedWithoutNull() {
+      let selected = [];
+      this.selected.forEach(element => {
+        if (element != undefined || element != null) {
+          selected.push(element);
+        }
+      });
+      return selected;
+    },
     ...mapState({
       dataset: state => state.initialDatadataset,
       indexNum: state => state.initialData.indexNum,
@@ -56,4 +78,9 @@ export default {
   }
 };
 </script>
-<style scoped></style>
+<style scoped>
+.columnList {
+  height: 230px;
+  overflow-y: scroll;
+}
+</style>
