@@ -1,57 +1,55 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="dialog" non-linear persistent max-width="800">
-      <v-stepper v-model="e1">
-        <!-- title -->
-        <v-card-title class="headline">
-          이동 평균 (Moving Average)
-        </v-card-title>
-        <!-- header -->
-        <v-stepper-header>
-          <v-stepper-step step="1" editable>
-            Define Target Columns
-          </v-stepper-step>
-          <v-stepper-step step="2" editable>
-            Define Time Unit
-          </v-stepper-step>
-        </v-stepper-header>
-        <!-- contents -->
-        <v-stepper-content step="1">
-          <ColumnList />
-        </v-stepper-content>
-        <v-stepper-content step="2">
-          <v-card>
-            <v-card-text>이동 평균 (Moving Average)를 계산할 시간 단위를 입력하세요.</v-card-text>
-            <v-row justify="center">
-              <v-col
-                cols="2"
-                v-for="(formField, indexOfFormFields) in formFields"
-                :key="indexOfFormFields"
-              >
-                <v-text-field
-                  v-model="dateValues[indexOfFormFields]"
-                  clearable
-                  dense
-                  :label="labels[indexOfFormFields]"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-card-actions>
-              <v-spacer></v-spacer>
+  <v-dialog v-model="dialog" persistent max-width="800">
+    <v-stepper v-model="e1" non-linear>
+      <!-- title -->
+      <v-card-title class="headline">
+        이동 평균 (Moving Average)
+      </v-card-title>
+      <!-- header -->
+      <v-stepper-header>
+        <v-stepper-step step="1" editable>
+          Define Target Columns
+        </v-stepper-step>
+        <v-stepper-step step="2" editable>
+          Define Time Unit
+        </v-stepper-step>
+      </v-stepper-header>
+      <!-- contents -->
+      <v-stepper-content step="1">
+        <ColumnList />
+      </v-stepper-content>
+      <v-stepper-content step="2">
+        <v-card>
+          <v-card-text>이동 평균 (Moving Average)를 계산할 시간 단위를 입력하세요.</v-card-text>
+          <v-row justify="center">
+            <v-col
+              cols="2"
+              v-for="(formField, indexOfFormFields) in formFields"
+              :key="indexOfFormFields"
+            >
+              <v-text-field
+                v-model="dateValues[indexOfFormFields]"
+                clearable
+                dense
+                :label="labels[indexOfFormFields]"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-card-actions>
+            <v-spacer></v-spacer>
 
-              <v-btn color="primary" @click="getMovingAverage">
-                Confirm
-              </v-btn>
+            <v-btn color="primary" @click="getMovingAverage">
+              Confirm
+            </v-btn>
 
-              <v-btn text @click="dialog = false">
-                Cancel
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-stepper-content>
-      </v-stepper>
-    </v-dialog>
-  </v-row>
+            <v-btn text @click="dialog = false">
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-stepper-content>
+    </v-stepper>
+  </v-dialog>
 </template>
 <script>
 import { eventBus } from "@/main";
@@ -138,6 +136,9 @@ export default {
     });
     eventBus.$on("toStepTwo", step => {
       this.e1 = step;
+    });
+    eventBus.$on("closeDialog", dialogStatus => {
+      this.dialog = dialogStatus;
     });
   }
 };

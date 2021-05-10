@@ -21,7 +21,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-
+      <!-- 구분선 -->
       <v-divider></v-divider>
       <v-list-item class="px-2">
         <v-list-item-title>List of Datasets</v-list-item-title>
@@ -54,13 +54,18 @@ export default {
         { title: "Delete Row", icon: "mdi-trash-can-outline" },
         { title: "Change Order", icon: "mdi-swap-vertical" },
         { title: "Moving Average", icon: "mdi-chart-timeline-variant" }
-      ],
-      tableList: []
+      ]
     };
   },
   components: {},
+  computed: {
+    ...mapState({
+      tableList: state => state.initialData.tableList
+    })
+  },
   methods: {
     ...mapActions("initialData", ["loadFundamentalData"]),
+    ...mapMutations("initialData", ["loadTableList"]),
     clickTableNameEvent() {
       this.loadFundamentalData("http://localhost:5000/loadData");
     },
@@ -69,6 +74,8 @@ export default {
         eventBus.$emit("openDeleteRowModal", true);
       } else if (title == "Moving Average") {
         eventBus.$emit("openMovingAverageModal", true);
+      } else if (title == "Change Order") {
+        eventBus.$emit("openChangeOrderModal", true);
       }
     },
     showTables() {
@@ -76,7 +83,8 @@ export default {
       axios
         .get(path)
         .then(res => {
-          this.tableList = res.data;
+          // this.tableList = res.data;
+          this.loadTableList(res.data);
         })
         .catch(error => {});
     }

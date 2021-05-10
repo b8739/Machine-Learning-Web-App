@@ -7,7 +7,7 @@
       </div>
     </div> -->
     <v-app>
-      <v-container id="mainWrapper" fluid>
+      <v-container v-show="featureFlag" id="mainWrapper" fluid>
         <v-row>
           <!-- 화면 좌측 -->
           <v-col cols="2"><SideMenu /></v-col>
@@ -31,6 +31,8 @@
               <GraphBuilder :columns="columns" />
               <DeleteStepper />
               <AverageModal />
+              <ChangeOrder />
+              <ModelingModal />
               <DataFeatures
                 :class="{ visibilityHidden: showFeatures }"
                 :columnsWithoutIndex="columnsWithoutIndex"
@@ -50,6 +52,9 @@
           </v-col>
         </v-row>
       </v-container>
+      <v-container fluid v-if="modelingFlag">
+        <Modeling />
+      </v-container>
     </v-app>
   </div>
 </template>
@@ -61,12 +66,16 @@ import DeleteStepper from "./DeleteStepper.vue";
 import AverageModal from "@/components/average/AverageModal.vue";
 //components
 import DataTable from "@/components/DataTable";
-import Sidebar from "@/components/layout/Sidebar";
+
 import AddModal from "@/components/modal/AddModal";
 import DataFeatures from "@/components/layout/DataFeatures";
 import InfiniteTable from "@/components/layout/InfiniteTable";
 import SideMenu from "@/components/layout/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
+import ChangeOrder from "@/components/changeOrder/ChangeOrder.vue";
+import ModelingModal from "@/components/modeling/ModelingModal.vue";
+import Modeling from "./Modeling.vue";
+
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
@@ -84,12 +93,14 @@ export default {
       isHidden: true,
       rowIndex: [],
       showFeatures: false,
-      showTable: true
+      showTable: true,
+      featureFlag: true,
+      modelingFlag: false
     };
   },
   components: {
     DataTable,
-    Sidebar,
+
     AddModal,
     DataFeatures,
     InfiniteTable,
@@ -97,7 +108,10 @@ export default {
     SideMenu,
     SaveMenu,
     DeleteStepper,
-    AverageModal
+    AverageModal,
+    ChangeOrder,
+    ModelingModal,
+    Modeling
   },
   // props: ["summarizedInfo"],
   computed: {
@@ -204,6 +218,10 @@ export default {
   created() {
     // this.loadData(); //store.js 실험하기 위해서 일단 주석 처리
     this.loadFundamentalData("http://localhost:5000/loadData");
+    eventBus.$on("createModel", modelingStatus => {
+      this.featureFlag = false;
+      this.modelingFlag = true;
+    });
     // this.loadSummarizedInfo(this.summarizedData);
 
     // this.$store.dispatch("loadFundamentalData", "http://localhost:5000/loadData");

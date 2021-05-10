@@ -5,8 +5,8 @@ const state = {
   dataset: {},
   summarizedInfo: [],
   indexNum: "",
-
-  columns: []
+  columns: [],
+  tableList: []
 };
 
 const mutations = {
@@ -31,6 +31,12 @@ const mutations = {
   },
   changeColumnName_vuex(state, payload) {
     state.columns[payload.columnIndex] = payload.columnName;
+  },
+  loadSelectedColumns(state, payload) {
+    state.selectedColumns.push(payload);
+  },
+  loadTableList(state, payload) {
+    state.tableList = payload;
   }
 };
 

@@ -44,7 +44,7 @@ export default {
       }
     },
     saveTableAxios(saveOption) {
-      const path = "http://localhost:5000/saveTable";
+      const path = "http://localhost:5000/overwriteTable";
       axios
         .get(path, {
           params: {

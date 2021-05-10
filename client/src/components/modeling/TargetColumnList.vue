@@ -5,24 +5,15 @@
         <v-checkbox
           v-for="(column, columnIndex) in columns"
           :key="columnIndex"
+          v-model="targets"
           :label="column"
-          v-model="selected[columnIndex]"
           :value="column"
+          @change="checkedEvent(columnIndex)"
           dense
+          v-bind="dynamicProps(columnIndex)"
         >
         </v-checkbox>
       </div>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="stepOneComplete">
-          Continue
-        </v-btn>
-
-        <v-btn text @click="closeDialog">
-          Cancel
-        </v-btn>
-      </v-card-actions>
     </v-col>
   </v-row>
 </template>
@@ -39,19 +30,31 @@ export default {
       clickedColumnItemStyle: {
         "background-color": "lightgrey"
       },
-      selected: []
+      selected: [],
+      disabledProps: {
+        disabled: true
+      },
+      targets: []
     };
   },
   props: [],
 
   methods: {
+    dynamicProps(columnIndex) {
+      for (let i = 0; i < this.selected.length; i++) {
+        if (this.selected[i] == columnIndex) {
+          return this.disabledProps;
+        }
+      }
+    },
+    checkedEvent(columnIndex) {
+      console.log(columnIndex);
+      eventBus.$emit("targetColumnChecked", columnIndex);
+    },
     closeDialog() {
       eventBus.$emit("closeDialog", false);
     },
-    stepOneComplete() {
-      eventBus.$emit("toStepTwo", 2);
-      eventBus.$emit("selectedColumns", this.selectedWithoutNull);
-    },
+
     changeColor(columnIndex) {
       this.clickedColumnIndex = columnIndex;
     },
@@ -63,6 +66,15 @@ export default {
   },
   components: {},
   computed: {
+    withoutUndefined() {
+      let cleansed = [];
+      this.targets.forEach(element => {
+        if (element != undefined) {
+          cleansed.push(element);
+        }
+      });
+      return cleansed;
+    },
     selectedWithoutNull() {
       let selected = [];
       this.selected.forEach(element => {
@@ -78,6 +90,11 @@ export default {
       columns: state => state.initialData.columns
       // columns: state => state.columns
     })
+  },
+  created() {
+    eventBus.$on("inputColumnChecked", index => {
+      this.selected.push(index);
+    });
   }
 };
 </script>

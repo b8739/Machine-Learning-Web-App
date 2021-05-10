@@ -12,8 +12,6 @@ import Header from "./components/layout/Header.vue";
 // import Sidebar from "./components/Sidebar.vue"
 import DataSummary from "./views/DataSummary.vue";
 
-import Login from "./views/Login.vue";
-
 export default {
   name: "App",
 

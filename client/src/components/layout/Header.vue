@@ -5,7 +5,7 @@
       <a href="#">Datasets</a>
       <a href="#">Preprocess</a>
       <a href="#" @click="openDialogue()">EDA</a>
-      <a href="#">Modeling</a>
+      <a href="#" @click="openModeling()">Modeling</a>
       <a href="#">Optimize</a>
     </nav>
   </div>
@@ -19,6 +19,9 @@ export default {
   methods: {
     openDialogue() {
       eventBus.$emit("openDialogue", true);
+    },
+    openModeling() {
+      eventBus.$emit("openModeling", true);
     }
   }
 };
@@ -34,7 +37,7 @@ body {
 .logo {
   width: 4%;
   position: absolute;
-  top: 15px;
+  top: 18px;
   left: 20px;
 }
 
