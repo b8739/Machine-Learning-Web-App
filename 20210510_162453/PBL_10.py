@@ -68,8 +68,9 @@ svr_model = SVR(kernel = 'rbf',
                 C = 100, 
                 epsilon = 0.1, 
                 gamma = 0.005)
-
+# 학습과정 (xn은 normalization을 한 것)
 svr_model.fit(train_Xn, y_train)
+# 예측값
 svr_model_predict = svr_model.predict(test_Xn)
 
 print('R_square of SVR :', r2_score(y_test, svr_model_predict))

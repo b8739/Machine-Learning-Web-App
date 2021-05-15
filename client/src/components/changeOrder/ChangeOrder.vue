@@ -3,7 +3,7 @@
     <v-card>
       <v-container class="columnList">
         <v-row>
-          <v-card-title>Change Column Order</v-card-title>
+          <v-card-title>Table 컬럼 순서 변경</v-card-title>
 
           <v-spacer></v-spacer>
           <v-btn x-small min-width="20" min-height="30" @click="closeStepper"
@@ -11,14 +11,16 @@
           </v-btn>
         </v-row>
         <v-divider></v-divider>
-        <v-list dense>
-          <draggable :list="columns" @change="onDragEvent">
-            <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
-              <v-list-item-content>
-                <v-list-item-title>{{ column }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </draggable>
+        <v-list outlined dense>
+          <v-list-item-group active-class="border">
+            <draggable :list="columns" @change="onDragEvent">
+              <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
+                <v-list-item-content>
+                  <v-list-item-title>{{ column }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </draggable>
+          </v-list-item-group>
         </v-list>
       </v-container>
     </v-card>

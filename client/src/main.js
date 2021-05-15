@@ -2,7 +2,8 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "@/store/index";
-
+// konva
+import VueKonva from "vue-konva";
 // apex charts
 import VueApexCharts from "vue-apexcharts";
 // portal
@@ -35,6 +36,7 @@ Vue.config.productionTip = false;
 Vue.use(PortalVue);
 Vue.use(Vuetify);
 
+Vue.use(VueKonva);
 // Vue.use(Vuetify);
 
 Vue.use(BootstrapVue);

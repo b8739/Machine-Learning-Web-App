@@ -6,6 +6,9 @@ const state = {
 const mutations = {
   saveInputs(state, payload) {
     state.inputs = payload;
+  },
+  saveTargets(state, payload) {
+    state.targets = payload;
   }
 };
 

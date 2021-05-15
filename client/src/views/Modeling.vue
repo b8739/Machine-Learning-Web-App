@@ -1,14 +1,34 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="2"> <ModelingSide /></v-col>
+      <v-col cols="2">
+        <ModelingSide />
+      </v-col>
       <v-col cols="10">
-        <v-card min-height="800px" elevation="1">
+        <!-- <v-card min-height="800px" elevation="1">
           <v-toolbar elevation="1" dense>
             <v-spacer></v-spacer
             ><v-btn><v-icon left small>mdi-play-outline</v-icon> Run</v-btn></v-toolbar
           >
-        </v-card>
+          <v-container>
+            <v-row justify="center">
+              <v-col cols="2" v-for="(input, index) in inputs" :key="index">
+                <v-card-text class="pa-0">{{ input }}</v-card-text>
+                <v-chip draggable label>
+                  Input
+                </v-chip>
+              </v-col>
+              <v-col cols="2" v-for="(target, index) in targets" :key="index">
+                <v-card-text class="pa-0">{{ target }}</v-card-text>
+                <v-chip draggable label>
+                  Target
+                </v-chip>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card> -->
+
+        <Canvas></Canvas>
       </v-col>
     </v-row>
   </v-container>
@@ -16,20 +36,30 @@
 <script>
 import { eventBus } from "@/main";
 import ModelingSide from "@/components/modeling/ModelingSide.vue";
+import Canvas from "@/components/modeling/Canvas.vue";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      inputs: [],
-      targets: []
+      left: null,
+      top: null
     };
   },
   components: {
-    ModelingSide
+    ModelingSide,
+    Canvas
+  },
+  methods: {
+    getPos(e) {
+      let obj = e.target;
+      this.left = obj.getBoundingClientRect().left;
+      this.top = obj.getBoundingClientRect().top;
+    }
   },
   computed: {
     ...mapState({
-      inputs: state => state.modelingData.inputs
+      inputs: state => state.modelingData.inputs,
+      targets: state => state.modelingData.targets
     })
   },
   created() {
@@ -39,6 +69,8 @@ export default {
     eventBus.$on("targetFeatures", targetFeatures => {
       this.targetFeatures = targetFeatures;
     });
-  }
+  },
+
+  mounted() {}
 };
 </script>

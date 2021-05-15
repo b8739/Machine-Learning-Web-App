@@ -18,7 +18,8 @@
   </v-row>
 </template>
 <script>
-import { mapState } from "vuex";
+//vuex
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 export default {
   data() {
@@ -40,6 +41,7 @@ export default {
   props: [],
 
   methods: {
+    ...mapMutations("modelingData", ["saveTargets"]),
     dynamicProps(columnIndex) {
       for (let i = 0; i < this.selected.length; i++) {
         if (this.selected[i] == columnIndex) {
@@ -66,6 +68,9 @@ export default {
   },
   components: {},
   computed: {
+    ...mapState({
+      columns: state => state.initialData.columns
+    }),
     withoutUndefined() {
       let cleansed = [];
       this.targets.forEach(element => {
@@ -84,16 +89,14 @@ export default {
       });
       return selected;
     },
-    ...mapState({
-      dataset: state => state.initialDatadataset,
-      indexNum: state => state.initialData.indexNum,
-      columns: state => state.initialData.columns
-      // columns: state => state.columns
-    })
+    ...mapState({})
   },
   created() {
     eventBus.$on("inputColumnChecked", index => {
       this.selected.push(index);
+    });
+    eventBus.$on("stepTwoFinished", status => {
+      this.saveTargets(this.withoutUndefined);
     });
   }
 };

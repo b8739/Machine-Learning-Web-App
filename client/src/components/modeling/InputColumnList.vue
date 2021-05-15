@@ -69,6 +69,9 @@ export default {
   },
   components: {},
   computed: {
+    ...mapState({
+      columns: state => state.initialData.columns
+    }),
     withoutUndefined() {
       let cleansed = [];
       this.inputs.forEach(element => {
@@ -87,12 +90,7 @@ export default {
       });
       return selected;
     },
-    ...mapState({
-      dataset: state => state.initialDatadataset,
-      indexNum: state => state.initialData.indexNum,
-      columns: state => state.initialData.columns
-      // columns: state => state.columns
-    })
+    ...mapState({})
   },
   created() {
     eventBus.$on("targetColumnChecked", index => {

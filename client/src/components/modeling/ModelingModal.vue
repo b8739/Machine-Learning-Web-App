@@ -9,7 +9,7 @@
           </v-btn>
         </v-row>
         <v-row justify="center" class="ma-0">
-          <v-card-title> Modeling Wizard</v-card-title>
+          <v-card-title class="pa-0"> Modeling Wizard</v-card-title>
         </v-row>
         <v-divider></v-divider>
         <v-row justify="center" class="ma-0">
@@ -49,19 +49,21 @@
             </v-row>
             <v-row justify="center" no-gutters dense>
               <v-col cols="1"><v-divider vertical></v-divider></v-col>
-              <v-col cols="5">
+              <v-col cols="6">
                 <v-autocomplete
                   v-for="(formField, indexOfFormFields) in formFields"
                   :key="indexOfFormFields"
                   outlined
                   clearable
                   dense
+                  no-data-text=""
                   v-bind="hideDetails(indexOfFormFields)"
                   :label="dataTypelabels[indexOfFormFields]"
+                  :placeholder="datasetRatio[indexOfFormFields]"
                 ></v-autocomplete>
               </v-col>
             </v-row>
-            <v-col cols="9">
+            <v-col cols="10">
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" @click="tab = 1">Next</v-btn>
@@ -134,6 +136,7 @@ export default {
       formFields: [1, 2, 3],
       dataInfoLabels: ["Dataset", "Dataset Version", "Subset"],
       dataTypelabels: ["Training", "Validation", "Test"],
+      datasetRatio: ["80%", "10%", "10%"],
       snippets: ["XGBoost", "Random Forest", "SVR"],
       hideDetailsProps: {
         "hide-details": true

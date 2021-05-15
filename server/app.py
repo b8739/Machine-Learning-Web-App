@@ -83,7 +83,7 @@ def dataupload():
   if request.method == 'POST' and 'csv_data' in request.files:
     # 테이블 이름 받아오기
     tableName = request.args.get('tableName')
-    print(tableName)
+  
 
     file = request.files['csv_data']
 	# dataInfo 테이블 생성
@@ -112,7 +112,7 @@ def dataupload():
     session.execute(sql)
     session.commit()
     session.close
-    print(df)
+
   # method='multi'
   # traditional한 sql에선 method multi를 하면 더 느려진다고 함
   
@@ -252,7 +252,7 @@ def deleteRow():
     for featureCondition in featureConditions:
       featureConditionQuery = ' And '+featureCondition
       sql += featureConditionQuery
-  print (sql)
+
   session.execute(sql)
   session.commit()
   session.close()
@@ -272,7 +272,7 @@ def deleteRowByPeriod():
 
   getEndIndexQuery="select ID from temp_dataset where ts like '%"+getFullTimeSeries_to+"%' order by id DESC LIMIT 1;"
   endIndex =  str(session.execute(getEndIndexQuery).fetchall()[0][0])
-  print(endIndex)
+
 
   deleteRowByIndexQuery="delete from temp_dataset where ID >= " +startIndex+ " && ID <= "+endIndex  
   session.execute(deleteRowByIndexQuery)
@@ -289,7 +289,7 @@ def showTables():
   tableInfo = list(session.execute(sql).fetchall())
   for index,tableName in enumerate(tableInfo):
     tableList.append(str(tableName[0]))
-  print(tableList)
+
   session.commit()
   session.close()
   return jsonify(tableList)
@@ -317,7 +317,7 @@ def changeColumnOrder():
   position = request.args.get('position')
   movedColumnName = request.args.get('movedColumnName')
   newIndex = request.args.get('newIndex')
-  print(newIndex)
+
   # get original name
   getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'temp_dataset' and ordinal_position = "+newIndex
   originalName=session.execute(getOriginalNameQuery).fetchall()[0][0]
@@ -337,7 +337,7 @@ def changeColumnOrder():
 @app.route('/loadSummarizedData',methods=['GET'])
 def loadSummarizedData():
   df = pd.read_sql_table('temp_dataset', session.bind)
-  print(df)
+
   return (summarizeData(df))
 
 if __name__ == '__main__':
