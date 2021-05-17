@@ -29,6 +29,7 @@ export default {
       model: graph,
       gridSize: 1
     });
+
     // line이 connect 되지 않으면 사라지도록
     paper.model.on("batch:stop", function() {
       var links = paper.model.getLinks();
@@ -47,18 +48,64 @@ export default {
         radius: 20
       }
     };
+
     // Model 정의
-    var shape = new joint.shapes.devs.Model({
+    let shape = new joint.shapes.devs.Model({
       position: {
         x: 100,
         y: 100
       },
+      size: { width: 100, height: 40 },
       inPorts: [""],
-      outPorts: [" "]
+      outPorts: [" "],
+      ports: {
+        groups: {
+          in: {
+            attrs: {
+              ".port-body": {
+                // fill: "#16A085",
+              }
+            }
+          },
+          out: {
+            attrs: {
+              ".port-body": {
+                // fill: "#E74C3C"
+              }
+            }
+          }
+        }
+      },
+      attrs: {
+        ".label": { text: "SVR", "ref-x": 0.5, "ref-y": 0.2 },
+        rect: { fill: "grey" }
+      }
     });
     // shape 화면의 render
     shape.addTo(graph);
+    //element
 
+    //Tools
+    let boundaryTool = new joint.elementTools.Boundary();
+    let removeButton = new joint.elementTools.Remove();
+
+    let toolsView = new joint.dia.ToolsView({
+      tools: [boundaryTool, removeButton]
+    });
+    let elementView = shape.findView(paper);
+    elementView.addTools(toolsView);
+    elementView.hideTools();
+
+    // element hover 설정
+    paper.on("element:mouseenter", function(elementView) {
+      elementView.showTools();
+    });
+
+    paper.on("element:mouseleave", function(elementView) {
+      elementView.hideTools();
+    });
+
+    // elementView.addTools(toolsView);
     // let rect = new joint.shapes.standard.Rectangle({});
 
     // rect.position(100, 30);
