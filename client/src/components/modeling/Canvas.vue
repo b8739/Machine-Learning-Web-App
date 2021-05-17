@@ -1,165 +1,103 @@
 <template>
-  <div>
+  <!-- konva 하던거 -->
+  <!-- <div>
     <button @click="button">button</button>
     <v-stage ref="stage" :config="configKonva">
       <v-layer>
-        <!-- <v-line :config="configLine" :x="configInput.x" :y="configInput.y"></v-line>
-        <v-label ref="hi" :config="configInput" @dragmove="checkPos1">
-          <v-tag :config="configTag"> </v-tag>
-          <v-text ref="hii" :config="configInputText"></v-text>
-        </v-label>
-        ><v-label ref="bye" :config="configInput" @dragmove="checkPos2">
-          <v-tag :config="configTag"> </v-tag>
-          <v-text ref="byee" :config="configTargetText"></v-text>
-        </v-label> -->
-        <v-label :draggable="true" :config="configLabel">
-          <v-line ref="line" :config="configLine" :x="configInput.x" :y="configInput.y"></v-line>
-          <v-circle
-            ref="dragCircle"
-            @dragmove="checkPos2"
-            :config="configDragCircle"
-            :x="configDragCircle.x"
-            :y="configDragCircle.y"
-            @dragend="resetPos"
-          >
-          </v-circle>
-          <v-circle :config="configAnchorTop"> </v-circle>
-          <v-tag :config="configTag"> </v-tag>
-          <v-text ref="byee" :config="configTargetText"></v-text>
-          <v-circle :config="configAnchorBottom"></v-circle>
-        </v-label>
-        <!-- <v-circle
-        :config="configAnchor"
-        :x="configLine.points[0]"
-        :y="configLine.points[1]"
-      ></v-circle>
-   -->
+        <Block />
+        <Block />
       </v-layer>
     </v-stage>
+  </div> -->
+  <div id="stage">
+    <div id="myholder">hello</div>
   </div>
 </template>
 <script>
+import Block from "@/components/modeling/Block.vue";
+
 export default {
-  data() {
-    return {
-      // canvas
-
-      configKonva: {
-        width: 1140,
-        height: 700
-      },
-      configLabel: {
-        x: 100,
-        y: 100,
-        opacity: 0.5
-      },
-
-      //   block
-      configInput: {
-        x: 10,
-        y: 10,
-
-        draggable: true
-      },
-      configTag: { fill: "lightgrey", cornerRadius: 5 },
-      configInputText: {
-        text: "Input",
-        fontSize: 15,
-
-        fill: "black",
-        padding: 7
-      },
-      configTargetText: {
-        text: "Target",
-        fontSize: 15,
-
-        fill: "black",
-        padding: 7
-      },
-      //   circle
-      configDragCircle: {
-        zIndex: 1,
-        x: 0,
-        y: 0,
-        draggable: true,
-        radius: 5,
-        // stroke: "#666",
-        // opacity: 0.4,
-        fill: "red",
-        strokeWidth: 5
-      },
-      configAnchorTop: {
-        x: 0,
-        radius: 5,
-        stroke: "#666",
-        fill: "#ddd",
-        strokeWidth: 2
-      },
-      configAnchorBottom: {
-        x: 0,
-        radius: 5,
-        stroke: "#666",
-        fill: "#ddd",
-        strokeWidth: 2
-      },
-
-      configLine: {
-        x: 0,
-        y: 0,
-        points: [0, 0],
-        stroke: "grey",
-        strokeWidth: 10,
-        lineJoin: "round",
-        lineCap: "round"
-      },
-      x: 500
-    };
-  },
-  watch: {},
-  computed: {},
-  methods: {
-    button() {},
-    resetPos() {
-      this.$refs.dragCircle.getNode().position({
-        x: this.configAnchorTop.x + 5,
-        y: this.configAnchorTop.y + 5
-      });
-      this.configLine.points[2] = this.$refs.dragCircle.getNode().position().x;
-      this.configLine.points[3] = this.$refs.dragCircle.getNode().position().y;
-    },
-    // checkPos1() {
-    //   this.configLine.points[0] = this.$refs.hi.getNode().x();
-    //   this.configAnchor.x = this.$refs.hi.getNode().x();
-    //   this.configLine.points[1] = this.$refs.hi.getNode().y();
-    //   this.configAnchor.y = this.$refs.hi.getNode().y();
-    // },
-    checkPos2() {
-      // this.configLine.points[2] = this.$refs.dragCircle.getNode().x();
-      // this.configLine.points[3] = this.$refs.dragCircle.getNode().y();
-      console.log(this.$refs.dragCircle.getNode().position());
-      this.configLine.points[2] = this.$refs.dragCircle.getNode().position().x;
-      this.configLine.points[3] = this.$refs.dragCircle.getNode().position().y;
-    }
-    // dragEvent() {
-    //   this.configLine.x = this.$refs.hi.getNode().absolutePosition().x;
-    //   this.configLine.y = this.$refs.hi.getNode().absolutePosition().y;
-    // }
-  },
-  created() {
-    // console.log(this.$refs.bye.getNode().width());
-  },
+  methods: {},
   mounted() {
-    //   circle
+    //graph 정의
+    let graph = new joint.dia.Graph();
+    //paper 정의
+    let paper = new joint.dia.Paper({
+      el: $("#myholder"),
+      width: 1000,
+      height: 1000,
+      model: graph,
+      gridSize: 1
+    });
+    // line이 connect 되지 않으면 사라지도록
+    paper.model.on("batch:stop", function() {
+      var links = paper.model.getLinks();
+      _.each(links, function(link) {
+        var source = link.get("source");
+        var target = link.get("target");
+        if (source.id === undefined || target.id === undefined) {
+          link.remove();
+        }
+      });
+    });
+    // default connector를 곡선으로 설정
+    paper.options.defaultConnector = {
+      name: "smooth",
+      args: {
+        radius: 20
+      }
+    };
+    // Model 정의
+    var shape = new joint.shapes.devs.Model({
+      position: {
+        x: 100,
+        y: 100
+      },
+      inPorts: [""],
+      outPorts: [" "]
+    });
+    // shape 화면의 render
+    shape.addTo(graph);
 
-    this.configAnchorTop.x = this.$refs.byee.getNode().width() / 2;
-    this.configAnchorTop.y = -6;
-    this.configAnchorBottom.x = this.$refs.byee.getNode().width() / 2;
-    this.configAnchorBottom.y = this.$refs.byee.getNode().width() / 2 + 6;
-    //   line
-    this.configLine.points[0] = this.configAnchorTop.x;
-    this.configLine.points[1] = this.configAnchorTop.y;
-    // dragCircle
-    // this.configDragCircle.x = this.configAnchorTop.x;
+    // let rect = new joint.shapes.standard.Rectangle({});
+
+    // rect.position(100, 30);
+    // rect.resize(100, 40);
+    // rect.attr({
+    //   body: {
+    //     fill: "#a9a9a9",
+    //     rx: 5,
+    //     ry: 5
+    //   },
+    //   label: {
+    //     text: "SVR",
+    //     fill: "white"
+    //   }
+    // });
+
+    // let rect2 = rect.clone();
+    // rect2.translate(300);
+
+    // var link = new joint.shapes.standard.Link();
+
+    // link.source(rect);
+    // link.target(rect2);
+
+    // graph.addCells([rect, rect2, link]);
+
+    // var link2 = new joint.shapes.standard.Link();
+    // link2.prop("source", { x: 0, y: 0 });
+    // link2.prop("target", { x: 200, y: 200 });
+    // // link2.prop("vertices", [{ x: 450, y: 700 }]);
+    // link2.attr("root/title", "joint.shapes.standard.Link");
+    // link2.attr("line/stroke", "#fe854f");
+    // link2.addTo(graph);
   }
 };
 </script>
+<style>
+#stage {
+  width: 1000px;
+  height: 1000px;
+}
+</style>

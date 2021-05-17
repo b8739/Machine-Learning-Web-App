@@ -23,6 +23,7 @@ import { faChartArea } from "@fortawesome/free-solid-svg-icons";
 import { faChartBar } from "@fortawesome/free-solid-svg-icons";
 import { faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import "..//node_modules/jointjs/css/layout.css";
 
 library.add(faChartLine);
 library.add(faChartArea);
@@ -42,6 +43,10 @@ Vue.use(VueKonva);
 Vue.use(BootstrapVue);
 Vue.component("apexchart", VueApexCharts);
 Vue.config.productionTip = false;
+
+// jointjs;
+window.$ = require("jquery");
+window.joint = require("jointjs");
 
 export const eventBus = new Vue();
 
