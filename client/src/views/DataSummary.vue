@@ -52,8 +52,9 @@
           </v-col>
         </v-row>
       </v-container>
-      <v-container fluid v-if="modelingFlag">
-        <Modeling />
+      <v-container fluid>
+        <Modeling v-if="modelingPreprocessFlag" />
+        <ModelingResult v-if="modelingResultFlag" />
       </v-container>
     </v-app>
   </div>
@@ -75,6 +76,7 @@ import SaveMenu from "@/components/save/SaveMenu.vue";
 import ChangeOrder from "@/components/changeOrder/ChangeOrder.vue";
 import ModelingModal from "@/components/modeling/ModelingModal.vue";
 import Modeling from "./Modeling.vue";
+import ModelingResult from "@/components/modeling/ModelingResult.vue";
 
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
@@ -95,7 +97,8 @@ export default {
       showFeatures: false,
       showTable: true,
       featureFlag: false,
-      modelingFlag: true
+      modelingPreprocessFlag: true,
+      modelingResultFlag: false
     };
   },
   components: {
@@ -111,7 +114,8 @@ export default {
     AverageModal,
     ChangeOrder,
     ModelingModal,
-    Modeling
+    Modeling,
+    ModelingResult
   },
   // props: ["summarizedInfo"],
   computed: {
@@ -220,7 +224,7 @@ export default {
     this.loadFundamentalData("http://localhost:5000/loadData");
     eventBus.$on("createModel", modelingStatus => {
       this.featureFlag = false;
-      this.modelingFlag = true;
+      this.modelingPreprocessFlag = true;
     });
     // this.loadSummarizedInfo(this.summarizedData);
 

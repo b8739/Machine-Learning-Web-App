@@ -24,6 +24,7 @@ import pandas as pd
 import numpy as np 
 
 from dataSummarizer import summarizeData
+from xgBoostModeling import xgboost, MAPE
 
 # pyarrow
 import pyarrow as pa
@@ -339,6 +340,10 @@ def loadSummarizedData():
   df = pd.read_sql_table('temp_dataset', session.bind)
 
   return (summarizeData(df))
+
+@app.route('/xgBoostModeling',methods=['GET'])
+def xgBoostModeling():
+  return (xgboost())
 
 if __name__ == '__main__':
     app.run(debug=True)

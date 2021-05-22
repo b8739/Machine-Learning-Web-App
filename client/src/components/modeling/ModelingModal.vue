@@ -60,6 +60,7 @@
                   v-bind="hideDetails(indexOfFormFields)"
                   :label="dataTypelabels[indexOfFormFields]"
                   :placeholder="datasetRatio[indexOfFormFields]"
+                  :items="datasetRatio[indexOfFormFields]"
                 ></v-autocomplete>
               </v-col>
             </v-row>
@@ -136,7 +137,7 @@ export default {
       formFields: [1, 2, 3],
       dataInfoLabels: ["Dataset", "Dataset Version", "Subset"],
       dataTypelabels: ["Training", "Validation", "Test"],
-      datasetRatio: ["80%", "10%", "10%"],
+      datasetRatio: ["80%", "0%", "20%"],
       snippets: ["XGBoost", "Random Forest", "SVR"],
       hideDetailsProps: {
         "hide-details": true

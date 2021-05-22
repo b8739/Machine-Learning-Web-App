@@ -27,16 +27,24 @@
             </v-row>
           </v-container>
         </v-card> -->
-
+        <v-toolbar elevation="1" dense>
+          <v-spacer></v-spacer
+          ><v-btn @click="runModel"
+            ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
+          ></v-toolbar
+        >
         <Canvas></Canvas>
+        <!-- <FlowChart /> -->
       </v-col>
     </v-row>
   </v-container>
 </template>
 <script>
+import axios from "axios";
 import { eventBus } from "@/main";
 import ModelingSide from "@/components/modeling/ModelingSide.vue";
 import Canvas from "@/components/modeling/Canvas.vue";
+import FlowChart from "@/components/modeling/FlowChart.vue";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
@@ -47,9 +55,21 @@ export default {
   },
   components: {
     ModelingSide,
-    Canvas
+    Canvas,
+    FlowChart
   },
   methods: {
+    runModel() {
+      const path = "http://localhost:5000/xgBoostModeling";
+      axios
+        .get(path)
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     getPos(e) {
       let obj = e.target;
       this.left = obj.getBoundingClientRect().left;
