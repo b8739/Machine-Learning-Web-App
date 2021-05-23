@@ -68,7 +68,8 @@ export default {
         .get(path)
         .then(res => {
           // console.log(res.data);
-          eventBus.$emit("modelResult", res.data);
+          eventBus.$emit("graphSources", res.data[0]);
+          eventBus.$emit("modelingSummary", res.data[1]);
         })
         .catch(error => {
           console.error(error);

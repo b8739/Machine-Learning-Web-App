@@ -1,5 +1,10 @@
 <template>
-  <apexchart ref="modelingChart" type="line" :options="firstGroupingChartOption"></apexchart>
+  <apexchart
+    ref="modelingChart"
+    type="line"
+    height="300"
+    :options="firstGroupingChartOption"
+  ></apexchart>
 </template>
 
 <script>
@@ -17,6 +22,7 @@ export default {
     return {
       actual: null,
       predictive: null,
+
       series: [[{ data: [] }]],
 
       // original
@@ -49,7 +55,7 @@ export default {
           type: "line"
         },
         markers: {
-          size: 1,
+          size: 3,
           strokeWidth: 0.1,
           strokeColor: "skyblue",
           hover: {
@@ -82,7 +88,6 @@ export default {
             rotate: -30,
             rotateAlways: true,
             hideOverlappingLabels: true,
-            format: "yy/MM/dd",
             style: {
               fontSize: "10px",
               fontWeight: 200
@@ -244,9 +249,10 @@ export default {
   },
 
   created() {
-    eventBus.$on("modelResult", modelResult => {
+    eventBus.$on("graphSources", modelResult => {
       this.actual = modelResult["Actual"];
       this.predictive = modelResult["Predictive"];
+
       this.$refs.modelingChart.updateSeries([
         {
           name: "Actual",

@@ -100,5 +100,5 @@ def xgboost():
 
     # print(y_test.tolist())
     chartData = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict.tolist()}
-    return jsonify(chartData)
+    return jsonify(chartData,xgbSummary)
     # return Response(result.to_json( orient='records'), mimetype='application/json')

@@ -2,8 +2,11 @@
   <div class="resultContainer">
     <v-container>
       <v-row>
-        <v-col>
+        <v-col cols="12">
           <ApexChart />
+        </v-col>
+        <v-col cols="12">
+          <ModelingSummary />
         </v-col>
       </v-row>
     </v-container>
@@ -11,8 +14,9 @@
 </template>
 <script>
 import ApexChart from "@/components/modeling/ApexChart.vue";
+import ModelingSummary from "@/components/modeling/ModelingSummary.vue";
 export default {
-  components: { ApexChart }
+  components: { ApexChart, ModelingSummary }
 };
 </script>
 
