@@ -80,10 +80,25 @@ def xgboost():
     MAPE1 = MAPE(y_test, xgb_model_predict)
 
 
-    print('R_square of XGB :', r2_score(y_test, xgb_model_predict))
-    print('RMSE of XGB :', mean_squared_error(y_test, xgb_model_predict)**0.5)
-    print('MAPE of XGB :', MAPE(y_test, xgb_model_predict))
+    # print('R_square of XGB :', r2_score(y_test, xgb_model_predict))
+    # print('RMSE of XGB :', mean_squared_error(y_test, xgb_model_predict)**0.5)
+    # print('MAPE of XGB :', MAPE(y_test, xgb_model_predict))
+
+    ## VISUALIZE THE RESULTS ##
+    w0 = pd.DataFrame(range(len(y_test)))
+    w1 = pd.DataFrame(y_test)
+    w1 = w1.reset_index(drop = True)
+    w2 = pd.DataFrame(xgb_model_predict)
+
+    result = pd.concat([w0,w1], axis = 1)
+    result2 = pd.concat([w0,w2], axis = 1)
+    result.columns = ['x','y']
+    result2.columns = ['x','y']
 
     # 반환
-    xgBoostModelingResult = {'R_square of XGB': rSquare, 'RMSE of XGB': RMSE,'MAPE of XGB': MAPE1}
-    return  jsonify(xgBoostModelingResult)
+    xgbSummary = {'R_square of XGB': rSquare, 'RMSE of XGB': RMSE,'MAPE of XGB': MAPE1}
+
+    # print(y_test.tolist())
+    chartData = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict.tolist()}
+    return jsonify(chartData)
+    # return Response(result.to_json( orient='records'), mimetype='application/json')

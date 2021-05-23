@@ -52,81 +52,81 @@ train_Xn = scalerX.transform(train_X)
 test_Xn = scalerX.transform(test_X)
 
 
-## 02. BUILD REGRESSION MODEL ##
+# ## 02. BUILD REGRESSION MODEL ##
 
-## CASE 01. 'SVR' ALGORITHM ##
+# ## CASE 01. 'SVR' ALGORITHM ##
 
-## Grid Search ##
-param={'C':[1, 5, 10, 20, 40, 100, 1000],
-      'gamma':[.0001, .005, .05, .1, .25, .5, 1]}
-GS = GridSearchCV(SVR(kernel='rbf'),param, cv = 5)
-GS.fit(train_Xn, y_train)
-print(GS.best_params_)
-print(GS.best_score_)
-
-
-svr_model = SVR(kernel = 'rbf', 
-                C = 100, 
-                epsilon = 0.1, 
-                gamma = 0.005)
-# 학습과정 (xn은 normalization을 한 것)
-svr_model.fit(train_Xn, y_train)
-# 예측값
-svr_model_predict = svr_model.predict(test_Xn)
-
-print('R_square of SVR :', r2_score(y_test, svr_model_predict))
-print('RMSE of SVR :', mean_squared_error(y_test, svr_model_predict)**0.5)
-print('MAPE of SVR :', MAPE(y_test, svr_model_predict))
-
-## VISUALIZE THE RESULTS ##
-y0 = pd.DataFrame(range(len(y_test)))
-y1 = pd.DataFrame(y_test)
-y1 = y1.reset_index(drop = True)
-y2 = pd.DataFrame(svr_model_predict)
-
-result = pd.concat([y0, y1, y2], axis = 1)
-result.columns = ['no', 'Actual', 'Predictive']
-
-## Graphs ##
-plt.style.use('bmh')
-# plt.style.use('ggplot')
-plt.figure(figsize = (12, 5))
-plt.plot(result.iloc[:, 1], color = 'dodgerblue', alpha = 0.3, marker = 'o', linewidth = 0.5)
-plt.plot(result.iloc[:, 2], color = 'brown', alpha = 0.4, marker = 'o', linewidth = 0.5)
-plt.title('Actual vs. Predictive : SVR')
-plt.show()
+# ## Grid Search ##
+# param={'C':[1, 5, 10, 20, 40, 100, 1000],
+#       'gamma':[.0001, .005, .05, .1, .25, .5, 1]}
+# GS = GridSearchCV(SVR(kernel='rbf'),param, cv = 5)
+# GS.fit(train_Xn, y_train)
+# print(GS.best_params_)
+# print(GS.best_score_)
 
 
+# svr_model = SVR(kernel = 'rbf', 
+#                 C = 100, 
+#                 epsilon = 0.1, 
+#                 gamma = 0.005)
+# # 학습과정 (xn은 normalization을 한 것)
+# svr_model.fit(train_Xn, y_train)
+# # 예측값
+# svr_model_predict = svr_model.predict(test_Xn)
 
-## CASE 02. 'RANDOM FOREST' ALGORITHM ##
+# print('R_square of SVR :', r2_score(y_test, svr_model_predict))
+# print('RMSE of SVR :', mean_squared_error(y_test, svr_model_predict)**0.5)
+# print('MAPE of SVR :', MAPE(y_test, svr_model_predict))
 
-rf_model = RandomForestRegressor(n_estimators = 800, 
-                                 min_samples_split = 3)
+# ## VISUALIZE THE RESULTS ##
+# y0 = pd.DataFrame(range(len(y_test)))
+# y1 = pd.DataFrame(y_test)
+# y1 = y1.reset_index(drop = True)
+# y2 = pd.DataFrame(svr_model_predict)
 
-rf_model.fit(train_Xn, y_train)
-rf_model_predict = rf_model.predict(test_Xn)
+# result = pd.concat([y0, y1, y2], axis = 1)
+# result.columns = ['no', 'Actual', 'Predictive']
 
-print('R_square of RF :', r2_score(y_test, rf_model_predict))
-print('RMSE of RF :', mean_squared_error(y_test, rf_model_predict)**0.5)
-print('MAPE of RF :', MAPE(y_test, rf_model_predict))
+# ## Graphs ##
+# plt.style.use('bmh')
+# # plt.style.use('ggplot')
+# plt.figure(figsize = (12, 5))
+# plt.plot(result.iloc[:, 1], color = 'dodgerblue', alpha = 0.3, marker = 'o', linewidth = 0.5)
+# plt.plot(result.iloc[:, 2], color = 'brown', alpha = 0.4, marker = 'o', linewidth = 0.5)
+# plt.title('Actual vs. Predictive : SVR')
+# plt.show()
 
-## VISUALIZE THE RESULTS ##
-z0 = pd.DataFrame(range(len(y_test)))
-z1 = pd.DataFrame(y_test)
-z1 = z1.reset_index(drop = True)
-z2 = pd.DataFrame(rf_model_predict)
 
-result = pd.concat([z0, z1, z2], axis = 1)
-result.columns = ['no', 'Actual', 'Predictive']
 
-## Graphs ##
-plt.style.use('bmh')
-# plt.style.use('ggplot')
-plt.figure(figsize = (12, 5))
-plt.plot(result.iloc[:, 1], color = 'dodgerblue', alpha = 0.3, marker = 'o', linewidth = 0.5)
-plt.plot(result.iloc[:, 2], color = 'brown', alpha = 0.4, marker = 'o', linewidth = 0.5)
-plt.title('Actual vs. Predictive : RF')
-plt.show()
+# ## CASE 02. 'RANDOM FOREST' ALGORITHM ##
+
+# rf_model = RandomForestRegressor(n_estimators = 800, 
+#                                  min_samples_split = 3)
+
+# rf_model.fit(train_Xn, y_train)
+# rf_model_predict = rf_model.predict(test_Xn)
+
+# print('R_square of RF :', r2_score(y_test, rf_model_predict))
+# print('RMSE of RF :', mean_squared_error(y_test, rf_model_predict)**0.5)
+# print('MAPE of RF :', MAPE(y_test, rf_model_predict))
+
+# ## VISUALIZE THE RESULTS ##
+# z0 = pd.DataFrame(range(len(y_test)))
+# z1 = pd.DataFrame(y_test)
+# z1 = z1.reset_index(drop = True)
+# z2 = pd.DataFrame(rf_model_predict)
+
+# result = pd.concat([z0, z1, z2], axis = 1)
+# result.columns = ['no', 'Actual', 'Predictive']
+
+# ## Graphs ##
+# plt.style.use('bmh')
+# # plt.style.use('ggplot')
+# plt.figure(figsize = (12, 5))
+# plt.plot(result.iloc[:, 1], color = 'dodgerblue', alpha = 0.3, marker = 'o', linewidth = 0.5)
+# plt.plot(result.iloc[:, 2], color = 'brown', alpha = 0.4, marker = 'o', linewidth = 0.5)
+# plt.title('Actual vs. Predictive : RF')
+# plt.show()
 
 
 
@@ -158,6 +158,7 @@ w2 = pd.DataFrame(xgb_model_predict)
 
 result = pd.concat([w0, w1, w2], axis = 1)
 result.columns = ['no', 'Actual', 'Predictive']
+
 
 ## Graphs ##
 plt.style.use('bmh')

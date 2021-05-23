@@ -5,7 +5,9 @@
         <v-btn @click="createShape">Create</v-btn>
         <div id="myholder"></div
       ></v-col>
+      <!-- Option -->
       <v-col cols="2">
+        <!-- Snippet Option -->
         <v-card v-show="showXgBoostOption" dark rounded min-height="300px" min-width="200px">
           <v-container>
             <v-row>
@@ -19,18 +21,65 @@
                 ></v-text-field
               ></v-col>
             </v-row>
-          </v-container> </v-card
-      ></v-col>
+          </v-container>
+        </v-card>
+
+        <!-- Input Option -->
+        <v-card v-show="showInputOption" dark rounded max-height="400px" min-width="200px">
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <!-- <v-select outlined :items="columns" :label="column" dense hide-details> </v-select> -->
+                <div class="columnList">
+                  <v-checkbox
+                    v-for="(input, inputIndex) in xTrain"
+                    :key="inputIndex"
+                    v-model="xTrain[inputIndex]"
+                    :label="input"
+                    dense
+                  >
+                  </v-checkbox>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
+        <!-- Target Option -->
+        <!-- Input Option -->
+        <v-card v-show="showTargetOption" dark rounded max-height="400px" min-width="200px">
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <!-- <v-select outlined :items="columns" :label="column" dense hide-details> </v-select> -->
+                <div class="targetList">
+                  <v-checkbox
+                    v-for="(target, targetIndex) in yTrain"
+                    :key="targetIndex"
+                    v-model="yTrain[targetIndex]"
+                    :label="target"
+                    dense
+                  >
+                  </v-checkbox>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 <script>
+//vuex
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
       shape: null,
       graph: null,
       showXgBoostOption: false,
+      showInputOption: false,
+      showTargetOption: false,
       xgboostOptions: [
         "n_estimators",
         "learning_rate",
@@ -55,10 +104,17 @@ export default {
         "B",
         "LSTAT"
       ],
-      yTrain: ["MEDV"]
+      yTrain: ["MEDV"],
+      inputList: []
     };
   },
   components: {},
+  computed: {
+    ...mapState({
+      columns: state => state.initialData.columns
+      // summarizedInfo: state => state.initialData.summarizedInfo
+    })
+  },
   methods: {
     createShape() {
       let cloned = this.shape.clone();
@@ -155,43 +211,64 @@ export default {
     });
     //shape 화면의 render
     this.shape.addTo(this.graph);
+    // Input
     let shapeView = this.shape.findView(paper);
+    let cloned = this.shape.clone();
+    cloned.position(500, 100);
+    cloned.attr(".label/text", "Input");
+    cloned.addTo(this.graph);
+    var link = new joint.shapes.standard.Link({
+      source: { id: cloned.id, port: "out" },
+      target: { id: this.shape.id, port: "in" },
+      connector: { name: "rounded" }
+    });
+    this.graph.addCell(link);
+    // Target
+    cloned = this.shape.clone();
+    cloned.position(500, 520);
+    cloned.attr(".label/text", "Target");
+    cloned.addTo(this.graph);
+    var link = new joint.shapes.standard.Link({
+      source: { id: this.shape.id, port: "out" },
+      target: { id: cloned.id, port: "in" },
+      connector: { name: "rounded" }
+    });
+    this.graph.addCell(link);
 
-    let x_position = 30;
-    //Input Cloning
-    for (let i = 0; i < this.xTrain.length; i++) {
-      let cloned = this.shape.clone();
+    // let x_position = 30;
+    // //Input Cloning
+    // for (let i = 0; i < this.xTrain.length; i++) {
+    //   let cloned = this.shape.clone();
 
-      cloned.position(x_position, 80);
-      cloned.attr(".label/text", this.xTrain[i]);
+    //   cloned.position(x_position, 80);
+    //   cloned.attr(".label/text", this.xTrain[i]);
 
-      //화면에 렌더링
-      cloned.addTo(this.graph);
-      var link = new joint.shapes.standard.Link({
-        source: { id: cloned.id, port: "out" },
-        target: { id: this.shape.id, port: "in" },
-        connector: { name: "rounded" }
-      });
-      this.graph.addCell(link);
+    //   //화면에 렌더링
+    //   cloned.addTo(this.graph);
+    //   var link = new joint.shapes.standard.Link({
+    //     source: { id: cloned.id, port: "out" },
+    //     target: { id: this.shape.id, port: "in" },
+    //     connector: { name: "rounded" }
+    //   });
+    //   this.graph.addCell(link);
 
-      x_position = x_position + 80;
-    }
+    //   x_position = x_position + 80;
+    // }
     // Target Cloning
+    // for (let i = 0; i < this.yTrain.length; i++) {
+    //   let cloned = this.shape.clone();
+    //   cloned.position(500, 520);
+    //   cloned.attr(".label/text", this.yTrain[i]);
 
-    for (let i = 0; i < this.yTrain.length; i++) {
-      let cloned = this.shape.clone();
-      cloned.position(500, 520);
-      cloned.attr(".label/text", this.yTrain[i]);
-
-      //화면에 렌더링
-      cloned.addTo(this.graph);
-      var link = new joint.shapes.standard.Link({
-        source: { id: this.shape.id, port: "out" },
-        target: { id: cloned.id, port: "in" },
-        connector: { name: "rounded" }
-      });
-      this.graph.addCell(link);
-    }
+    //   //화면에 렌더링
+    //   cloned.addTo(this.graph);
+    //   var link = new joint.shapes.standard.Link({
+    //     source: { id: this.shape.id, port: "out" },
+    //     target: { id: cloned.id, port: "in" },
+    //     connector: { name: "rounded" }
+    //   });
+    //   this.graph.addCell(link);
+    // }
 
     //Tools (shape)
     let boundaryTool = new joint.elementTools.Boundary();
@@ -234,7 +311,20 @@ export default {
       shapeView.showTools();
     });
     paper.on("element:pointerclick", shapeView => {
-      this.showXgBoostOption = !this.showXgBoostOption;
+      let labelName = shapeView.model.attr(".label/text");
+      if (labelName === "XGBOOST") {
+        this.showXgBoostOption = !this.showXgBoostOption;
+        this.showInputOption = false;
+        this.showTargetOption = false;
+      } else if (labelName === "Input") {
+        this.showInputOption = !this.showInputOption;
+        this.showXgBoostOption = false;
+        this.showTargetOption = false;
+      } else if (labelName === "Target") {
+        this.showTargetOption = !this.showTargetOption;
+        this.showInputOption = false;
+        this.showXgBoostOption = false;
+      }
     });
 
     paper.on("element:mouseleave", function(shapeView) {
@@ -283,5 +373,9 @@ export default {
 #stage {
   width: 1000px;
   height: 1000px;
+}
+.columnList {
+  height: 400px;
+  overflow-y: scroll;
 }
 </style>

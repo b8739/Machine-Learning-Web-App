@@ -28,7 +28,7 @@ export default {
 /* reset */
 * {
   font-family: "Spoqa Han Sans", "Sans-serif", "Nunito Sans", sans-serif, "Noto Sans", sans-serif;
-  color: #2b2b2b;
+  /* color: #2b2b2b; */
   margin: 0;
   padding: 0;
 }

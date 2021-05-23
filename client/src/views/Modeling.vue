@@ -33,8 +33,8 @@
             ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
           ></v-toolbar
         >
-        <Canvas></Canvas>
-        <!-- <FlowChart /> -->
+        <!-- <Canvas></Canvas> -->
+        <ModelingResult />
       </v-col>
     </v-row>
   </v-container>
@@ -46,6 +46,8 @@ import ModelingSide from "@/components/modeling/ModelingSide.vue";
 import Canvas from "@/components/modeling/Canvas.vue";
 import FlowChart from "@/components/modeling/FlowChart.vue";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+import ModelingResult from "@/components/modeling/ModelingResult.vue";
+
 export default {
   data() {
     return {
@@ -56,7 +58,8 @@ export default {
   components: {
     ModelingSide,
     Canvas,
-    FlowChart
+    FlowChart,
+    ModelingResult
   },
   methods: {
     runModel() {
@@ -64,7 +67,8 @@ export default {
       axios
         .get(path)
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
+          eventBus.$emit("modelResult", res.data);
         })
         .catch(error => {
           console.error(error);
