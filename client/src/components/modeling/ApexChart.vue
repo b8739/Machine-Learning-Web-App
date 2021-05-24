@@ -12,9 +12,9 @@
 import * as randomizer from "@/assets/js/randomizer.js";
 //vuex
 import { eventBus } from "@/main";
-import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
+
+import { mapState, mapGetters, mapActions } from "vuex";
+
 export default {
   // legend를 하나만 씀으로 "nameChangeMark" props 로 받지 않음
 
@@ -249,31 +249,37 @@ export default {
   },
 
   created() {
-    eventBus.$on("graphSources", modelResult => {
-      this.actual = modelResult["Actual"];
-      this.predictive = modelResult["Predictive"];
-
-      this.$refs.modelingChart.updateSeries([
-        {
-          name: "Actual",
-          data: this.actual
-        },
-        {
-          name: "Predictive",
-          data: this.predictive
-        }
-      ]);
-    });
+    // eventBus.$on("graphSources", modelResult => {
+    //   this.actual = modelResult["Actual"];
+    //   this.predictive = modelResult["Predictive"];
+    //   this.$refs.modelingChart.updateSeries([
+    //     {
+    //       name: "Actual",
+    //       data: this.actual
+    //     },
+    //     {
+    //       name: "Predictive",
+    //       data: this.predictive
+    //     }
+    //   ]);
+    // });
   },
   // cons
   mounted() {
-    //console.log(this.dataset);
+    this.$refs.modelingChart.updateSeries([
+      {
+        name: "Actual",
+        data: this.graphSources["Actual"]
+      },
+      {
+        name: "Predictive",
+        data: this.graphSources["Predictive"]
+      }
+    ]);
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
-      indexNum: state => state.initialData.indexNum,
-      summarizedInfo: state => state.initialData.summarizedInfo
+      graphSources: state => state.modelingResult.graphSources
     })
   },
   methods: {

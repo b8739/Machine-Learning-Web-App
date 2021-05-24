@@ -1,17 +1,13 @@
 <template>
-  <v-data-table
-    v-if="modelingSummary"
-    :headers="headers"
-    :items="dataTableItems"
-    class="elevation-1"
-  ></v-data-table>
+  <v-data-table :headers="headers" :items="dataTableItems" class="elevation-1"></v-data-table>
 </template>
 <script>
 import { eventBus } from "@/main";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      modelingSummary: false,
+      // showModelingSummary: false,
       headers: [
         {
           text: "Modeling Summary",
@@ -24,6 +20,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      modelingSummary: state => state.modelingResult.modelingSummary
+    }),
     dataTableItems() {
       let dataTableItems = [];
       let dataTableFormat = {};
@@ -36,9 +35,9 @@ export default {
     }
   },
   created() {
-    eventBus.$on("modelingSummary", modelingSummary => {
-      this.modelingSummary = modelingSummary;
-    });
+    // eventBus.$on("showModelingSummary", status => {
+    //   this.showModelingSummary = status;
+    // });
   }
 };
 </script>

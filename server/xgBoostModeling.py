@@ -60,7 +60,7 @@ def xgboost():
 
 
     ## CASE 03. 'XGBOOST' ALGORITHM ##
-
+    user_input = {'n_estimators':'','learning_rate':'','gamma':'','eta':'','subsample':'','colsample_bytree':'','max_depth':'',}
     xgb_model = xgb.XGBRegressor(n_estimators = 500, 
                                 learning_rate = 0.08, 
                                 gamma = 0.3, 

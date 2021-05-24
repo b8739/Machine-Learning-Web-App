@@ -11,13 +11,14 @@
         <v-card v-show="showXgBoostOption" dark rounded min-height="300px" min-width="200px">
           <v-container>
             <v-row>
-              <v-col cols="12" v-for="(xgboostOption, index) in xgboostOptions" :key="index">
+              <v-col cols="12" v-for="(xgboostOption, index) in xgboostLabels" :key="index">
                 <v-text-field
                   hide-details
                   outlined
                   dense
                   :label="xgboostOption"
                   placeholder=""
+                  v-model="xgboostOptions[index]"
                 ></v-text-field
               ></v-col>
             </v-row>
@@ -80,7 +81,7 @@ export default {
       showXgBoostOption: false,
       showInputOption: false,
       showTargetOption: false,
-      xgboostOptions: [
+      xgboostLabels: [
         "n_estimators",
         "learning_rate",
         "gamma",
@@ -89,6 +90,7 @@ export default {
         "colsample_bytree",
         "max_depth"
       ],
+      xgboostOptions: [],
       xTrain: [
         "CRIM",
         "ZN",
