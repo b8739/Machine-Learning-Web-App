@@ -343,7 +343,19 @@ def loadSummarizedData():
 
 @app.route('/xgBoostModeling',methods=['GET'])
 def xgBoostModeling():
-  return (xgboost())
+  modelingOption_str = request.args.get('modelingOption')
+
+  modelingOption_list = modelingOption_str.split(',')
+  print(modelingOption_list)
+  for index,value in enumerate(modelingOption_list):
+    # 문자에 .이 포함되어있으면 소수이니 float으로 변환
+    if modelingOption_list[index].find('.') != -1:
+      modelingOption_list[index] = float(value)
+    # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+    else: 
+      modelingOption_list[index] = int(value)
+  print(modelingOption_list)
+  return (xgboost(modelingOption_list))
 
 if __name__ == '__main__':
     app.run(debug=True)

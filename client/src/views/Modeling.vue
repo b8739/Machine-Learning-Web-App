@@ -43,8 +43,6 @@ export default {
     ModelingResult
   },
   methods: {
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
     runModel() {
       eventBus.$emit("runModel", true);
     },

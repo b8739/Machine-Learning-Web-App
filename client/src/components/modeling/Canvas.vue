@@ -72,6 +72,14 @@
 </template>
 <script>
 import axios from "axios";
+axios.defaults.paramsSerializer = function(paramObj) {
+  const params = new URLSearchParams();
+  for (const key in paramObj) {
+    params.append(key, paramObj[key]);
+  }
+
+  return params.toString();
+};
 import { eventBus } from "@/main";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
@@ -125,15 +133,17 @@ export default {
     createShape() {
       let cloned = this.shape.clone();
       cloned.addTo(this.graph);
-    }
-  },
-  created() {
-    eventBus.$on("runModel", status => {
-      //     this.showCanvas = !this.showCanvas;
-      // this.showModelingResult = !this.showModelingResult;
+    },
+    runModel(modelingOption) {
+      console.log(modelingOption);
       const path = "http://localhost:5000/xgBoostModeling";
       axios
-        .get(path)
+        .get(path, {
+          params: {
+            //xgboostOption 전송
+            modelingOption: modelingOption
+          }
+        })
         .then(res => {
           // vuex
           this.saveGraphSources(res.data[0]);
@@ -145,6 +155,11 @@ export default {
         .catch(error => {
           console.error(error);
         });
+    }
+  },
+  created() {
+    eventBus.$on("runModel", status => {
+      this.runModel(this.xgboostOptions);
     });
   },
   mounted() {

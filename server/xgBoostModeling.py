@@ -33,7 +33,7 @@ from app import jsonify, Response
 def MAPE(y, pred):
   return np.mean(np.abs((y-pred)/y)*100)
 
-def xgboost():
+def xgboost(modelingOption):
     #### REGRESSION MODEL : "Boston Housing" DATA SET ####
 
     ## 01. OPEN DATA & PROCESSING ##
@@ -60,14 +60,21 @@ def xgboost():
 
 
     ## CASE 03. 'XGBOOST' ALGORITHM ##
-    user_input = {'n_estimators':'','learning_rate':'','gamma':'','eta':'','subsample':'','colsample_bytree':'','max_depth':'',}
-    xgb_model = xgb.XGBRegressor(n_estimators = 500, 
-                                learning_rate = 0.08, 
-                                gamma = 0.3, 
-                                eta = 0.04,
-                                subsample = 0.75,
-                                colsample_bytree = 0.5, 
-                                max_depth = 7)
+    # user_input = {'n_estimators':'','learning_rate':'','gamma':'','eta':'','subsample':'','colsample_bytree':'','max_depth':'',}
+    # xgb_model = xgb.XGBRegressor(n_estimators = 500, 
+    #                             learning_rate = 0.08, 
+    #                             gamma = 0.3, 
+    #                             eta = 0.04,
+    #                             subsample = 0.75,
+    #                             colsample_bytree = 0.5, 
+    #                             max_depth = 7)
+    xgb_model = xgb.XGBRegressor(n_estimators = modelingOption[0], 
+                              learning_rate = modelingOption[1], 
+                              gamma = modelingOption[2], 
+                              eta = modelingOption[3],
+                              subsample = modelingOption[4],
+                              colsample_bytree = modelingOption[5], 
+                              max_depth = modelingOption[6])
 
     xgb_model.fit(train_Xn, y_train)
 
