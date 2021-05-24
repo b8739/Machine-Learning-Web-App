@@ -71,6 +71,8 @@
   </v-container>
 </template>
 <script>
+import axios from "axios";
+import { eventBus } from "@/main";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
@@ -118,12 +120,33 @@ export default {
     })
   },
   methods: {
+    ...mapMutations("modelingResult", ["saveGraphSources"]),
+    ...mapMutations("modelingResult", ["saveModelingSummary"]),
     createShape() {
       let cloned = this.shape.clone();
       cloned.addTo(this.graph);
     }
   },
+  created() {
+    eventBus.$on("runModel", status => {
+      //     this.showCanvas = !this.showCanvas;
+      // this.showModelingResult = !this.showModelingResult;
+      const path = "http://localhost:5000/xgBoostModeling";
+      axios
+        .get(path)
+        .then(res => {
+          // vuex
+          this.saveGraphSources(res.data[0]);
+          this.saveModelingSummary(res.data[1]);
+          //canvas 감추기
 
+          eventBus.$emit("showModelingResult", true);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    });
+  },
   mounted() {
     //graph 정의
     this.graph = new joint.dia.Graph();

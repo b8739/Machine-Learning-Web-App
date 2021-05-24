@@ -11,7 +11,7 @@
             ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
           ></v-toolbar
         >
-        <Canvas v-if="showCanvas"></Canvas>
+        <Canvas v-show="showCanvas"></Canvas>
         <ModelingResult v-if="showModelingResult" />
       </v-col>
     </v-row>
@@ -29,10 +29,11 @@ import ModelingResult from "@/components/modeling/ModelingResult.vue";
 export default {
   data() {
     return {
-      left: null,
-      top: null,
       showCanvas: true,
-      showModelingResult: false
+
+      showModelingResult: false,
+      left: null,
+      top: null
     };
   },
   components: {
@@ -45,20 +46,7 @@ export default {
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
     runModel() {
-      this.showCanvas = !this.showCanvas;
-      this.showModelingResult = !this.showModelingResult;
-      const path = "http://localhost:5000/xgBoostModeling";
-      axios
-        .get(path)
-        .then(res => {
-          this.saveGraphSources(res.data[0]);
-          this.saveModelingSummary(res.data[1]);
-          // eventBus.$emit("graphSources", res.data[0]);
-          // eventBus.$emit("modelingSummary", res.data[1]);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      eventBus.$emit("runModel", true);
     },
     getPos(e) {
       let obj = e.target;
@@ -78,6 +66,10 @@ export default {
     });
     eventBus.$on("targetFeatures", targetFeatures => {
       this.targetFeatures = targetFeatures;
+    });
+    eventBus.$on("showModelingResult", status => {
+      this.showCanvas = !this.showCanvas;
+      this.showModelingResult = !this.showModelingResult;
     });
   },
 
