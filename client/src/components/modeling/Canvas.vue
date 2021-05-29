@@ -11,14 +11,14 @@
         <v-card v-show="showXgBoostOption" dark rounded min-height="300px" min-width="200px">
           <v-container>
             <v-row>
-              <v-col cols="12" v-for="(xgboostOption, index) in xgboostLabels" :key="index">
+              <v-col cols="12" v-for="(snippetProp, index) in snippetProps" :key="index">
                 <v-text-field
                   hide-details
                   outlined
                   dense
-                  :label="xgboostOption"
+                  :label="snippetProp"
                   placeholder=""
-                  v-model="xgboostOptions[index]"
+                  v-model="selectedProps[index]"
                 ></v-text-field
               ></v-col>
             </v-row>
@@ -35,7 +35,7 @@
                   <v-checkbox
                     v-for="(input, inputIndex) in xTrain"
                     :key="inputIndex"
-                    v-model="xTrain[inputIndex]"
+                    v-model="inputs[inputIndex]"
                     :label="input"
                     dense
                   >
@@ -56,7 +56,7 @@
                   <v-checkbox
                     v-for="(target, targetIndex) in yTrain"
                     :key="targetIndex"
-                    v-model="yTrain[targetIndex]"
+                    v-model="targets[targetIndex]"
                     :label="target"
                     dense
                   >
@@ -91,7 +91,8 @@ export default {
       showXgBoostOption: false,
       showInputOption: false,
       showTargetOption: false,
-      xgboostLabels: [
+      // props
+      xgboost_props: [
         "n_estimators",
         "learning_rate",
         "gamma",
@@ -100,7 +101,10 @@ export default {
         "colsample_bytree",
         "max_depth"
       ],
-      xgboostOptions: [],
+      svr_props: ["kernel", "C", "epsilon", "gamma"],
+      randomForest_props: ["n_estimators", "min_samples_split"],
+      // options
+      selectedProps: [],
       xTrain: [
         "CRIM",
         "ZN",
@@ -117,37 +121,66 @@ export default {
         "LSTAT"
       ],
       yTrain: ["MEDV"],
-      inputList: []
+      inputList: [],
+      inputView: null
     };
   },
   components: {},
   computed: {
     ...mapState({
-      columns: state => state.initialData.columns
-      // summarizedInfo: state => state.initialData.summarizedInfo
-    })
+      columns: state => state.initialData.columns,
+      inputs: state => state.modelingData.inputs,
+      targets: state => state.modelingData.targets,
+      snippet: state => state.modelingData.snippet
+    }),
+    snippetProps() {
+      if (this.snippet == "XGBoost") {
+        return this.xgboost_props;
+      } else if (this.snippet == "Random Forest") {
+        return this.randomForest_props;
+      } else if (this.snippet == "SVR") {
+        return this.svr_props;
+      }
+    }
   },
   methods: {
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
-    createShape() {
+    createInputBlock() {
       let cloned = this.shape.clone();
+      cloned.position(700, 100);
+      cloned.attr(".label/text", "Input");
       cloned.addTo(this.graph);
     },
+    createTargetBlock() {
+      let cloned = this.shape.clone();
+      cloned.position(700, 520);
+      cloned.attr(".label/text", "Target");
+      cloned.addTo(this.graph);
+    },
+
     runModel(modelingOption) {
-      console.log(modelingOption);
-      const path = "http://localhost:5000/xgBoostModeling";
+      let path = "http://localhost:5000/";
+      // define path
+      if (this.snippet == "XGBoost") {
+        path += "xgboost_modeling";
+      } else if (this.snippet == "Random Forest") {
+        path += "rf_modeling";
+      } else if (this.snippet == "SVR") {
+        path += "svr_modeling";
+      }
+      // axios
       axios
         .get(path, {
           params: {
-            //xgboostOption 전송
+            //snippetProp 전송
             modelingOption: modelingOption
           }
         })
         .then(res => {
           // vuex
-          this.saveGraphSources(res.data[0]);
-          this.saveModelingSummary(res.data[1]);
+          this.saveGraphSources(res.data[0]); // Test and Valid dataset
+          this.saveModelingSummary(res.data[1]); //modeling summary (ex.MAPE)
           //canvas 감추기
 
           eventBus.$emit("showModelingResult", true);
@@ -159,7 +192,15 @@ export default {
   },
   created() {
     eventBus.$on("runModel", status => {
-      this.runModel(this.xgboostOptions);
+      //from Modeling.vue
+      this.runModel(this.selectedProps);
+    });
+    eventBus.$on("createBlock", index => {
+      if (index == 0) {
+        this.createInputBlock();
+      } else {
+        this.createTargetBlock();
+      }
     });
   },
   mounted() {
@@ -235,7 +276,7 @@ export default {
       },
       attrs: {
         ".label": {
-          text: "XGBOOST",
+          text: this.snippet,
           "ref-x": 0.5,
           "ref-y": 0.3,
           "font-size": 12,
@@ -251,8 +292,8 @@ export default {
     });
     //shape 화면의 render
     this.shape.addTo(this.graph);
-    // Input
     let shapeView = this.shape.findView(paper);
+    // Input
     let cloned = this.shape.clone();
     cloned.position(500, 100);
     cloned.attr(".label/text", "Input");
@@ -352,11 +393,7 @@ export default {
     });
     paper.on("element:pointerclick", shapeView => {
       let labelName = shapeView.model.attr(".label/text");
-      if (labelName === "XGBOOST") {
-        this.showXgBoostOption = !this.showXgBoostOption;
-        this.showInputOption = false;
-        this.showTargetOption = false;
-      } else if (labelName === "Input") {
+      if (labelName === "Input") {
         this.showInputOption = !this.showInputOption;
         this.showXgBoostOption = false;
         this.showTargetOption = false;
@@ -364,6 +401,10 @@ export default {
         this.showTargetOption = !this.showTargetOption;
         this.showInputOption = false;
         this.showXgBoostOption = false;
+      } else {
+        this.showXgBoostOption = !this.showXgBoostOption;
+        this.showInputOption = false;
+        this.showTargetOption = false;
       }
     });
 

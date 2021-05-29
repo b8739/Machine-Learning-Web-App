@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     runModel() {
-      eventBus.$emit("runModel", true);
+      eventBus.$emit("runModel", true); // to Canvas.vue
     },
     getPos(e) {
       let obj = e.target;

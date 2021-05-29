@@ -94,9 +94,9 @@ export default {
       rowIndex: [],
       showFeatures: false,
       showTable: true,
-      featureFlag: false,
-      modelingPreprocessFlag: true,
-      modelingResultFlag: false
+      // flag
+      featureFlag: true,
+      modelingPreprocessFlag: false
     };
   },
   components: {

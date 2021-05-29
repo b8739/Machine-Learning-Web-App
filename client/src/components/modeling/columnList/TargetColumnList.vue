@@ -1,21 +1,26 @@
 <template>
-  <v-row>
-    <v-col>
-      <div class="columnList">
-        <v-checkbox
-          v-for="(column, columnIndex) in columns"
-          :key="columnIndex"
-          v-model="targets"
-          :label="column"
-          :value="column"
-          @change="checkedEvent(columnIndex)"
-          dense
-          v-bind="dynamicProps(columnIndex)"
-        >
-        </v-checkbox>
-      </div>
-    </v-col>
-  </v-row>
+  <v-container>
+    <v-row dense>
+      <v-col cols="12"> <v-checkbox label="Target" @change="selectAll"></v-checkbox></v-col>
+    </v-row>
+    <v-row dense>
+      <v-col>
+        <div class="columnList">
+          <v-checkbox
+            v-for="(column, columnIndex) in columns"
+            :key="columnIndex"
+            v-model="targets"
+            :label="column"
+            :value="column"
+            @change="checkedEvent(columnIndex)"
+            dense
+            v-bind="dynamicProps(columnIndex)"
+          >
+          </v-checkbox>
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 <script>
 //vuex
@@ -42,6 +47,11 @@ export default {
 
   methods: {
     ...mapMutations("modelingData", ["saveTargets"]),
+    selectAll() {
+      for (let i = 0; i < this.columns.length; i++) {
+        this.targets.push(this.columns[i]);
+      }
+    },
     dynamicProps(columnIndex) {
       for (let i = 0; i < this.selected.length; i++) {
         if (this.selected[i] == columnIndex) {

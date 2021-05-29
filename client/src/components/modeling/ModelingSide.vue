@@ -27,7 +27,7 @@
             <v-list-item-title>Blocks</v-list-item-title>
           </template>
           <v-list-item v-for="(block, index) in blocks" :key="index">
-            <v-chip draggable label>{{ block }}</v-chip>
+            <v-chip draggable label @click="createBlock(index)">{{ block }}</v-chip>
           </v-list-item>
           <!-- 여기 chip 들어감 -->
         </v-list-group>
@@ -60,6 +60,7 @@
   </v-navigation-drawer>
 </template>
 <script>
+import { eventBus } from "@/main";
 export default {
   data() {
     return {
@@ -67,8 +68,13 @@ export default {
       drawer: true,
       mini: true,
       snippets: ["XGBoost", "Random Forest", "SVR"],
-      blocks: ["Input", "Output"]
+      blocks: ["Input", "Target"]
     };
+  },
+  methods: {
+    createBlock(index) {
+      eventBus.$emit("createBlock", index);
+    }
   }
 };
 </script>

@@ -1,3 +1,4 @@
+
 # flask
 from flask import Flask, jsonify, request, render_template,request,url_for, Response
 from flask_cors import CORS
@@ -16,6 +17,8 @@ from config import DB_URL
 
 from werkzeug.utils  import secure_filename
 import os
+import sys
+sys.path.append('/Users/jeongjaeho/attic_project/mlApp/server/modeling')
 import datetime
 import time
 
@@ -24,7 +27,10 @@ import pandas as pd
 import numpy as np 
 
 from dataSummarizer import summarizeData
-from xgBoostModeling import xgboost, MAPE
+from xgboost_modeling import *
+from svr_modeling import *
+from rf_modeling import *
+
 
 # pyarrow
 import pyarrow as pa
@@ -341,12 +347,12 @@ def loadSummarizedData():
 
   return (summarizeData(df))
 
-@app.route('/xgBoostModeling',methods=['GET'])
-def xgBoostModeling():
+@app.route('/xgboost_modeling',methods=['GET'])
+def xgboost_modeling():
   modelingOption_str = request.args.get('modelingOption')
-
+  print(modelingOption_str)
   modelingOption_list = modelingOption_str.split(',')
-  print(modelingOption_list)
+
   for index,value in enumerate(modelingOption_list):
     # 문자에 .이 포함되어있으면 소수이니 float으로 변환
     if modelingOption_list[index].find('.') != -1:
@@ -356,6 +362,41 @@ def xgBoostModeling():
       modelingOption_list[index] = int(value)
   print(modelingOption_list)
   return (xgboost(modelingOption_list))
+
+@app.route('/svr_modeling',methods=['GET'])
+def svr_modeling():
+  modelingOption_str = request.args.get('modelingOption')
+
+  modelingOption_list = modelingOption_str.split(',')
+  print(modelingOption_list)
+  for index,value in enumerate(modelingOption_list):
+    #str이 아닐 때 (int/float일 때)만 if 문 작동
+    print(modelingOption_list[index].isalpha()==False)
+    if modelingOption_list[index].isalpha()==False:
+      # 문자에 .이 포함되어있으면 소수이니 float으로 변환
+      if modelingOption_list[index].find('.') != -1:
+        modelingOption_list[index] = float(value)
+      # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+      else: 
+        modelingOption_list[index] = int(value)
+  print(modelingOption_list)
+  return (svr(modelingOption_list))
+
+@app.route('/rf_modeling',methods=['GET'])
+def rf_modeling():
+  modelingOption_str = request.args.get('modelingOption')
+  print(modelingOption_str)
+  modelingOption_list = modelingOption_str.split(',')
+
+  for index,value in enumerate(modelingOption_list):
+    # 문자에 .이 포함되어있으면 소수이니 float으로 변환
+    if modelingOption_list[index].find('.') != -1:
+      modelingOption_list[index] = float(value)
+    # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+    else: 
+      modelingOption_list[index] = int(value)
+  print(modelingOption_list)
+  return (rf(modelingOption_list))
 
 if __name__ == '__main__':
     app.run(debug=True)

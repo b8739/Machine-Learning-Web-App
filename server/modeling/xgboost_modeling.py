@@ -19,9 +19,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
-from sklearn.svm import SVR
 from sklearn.model_selection import KFold, GridSearchCV
-from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
 
 from sklearn.metrics import mean_squared_error
@@ -47,20 +45,27 @@ def xgboost(modelingOption):
     y = df_00['MEDV']
 
     ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
+    # 두 단계에 거쳐서 Dataset을 Train, Test, Validation (6:2:2)로 나눔
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 123)
+    X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test,test_size=0.5,random_state=123)
 
+    # test
     train_X = X_train 
     test_X = X_test
+    
+    # valid
+    valid_X = X_valid
 
     ## NORMALIZATION ##
     scalerX = StandardScaler()
     scalerX.fit(train_X)
     train_Xn = scalerX.transform(train_X)
     test_Xn = scalerX.transform(test_X)
-
+    valid_Xn = scalerX.transform(valid_X)
 
     ## CASE 03. 'XGBOOST' ALGORITHM ##
-    # user_input = {'n_estimators':'','learning_rate':'','gamma':'','eta':'','subsample':'','colsample_bytree':'','max_depth':'',}
+    # 기존 model
+
     # xgb_model = xgb.XGBRegressor(n_estimators = 500, 
     #                             learning_rate = 0.08, 
     #                             gamma = 0.3, 
@@ -80,32 +85,36 @@ def xgboost(modelingOption):
 
     xgb.plot_importance(xgb_model)
 
-    xgb_model_predict = xgb_model.predict(test_Xn)
+    xgb_model_predict_test = xgb_model.predict(test_Xn)
+    xgb_model_predict_valid = xgb_model.predict(valid_Xn)
 
-    rSquare = r2_score(y_test, xgb_model_predict)
-    RMSE = mean_squared_error(y_test, xgb_model_predict)**0.5
-    MAPE1 = MAPE(y_test, xgb_model_predict)
+    # test result
+    rSquare_test = r2_score(y_test, xgb_model_predict_test)
+    RMSE_test = mean_squared_error(y_test, xgb_model_predict_test)**0.5
+    MAPE_test = MAPE(y_test, xgb_model_predict_test)
 
-
-    # print('R_square of XGB :', r2_score(y_test, xgb_model_predict))
-    # print('RMSE of XGB :', mean_squared_error(y_test, xgb_model_predict)**0.5)
-    # print('MAPE of XGB :', MAPE(y_test, xgb_model_predict))
+    # valid result
+    rSquare_test = r2_score(y_valid, xgb_model_predict_valid)
+    RMSE_test = mean_squared_error(y_valid, xgb_model_predict_valid)**0.5
+    MAPE_test = MAPE(y_valid, xgb_model_predict_valid)
 
     ## VISUALIZE THE RESULTS ##
-    w0 = pd.DataFrame(range(len(y_test)))
-    w1 = pd.DataFrame(y_test)
-    w1 = w1.reset_index(drop = True)
-    w2 = pd.DataFrame(xgb_model_predict)
+    # w0 = pd.DataFrame(range(len(y_test)))
+    # w1 = pd.DataFrame(y_test)
+    # w1 = w1.reset_index(drop = True)
+    # w2 = pd.DataFrame(xgb_model_predict_test)
 
-    result = pd.concat([w0,w1], axis = 1)
-    result2 = pd.concat([w0,w2], axis = 1)
-    result.columns = ['x','y']
-    result2.columns = ['x','y']
+    # result = pd.concat([w0,w1], axis = 1)
+    # result2 = pd.concat([w0,w2], axis = 1)
+    # result.columns = ['x','y']
+    # result2.columns = ['x','y']
 
     # 반환
-    xgbSummary = {'R_square of XGB': rSquare, 'RMSE of XGB': RMSE,'MAPE of XGB': MAPE1}
+    modelingResult = {'R_square of XGB': rSquare_test, 'RMSE_test of XGB': RMSE_test,'MAPE of XGB': MAPE_test}
 
     # print(y_test.tolist())
-    chartData = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict.tolist()}
-    return jsonify(chartData,xgbSummary)
+    modelingValues = {'test':None, 'valid':None}
+    modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict_test.tolist()}
+    modelingValues['valid'] = {'Actual':y_valid.tolist(),'Predictive':xgb_model_predict_valid.tolist()}
+    return jsonify(modelingValues,modelingResult)
     # return Response(result.to_json( orient='records'), mimetype='application/json')

@@ -1,10 +1,8 @@
 <template>
-  <apexchart
-    ref="modelingChart"
-    type="line"
-    height="300"
-    :options="firstGroupingChartOption"
-  ></apexchart>
+  <div>
+    <apexchart ref="testChart" type="line" height="250" :options="testChartOption"></apexchart>
+    <apexchart ref="validChart" type="line" height="250" :options="validChartOption"></apexchart>
+  </div>
 </template>
 
 <script>
@@ -28,31 +26,18 @@ export default {
       // original
 
       //mainfirstChartOption
-      firstGroupingChartOption: {
+      testChartOption: {
         chart: {
-          id: "syncChartId",
-          group: "syncChartGroup",
-          toolbar: {
-            //Grouping시 변경
-            show: true,
-            tools: {
-              customIcons: [
-                {
-                  icon: '<p  width="20">R<p>',
-                  index: 6,
-                  title: "tooltip of the icon",
-                  class: "custom-icon",
-                  click: (chart, options, e) => {
-                    console.log(options);
-                  }
-                }
-              ]
-            }
-          },
-          sparkline: {
-            enabled: false
-          },
           type: "line"
+          // background: "#f8f8f8"
+        },
+        title: {
+          text: "Test",
+          align: "left",
+          style: {
+            fontSize: "16px",
+            fontWeight: "bold"
+          }
         },
         markers: {
           size: 3,
@@ -109,171 +94,98 @@ export default {
           }
         }
       },
-      // mainoptions
-      groupingChartOption: {
+      validChartOption: {
         chart: {
-          type: "line",
-          stacked: false,
-          toolbar: {
-            show: false,
-            autoSelected: "selection"
-          },
-          //zoom
-          zoom: {
-            type: "xy",
-            enabled: true,
-            autoScaleYaxis: true,
-            zoomedArea: {
-              fill: {
-                color: "#90CAF9",
-                opacity: 0.4
-              },
-              stroke: {
-                color: "#0D47A1",
-                opacity: 0.4,
-                width: 1
-              }
-            }
-          },
-          //selection
-          selection: {
-            enabled: true,
-            type: "xy",
-            fill: {
-              color: "black",
-              opacity: 0.1
-            },
-            stroke: {
-              width: 5,
-              dashArray: 3,
-              color: "black",
-              opacity: 0.4
-            }
-          },
-
-          events: {
-            legendClick: function(chartContext, seriesIndex, config) {
-              // console.log(seriesIndex);
-              // ...
-            },
-            // selection events
-            selection: (chartContext, { xaxis, yaxis }) => {
-              let yaxisObject = { min: null, max: null };
-              console.log(xaxis);
-              // yaxisObject.min = yaxis[0]["min"];
-              // yaxisObject.max = yaxis[0]["max"];
-              // this.yaxisWhenSelected = yaxisObject;
-              this.xaxisWhenSelected = xaxis;
-              this.$emit("xaxis", this.xaxisWhenSelected);
-            }
-          }
+          type: "line"
+          // background: "#f8f8f8"
         },
-        subtitle: {
-          text: undefined,
-          align: "center",
-
-          floating: true,
-          offsetY: 5,
+        title: {
+          text: "Validation",
+          align: "left",
           style: {
-            // fontSize: "12px",
-            fontWeight: "normal",
-            fontFamily: undefined,
-            color: "#9699a2"
+            fontSize: "16px",
+            fontWeight: "bold"
           }
         },
-        // colors: ['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
-        states: {
-          active: {
-            allowMultipleDataPointsSelection: true,
-            filter: {
-              type: "darken",
-              value: 0.35
-            }
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        title: {},
+        colors: ["#E91E63", "#FF9800"],
         markers: {
-          size: 1,
+          size: 3,
           strokeWidth: 0.1,
-          strokeColor: "skyblue",
+
           hover: {
             size: 2,
             strokeColor: "#fff"
-          }
-        },
-        noData: {
-          text: "Loading..."
-        },
-        xaxis: {
-          floating: false,
-          labels: {
-            offsetX: 0
-          },
-          type: "datetime",
-          labels: {
-            // show: false,
-            minHeight: 50,
-            rotate: -30,
-            rotateAlways: true,
-            hideOverlappingLabels: false,
-            format: "yy/MM/dd",
-            style: {
-              fontSize: "10px",
-              fontWeight: 200
-            }
-          }
-        },
-        // mainYaxis
-        yaxis: {
-          floating: true,
-          labels: {
-            offsetX: -50
           }
         },
         grid: {
           show: false
         },
         legend: {
-          show: false,
+          //Grouping시 변경
+          show: true,
           showForSingleSeries: true,
           position: "bottom"
         },
         stroke: {
           width: 1
+        },
+        noData: {
+          text: "Loading..."
+        },
+        xaxis: {
+          tickAmount: 5,
+          // floating: true,
+          labels: {
+            offsetX: 0,
+            // show: false,
+            minHeight: 50,
+            rotate: -30,
+            rotateAlways: true,
+            hideOverlappingLabels: true,
+            style: {
+              fontSize: "10px",
+              fontWeight: 200
+            }
+          }
+        },
+        yaxis: {
+          decimalsInFloat: 1,
+          // floating:true,
+          axisTicks: {
+            show: true
+          },
+          axisBorder: {
+            show: true
+          },
+          // floating: true,
+          labels: {
+            show: true
+          }
         }
       }
     };
   },
 
-  created() {
-    // eventBus.$on("graphSources", modelResult => {
-    //   this.actual = modelResult["Actual"];
-    //   this.predictive = modelResult["Predictive"];
-    //   this.$refs.modelingChart.updateSeries([
-    //     {
-    //       name: "Actual",
-    //       data: this.actual
-    //     },
-    //     {
-    //       name: "Predictive",
-    //       data: this.predictive
-    //     }
-    //   ]);
-    // });
-  },
-  // cons
+  created() {},
   mounted() {
-    this.$refs.modelingChart.updateSeries([
+    this.$refs.testChart.updateSeries([
       {
         name: "Actual",
-        data: this.graphSources["Actual"]
+        data: this.graphSources["test"]["Actual"]
       },
       {
         name: "Predictive",
-        data: this.graphSources["Predictive"]
+        data: this.graphSources["test"]["Predictive"]
+      }
+    ]);
+    this.$refs.validChart.updateSeries([
+      {
+        name: "Actual",
+        data: this.graphSources["valid"]["Actual"]
+      },
+      {
+        name: "Predictive",
+        data: this.graphSources["valid"]["Predictive"]
       }
     ]);
   },
@@ -299,7 +211,7 @@ export default {
     //APEX CHART
     resetSeries() {
       this.numOfDragElement = 0;
-      this.$refs.modelingChart[0].updateOptions(
+      this.$refs.testChart[0].updateOptions(
         {
           series: [{}],
           xaxis: {
@@ -312,8 +224,8 @@ export default {
       console.log("reset");
     },
     appendSeries(seriesName, dataSet) {
-      // for (let i = 0; i < this.$refs.modelingChart.length; i++) {
-      //   this.$refs.modelingChart[i].appendSeries({
+      // for (let i = 0; i < this.$refs.testChart.length; i++) {
+      //   this.$refs.testChart[i].appendSeries({
       //     name: seriesName,
       //     data: dataSet
       //   });
@@ -330,8 +242,8 @@ export default {
       this.axisName.splice(indexNumOfAxis, 1); //axisName에서 제거
       this.resetYaxis();
       console.log(`indexNumOfAxis:${indexNumOfAxis}`);
-      // for (let i = 0; i < this.$refs.modelingChart.length; i++) {
-      //   this.$refs.modelingChart[i].updateSeries([
+      // for (let i = 0; i < this.$refs.testChart.length; i++) {
+      //   this.$refs.testChart[i].updateSeries([
       //     {
       //       name: axisName,
       //       data: []
@@ -339,11 +251,11 @@ export default {
       //   ]);
       // }
 
-      // this.firstGroupingChartOption.yaxis.splice(indexNumOfAxis, 1);
+      // this.testChartOption.yaxis.splice(indexNumOfAxis, 1);
     },
     updateSeries(axisName, dataSet) {
-      // for (let i = 0; i < this.$refs.modelingChart.length; i++) {
-      //   this.$refs.modelingChart[i].updateOptions(
+      // for (let i = 0; i < this.$refs.testChart.length; i++) {
+      //   this.$refs.testChart[i].updateOptions(
       //     {
       //       series: [
       //         {
@@ -361,11 +273,11 @@ export default {
       this.series[0].push(newSeries);
     },
     updateGroupingOption() {
-      this.firstGroupingChartOption.legend["show"] = false;
-      this.firstGroupingChartOption.chart.toolbar["show"] = false;
-      // this.firstGroupingChartOption.xaxis.labels["show"] = false;
-      this.firstGroupingChartOption.yaxis.labels["show"] = false;
-      // this.$refs.modelingChart[0].updateOptions({
+      this.testChartOption.legend["show"] = false;
+      this.testChartOption.chart.toolbar["show"] = false;
+      // this.testChartOption.xaxis.labels["show"] = false;
+      this.testChartOption.yaxis.labels["show"] = false;
+      // this.$refs.testChart[0].updateOptions({
       //   yaxis: {
       //     labels: {
       //       show: true
@@ -374,15 +286,15 @@ export default {
       // });
     },
     resetYaxis() {
-      for (let i = 0; i < this.$refs.modelingChart.length; i++) {
-        this.$refs.modelingChart[i].updateOptions({
+      for (let i = 0; i < this.$refs.testChart.length; i++) {
+        this.$refs.testChart[i].updateOptions({
           yaxis: {}
         });
       }
     },
     updateYaxis(axisName, minOfDataset) {
-      for (let i = 0; i < this.$refs.modelingChart.length; i++) {
-        this.$refs.modelingChart[i].updateOptions(
+      for (let i = 0; i < this.$refs.testChart.length; i++) {
+        this.$refs.testChart[i].updateOptions(
           {
             yaxis: [
               {
@@ -432,8 +344,8 @@ export default {
       }
     },
     updateCategories(newCategories) {
-      for (let i = 0; i < this.$refs.modelingChart.length; i++) {
-        this.$refs.modelingChart[i].updateOptions({
+      for (let i = 0; i < this.$refs.testChart.length; i++) {
+        this.$refs.testChart[i].updateOptions({
           xaxis: {
             categories: newCategories
           }
@@ -441,14 +353,14 @@ export default {
       }
     },
     updateGraphType(graphType) {
-      this.$refs.modelingChart.updateOptions({
+      this.$refs.testChart.updateOptions({
         chart: {
           type: graphType
         }
       });
     },
     updateSelection() {
-      this.$refs.modelingChart.updateOptions({
+      this.$refs.testChart.updateOptions({
         chart: {
           selection: {
             xaxis: {
@@ -462,7 +374,7 @@ export default {
 
     toggleDataPointSelection(xaxis) {
       for (let i = xaxis.min; i <= xaxis.max; i++) {
-        this.$refs.modelingChart.toggleDataPointSelection(0, i);
+        this.$refs.testChart.toggleDataPointSelection(0, i);
       }
     },
     resetdataArrays() {

@@ -1,21 +1,26 @@
 <template>
-  <v-row>
-    <v-col>
-      <div class="columnList">
-        <v-checkbox
-          v-for="(column, columnIndex) in columns"
-          v-model="inputs[columnIndex]"
-          :key="columnIndex"
-          :label="column"
-          :value="column"
-          @change="checkedEvent(columnIndex)"
-          dense
-          v-bind="dynamicProps(columnIndex)"
-        >
-        </v-checkbox>
-      </div>
-    </v-col>
-  </v-row>
+  <v-container>
+    <v-row dense>
+      <v-col cols="12"> <v-checkbox label="Input" @change="selectAll"></v-checkbox></v-col>
+    </v-row>
+    <v-row dense>
+      <v-col>
+        <div class="columnList">
+          <v-checkbox
+            v-for="(column, columnIndex) in columns"
+            v-model="inputs[columnIndex]"
+            :key="columnIndex"
+            :label="column"
+            :value="column"
+            @change="checkedEvent(columnIndex)"
+            dense
+            v-bind="dynamicProps(columnIndex)"
+          >
+          </v-checkbox>
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 <script>
 //vuex
@@ -33,10 +38,11 @@ export default {
       clickedColumnItemStyle: {
         "background-color": "lightgrey"
       },
-      selected: [],
+      selected: [], //이미 Target에서 선택되어서, input에서는 선택할 수 없는 것들
       disabledProps: {
         disabled: true
       },
+      //v-model
       inputs: []
     };
   },
@@ -44,6 +50,11 @@ export default {
 
   methods: {
     ...mapMutations("modelingData", ["saveInputs"]),
+    selectAll() {
+      for (let i = 0; i < this.columns.length; i++) {
+        this.inputs.push(this.columns[i]);
+      }
+    },
     dynamicProps(columnIndex) {
       for (let i = 0; i < this.selected.length; i++) {
         if (this.selected[i] == columnIndex) {
@@ -89,13 +100,14 @@ export default {
         }
       });
       return selected;
-    },
-    ...mapState({})
+    }
   },
   created() {
+    //중복 체크 방지
     eventBus.$on("targetColumnChecked", index => {
       this.selected.push(index);
     });
+    //vuex에 저장
     eventBus.$on("stepTwoFinished", status => {
       this.saveInputs(this.withoutUndefined);
     });

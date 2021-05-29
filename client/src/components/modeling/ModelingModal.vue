@@ -1,7 +1,7 @@
 <template>
-  <v-dialog v-model="dialog" max-width="700">
+  <v-dialog v-model="dialog" max-width="810">
     <v-container fluid class="pa-0">
-      <v-card max-width="800" min-height="700" rounded>
+      <v-card max-width="900" min-height="700" rounded>
         <v-row class="ma-0">
           <v-spacer></v-spacer>
           <v-btn x-small min-width="20" min-height="30" @click="closeStepper"
@@ -25,8 +25,9 @@
         <v-tabs centered v-model="tab">
           <v-tab>1. Dataset</v-tab>
           <v-tab>2. Input/target</v-tab>
-          <v-tab>3. Snippet</v-tab>
-          <v-tab>4. Weights</v-tab>
+          <v-tab>3. Normalization</v-tab>
+          <v-tab>4. Snippet</v-tab>
+          <v-tab>5. Weights</v-tab>
         </v-tabs>
         <!-- 1. dataset -->
         <v-tabs-items v-model="tab">
@@ -77,13 +78,12 @@
               <v-row>
                 <v-card-text>Select the input(s) and target features you want to use.</v-card-text>
                 <v-col cols="6">
-                  <v-card-subtitle>Input</v-card-subtitle>
                   <InputColumnList />
                 </v-col>
                 <v-col cols="6">
-                  <v-card-subtitle>Target</v-card-subtitle>
                   <TargetColumnList />
                 </v-col>
+
                 <v-col cols="12">
                   <v-card-actions>
                     <v-btn color="primary" @click="tab = 0">Previous</v-btn>
@@ -94,20 +94,65 @@
               </v-row>
             </v-container>
           </v-tab-item>
-          <!-- 3.Snippet -->
+          <!-- 3.Normalization -->
+          <v-tab-item>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-card-subtitle>Normalization</v-card-subtitle>
+                </v-col>
+              </v-row>
+              <v-row v-for="(dataType, index) in dataTypes" :key="index" no-gutters>
+                <v-col offset="1" cols="3">
+                  <v-card-text class="pt-5">
+                    {{ dataType }}
+                  </v-card-text>
+                </v-col>
+
+                <v-col cols="4">
+                  <v-checkbox label="Fit"></v-checkbox>
+                </v-col>
+                <v-col cols="4">
+                  <v-checkbox label="Transform"></v-checkbox>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <v-card-actions>
+                    <v-btn color="primary" @click="tab = 1">Previous</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" @click="tab = 3">Next</v-btn>
+                  </v-card-actions></v-col
+                >
+              </v-row>
+            </v-container>
+          </v-tab-item>
+          <!-- 4.Snippet -->
           <v-tab-item>
             <v-card elevation="0" min-height="393px">
-              <v-list outlined dense>
-                <v-list-group>
+              <v-list outlined selectable>
+                <v-list-group :value="true" no-action>
                   <template v-slot:activator>
                     <v-list-item-icon>
                       <v-icon>mdi-arrow-decision-auto</v-icon>
                     </v-list-item-icon>
-                    <v-list-item-title>Select Problem Type</v-list-item-title>
+                    <v-list-item-content>
+                      <v-list-item-title>Snippets</v-list-item-title>
+                    </v-list-item-content>
                   </template>
-                  <v-list-item v-for="(snippet, index) in snippets" :key="index">
-                    {{ snippet }}
-                  </v-list-item>
+                  <v-list-item-group v-model="model">
+                    <v-list-item
+                      v-for="(snippet, index) in snippets"
+                      :key="index"
+                      @click="snippetClicked(snippet)"
+                    >
+                      <v-list-item-title v-text="snippet"></v-list-item-title>
+
+                      <v-list-item-icon>
+                        <v-icon v-text="icon"></v-icon>
+                      </v-list-item-icon>
+                    </v-list-item>
+                  </v-list-item-group>
                 </v-list-group>
               </v-list>
             </v-card>
@@ -117,7 +162,7 @@
               <v-btn color="primary" @click="createModel">Create</v-btn>
             </v-card-actions>
           </v-tab-item>
-          <!-- 3.Weights -->
+          <!-- 5.Weights -->
           <v-tab-item> </v-tab-item>
         </v-tabs-items>
       </v-card>
@@ -126,13 +171,15 @@
 </template>
 <script>
 import { eventBus } from "@/main";
-import InputColumnList from "@/components/modeling/InputColumnList.vue";
-import TargetColumnList from "@/components/modeling/TargetColumnList.vue";
+import InputColumnList from "@/components/modeling/columnList/InputColumnList.vue";
+import TargetColumnList from "@/components/modeling/columnList/TargetColumnList.vue";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      model: 1,
       tab: null,
+      dataTypes: ["X Train Data", "X Test Data", "Y Train Data", "Y Test Data"],
       dialog: false,
       formFields: [1, 2, 3],
       dataInfoLabels: ["Dataset", "Dataset Version", "Subset"],
@@ -141,7 +188,8 @@ export default {
       snippets: ["XGBoost", "Random Forest", "SVR"],
       hideDetailsProps: {
         "hide-details": true
-      }
+      },
+      chosenSnippet: null
     };
   },
   computed: {
@@ -150,6 +198,10 @@ export default {
     })
   },
   methods: {
+    ...mapMutations("modelingData", ["saveSnippet"]),
+    snippetClicked(snippet) {
+      this.chosenSnippet = snippet;
+    },
     getItems(index) {
       if (index == 0) {
         return this.tableList;
@@ -179,6 +231,7 @@ export default {
     },
     createModel() {
       this.dialog = false;
+      this.saveSnippet(this.chosenSnippet);
       eventBus.$emit("createModel", true);
     }
   },
