@@ -160,6 +160,7 @@ export default {
     },
 
     runModel(modelingOption) {
+      eventBus.$emit("modelingOption", modelingOption);
       let path = "http://localhost:5000/";
       // define path
       if (this.snippet == "XGBoost") {

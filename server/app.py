@@ -21,6 +21,7 @@ import sys
 sys.path.append('/Users/jeongjaeho/attic_project/mlApp/server/modeling')
 import datetime
 import time
+import json
 
 # EDA Packages
 import pandas as pd 
@@ -64,9 +65,12 @@ class DataInfo(Base):
     quartile = Column(String(300))
     numofna = Column(String(300))
     
-# engine
-engine = create_engine('mysql+mysqldb://root:0000@localhost/newdatabase',echo = False)
-Session = sessionmaker(bind=engine,autocommit=False)
+# engine1
+db1URI = 'mysql+mysqldb://root:0000@localhost/newdatabase'
+db2URI = 'mysql+mysqldb://root:0000@localhost/modeling'
+engine1 = create_engine(db1URI,echo = False)
+engine2 = create_engine(db2URI,echo = False)
+Session = sessionmaker(bind=engine1,autocommit=False)
 session = Session()
 
 # autocommit = 0 (false)
@@ -94,7 +98,7 @@ def dataupload():
 
     file = request.files['csv_data']
 	# dataInfo 테이블 생성
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine1)
     # pyarrow
     pyarrow_table = csv.read_csv(file)
     df = pyarrow_table.to_pandas()
@@ -106,7 +110,7 @@ def dataupload():
 		# csv to sql
     df.to_sql (
 			tableName,
-			engine,
+			engine1,
 			if_exists='replace',
 			index=False,
 			chunksize=10000,
@@ -140,7 +144,7 @@ def addData():
 	tableName = 'dataset'
 	dictToDf.to_sql (
 				tableName,
-				engine,
+				engine1,
 				if_exists='append',
 				index=False,
 				chunksize=4000,
@@ -203,7 +207,7 @@ infinite-loading Test:
 @app.route('/infiniteLoading',methods=['GET','POST'])
 def infiniteLoading():
 	limit = request.args.get('limit')
-	conn = engine.connect()
+	conn = engine1.connect()
 	df = pd.read_sql_query("select * from temp_dataset limit "+limit+",45;", conn)
 	conn.close
 	return Response(df.to_json( orient='records'), mimetype='application/json')
@@ -352,14 +356,14 @@ def xgboost_modeling():
   modelingOption_str = request.args.get('modelingOption')
   print(modelingOption_str)
   modelingOption_list = modelingOption_str.split(',')
-
-  for index,value in enumerate(modelingOption_list):
-    # 문자에 .이 포함되어있으면 소수이니 float으로 변환
-    if modelingOption_list[index].find('.') != -1:
-      modelingOption_list[index] = float(value)
-    # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
-    else: 
-      modelingOption_list[index] = int(value)
+  # 개발 편의성 속성 직접 받지 않고 주석처리
+  # for index,value in enumerate(modelingOption_list):
+  #   # 문자에 .이 포함되어있으면 소수이니 float으로 변환
+  #   if modelingOption_list[index].find('.') != -1:
+  #     modelingOption_list[index] = float(value)
+  #   # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+  #   else: 
+  #     modelingOption_list[index] = int(value)
   print(modelingOption_list)
   return (xgboost(modelingOption_list))
 
@@ -369,16 +373,17 @@ def svr_modeling():
 
   modelingOption_list = modelingOption_str.split(',')
   print(modelingOption_list)
-  for index,value in enumerate(modelingOption_list):
-    #str이 아닐 때 (int/float일 때)만 if 문 작동
-    print(modelingOption_list[index].isalpha()==False)
-    if modelingOption_list[index].isalpha()==False:
-      # 문자에 .이 포함되어있으면 소수이니 float으로 변환
-      if modelingOption_list[index].find('.') != -1:
-        modelingOption_list[index] = float(value)
-      # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
-      else: 
-        modelingOption_list[index] = int(value)
+  # 개발 편의상 주석처리
+  # for index,value in enumerate(modelingOption_list):
+  #   #str이 아닐 때 (int/float일 때)만 if 문 작동
+  #   print(modelingOption_list[index].isalpha()==False)
+  #   if modelingOption_list[index].isalpha()==False:
+  #     # 문자에 .이 포함되어있으면 소수이니 float으로 변환
+  #     if modelingOption_list[index].find('.') != -1:
+  #       modelingOption_list[index] = float(value)
+  #     # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+  #     else: 
+  #       modelingOption_list[index] = int(value)
   print(modelingOption_list)
   return (svr(modelingOption_list))
 
@@ -397,6 +402,42 @@ def rf_modeling():
       modelingOption_list[index] = int(value)
   print(modelingOption_list)
   return (rf(modelingOption_list))
+
+@app.route('/saveModel',methods=['POST'])
+def saveModel():
+  graphSources = request.get_json()['graphSources']
+  modelingSummary = request.get_json()['modelingSummary']
+  graphSources = json.loads(graphSources)
+  modelingSummary = json.loads(modelingSummary)
+
+  modelingSummary_df = pd.DataFrame(modelingSummary,index=['Case 1'])
+  modelingSummary_df.to_sql (
+    'modeling_summary',
+    engine2,
+    if_exists='replace',
+    index=False,
+    chunksize=10000,
+  ) 
+  
+  test_df = pd.DataFrame(graphSources['test'])
+  test_df.to_sql (
+    'test_dataset',
+    engine2,
+    if_exists='replace',
+    index=False,
+    chunksize=10000,
+  ) 
+
+  valid_df = pd.DataFrame(graphSources['valid'])
+  valid_df.to_sql (
+    'valid_dataset',
+    engine2,
+    if_exists='replace',
+    index=False,
+    chunksize=10000,
+  ) 
+
+  return jsonify('hello')
 
 if __name__ == '__main__':
     app.run(debug=True)

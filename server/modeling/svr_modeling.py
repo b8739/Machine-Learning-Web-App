@@ -41,17 +41,30 @@ def svr(modelingOption):
   X = df_00.drop('MEDV', axis = 1)
   y = df_00['MEDV']
 
+  ## Valid Data (20%) 사전에 추출 ##
+  startIndex = round(len(df_00)*0.8)
+  X_valid = X[startIndex:]
+  y_valid = y[startIndex:]
+
+  X= X.drop(X.index[startIndex:])
+  y= y.drop(y.index[startIndex:])
+
   ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
 
+  # test
   train_X = X_train 
   test_X = X_test
+
+  # valid
+  valid_X = X_valid
 
   ## NORMALIZATION ##
   scalerX = StandardScaler()
   scalerX.fit(train_X)
   train_Xn = scalerX.transform(train_X)
   test_Xn = scalerX.transform(test_X)
+  valid_Xn = scalerX.transform(valid_X)
 
 
   # ## 02. BUILD REGRESSION MODEL ##
@@ -67,49 +80,49 @@ def svr(modelingOption):
   # print(GS.best_score_)
 
 
-  # svr_model = SVR(kernel = 'rbf', 
-  #                 C = 100, 
-  #                 epsilon = 0.1, 
-  #                 gamma = 0.005)
+  svr_model = SVR(kernel = 'rbf', 
+                  C = 100, 
+                  epsilon = 0.1, 
+                  gamma = 0.005)
 
-  svr_model = SVR(kernel = modelingOption[0], 
-                  C = modelingOption[1], 
-                  epsilon = modelingOption[2], 
-                  gamma = modelingOption[3])
+  # svr_model = SVR(kernel = modelingOption[0], 
+  #                 C = modelingOption[1], 
+  #                 epsilon = modelingOption[2], 
+  #                 gamma = modelingOption[3])
   # 학습과정 (xn은 normalization을 한 것)
   svr_model.fit(train_Xn, y_train)
   # 예측값
-  svr_model_predict = svr_model.predict(test_Xn)
+  svr_model_predict_test = svr_model.predict(test_Xn)
+  svr_model_predict_valid = svr_model.predict(valid_Xn)
+  
 
-  rSquare = r2_score(y_test, svr_model_predict)
-  RMSE = mean_squared_error(y_test, svr_model_predict)**0.5
-  MAPE1 = MAPE(y_test, svr_model_predict)
+  rSquare_test = r2_score(y_test, svr_model_predict_test)
+  RMSE_test = mean_squared_error(y_test, svr_model_predict_test)**0.5
+  MAPE1_test = MAPE(y_test, svr_model_predict_test)
 
-  print('R_square of SVR :', rSquare)
-  print('RMSE of SVR :', RMSE)
-  print('MAPE of SVR :', MAPE1)
+  # formatting (round)
+  MAPE1_test = str(round(MAPE1_test,2))+'%'
+  rSquare_test = round(rSquare_test,4)
+  RMSE_test = round(RMSE_test,4)
+
+  print('R_square of SVR :', rSquare_test)
+  print('RMSE of SVR :', RMSE_test)
+  print('MAPE of SVR :', MAPE1_test)
 
   ## VISUALIZE THE RESULTS ##
-  y0 = pd.DataFrame(range(len(y_test)))
-  y1 = pd.DataFrame(y_test)
-  y1 = y1.reset_index(drop = True)
-  y2 = pd.DataFrame(svr_model_predict)
+  # y0 = pd.DataFrame(range(len(y_test)))
+  # y1 = pd.DataFrame(y_test)
+  # y1 = y1.reset_index(drop = True)
+  # y2 = pd.DataFrame(svr_model_predict_test)
 
   # result = pd.concat([y0, y1, y2], axis = 1)
   # result.columns = ['no', 'Actual', 'Predictive']
 
-  ## Graphs ##
-  # plt.style.use('bmh')
-  # # plt.style.use('ggplot')
-  # plt.figure(figsize = (12, 5))
-  # plt.plot(result.iloc[:, 1], color = 'dodgerblue', alpha = 0.3, marker = 'o', linewidth = 0.5)
-  # plt.plot(result.iloc[:, 2], color = 'brown', alpha = 0.4, marker = 'o', linewidth = 0.5)
-  # plt.title('Actual vs. Predictive : SVR')
-  # plt.show()
-
   # 반환
-  modelingResult = {'R_square of SVR': rSquare, 'RMSE of SVR': RMSE,'MAPE of SVR': MAPE1}
+  modelingResult = {'R_square of SVR': rSquare_test, 'RMSE of SVR': RMSE_test,'MAPE of SVR': MAPE1_test}
 
   # print(y_test.tolist())
-  chartData = {'Actual':y_test.tolist(),'Predictive':svr_model_predict.tolist()}
-  return jsonify(chartData,modelingResult)
+  modelingValues = {'test':None, 'valid':None}
+  modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':svr_model_predict_test.tolist()}
+  modelingValues['valid'] = {'Actual':y_valid.tolist(),'Predictive':svr_model_predict_valid.tolist()}
+  return jsonify(modelingValues,modelingResult)

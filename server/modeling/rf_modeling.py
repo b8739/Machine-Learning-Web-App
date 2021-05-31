@@ -73,6 +73,11 @@ def rf(modelingOption):
   RMSE = mean_squared_error(y_test, rf_model_predict)**0.5
   MAPE1 = MAPE(y_test, rf_model_predict)
 
+    # formatting (round)
+  MAPE1 = str(round(MAPE1,2))+'%'
+  rSquare = round(rSquare,4)
+  RMSE = round(RMSE,4)
+
   print('R_square of RF :', rSquare)
   print('RMSE of RF :', RMSE)
   print('MAPE of RF :',MAPE1)

@@ -28,7 +28,10 @@ export default {
       //mainfirstChartOption
       testChartOption: {
         chart: {
-          type: "line"
+          type: "line",
+          toolbar: {
+            show: false
+          }
           // background: "#f8f8f8"
         },
         title: {
@@ -39,6 +42,7 @@ export default {
             fontWeight: "bold"
           }
         },
+        colors: [" #03A9F4 ", " #81d4fa", "#00ab08", "#4ded30"],
         markers: {
           size: 3,
           strokeWidth: 0.1,
@@ -96,7 +100,10 @@ export default {
       },
       validChartOption: {
         chart: {
-          type: "line"
+          type: "line",
+          toolbar: {
+            show: false
+          }
           // background: "#f8f8f8"
         },
         title: {
@@ -107,7 +114,8 @@ export default {
             fontWeight: "bold"
           }
         },
-        colors: ["#E91E63", "#FF9800"],
+        // colors: ["#E91E63", "#FF9800"],
+        colors: ["#00ab08", "#4ded30"],
         markers: {
           size: 3,
           strokeWidth: 0.1,
@@ -170,12 +178,20 @@ export default {
   mounted() {
     this.$refs.testChart.updateSeries([
       {
-        name: "Actual",
+        name: "Test_Actual",
         data: this.graphSources["test"]["Actual"]
       },
       {
-        name: "Predictive",
+        name: "Test_Predictive",
         data: this.graphSources["test"]["Predictive"]
+      },
+      {
+        name: "Validation_Actual",
+        data: this.graphSources["valid"]["Actual"]
+      },
+      {
+        name: "Validation_Predictive",
+        data: this.graphSources["valid"]["Predictive"]
       }
     ]);
     this.$refs.validChart.updateSeries([
