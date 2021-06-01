@@ -112,9 +112,11 @@ def xgboost(modelingOption):
     MAPE_valid = MAPE(y_valid, xgb_model_predict_valid)
 
     # formatting (round)
-    MAPE_test = str(round(MAPE_valid,2))+'%'
-    rSquare_test = round(rSquare_valid,4)
-    RMSE_test = round(RMSE_valid,4)
+    MAPE_valid = str(round(MAPE_valid,2))+'%'
+    rSquare_valid = round(rSquare_valid,4)
+    RMSE_valid = round(RMSE_valid,4)
+
+  
 
     ## VISUALIZE THE RESULTS ##
     # w0 = pd.DataFrame(range(len(y_test)))
@@ -128,9 +130,10 @@ def xgboost(modelingOption):
     # result2.columns = ['x','y']
 
     # 반환
-    modelingResult = {'R_square of XGB': rSquare_test, 'RMSE_test of XGB': RMSE_test,'MAPE of XGB': MAPE_test}
+    modelingResult = {'test':None, 'valid':None}
+    modelingResult['test'] = {'R_square of XGB': rSquare_test, 'RMSE_test of XGB': RMSE_test,'MAPE of XGB': MAPE_test}
+    modelingResult['valid'] = {'R_square of XGB': rSquare_valid, 'RMSE_test of XGB': RMSE_valid,'MAPE of XGB': MAPE_valid}
 
-    # print(y_test.tolist())
     modelingValues = {'test':None, 'valid':None}
     modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict_test.tolist()}
     modelingValues['valid'] = {'Actual':y_valid.tolist(),'Predictive':xgb_model_predict_valid.tolist()}

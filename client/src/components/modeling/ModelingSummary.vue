@@ -1,5 +1,18 @@
 <template>
-  <v-data-table :headers="headers" :items="dataTableItems" class="elevation-1"></v-data-table>
+  <v-container>
+    <v-tabs v-model="tab">
+      <v-tab>Test</v-tab>
+      <v-tab>Validation</v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item>
+        <v-data-table :headers="headers" :items="test_result" class="elevation-1"></v-data-table>
+      </v-tab-item>
+      <v-tab-item>
+        <v-data-table :headers="headers" :items="valid_result" class="elevation-1"></v-data-table>
+      </v-tab-item>
+    </v-tabs-items>
+  </v-container>
 </template>
 <script>
 import { eventBus } from "@/main";
@@ -7,6 +20,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      tab: null,
       // showModelingSummary: false,
       headers: [
         {
@@ -23,15 +37,25 @@ export default {
     ...mapState({
       modelingSummary: state => state.modelingResult.modelingSummary
     }),
-    dataTableItems() {
-      let dataTableItems = [];
-      let dataTableFormat = {};
-      for (const [key, value] of Object.entries(this.modelingSummary)) {
-        dataTableFormat = { name: key, value: value };
-        dataTableItems.push(dataTableFormat);
+    test_result() {
+      let results = [];
+      let resultsFormat = {};
+      for (const [key, value] of Object.entries(this.modelingSummary["test"])) {
+        resultsFormat = { name: key, value: value };
+        results.push(resultsFormat);
       }
 
-      return dataTableItems;
+      return results;
+    },
+    valid_result() {
+      let results = [];
+      let resultsFormat = {};
+      for (const [key, value] of Object.entries(this.modelingSummary["valid"])) {
+        resultsFormat = { name: key, value: value };
+        results.push(resultsFormat);
+      }
+
+      return results;
     }
   },
   created() {

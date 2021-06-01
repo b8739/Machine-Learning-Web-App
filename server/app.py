@@ -65,13 +65,14 @@ class DataInfo(Base):
     quartile = Column(String(300))
     numofna = Column(String(300))
     
-# engine1
-db1URI = 'mysql+mysqldb://root:0000@localhost/newdatabase'
-db2URI = 'mysql+mysqldb://root:0000@localhost/modeling'
-engine1 = create_engine(db1URI,echo = False)
-engine2 = create_engine(db2URI,echo = False)
-Session = sessionmaker(bind=engine1,autocommit=False)
+# engine_dataset
+URI_dataset = 'mysql+mysqldb://root:0000@localhost/newdatabase'
+URI_modeling = 'mysql+mysqldb://root:0000@localhost/modeling'
+engine_dataset = create_engine(URI_dataset,echo = False)
+engine_modeling = create_engine(URI_modeling,echo = False)
+Session = sessionmaker(bind=engine_dataset,autocommit=False)
 session = Session()
+
 
 # autocommit = 0 (false)
 # sql = "SET AUTOCOMMIT = 0;"
@@ -91,6 +92,9 @@ def testing():
 # Route for our Processing and Details Page
 @app.route('/dataupload',methods=['GET','POST'])
 def dataupload():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
+
   if request.method == 'POST' and 'csv_data' in request.files:
     # 테이블 이름 받아오기
     tableName = request.args.get('tableName')
@@ -98,7 +102,7 @@ def dataupload():
 
     file = request.files['csv_data']
 	# dataInfo 테이블 생성
-    Base.metadata.create_all(engine1)
+    Base.metadata.create_all(engine_dataset)
     # pyarrow
     pyarrow_table = csv.read_csv(file)
     df = pyarrow_table.to_pandas()
@@ -110,7 +114,7 @@ def dataupload():
 		# csv to sql
     df.to_sql (
 			tableName,
-			engine1,
+			engine_dataset,
 			if_exists='replace',
 			index=False,
 			chunksize=10000,
@@ -144,7 +148,7 @@ def addData():
 	tableName = 'dataset'
 	dictToDf.to_sql (
 				tableName,
-				engine1,
+				engine_dataset,
 				if_exists='append',
 				index=False,
 				chunksize=4000,
@@ -163,6 +167,8 @@ loadData: Frontend에서 Dataset을 로드해오는 라우팅
 
 @app.route('/loadData',methods=['GET','POST'])
 def loadData():
+    Session = sessionmaker(bind=engine_dataset,autocommit=False)
+    session = Session()
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
     data = pd.read_sql_table('temp_dataset', session.bind)
     # return jsonify(data.to_dict())
@@ -207,7 +213,7 @@ infinite-loading Test:
 @app.route('/infiniteLoading',methods=['GET','POST'])
 def infiniteLoading():
 	limit = request.args.get('limit')
-	conn = engine1.connect()
+	conn = engine_dataset.connect()
 	df = pd.read_sql_query("select * from temp_dataset limit "+limit+",45;", conn)
 	conn.close
 	return Response(df.to_json( orient='records'), mimetype='application/json')
@@ -220,6 +226,8 @@ def dataSummarize():
 
 @app.route('/deleteColumn',methods=['GET'])
 def deleteColumn():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
   columnToDelete = request.args.get('columnToDelete')
   sql = "alter table temp_dataset drop column "+ columnToDelete+";"
   session.execute(sql)
@@ -229,6 +237,8 @@ def deleteColumn():
 
 @app.route('/overwriteTable',methods=['GET'])
 def overwriteTable():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
   sql = "drop table dataset"
   session.execute(sql)
     
@@ -253,6 +263,9 @@ def duplicateTable():
 
 @app.route('/deleteRow',methods=['GET'])
 def deleteRow():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
+
   timeSeriesCondition = request.args.get('timeSeriesCondition')
   featureConditions = request.args.getlist('featureConditions[]')
   sql = "delete from temp_dataset where"
@@ -271,6 +284,8 @@ def deleteRow():
 
 @app.route('/deleteRowByPeriod',methods=['GET'])
 def deleteRowByPeriod():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
 
   getFullTimeSeries_from = request.args.get('getFullTimeSeries_from')
   getFullTimeSeries_to = request.args.get('getFullTimeSeries_to')
@@ -295,6 +310,9 @@ def deleteRowByPeriod():
 
 @app.route('/showTables',methods=['GET'])
 def showTables():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
+
   sql="show tables;"
   tableList=[]
   tableInfo = list(session.execute(sql).fetchall())
@@ -307,6 +325,9 @@ def showTables():
 
 @app.route('/changeColumnName',methods=['GET'])
 def changeColumnName():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
+
   newName = request.args.get('columnName')
   columnIndex = str(int(request.args.get('columnIndex'))+1)
   # sql
@@ -325,6 +346,8 @@ def changeColumnName():
 
 @app.route('/changeColumnOrder',methods=['GET'])
 def changeColumnOrder():
+  Session = sessionmaker(bind=engine_dataset,autocommit=False)
+  session = Session()
   position = request.args.get('position')
   movedColumnName = request.args.get('movedColumnName')
   newIndex = request.args.get('newIndex')
@@ -405,39 +428,85 @@ def rf_modeling():
 
 @app.route('/saveModel',methods=['POST'])
 def saveModel():
-  graphSources = request.get_json()['graphSources']
-  modelingSummary = request.get_json()['modelingSummary']
-  graphSources = json.loads(graphSources)
-  modelingSummary = json.loads(modelingSummary)
+  # get request data
+  caseName = request.get_json()['caseName']
 
-  modelingSummary_df = pd.DataFrame(modelingSummary,index=['Case 1'])
-  modelingSummary_df.to_sql (
-    'modeling_summary',
-    engine2,
-    if_exists='replace',
-    index=False,
-    chunksize=10000,
-  ) 
+  # make case_list table
+  Session = sessionmaker(bind=engine_modeling,autocommit=False)
+  session = Session()
+
+  sql = "CREATE TABLE case_list (case_name char(20), PRIMARY KEY(case_name));"
+  session.execute(sql)
+
+  sql = " insert into case_list (case_name) VALUE ('"+caseName+"');"
+  session.execute(sql)
+  session.commit()
+  session.close
+  """ 
+  1) modelingOption 전처리 및 테이블 삽입
+  """
+  # convert (json -> df)
+  modelingOption = [1,2,3,4,5,6,7]
+  modelingOption_dict = {'n_estimators':'','learning_rate':'','gamma':'','eta':'','subsample':'','colsample_bytree':'','max_depth':''}
+  index = 0 
+  for key in modelingOption_dict:
+    modelingOption_dict[key] = modelingOption[index]
+    index += 1
+  modelingOption_df = pd.DataFrame(modelingOption_dict,index=[caseName])
+
+  # name tables (test & valid)
+  tableName_modelingOption = caseName + '_parameter'
   
-  test_df = pd.DataFrame(graphSources['test'])
-  test_df.to_sql (
-    'test_dataset',
-    engine2,
+  # convert (df -> sql)
+  modelingOption_df.to_sql (
+    tableName_modelingOption,
+    engine_modeling,
     if_exists='replace',
     index=False,
     chunksize=10000,
   ) 
+  """ 
+  2) modelingSummary 전처리 및 테이블 삽입
+  """
+  # convert 'modelingSummary' (json -> df)
+  modelingSummary = request.get_json()['modelingSummary']
+  modelingSummary = json.loads(modelingSummary)
+  modelingSummary_test_df = pd.DataFrame(modelingSummary['test'],index=[caseName])
+  modelingSummary_valid_df = pd.DataFrame(modelingSummary['valid'],index=[caseName])
+  
+  # name tables (test & valid)
+  tableName_modelingSummary_test = caseName + '_test'
+  tableName_modelingSummary_valid = caseName + '_valid'
 
-  valid_df = pd.DataFrame(graphSources['valid'])
-  valid_df.to_sql (
-    'valid_dataset',
-    engine2,
+  # convert (df -> sql)
+  modelingSummary_test_df.to_sql (
+    tableName_modelingSummary_test,
+    engine_modeling,
     if_exists='replace',
     index=False,
     chunksize=10000,
-  ) 
-
+  )
+  modelingSummary_valid_df.to_sql (
+    tableName_modelingSummary_valid,
+    engine_modeling,
+    if_exists='replace',
+    index=False,
+    chunksize=10000,
+  )  
   return jsonify('hello')
+
+@app.route('/loadCases',methods=['GET'])
+def loadCases():
+  Session = sessionmaker(bind=engine_modeling,autocommit=False)
+  session = Session()
+
+  sql="select * from case_list"
+  caseRow = session.execute(sql).fetchall()
+  print(caseRow[0][0])
+  caseList = []
+  for index,case in enumerate(caseRow):
+    caseList.append(str(caseRow[index][0]))
+  return jsonify(caseList)
 
 if __name__ == '__main__':
     app.run(debug=True)

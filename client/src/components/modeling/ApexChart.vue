@@ -115,7 +115,7 @@ export default {
           }
         },
         // colors: ["#E91E63", "#FF9800"],
-        colors: ["#00ab08", "#4ded30"],
+        colors: ["#00ab08", "#81c147"],
         markers: {
           size: 3,
           strokeWidth: 0.1,
@@ -178,20 +178,12 @@ export default {
   mounted() {
     this.$refs.testChart.updateSeries([
       {
-        name: "Test_Actual",
+        name: "Actual",
         data: this.graphSources["test"]["Actual"]
       },
       {
-        name: "Test_Predictive",
+        name: "Predictive",
         data: this.graphSources["test"]["Predictive"]
-      },
-      {
-        name: "Validation_Actual",
-        data: this.graphSources["valid"]["Actual"]
-      },
-      {
-        name: "Validation_Predictive",
-        data: this.graphSources["valid"]["Predictive"]
       }
     ]);
     this.$refs.validChart.updateSeries([

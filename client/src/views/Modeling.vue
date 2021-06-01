@@ -13,8 +13,8 @@
           >
           <v-btn v-else @click="dialog = true">Save Model</v-btn>
         </v-toolbar>
-        <Canvas v-show="showCanvas"></Canvas>
-        <ModelingResult v-if="showModelingResult" />
+        <Canvas v-if="showCanvas"></Canvas>
+        <ModelingResult v-else />
       </v-col>
     </v-row>
     <!-- dialog -->
@@ -27,7 +27,7 @@
           <v-text-field v-model="caseName" placeholder="Case 1" required></v-text-field>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="gray darken-1" text>
+            <v-btn @click="dialog = !dialog" color="gray darken-1" text>
               Close
             </v-btn>
             <v-btn @click="saveModel" color="blue darken-1" @click.once="eventHandler" text>
@@ -57,7 +57,7 @@ export default {
       caseName: "",
       showCanvas: true,
       dialog: false,
-      showModelingResult: false,
+
       left: null,
       top: null,
       modelingProcess: true,
@@ -84,17 +84,13 @@ export default {
         url: path,
         data: {
           caseName: this.caseName,
-          modelingOption: this.modelingOption
+          modelingOption: this.modelingOption,
           // graphSources: JSON.stringify(this.graphSources),
-          // modelingSummary: JSON.stringify(this.modelingSummary)
+          modelingSummary: JSON.stringify(this.modelingSummary)
         }
-      })
-        .then(function(response) {
-          console.log(response.data);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      });
+
+      this.dialog = !this.dialog;
     },
     getPos(e) {
       let obj = e.target;
@@ -119,7 +115,6 @@ export default {
     });
     eventBus.$on("showModelingResult", status => {
       this.showCanvas = !this.showCanvas;
-      this.showModelingResult = !this.showModelingResult;
     });
     eventBus.$on("modelingOption", modelingOption => {
       this.modelingOption = modelingOption;
