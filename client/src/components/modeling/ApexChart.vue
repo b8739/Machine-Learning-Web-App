@@ -18,6 +18,7 @@ export default {
 
   data() {
     return {
+      chartStatus: false,
       actual: null,
       predictive: null,
 
@@ -173,30 +174,34 @@ export default {
       }
     };
   },
-
-  created() {},
-  mounted() {
-    this.$refs.testChart.updateSeries([
-      {
-        name: "Actual",
-        data: this.graphSources["test"]["Actual"]
-      },
-      {
-        name: "Predictive",
-        data: this.graphSources["test"]["Predictive"]
-      }
-    ]);
-    this.$refs.validChart.updateSeries([
-      {
-        name: "Actual",
-        data: this.graphSources["valid"]["Actual"]
-      },
-      {
-        name: "Predictive",
-        data: this.graphSources["valid"]["Predictive"]
-      }
-    ]);
+  watch: {
+    chartStatus: function(data) {
+      this.$refs.testChart.updateSeries([
+        {
+          name: "Actual",
+          data: this.graphSources["test"]["Actual"]
+        },
+        {
+          name: "Predictive",
+          data: this.graphSources["test"]["Predictive"]
+        }
+      ]);
+      this.$refs.validChart.updateSeries([
+        {
+          name: "Actual",
+          data: this.graphSources["valid"]["Actual"]
+        },
+        {
+          name: "Predictive",
+          data: this.graphSources["valid"]["Predictive"]
+        }
+      ]);
+    }
   },
+  created() {
+    this.chartStatus = true;
+  },
+  mounted() {},
   computed: {
     ...mapState({
       graphSources: state => state.modelingResult.graphSources

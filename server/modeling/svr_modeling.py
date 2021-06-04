@@ -90,36 +90,36 @@ def svr(modelingOption):
   #                 epsilon = modelingOption[2], 
   #                 gamma = modelingOption[3])
   # 학습과정 (xn은 normalization을 한 것)
+
   svr_model.fit(train_Xn, y_train)
   # 예측값
   svr_model_predict_test = svr_model.predict(test_Xn)
   svr_model_predict_valid = svr_model.predict(valid_Xn)
   
-
+  # test
   rSquare_test = r2_score(y_test, svr_model_predict_test)
   RMSE_test = mean_squared_error(y_test, svr_model_predict_test)**0.5
-  MAPE1_test = MAPE(y_test, svr_model_predict_test)
+  MAPE_test = MAPE(y_test, svr_model_predict_test)
 
   # formatting (round)
-  MAPE1_test = str(round(MAPE1_test,2))+'%'
+  MAPE_test = str(round(MAPE_test,2))+'%'
   rSquare_test = round(rSquare_test,4)
   RMSE_test = round(RMSE_test,4)
 
-  print('R_square of SVR :', rSquare_test)
-  print('RMSE of SVR :', RMSE_test)
-  print('MAPE of SVR :', MAPE1_test)
+  # valid
+  rSquare_valid = r2_score(y_valid, svr_model_predict_valid)
+  RMSE_valid = mean_squared_error(y_valid, svr_model_predict_valid)**0.5
+  MAPE_valid = MAPE(y_valid, svr_model_predict_valid)
 
-  ## VISUALIZE THE RESULTS ##
-  # y0 = pd.DataFrame(range(len(y_test)))
-  # y1 = pd.DataFrame(y_test)
-  # y1 = y1.reset_index(drop = True)
-  # y2 = pd.DataFrame(svr_model_predict_test)
+  # formatting (round)
+  MAPE_valid = str(round(MAPE_valid,2))+'%'
+  rSquare_valid = round(rSquare_valid,4)
+  RMSE_valid = round(RMSE_valid,4)
 
-  # result = pd.concat([y0, y1, y2], axis = 1)
-  # result.columns = ['no', 'Actual', 'Predictive']
 
-  # 반환
-  modelingResult = {'R_square of SVR': rSquare_test, 'RMSE of SVR': RMSE_test,'MAPE of SVR': MAPE1_test}
+  modelingResult = {'test':None, 'valid':None}
+  modelingResult['test'] = {'R_square of SVR': rSquare_test, 'RMSE_test of SVR': RMSE_test,'MAPE of SVR': MAPE_test}
+  modelingResult['valid'] = {'R_square of SVR': rSquare_valid, 'RMSE_test of SVR': RMSE_valid,'MAPE of SVR': MAPE_valid}
 
   # print(y_test.tolist())
   modelingValues = {'test':None, 'valid':None}

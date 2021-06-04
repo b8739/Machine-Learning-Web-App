@@ -73,11 +73,23 @@ export default {
     SaveMenu
   },
   methods: {
+    ...mapMutations("modelingResult", ["saveCaseList"]),
+    loadCases() {
+      console.log("loadCases");
+      let path = "http://localhost:5000/loadCases";
+      axios
+        .get(path)
+        .then(res => {
+          this.saveCaseList(res.data);
+        })
+        .catch(error => {});
+    },
     runModel() {
       eventBus.$emit("runModel", true); // to Canvas.vue
       this.modelingProcess = !this.modelingProcess;
     },
     saveModel() {
+      let vm = this;
       let path = "http://localhost:5000/saveModel";
       axios({
         method: "post",
@@ -85,9 +97,12 @@ export default {
         data: {
           caseName: this.caseName,
           modelingOption: this.modelingOption,
-          // graphSources: JSON.stringify(this.graphSources),
+          snippet: this.snippet,
+          graphSources: JSON.stringify(this.graphSources),
           modelingSummary: JSON.stringify(this.modelingSummary)
         }
+      }).then(function(res) {
+        vm.loadCases();
       });
 
       this.dialog = !this.dialog;
@@ -102,6 +117,7 @@ export default {
     ...mapState({
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
+      snippet: state => state.modelingData.snippet,
       graphSources: state => state.modelingResult.graphSources,
       modelingSummary: state => state.modelingResult.modelingSummary
     })

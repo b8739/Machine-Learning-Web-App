@@ -5,10 +5,13 @@
       <v-list-item>
         <v-list-item-title class="font-weight-bold">Cases</v-list-item-title>
       </v-list-item>
-      <v-list-item v-for="(caseName, index) in caseList" :key="index">
-        <v-sheet light outlined height="100" width="100%" @click="changeCase">
-          <v-card-subtitle> {{ caseName }}</v-card-subtitle>
-          <v-card-text class="font-weight-thin body-2"> Created __ days ago</v-card-text>
+      <v-list-item v-for="(case_, index) in caseList" :key="index">
+        <v-sheet light outlined height="100" width="100%" @click="changeCase(case_[caseName])">
+          <v-card-text class="font-weight-bold pt-2 pb-0"> {{ case_["caseName"] }}</v-card-text>
+          <v-card-text class="font-weight-light caption pt-2 pb-1">
+            {{ case_["snippet"] }}</v-card-text
+          >
+          <v-card-text class="font-weight-thin caption pt-1"> Created __ days ago</v-card-text>
         </v-sheet>
       </v-list-item>
       <!-- 여기 chip 들어감 -->
@@ -22,7 +25,8 @@ export default {
   data() {
     return {
       tab: null,
-      drawer: true
+      drawer: true,
+      caseName: "caseName"
     };
   },
   computed: {
@@ -32,7 +36,9 @@ export default {
   },
   methods: {
     ...mapMutations("modelingResult", ["saveCaseList"]),
+    ...mapMutations("modelingResult", ["saveCaseInfo"]),
     loadCases() {
+      console.log("loadCases");
       let path = "http://localhost:5000/loadCases";
       axios
         .get(path)
@@ -40,6 +46,23 @@ export default {
           this.saveCaseList(res.data);
         })
         .catch(error => {});
+    },
+    changeCase(caseName) {
+      let path = "http://localhost:5000/changeCase";
+      axios
+        .get(path, {
+          params: {
+            //snippetProp 전송
+            caseName: caseName
+          }
+        })
+        .then(res => {
+          this.saveCaseInfo(res.data);
+          console.log(res.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
   },
   created() {

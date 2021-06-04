@@ -1,7 +1,8 @@
 const state = {
   graphSources: null,
   modelingSummary: null,
-  caseList: []
+  caseList: [],
+  caseInfo: null
 };
 
 const mutations = {
@@ -13,6 +14,9 @@ const mutations = {
   },
   saveCaseList(state, payload) {
     state.caseList = payload;
+  },
+  saveCaseInfo(state, payload) {
+    state.caseInfo = payload;
   }
 };
 

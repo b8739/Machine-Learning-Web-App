@@ -1,6 +1,7 @@
 
 # flask
 from flask import Flask, jsonify, request, render_template,request,url_for, Response
+from sqlalchemy.sql.sqltypes import VARCHAR
 from flask_cors import CORS
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
 
@@ -428,23 +429,45 @@ def rf_modeling():
 
 @app.route('/saveModel',methods=['POST'])
 def saveModel():
-  # get request data
-  caseName = request.get_json()['caseName']
+  """ 
+  Request로 받아서 저장해야 할 항목 (한번 저장 시 총 8개 테이블):
+  1. Case Name 
+    -> case_list ['caseName'], 
+  2. Snippet 
+    -> case_list ['snippet'] 
+  3. Modeling Parameter 
+    -> ['<case이름>_parameter']
+  4. Modeling Summary 
+    -> ['<case이름>_test/valid_summary']
+  5. Modeling Dataset (Actual Predictive) 
+    -> ['<case이름>_test/valid_actual/predictive']
+  """
 
-  # make case_list table
+  """ Session 생성 (engine_modeling) """
   Session = sessionmaker(bind=engine_modeling,autocommit=False)
   session = Session()
 
-  sql = "CREATE TABLE case_list (case_name char(20), PRIMARY KEY(case_name));"
-  session.execute(sql)
-
-  sql = " insert into case_list (case_name) VALUE ('"+caseName+"');"
-  session.execute(sql)
-  session.commit()
-  session.close
   """ 
-  1) modelingOption 전처리 및 테이블 삽입
+  1. Case Name, 
+  2. Snippet 저장 
   """
+
+  caseName = request.get_json()['caseName']
+  snippet = request.get_json()['snippet']
+
+  dict = {'caseName':caseName,'snippet':snippet}
+
+  caseName_df = pd.DataFrame(dict,index=[0])
+  caseName_df.to_sql (
+    'case_list',
+    engine_modeling,
+    if_exists='append',
+    index=False,
+    chunksize=10000,
+  ) 
+
+  """ 3. Modeling Parameter 저장 """
+
   # convert (json -> df)
   modelingOption = [1,2,3,4,5,6,7]
   modelingOption_dict = {'n_estimators':'','learning_rate':'','gamma':'','eta':'','subsample':'','colsample_bytree':'','max_depth':''}
@@ -452,47 +475,71 @@ def saveModel():
   for key in modelingOption_dict:
     modelingOption_dict[key] = modelingOption[index]
     index += 1
+    
   modelingOption_df = pd.DataFrame(modelingOption_dict,index=[caseName])
-
-  # name tables (test & valid)
-  tableName_modelingOption = caseName + '_parameter'
+  modelingOption_df.index.name = 'case_name'
   
   # convert (df -> sql)
   modelingOption_df.to_sql (
-    tableName_modelingOption,
+    'parameter',
+    engine_modeling,
+    if_exists='replace',
+    dtype={"case_name": VARCHAR(10)},
+    chunksize=10000,
+  ) 
+  """  4. Modeling Summary 저장 """
+    # convert 'modelingSummary' (json -> df)
+  modelingSummary = request.get_json()['modelingSummary']
+  modelingSummary = json.loads(modelingSummary)
+
+  modelingSummary_test_df = pd.DataFrame(modelingSummary['test'],index=[caseName])
+  modelingSummary_test_df.index.name = 'case_name'
+  modelingSummary_test_df['type'] = 'test'
+
+  modelingSummary_valid_df = pd.DataFrame(modelingSummary['valid'],index=[caseName])
+  modelingSummary_valid_df.index.name = 'case_name'
+  modelingSummary_valid_df['type'] = 'valid'
+
+  modelingSummary_df = pd.concat([modelingSummary_test_df,modelingSummary_valid_df])
+
+  # convert (df -> sql)
+  modelingSummary_df.to_sql (
+    'summary',
+    engine_modeling,
+    dtype={"case_name": VARCHAR(10)},
+    if_exists='replace',
+    chunksize=10000,
+  )
+
+  """ 5. Modeling Dataset (Actual/Predictive)저장 """
+
+  graphSources = request.get_json()['graphSources']
+  graphSources = json.loads(graphSources)
+
+  # 1) df 생성, 2) 컬럼 추가 (case 이름), 3) 컬럼 순서 재설정
+  test_df = pd.DataFrame(graphSources['test'])
+  test_df['case_name'] = caseName
+  test_df = test_df[['case_name', 'Actual', 'Predictive']]
+
+  # df -> sql table
+  test_df.to_sql (
+    'dataset_test',
     engine_modeling,
     if_exists='replace',
     index=False,
     chunksize=10000,
   ) 
-  """ 
-  2) modelingSummary 전처리 및 테이블 삽입
-  """
-  # convert 'modelingSummary' (json -> df)
-  modelingSummary = request.get_json()['modelingSummary']
-  modelingSummary = json.loads(modelingSummary)
-  modelingSummary_test_df = pd.DataFrame(modelingSummary['test'],index=[caseName])
-  modelingSummary_valid_df = pd.DataFrame(modelingSummary['valid'],index=[caseName])
-  
-  # name tables (test & valid)
-  tableName_modelingSummary_test = caseName + '_test'
-  tableName_modelingSummary_valid = caseName + '_valid'
 
-  # convert (df -> sql)
-  modelingSummary_test_df.to_sql (
-    tableName_modelingSummary_test,
+  valid_df = pd.DataFrame(graphSources['valid'])
+  valid_df['case_name'] = caseName
+  valid_df = valid_df[['case_name', 'Actual', 'Predictive']]
+
+  valid_df.to_sql (
+    'dataset_valid',
     engine_modeling,
     if_exists='replace',
-    index=False,
     chunksize=10000,
-  )
-  modelingSummary_valid_df.to_sql (
-    tableName_modelingSummary_valid,
-    engine_modeling,
-    if_exists='replace',
-    index=False,
-    chunksize=10000,
-  )  
+  ) 
   return jsonify('hello')
 
 @app.route('/loadCases',methods=['GET'])
@@ -502,11 +549,33 @@ def loadCases():
 
   sql="select * from case_list"
   caseRow = session.execute(sql).fetchall()
-  print(caseRow[0][0])
+  caseDict={'caseName':'','snippet':''}
   caseList = []
   for index,case in enumerate(caseRow):
-    caseList.append(str(caseRow[index][0]))
+    caseDict['caseName']=caseRow[index][0]
+    caseDict['snippet']=caseRow[index][1]
+    caseList.append({'caseName':caseDict['caseName'],'snippet': caseDict['snippet']})
+    # caseList.append(str(caseRow[index][0]))
   return jsonify(caseList)
+
+@app.route('/changeCase',methods=['GET'])
+def changeCase():
+  Session = sessionmaker(bind=engine_modeling,autocommit=False)
+  session = Session()
+
+  caseName = request.args.get('caseName')
+  sql="show tables in modeling like '"+caseName+"%';"
+  caseList = session.execute(sql).fetchall()
+  caseInfo = {}
+  caseValue = []
+  
+  for index,case in enumerate(caseList):
+    sql = "select * from "+ caseList[index][0]
+    # caseInfo[caseList[index][0]] = list(session.execute(sql).fetchall())
+    for i,c in enumerate(session.execute(sql).fetchall()):
+      caseInfo[caseList[index][0]] =list(c)
+  print(caseInfo)
+  return jsonify(caseInfo)
 
 if __name__ == '__main__':
     app.run(debug=True)

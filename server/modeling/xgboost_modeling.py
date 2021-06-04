@@ -53,7 +53,6 @@ def xgboost(modelingOption):
     y= y.drop(y.index[startIndex:])
 
     ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
-    # 두 단계에 거쳐서 Dataset을 Train, Test, Validation (6:2:2)로 나눔
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
     # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test,test_size=0.5,random_state=123)
 
@@ -115,19 +114,6 @@ def xgboost(modelingOption):
     MAPE_valid = str(round(MAPE_valid,2))+'%'
     rSquare_valid = round(rSquare_valid,4)
     RMSE_valid = round(RMSE_valid,4)
-
-  
-
-    ## VISUALIZE THE RESULTS ##
-    # w0 = pd.DataFrame(range(len(y_test)))
-    # w1 = pd.DataFrame(y_test)
-    # w1 = w1.reset_index(drop = True)
-    # w2 = pd.DataFrame(xgb_model_predict_test)
-
-    # result = pd.concat([w0,w1], axis = 1)
-    # result2 = pd.concat([w0,w2], axis = 1)
-    # result.columns = ['x','y']
-    # result2.columns = ['x','y']
 
     # 반환
     modelingResult = {'test':None, 'valid':None}

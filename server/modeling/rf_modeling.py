@@ -45,18 +45,31 @@ def rf(modelingOption):
   ## EXTRACT X & y SEPARATELY ##
   X = df_00.drop('MEDV', axis = 1)
   y = df_00['MEDV']
+  
+  ## Valid Data (20%) 사전에 추출 ##
+  startIndex = round(len(df_00)*0.8)
+  X_valid = X[startIndex:]
+  y_valid = y[startIndex:]
 
+  X= X.drop(X.index[startIndex:])
+  y= y.drop(y.index[startIndex:])
+  
   ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
 
+  # test
   train_X = X_train 
   test_X = X_test
+
+  # valid
+  valid_X = X_valid
 
   ## NORMALIZATION ##
   scalerX = StandardScaler()
   scalerX.fit(train_X)
   train_Xn = scalerX.transform(train_X)
   test_Xn = scalerX.transform(test_X)
+  valid_Xn = scalerX.transform(valid_X)
 
   ## CASE 02. 'RANDOM FOREST' ALGORITHM ##
 
@@ -67,42 +80,34 @@ def rf(modelingOption):
                                   min_samples_split = modelingOption[1])
 
   rf_model.fit(train_Xn, y_train)
-  rf_model_predict = rf_model.predict(test_Xn)
+  rf_model_predict_test = rf_model.predict(test_Xn)
+  rf_model_predict_valid = rf_model.predict(valid_Xn)
 
-  rSquare = r2_score(y_test, rf_model_predict)
-  RMSE = mean_squared_error(y_test, rf_model_predict)**0.5
-  MAPE1 = MAPE(y_test, rf_model_predict)
+  rSquare_test = r2_score(y_test, rf_model_predict_test)
+  RMSE_test = mean_squared_error(y_test, rf_model_predict_test)**0.5
+  MAPE_test = MAPE(y_test, rf_model_predict_test)
 
-    # formatting (round)
-  MAPE1 = str(round(MAPE1,2))+'%'
-  rSquare = round(rSquare,4)
-  RMSE = round(RMSE,4)
+  # formatting (round)
+  MAPE_test = str(round(MAPE_test,2))+'%'
+  rSquare_test = round(rSquare_test,4)
+  RMSE_test = round(RMSE_test,4)
 
-  print('R_square of RF :', rSquare)
-  print('RMSE of RF :', RMSE)
-  print('MAPE of RF :',MAPE1)
+  rSquare_valid = r2_score(y_valid, rf_model_predict_valid)
+  RMSE_valid = mean_squared_error(y_valid, rf_model_predict_valid)**0.5
+  MAPE_valid = MAPE(y_valid, rf_model_predict_valid)
 
-  ## VISUALIZE THE RESULTS ##
-  z0 = pd.DataFrame(range(len(y_test)))
-  z1 = pd.DataFrame(y_test)
-  z1 = z1.reset_index(drop = True)
-  z2 = pd.DataFrame(rf_model_predict)
-
-  # result = pd.concat([z0, z1, z2], axis = 1)
-  # result.columns = ['no', 'Actual', 'Predictive']
-
-  # ## Graphs ##
-  # plt.style.use('bmh')
-  # # plt.style.use('ggplot')
-  # plt.figure(figsize = (12, 5))
-  # plt.plot(result.iloc[:, 1], color = 'dodgerblue', alpha = 0.3, marker = 'o', linewidth = 0.5)
-  # plt.plot(result.iloc[:, 2], color = 'brown', alpha = 0.4, marker = 'o', linewidth = 0.5)
-  # plt.title('Actual vs. Predictive : RF')
-  # plt.show()
+  # formatting (round)
+  MAPE_valid = str(round(MAPE_valid,2))+'%'
+  rSquare_valid = round(rSquare_valid,4)
+  RMSE_valid = round(RMSE_valid,4)
 
   # 반환
-  modelingResult = {'R_square of RF': rSquare, 'RMSE of RF': RMSE,'MAPE of RF': MAPE1}
+  modelingResult = {'test':None, 'valid':None}
+  modelingResult['test'] = {'R_square of RF': rSquare_test, 'RMSE_test of RF': RMSE_test,'MAPE of RF': MAPE_test}
+  modelingResult['valid'] = {'R_square of RF': rSquare_valid, 'RMSE_test of RF': RMSE_valid,'MAPE of RF': MAPE_valid}
 
-  # print(y_test.tolist())
-  chartData = {'Actual':y_test.tolist(),'Predictive':rf_model_predict.tolist()}
-  return jsonify(chartData,modelingResult)
+  modelingValues = {'test':None, 'valid':None}
+  modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':rf_model_predict_test.tolist()}
+  modelingValues['valid'] = {'Actual':y_valid.tolist(),'Predictive':rf_model_predict_valid.tolist()}
+
+  return jsonify(modelingValues,modelingResult)

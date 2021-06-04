@@ -145,7 +145,7 @@ export default {
           text: "Loading..."
         },
         xaxis: {
-          type: "datetime",
+          // type: "datetime",
           labels: {
             minHeight: 50,
             rotate: -30,
@@ -207,8 +207,9 @@ export default {
       this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
       this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
       this.updateSeriesLine(this.dataArray, this.seriesName);
-      this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
-      this.updateCategories(this.dateArray);
+      // time series 아니라서 일단 밑에 2줄 주석 처리
+      // this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
+      // this.updateCategories(this.dateArray);
     }
   },
   computed: {
