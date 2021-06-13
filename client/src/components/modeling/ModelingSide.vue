@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" absolute width="100%">
+  <v-navigation-drawer v-model="drawer" width="100%">
     <v-tabs v-model="tab" centered>
       <v-tab>Build</v-tab>
       <v-tab>Settings</v-tab>

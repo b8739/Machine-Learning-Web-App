@@ -37,6 +37,7 @@ export default {
     ...mapState({
       modelingSummary: state => state.modelingResult.modelingSummary
     }),
+
     test_result() {
       let results = [];
       let resultsFormat = {};

@@ -14,5 +14,5 @@ export default new Vuex.Store({
     modelingData,
     modelingResult
   },
-  plugins: [createPersistedState({ paths: ["initialData", "modelingResult"] })]
+  plugins: [createPersistedState({ paths: ["initialData", "modelingData", "modelingResult"] })]
 });

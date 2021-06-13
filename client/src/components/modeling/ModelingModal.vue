@@ -102,6 +102,14 @@
                   <v-card-subtitle>Normalization</v-card-subtitle>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col offset="1" cols="3">
+                  <v-card-text>Scaler Tool</v-card-text>
+                </v-col>
+                <v-col cols="6">
+                  <v-select :items="normalization_items"></v-select>
+                </v-col>
+              </v-row>
               <v-row v-for="(dataType, index) in dataTypes" :key="index" no-gutters>
                 <v-col offset="1" cols="3">
                   <v-card-text class="pt-5">
@@ -179,13 +187,14 @@ export default {
     return {
       model: 1,
       tab: null,
-      dataTypes: ["X Train Data", "X Test Data", "Y Train Data", "Y Test Data"],
+      dataTypes: ["X Train Data", "X Test Data"],
       dialog: false,
       formFields: [1, 2, 3],
       dataInfoLabels: ["Dataset", "Dataset Version", "Subset"],
       dataTypelabels: ["Training", "Validation", "Test"],
       datasetRatio: ["60%", "20%", "20%"],
       snippets: ["XGBoost", "Random Forest", "SVR"],
+      normalization_items: ["Standard Scaler"],
       hideDetailsProps: {
         "hide-details": true
       },
@@ -232,7 +241,7 @@ export default {
     createModel() {
       this.dialog = false;
       this.saveSnippet(this.chosenSnippet);
-      eventBus.$emit("createModel", true);
+      this.$router.push({ name: "modeling" });
     }
   },
   components: {

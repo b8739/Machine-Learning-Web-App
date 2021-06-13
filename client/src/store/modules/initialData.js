@@ -6,7 +6,8 @@ const state = {
   summarizedInfo: [],
   indexNum: "",
   columns: [],
-  tableList: []
+  tableList: [],
+  navStatus: null
 };
 
 const mutations = {
@@ -16,7 +17,9 @@ const mutations = {
   loadIndexNum(state, payload) {
     state.indexNum = payload;
   },
-
+  setNavStatus(state, payload) {
+    state.navStatus = payload;
+  },
   saveResponseData(state) {
     state.columns = [];
     let columnValues = Object.keys(state.dataset);

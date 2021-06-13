@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <Header />
     <div id="content" class="content">
       <router-view></router-view>
     </div>
@@ -34,6 +33,9 @@ export default {
 }
 a {
   text-decoration: none;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
 
 /* base.html */

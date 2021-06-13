@@ -6,8 +6,10 @@
         <v-list-item-title class="font-weight-bold">Cases</v-list-item-title>
       </v-list-item>
       <v-list-item v-for="(case_, index) in caseList" :key="index">
-        <v-sheet light outlined height="100" width="100%" @click="changeCase(case_[caseName])">
-          <v-card-text class="font-weight-bold pt-2 pb-0"> {{ case_["caseName"] }}</v-card-text>
+        <v-sheet light outlined height="100" width="100%" @click="newWindow(case_[case_name])">
+          <v-card-text class="font-weight-bold subheading pt-2 pb-0">
+            {{ case_["case_name"] }}</v-card-text
+          >
           <v-card-text class="font-weight-light caption pt-2 pb-1">
             {{ case_["snippet"] }}</v-card-text
           >
@@ -26,7 +28,7 @@ export default {
     return {
       tab: null,
       drawer: true,
-      caseName: "caseName"
+      case_name: "case_name"
     };
   },
   computed: {
@@ -37,6 +39,8 @@ export default {
   methods: {
     ...mapMutations("modelingResult", ["saveCaseList"]),
     ...mapMutations("modelingResult", ["saveCaseInfo"]),
+    ...mapMutations("modelingResult", ["saveGraphSources"]),
+    ...mapMutations("modelingResult", ["saveModelingSummary"]),
     loadCases() {
       console.log("loadCases");
       let path = "http://localhost:5000/loadCases";
@@ -47,22 +51,25 @@ export default {
         })
         .catch(error => {});
     },
-    changeCase(caseName) {
-      let path = "http://localhost:5000/changeCase";
-      axios
-        .get(path, {
-          params: {
-            //snippetProp 전송
-            caseName: caseName
-          }
-        })
-        .then(res => {
-          this.saveCaseInfo(res.data);
-          console.log(res.data);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+    newWindow(case_name) {
+      let w = 1000;
+      let h = 500;
+      let leftPosition = (screen.width - w) / 2;
+      let topPosition = (screen.height - h) / 2;
+      let url = "http://localhost:8080/modelingResult?" + case_name;
+      window.open(
+        url,
+        "modelingResult",
+        "width=" +
+          w +
+          ",height=" +
+          h +
+          ",top=" +
+          topPosition +
+          ",left=" +
+          leftPosition +
+          ", scrollbars=no"
+      );
     }
   },
   created() {

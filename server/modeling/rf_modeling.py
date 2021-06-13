@@ -56,7 +56,7 @@ def rf(modelingOption):
   
   ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
-
+  print(y_test.tolist())
   # test
   train_X = X_train 
   test_X = X_test
@@ -103,8 +103,8 @@ def rf(modelingOption):
 
   # 반환
   modelingResult = {'test':None, 'valid':None}
-  modelingResult['test'] = {'R_square of RF': rSquare_test, 'RMSE_test of RF': RMSE_test,'MAPE of RF': MAPE_test}
-  modelingResult['valid'] = {'R_square of RF': rSquare_valid, 'RMSE_test of RF': RMSE_valid,'MAPE of RF': MAPE_valid}
+  modelingResult['test'] = {'R_square': rSquare_test, 'RMSE': RMSE_test,'MAPE': MAPE_test}
+  modelingResult['valid'] = {'R_square': rSquare_valid, 'RMSE': RMSE_valid,'MAPE': MAPE_valid}
 
   modelingValues = {'test':None, 'valid':None}
   modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':rf_model_predict_test.tolist()}

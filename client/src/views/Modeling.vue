@@ -1,43 +1,50 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="2">
-        <ModelingSide v-if="modelingProcess" />
-        <ModelingResultSide v-else />
-      </v-col>
-      <v-col cols="10">
-        <v-toolbar elevation="1" dense>
-          <v-spacer></v-spacer
-          ><v-btn @click="runModel" v-if="modelingProcess"
-            ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
-          >
-          <v-btn v-else @click="dialog = true">Save Model</v-btn>
-        </v-toolbar>
-        <Canvas v-if="showCanvas"></Canvas>
-        <ModelingResult v-else />
-      </v-col>
-    </v-row>
-    <!-- dialog -->
-    <v-dialog v-model="dialog" persistent max-width="400px">
-      <v-card>
-        <v-container fluid>
-          <span class="headline">Name of Case</span>
-          <!-- 최상단 메뉴 탭 -->
+  <div>
+    <Header></Header>
 
-          <v-text-field v-model="caseName" placeholder="Case 1" required></v-text-field>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="dialog = !dialog" color="gray darken-1" text>
-              Close
-            </v-btn>
-            <v-btn @click="saveModel" color="blue darken-1" @click.once="eventHandler" text>
-              Confirm
-            </v-btn>
-          </v-card-actions>
-        </v-container>
-      </v-card>
-    </v-dialog>
-  </v-container>
+    <v-app>
+      <v-container fluid>
+        <v-row>
+          <v-col cols="2">
+            <ModelingSide v-if="modelingProcess" />
+            <ModelingResultSide v-else />
+          </v-col>
+          <v-col cols="10">
+            <v-toolbar elevation="1" dense>
+              <v-spacer></v-spacer
+              ><v-btn @click="runModel" v-if="modelingProcess"
+                ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
+              >
+
+              <v-btn @click="dialog = true">Save Model</v-btn>
+            </v-toolbar>
+            <Canvas v-if="showCanvas"></Canvas>
+            <ModelingResult v-else />
+          </v-col>
+        </v-row>
+        <!-- dialog -->
+        <v-dialog v-model="dialog" persistent max-width="400px">
+          <v-card>
+            <v-container fluid>
+              <span class="headline">Name of Case</span>
+              <!-- 최상단 메뉴 탭 -->
+
+              <v-text-field v-model="case_name" placeholder="Case 1" required></v-text-field>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="dialog = !dialog" color="gray darken-1" text>
+                  Close
+                </v-btn>
+                <v-btn @click="saveModel" color="blue darken-1" @click.once="eventHandler" text>
+                  Confirm
+                </v-btn>
+              </v-card-actions>
+            </v-container>
+          </v-card>
+        </v-dialog>
+      </v-container>
+    </v-app>
+  </div>
 </template>
 <script>
 import axios from "axios";
@@ -54,7 +61,7 @@ import ModelingResultSide from "@/components/modeling/ModelingResultSide.vue";
 export default {
   data() {
     return {
-      caseName: "",
+      case_name: "",
       showCanvas: true,
       dialog: false,
 
@@ -74,6 +81,7 @@ export default {
   },
   methods: {
     ...mapMutations("modelingResult", ["saveCaseList"]),
+
     loadCases() {
       console.log("loadCases");
       let path = "http://localhost:5000/loadCases";
@@ -95,7 +103,7 @@ export default {
         method: "post",
         url: path,
         data: {
-          caseName: this.caseName,
+          case_name: this.case_name,
           modelingOption: this.modelingOption,
           snippet: this.snippet,
           graphSources: JSON.stringify(this.graphSources),
@@ -123,6 +131,15 @@ export default {
     })
   },
   created() {
+    let caseNameFromUrl = this.$route.params.case;
+    // console.log(caseNameFromUrl);
+    if (caseNameFromUrl != null) {
+      this.showCanvas = false;
+      this.modelingProcess = false;
+
+      eventBus.$emit("changeCase", caseNameFromUrl);
+    }
+    // eventbus
     eventBus.$on("inputFeatures", inputFeatures => {
       this.inputFeatures = inputFeatures;
     });
@@ -130,7 +147,7 @@ export default {
       this.targetFeatures = targetFeatures;
     });
     eventBus.$on("showModelingResult", status => {
-      this.showCanvas = !this.showCanvas;
+      this.showCanvas = false;
     });
     eventBus.$on("modelingOption", modelingOption => {
       this.modelingOption = modelingOption;

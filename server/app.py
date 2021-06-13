@@ -56,19 +56,19 @@ app.config["TEMPLATES_AUTO_RELOAD"] = False
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 # 임시 schema
-class DataInfo(Base):
-    __tablename__ = 'dataInfo'
-    columnName = Column(String(300),primary_key=True)
-    dataType = Column(String(300))
-    normalization = Column(String(300))
-    mean = Column(Integer)
-    stdev = Column(String(300))
-    quartile = Column(String(300))
-    numofna = Column(String(300))
+# class DataInfo(Base):
+#     __tablename__ = 'dataInfo'
+#     columnName = Column(String(300),primary_key=True)
+#     dataType = Column(String(300))
+#     normalization = Column(String(300))
+#     mean = Column(Integer)
+#     stdev = Column(String(300))
+#     quartile = Column(String(300))
+#     numofna = Column(String(300))
     
 # engine_dataset
-URI_dataset = 'mysql+mysqldb://root:0000@localhost/newdatabase'
-URI_modeling = 'mysql+mysqldb://root:0000@localhost/modeling'
+URI_dataset = 'mysql+mysqldb://root:0000@localhost/datasets'
+URI_modeling = 'mysql+mysqldb://root:0000@localhost/project_1'
 engine_dataset = create_engine(URI_dataset,echo = False)
 engine_modeling = create_engine(URI_modeling,echo = False)
 Session = sessionmaker(bind=engine_dataset,autocommit=False)
@@ -102,7 +102,7 @@ def dataupload():
   
 
     file = request.files['csv_data']
-	# dataInfo 테이블 생성
+	# dataset 테이블 생성
     Base.metadata.create_all(engine_dataset)
     # pyarrow
     pyarrow_table = csv.read_csv(file)
@@ -372,13 +372,12 @@ def changeColumnOrder():
 @app.route('/loadSummarizedData',methods=['GET'])
 def loadSummarizedData():
   df = pd.read_sql_table('temp_dataset', session.bind)
-
   return (summarizeData(df))
 
 @app.route('/xgboost_modeling',methods=['GET'])
 def xgboost_modeling():
   modelingOption_str = request.args.get('modelingOption')
-  print(modelingOption_str)
+  # print(modelingOption_str)
   modelingOption_list = modelingOption_str.split(',')
   # 개발 편의성 속성 직접 받지 않고 주석처리
   # for index,value in enumerate(modelingOption_list):
@@ -396,25 +395,25 @@ def svr_modeling():
   modelingOption_str = request.args.get('modelingOption')
 
   modelingOption_list = modelingOption_str.split(',')
-  print(modelingOption_list)
+
   # 개발 편의상 주석처리
-  # for index,value in enumerate(modelingOption_list):
-  #   #str이 아닐 때 (int/float일 때)만 if 문 작동
-  #   print(modelingOption_list[index].isalpha()==False)
-  #   if modelingOption_list[index].isalpha()==False:
-  #     # 문자에 .이 포함되어있으면 소수이니 float으로 변환
-  #     if modelingOption_list[index].find('.') != -1:
-  #       modelingOption_list[index] = float(value)
-  #     # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
-  #     else: 
-  #       modelingOption_list[index] = int(value)
-  print(modelingOption_list)
+  for index,value in enumerate(modelingOption_list):
+    #str이 아닐 때 (int/float일 때)만 if 문 작동
+    print(modelingOption_list[index].isalpha()==False)
+    if modelingOption_list[index].isalpha()==False:
+      # 문자에 .이 포함되어있으면 소수이니 float으로 변환
+      if modelingOption_list[index].find('.') != -1:
+        modelingOption_list[index] = float(value)
+      # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+      else: 
+        modelingOption_list[index] = int(value)
+
   return (svr(modelingOption_list))
 
 @app.route('/rf_modeling',methods=['GET'])
 def rf_modeling():
   modelingOption_str = request.args.get('modelingOption')
-  print(modelingOption_str)
+
   modelingOption_list = modelingOption_str.split(',')
 
   for index,value in enumerate(modelingOption_list):
@@ -424,7 +423,7 @@ def rf_modeling():
     # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
     else: 
       modelingOption_list[index] = int(value)
-  print(modelingOption_list)
+
   return (rf(modelingOption_list))
 
 @app.route('/saveModel',methods=['POST'])
@@ -432,13 +431,17 @@ def saveModel():
   """ 
   Request로 받아서 저장해야 할 항목 (한번 저장 시 총 8개 테이블):
   1. Case Name 
-    -> case_list ['caseName'], 
+    -> case_list ['case_name'], 
+
   2. Snippet 
     -> case_list ['snippet'] 
+
   3. Modeling Parameter 
     -> ['<case이름>_parameter']
+
   4. Modeling Summary 
     -> ['<case이름>_test/valid_summary']
+
   5. Modeling Dataset (Actual Predictive) 
     -> ['<case이름>_test/valid_actual/predictive']
   """
@@ -452,13 +455,15 @@ def saveModel():
   2. Snippet 저장 
   """
 
-  caseName = request.get_json()['caseName']
+  case_name = request.get_json()['case_name']
   snippet = request.get_json()['snippet']
 
-  dict = {'caseName':caseName,'snippet':snippet}
+  dict = {'case_name':case_name,'snippet':snippet}
 
-  caseName_df = pd.DataFrame(dict,index=[0])
-  caseName_df.to_sql (
+  case_name_df = pd.DataFrame(dict,index=[0])
+  case_name_df['dataset'] = 'dataset_1'
+  
+  case_name_df.to_sql (
     'case_list',
     engine_modeling,
     if_exists='append',
@@ -476,14 +481,14 @@ def saveModel():
     modelingOption_dict[key] = modelingOption[index]
     index += 1
     
-  modelingOption_df = pd.DataFrame(modelingOption_dict,index=[caseName])
+  modelingOption_df = pd.DataFrame(modelingOption_dict,index=[case_name])
   modelingOption_df.index.name = 'case_name'
   
   # convert (df -> sql)
   modelingOption_df.to_sql (
     'parameter',
     engine_modeling,
-    if_exists='replace',
+    if_exists='append',
     dtype={"case_name": VARCHAR(10)},
     chunksize=10000,
   ) 
@@ -492,11 +497,11 @@ def saveModel():
   modelingSummary = request.get_json()['modelingSummary']
   modelingSummary = json.loads(modelingSummary)
 
-  modelingSummary_test_df = pd.DataFrame(modelingSummary['test'],index=[caseName])
+  modelingSummary_test_df = pd.DataFrame(modelingSummary['test'],index=[case_name])
   modelingSummary_test_df.index.name = 'case_name'
   modelingSummary_test_df['type'] = 'test'
 
-  modelingSummary_valid_df = pd.DataFrame(modelingSummary['valid'],index=[caseName])
+  modelingSummary_valid_df = pd.DataFrame(modelingSummary['valid'],index=[case_name])
   modelingSummary_valid_df.index.name = 'case_name'
   modelingSummary_valid_df['type'] = 'valid'
 
@@ -507,7 +512,7 @@ def saveModel():
     'summary',
     engine_modeling,
     dtype={"case_name": VARCHAR(10)},
-    if_exists='replace',
+    if_exists='append',
     chunksize=10000,
   )
 
@@ -518,28 +523,31 @@ def saveModel():
 
   # 1) df 생성, 2) 컬럼 추가 (case 이름), 3) 컬럼 순서 재설정
   test_df = pd.DataFrame(graphSources['test'])
-  test_df['case_name'] = caseName
+  test_df['case_name'] = case_name
   test_df = test_df[['case_name', 'Actual', 'Predictive']]
 
   # df -> sql table
   test_df.to_sql (
     'dataset_test',
     engine_modeling,
-    if_exists='replace',
+    if_exists='append',
     index=False,
     chunksize=10000,
   ) 
 
   valid_df = pd.DataFrame(graphSources['valid'])
-  valid_df['case_name'] = caseName
+  valid_df['case_name'] = case_name
   valid_df = valid_df[['case_name', 'Actual', 'Predictive']]
 
   valid_df.to_sql (
     'dataset_valid',
     engine_modeling,
-    if_exists='replace',
+    if_exists='append',
+    index=False,
     chunksize=10000,
-  ) 
+  )
+  session.commit()
+  session.close
   return jsonify('hello')
 
 @app.route('/loadCases',methods=['GET'])
@@ -549,13 +557,15 @@ def loadCases():
 
   sql="select * from case_list"
   caseRow = session.execute(sql).fetchall()
-  caseDict={'caseName':'','snippet':''}
+  caseDict={'case_name':'','snippet':''}
   caseList = []
   for index,case in enumerate(caseRow):
-    caseDict['caseName']=caseRow[index][0]
+    caseDict['case_name']=caseRow[index][0]
     caseDict['snippet']=caseRow[index][1]
-    caseList.append({'caseName':caseDict['caseName'],'snippet': caseDict['snippet']})
+    caseList.append({'case_name':caseDict['case_name'],'snippet': caseDict['snippet']})
     # caseList.append(str(caseRow[index][0]))
+  session.commit()
+  session.close
   return jsonify(caseList)
 
 @app.route('/changeCase',methods=['GET'])
@@ -563,19 +573,65 @@ def changeCase():
   Session = sessionmaker(bind=engine_modeling,autocommit=False)
   session = Session()
 
-  caseName = request.args.get('caseName')
-  sql="show tables in modeling like '"+caseName+"%';"
-  caseList = session.execute(sql).fetchall()
-  caseInfo = {}
-  caseValue = []
+  case_name = request.args.get('case_name')
+  """ 1) Graph """
+  # sql 정의
+  test_actual="select Actual from dataset_test where case_name = '"+case_name +"';"
+  test_predictive="select Predictive from dataset_test where case_name = '"+case_name +"';"
+  valid_actual="select Actual from dataset_valid where case_name = '"+case_name +"';"
+  valid_predictive="select Predictive from dataset_valid where case_name = '"+case_name +"';"
+
+  # sql 실행 반환 값 저장 (test & valid dataset)
+  test_actual_list = []
+  for i,c in enumerate(session.execute(test_actual).fetchall()):
+    test_actual_list.append(c[0])
   
-  for index,case in enumerate(caseList):
-    sql = "select * from "+ caseList[index][0]
-    # caseInfo[caseList[index][0]] = list(session.execute(sql).fetchall())
-    for i,c in enumerate(session.execute(sql).fetchall()):
-      caseInfo[caseList[index][0]] =list(c)
-  print(caseInfo)
-  return jsonify(caseInfo)
+  test_predictive_list = []
+  for i,c in enumerate(session.execute(test_predictive).fetchall()):
+    test_predictive_list.append(c[0])
+
+  valid_actual_list = []
+  for i,c in enumerate(session.execute(valid_actual).fetchall()):
+    valid_actual_list.append(c[0])
+
+  valid_predictive_list = []
+  for i,c in enumerate(session.execute(valid_predictive).fetchall()):
+    valid_predictive_list.append(c[0])
+
+  # return format 정리
+  modeling_dataset = {'test':None,'valid':None}
+  modeling_dataset['test'] = {'Actual':test_actual_list,'Predictive':test_predictive_list}
+  modeling_dataset['valid'] = {'Actual':valid_actual_list,'Predictive':valid_predictive_list}
+  
+  """ 2) Table """
+  caseList = []
+  test_modelingSummary = "select * from summary where case_name = '"+case_name +"';"
+
+  listConverted = []
+  for i,c in enumerate(session.execute(test_modelingSummary).fetchall()):
+    listConverted.append(list(c))
+    listConverted[i].pop(0)
+    listConverted[i].pop(-1)
+
+  modeling_summary = {'test':{'MAPE':listConverted[0][0],'RMSE':listConverted[0][1],'R_square':listConverted[0][2]},
+  'valid':{'MAPE':listConverted[1][0],'RMSE':listConverted[1][1],'R_square':listConverted[1][2]}}
+
+  print(modeling_summary)
+
+  return jsonify(modeling_dataset,modeling_summary)
+
+@app.route('/loadProjects',methods=['GET'])
+def loadProjects():
+  Session = sessionmaker(bind=engine_modeling,autocommit=False)
+  session = Session()
+  sql = "SHOW DATABASES LIKE '%project%';"
+  project_list = []
+  for i,v in enumerate(session.execute(sql).fetchall()):
+    project_list = project_list+list(v)
+  print(project_list)
+  session.commit()
+  session.close
+  return jsonify(project_list)
 
 if __name__ == '__main__':
     app.run(debug=True)

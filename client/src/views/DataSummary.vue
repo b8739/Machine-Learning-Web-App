@@ -1,13 +1,8 @@
 <template>
   <div id="wrap">
-    <!-- <div class="sidebar">
-      <div class="editData">
-        <button class="editButton btn-1" type="button" v-b-modal.add-modal>Add Row</button>
-        <button class="editButton btn-1" type="button" @click="showElement()">Update Row</button>
-      </div>
-    </div> -->
+    <Header></Header>
     <v-app>
-      <v-container v-show="featureFlag" id="mainWrapper" fluid>
+      <v-container id="mainWrapper" fluid>
         <v-row>
           <!-- 화면 좌측 -->
           <v-col cols="2"><SideMenu /></v-col>
@@ -32,7 +27,7 @@
               <DeleteStepper />
               <AverageModal />
               <ChangeOrder />
-              <ModelingModal />
+
               <DataFeatures
                 :class="{ visibilityHidden: showFeatures }"
                 :columnsWithoutIndex="columnsWithoutIndex"
@@ -52,9 +47,6 @@
           </v-col>
         </v-row>
       </v-container>
-      <v-container fluid>
-        <Modeling v-if="modelingPreprocessFlag" />
-      </v-container>
     </v-app>
   </div>
 </template>
@@ -73,7 +65,7 @@ import InfiniteTable from "@/components/layout/InfiniteTable";
 import SideMenu from "@/components/layout/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 import ChangeOrder from "@/components/changeOrder/ChangeOrder.vue";
-import ModelingModal from "@/components/modeling/ModelingModal.vue";
+
 import Modeling from "./Modeling.vue";
 
 //vuex
@@ -111,7 +103,7 @@ export default {
     DeleteStepper,
     AverageModal,
     ChangeOrder,
-    ModelingModal,
+
     Modeling
   },
   // props: ["summarizedInfo"],
@@ -133,8 +125,10 @@ export default {
   },
   methods: {
     ...mapMutations("initialData", ["setHadLoaded"]),
+    ...mapMutations("initialData", ["setNavStatus"]),
     // ...mapMutations("initialData", ["loadSummarizedInfo"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
+    ...mapActions("initialData", ["loadSummarizedData"]),
     // showDrawer() {
     //   eventBus.$emit("showDrawer", true);
     // },
@@ -217,20 +211,11 @@ export default {
     }
   },
   created() {
-    // this.loadData(); //store.js 실험하기 위해서 일단 주석 처리
     this.loadFundamentalData("http://localhost:5000/loadData");
-    eventBus.$on("createModel", modelingStatus => {
-      this.featureFlag = false;
-      this.modelingPreprocessFlag = true;
-    });
-    // this.loadSummarizedInfo(this.summarizedData);
-
-    // this.$store.dispatch("loadFundamentalData", "http://localhost:5000/loadData");
-    // this.loadData();
+    this.loadSummarizedData();
+    this.setNavStatus("datasummary");
   },
-  mounted() {},
-  beforeUpdate() {},
-  updated() {}
+  mounted() {}
 };
 </script>
 

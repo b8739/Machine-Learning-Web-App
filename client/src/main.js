@@ -2,6 +2,13 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "@/store/index";
+// global component
+import Header from "@/components/layout/Header.vue";
+Vue.component("Header", Header);
+// axios
+import axios from "axios";
+Vue.prototype.$axios = axios;
+
 // konva
 import VueKonva from "vue-konva";
 // apex charts

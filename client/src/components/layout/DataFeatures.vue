@@ -47,13 +47,22 @@
             </tr> -->
               <tr>
                 <span class="info_title">Num. of NA: </span>
-                <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span
-                ><br />
-                <span class="info_title">Most Frequent Value: </span>
+                <span>{{ categorical_numOfNaJson[categoricalColumn] }}</span>
+              </tr>
+              <tr>
+                <span class="info_title">Shape:</span>
+              </tr>
+              <tr>
+                <span class="info_title">Unique Values</span>
+              </tr>
+              <tr>
+                <span class="info_title">Most Common:</span>
               </tr>
             </td>
 
-            <td></td>
+            <td>
+              <span class="info_title">Sampels For Class:</span>
+            </td>
           </tr>
         </draggable>
 
@@ -131,7 +140,7 @@
             </td>
             <!-- 5th column -->
             <td>
-              <span class="tdTitle" @click="showTimeSeriesGraph()">Time Series Graph</span>
+              <!-- <p class="text-center  font-weight-medium">Graph</p> -->
               <TimeSeries
                 :rawDataset="dataset[numericColumns[numericIndex]]"
                 :date="dataset['ts']"
@@ -207,9 +216,8 @@ export default {
       editModal_date: {},
       editModal_indexNum: {},
       editModal_darkenBackground: false,
-      selectedColumnIndex: null,
+      selectedColumnIndex: null
       //etc (for dataset parsing)
-      show_timeSeriesGraph: false
     };
   },
   components: {
@@ -321,9 +329,7 @@ export default {
       // this.editModal_date = {};
       // this.editModal_indexNum = {};
     },
-    showTimeSeriesGraph() {
-      this.show_timeSeriesGraph = !this.show_timeSeriesGraph;
-    },
+
     loadDataSummary() {
       this.numeric_meanJson = this.summarizedInfo[0]["mean"];
       this.numeric_stdJson = this.summarizedInfo[0]["std"];

@@ -174,8 +174,26 @@ export default {
       }
     };
   },
+
   watch: {
+    graphSources: function(data) {
+      this.updateChart();
+    },
     chartStatus: function(data) {
+      this.updateChart();
+    }
+  },
+  created() {
+    this.chartStatus = true;
+  },
+  mounted() {},
+  computed: {
+    ...mapState({
+      graphSources: state => state.modelingResult.graphSources
+    })
+  },
+  methods: {
+    updateChart() {
       this.$refs.testChart.updateSeries([
         {
           name: "Actual",
@@ -196,24 +214,7 @@ export default {
           data: this.graphSources["valid"]["Predictive"]
         }
       ]);
-    }
-  },
-  created() {
-    this.chartStatus = true;
-  },
-  mounted() {},
-  computed: {
-    ...mapState({
-      graphSources: state => state.modelingResult.graphSources
-    })
-  },
-  methods: {
-    putIntoArray(jsonObject, targetArray, randomIndex) {
-      for (let i = 0; i < randomIndex.length; i++) {
-        targetArray.push(jsonObject[randomIndex[i]]);
-      }
     },
-
     //date methods
     formatDate(dateArray) {
       for (let i = 0; i < dateArray.length; i++) {

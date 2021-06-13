@@ -111,6 +111,9 @@ export default {
   computed: {
     ...mapState({})
   },
+  methods: {
+    ...mapMutations("initialData", ["setNavStatus"])
+  },
   components: {
     ColumnList,
     DragBoxXaxis,

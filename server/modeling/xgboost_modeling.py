@@ -117,8 +117,8 @@ def xgboost(modelingOption):
 
     # 반환
     modelingResult = {'test':None, 'valid':None}
-    modelingResult['test'] = {'R_square of XGB': rSquare_test, 'RMSE_test of XGB': RMSE_test,'MAPE of XGB': MAPE_test}
-    modelingResult['valid'] = {'R_square of XGB': rSquare_valid, 'RMSE_test of XGB': RMSE_valid,'MAPE of XGB': MAPE_valid}
+    modelingResult['test'] = {'R_square': rSquare_test, 'RMSE': RMSE_test,'MAPE': MAPE_test}
+    modelingResult['valid'] = {'R_square': rSquare_valid, 'RMSE': RMSE_valid,'MAPE': MAPE_valid}
 
     modelingValues = {'test':None, 'valid':None}
     modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict_test.tolist()}

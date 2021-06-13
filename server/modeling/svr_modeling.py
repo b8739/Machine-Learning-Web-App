@@ -118,8 +118,8 @@ def svr(modelingOption):
 
 
   modelingResult = {'test':None, 'valid':None}
-  modelingResult['test'] = {'R_square of SVR': rSquare_test, 'RMSE_test of SVR': RMSE_test,'MAPE of SVR': MAPE_test}
-  modelingResult['valid'] = {'R_square of SVR': rSquare_valid, 'RMSE_test of SVR': RMSE_valid,'MAPE of SVR': MAPE_valid}
+  modelingResult['test'] = {'R_square': rSquare_test, 'RMSE': RMSE_test,'MAPE': MAPE_test}
+  modelingResult['valid'] = {'R_square': rSquare_valid, 'RMSE': RMSE_valid,'MAPE': MAPE_valid}
 
   # print(y_test.tolist())
   modelingValues = {'test':None, 'valid':None}

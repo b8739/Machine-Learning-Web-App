@@ -1,35 +1,32 @@
 <template>
-  <div class="container">
-    <div class="dropBox" @dragover.prevent @drop.stop.prevent="onDrop">
-      <label><strong> Drop A File</strong></label>
-
-      <p>OR</p>
-      <!-- dropzone -->
-      <!-- <dropzone :dropzoneFiles="files"> </dropzone> -->
-      <!-- manual -->
-      <div class="large-12 medium-12 small-12 cell">
-        <label
-          >Select File
+  <v-dialog v-model="dialog" width="40vw">
+    <v-card outlined class="py-10" @dragover.prevent @drop.stop.prevent="onDrop">
+      <v-row justify="center" class="ma-0">
+        <v-icon color="teal" class="mdi-48px"> mdi-briefcase-upload </v-icon>
+        <v-col cols="12">
+          <p class="body-2 text-center ">
+            <strong> Drag And Drop Your File Here </strong>
+          </p>
+          <p class="text-center caption font-weight-thin">File Supported: csv</p>
+          <p class="text-center subheading font-weight-light">or</p>
+        </v-col>
+        <label>
+          Browse Files
           <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()" />
         </label>
-      </div>
-      <div class="large-12 medium-12 small-12 cell">
-        <div v-for="(file, index) in files" class="file-listing" :key="index">
-          {{ file.name }} <span class="remove-file" v-on:click="removeFile(key)">Remove</span>
-        </div>
-      </div>
-      <br />
-      <br />
-      <div class="large-12 medium-12 small-12 cell">
-        <button v-on:click="submitFiles()">Submit</button>
-      </div>
-    </div>
-    <v-app>
-      <DefineDataset />
-    </v-app>
-  </div>
+      </v-row>
+      <v-row justify="center" align="center" class="ma-0">
+        <v-col cols="12" v-for="(file, index) in files" class="file-listing" :key="index">
+          <p class="text-center">{{ file.name }}</p>
+          <span class="text-center remove-file" v-on:click="removeFile(key)">
+            Remove
+          </span>
+        </v-col>
+        <!-- <v-btn class="mb-3" v-on:click="submitFiles()">Submit</v-btn> -->
+      </v-row>
+    </v-card>
+  </v-dialog>
 </template>
-
 <script>
 import axios from "axios";
 //vuex
@@ -37,18 +34,18 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 import { eventBus } from "@/main";
 
-import DefineDataset from "@/components/modal/DefineDataset";
 export default {
   /*
       Defines the data used by the component
     */
   data() {
     return {
-      files: []
+      files: [],
+      datasets: [1, 2],
+      dialog: false
     };
   },
-  props: ["sidebarStatus"],
-  components: { DefineDataset },
+
   /*
       Defines the method used by the component
     */
@@ -127,19 +124,22 @@ export default {
 */
       eventBus.$emit("dataUploadMode", true);
       eventBus.$emit("formData", formData);
-    },
-    //실험
-    created() {
-      console.log("Datatable created");
     }
+    //실험
+  },
+  created() {
+    eventBus.$on("openUploader", dialogStatus => {
+      this.dialog = dialogStatus;
+    });
   }
 };
 </script>
 
-<style>
+<style scoped>
 input[type="file"] {
-  position: absolute;
-  top: -500px;
+  /* position: absolute;
+  top: -500px; */
+  display: none;
 }
 div.file-listing {
   width: 200px;
@@ -149,30 +149,28 @@ span.remove-file {
   cursor: pointer;
   float: right;
 }
-/* dropbox */
-.dropBox {
-  width: 300px;
-  height: 200px;
-  border: 2px dashed #97cfb7;
-  margin: 120px auto 0;
+
+label {
+  display: block;
+  width: 10vw;
+  border: 1px solid #009688;
+  color: #009688;
+
+  line-height: 2.5em;
+  border-radius: 4px;
+
+  /* font */
+  font-size: 1em;
   text-align: center;
-  padding-top: 20px;
-  font-size: 17px;
-  background-color: #fff;
-}
-.dropBox p {
-  color: #333333;
-  font-size: 14px;
-}
-.dropBox button {
-  background-color: #97cfb7;
-  border: none;
-  color: #fff;
-  width: 60px;
-  height: 20px;
-}
-.dropbox button:hover {
-  background-color: #97cfb7;
+  text-transform: uppercase;
+  letter-spacing: 0.0892857143em;
+  font-weight: 500;
+  text-indent: 0.0892857143em;
+  font-size: 0.875rem;
+
   cursor: pointer;
+}
+label:hover {
+  background-color: #e0f1f0;
 }
 </style>
