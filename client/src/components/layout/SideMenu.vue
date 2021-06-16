@@ -1,15 +1,12 @@
 <template>
   <v-container>
     <v-navigation-drawer v-model="drawer" absolute>
-      <v-list-item class="px-2">
-        <v-list-item-title>Options</v-list-item-title>
-        <v-btn @click.stop="mini = !mini" icon>
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
+      <!-- <v-list-item class="pt-2">
+        <v-list-item-title class="text-uppercase">Options</v-list-item-title>
       </v-list-item>
 
-      <v-divider></v-divider>
-
+      <v-divider></v-divider> -->
+      <!-- 
       <v-list dense>
         <v-list-item v-for="item in items" :key="item.title" link @click="callOption(item.title)">
           <v-list-item-icon>
@@ -17,24 +14,47 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <p class="grey--text text--darken-3 body-2">{{ item.title }}</p>
           </v-list-item-content>
         </v-list-item>
+      </v-list> -->
+      <v-list dense>
+        <v-list-group v-model="activeState">
+          <template v-slot:activator>
+            <v-list-item-title active>Options</v-list-item-title>
+          </template>
+          <v-list-item v-for="item in items" :key="item.title" link @click="callOption(item.title)">
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title draggable label>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list-group>
       </v-list>
       <!-- 구분선 -->
-      <v-divider></v-divider>
-      <v-list-item class="px-2">
-        <v-list-item-title>List of Datasets</v-list-item-title>
-      </v-list-item>
+      <!-- <v-divider class=""></v-divider> -->
+      <v-list dense>
+        <v-list-group v-model="activeState">
+          <template v-slot:activator>
+            <v-list-item-title>List of Datasets</v-list-item-title>
+          </template>
+          <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
+            <v-list-item-title @click="clickTableNameEvent">{{ tableName }}</v-list-item-title>
+          </v-list-item>
+        </v-list-group>
+      </v-list>
+      <!-- <v-list-item class="">
+        <v-list-item-title class="body-1">List of Datasets</v-list-item-title>
+      </v-list-item> -->
       <!-- 테이블 리스트 -->
-      <v-divider></v-divider>
+      <!-- <v-divider></v-divider>
       <v-list dense>
         <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
           <v-list-item-content>
             <v-list-item-title @click="clickTableNameEvent">{{ tableName }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </v-list>
+      </v-list> -->
     </v-navigation-drawer>
   </v-container>
 </template>
@@ -54,7 +74,8 @@ export default {
         { title: "Delete Row", icon: "mdi-trash-can-outline" },
         { title: "Change Order", icon: "mdi-swap-vertical" },
         { title: "Moving Average", icon: "mdi-chart-timeline-variant" }
-      ]
+      ],
+      activeState: true
     };
   },
   components: {},

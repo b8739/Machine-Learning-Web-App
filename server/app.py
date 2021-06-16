@@ -557,12 +557,14 @@ def loadCases():
 
   sql="select * from case_list"
   caseRow = session.execute(sql).fetchall()
-  caseDict={'case_name':'','snippet':''}
+  caseDict={'case_name':'','snippet':'','dataset':''}
   caseList = []
   for index,case in enumerate(caseRow):
     caseDict['case_name']=caseRow[index][0]
     caseDict['snippet']=caseRow[index][1]
-    caseList.append({'case_name':caseDict['case_name'],'snippet': caseDict['snippet']})
+    caseDict['dataset']=caseRow[index][2]
+    caseList.append({'case_name':caseDict['case_name'],'snippet': caseDict['snippet'],
+    'dataset': caseDict['dataset']})
     # caseList.append(str(caseRow[index][0]))
   session.commit()
   session.close

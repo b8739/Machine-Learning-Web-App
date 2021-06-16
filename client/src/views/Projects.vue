@@ -78,7 +78,7 @@ export default {
 .logo {
   width: 4%;
   position: absolute;
-  top: 18px;
+  top: 35%;
   left: 20px;
 }
 </style>

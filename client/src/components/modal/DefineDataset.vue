@@ -19,7 +19,7 @@
           ></v-text-field>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="gray darken-1" text>
+            <v-btn color="gray darken-1" text @click="dialog = false">
               Close
             </v-btn>
             <v-btn color="blue darken-1" @click.once="eventHandler" text>
@@ -74,11 +74,11 @@ export default {
           this.result = response.data;
           this.loadSummarizedInfo(this.result);
 
-          this.$router.push({ name: "dataSummary" });
+          this.$router.push({ name: "preprocess" });
         })
         .catch(ex => {
           console.log("ERR!!!!! : ", ex);
-          // this.$router.push('/dataSummary'); //delete later
+          // this.$router.push('/preprocess'); //delete later
         });
     },
     saveNewFile(tableName) {

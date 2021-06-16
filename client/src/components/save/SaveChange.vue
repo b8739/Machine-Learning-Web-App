@@ -3,7 +3,7 @@
     <v-dialog v-model="dialog" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">
-          ‘data111’ 문서의 변경 사항을 저장하겠습니까?
+          Case의 변경 사항을 저장하겠습니까?
         </v-card-title>
         <v-card-text>저장하지 않으면 변경 사항이 유실됩니다.</v-card-text>
         <v-card-actions>

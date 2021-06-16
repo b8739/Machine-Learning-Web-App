@@ -2,9 +2,10 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Projects from "../views/Projects";
 import Datasets from "../views/Datasets";
-import DataSummary from "../views/DataSummary";
+import Preprocess from "../views/Preprocess";
 import Modeling from "../views/Modeling";
 import Models from "../views/Models";
+import GraphBuilder from "../views/GraphBuilder";
 import ModelingResult from "../components/modeling/ModelingResult";
 import "../assets/css/main.css";
 
@@ -28,9 +29,14 @@ const router = new VueRouter({
       props: true
     },
     {
-      path: "/dataSummary",
-      name: "dataSummary",
-      component: DataSummary,
+      path: "/preprocess",
+      name: "preprocess",
+      component: Preprocess,
+      props: true
+    },
+    {
+      path: "/eda",
+      component: GraphBuilder,
       props: true
     },
     {

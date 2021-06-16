@@ -42,6 +42,7 @@
             </v-container>
           </v-card>
         </v-dialog>
+        <SaveChange />
       </v-container>
     </v-app>
   </div>
@@ -56,6 +57,7 @@ import FlowChart from "@/components/modeling/FlowChart.vue";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import ModelingResult from "@/components/modeling/ModelingResult.vue";
 import SaveMenu from "@/components/modeling/SaveMenu.vue";
+import SaveChange from "@/components/save/SaveChange.vue";
 import ModelingResultSide from "@/components/modeling/ModelingResultSide.vue";
 
 export default {
@@ -77,7 +79,8 @@ export default {
     FlowChart,
     ModelingResult,
     ModelingResultSide,
-    SaveMenu
+    SaveMenu,
+    SaveChange
   },
   methods: {
     ...mapMutations("modelingResult", ["saveCaseList"]),
@@ -130,6 +133,7 @@ export default {
       modelingSummary: state => state.modelingResult.modelingSummary
     })
   },
+
   created() {
     let caseNameFromUrl = this.$route.params.case;
     // console.log(caseNameFromUrl);
@@ -152,8 +156,11 @@ export default {
     eventBus.$on("modelingOption", modelingOption => {
       this.modelingOption = modelingOption;
     });
-  },
+  }
+  // beforeRouteLeave(to, from, next) {
+  //   eventBus.$emit("openSaveChange", true);
 
-  mounted() {}
+  //   next(false);
+  // }
 };
 </script>

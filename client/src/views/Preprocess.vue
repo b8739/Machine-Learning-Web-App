@@ -8,22 +8,19 @@
           <v-col cols="2"><SideMenu /></v-col>
           <!-- 화면 우측 -->
           <v-col cols="10">
-            <v-row class="mainContainer">
-              <!-- DataSummary/Table 교체 버튼 -->
-              <v-col>
-                <v-btn @click="displaySwitch()">Feature</v-btn
+            <v-toolbar elevation="1">
+              <!-- Preprocess/Table 교체 버튼 -->
+              <v-row>
+                <v-btn class="mr-2" @click="displaySwitch()">Feature</v-btn
                 ><v-btn @click="displaySwitch()">Table</v-btn>
-              </v-col>
 
-              <v-spacer></v-spacer>
-              <!-- <v-btn elevation="2" @click="openSaveChangeDialog">Save Changes</v-btn>
-             -->
-              <v-col>
+                <v-spacer></v-spacer>
+
                 <SaveMenu />
-              </v-col>
-            </v-row>
+              </v-row>
+            </v-toolbar>
             <v-row>
-              <GraphBuilder :columns="columns" />
+              <!-- <GraphBuilder :columns="columns" /> -->
               <DeleteStepper />
               <AverageModal />
               <ChangeOrder />
@@ -213,9 +210,8 @@ export default {
   created() {
     this.loadFundamentalData("http://localhost:5000/loadData");
     this.loadSummarizedData();
-    this.setNavStatus("datasummary");
-  },
-  mounted() {}
+    this.setNavStatus("preprocess");
+  }
 };
 </script>
 
@@ -234,11 +230,7 @@ export default {
   /* float: left; */
   /* padding: 20px; */
 }
-.mainContainer {
-  min-width: 1200px;
-  max-width: 1900px;
-  margin: 0 auto;
-}
+
 .toggle-summary button {
   width: 8%;
   height: 8%;

@@ -17,7 +17,6 @@
             light
             outlined
             width="350px"
-            height="300px"
             v-for="(tableName, tableIndex) in tableList"
             :key="tableIndex"
             class="mr-5 mt-5 cursor-pointer"
@@ -74,7 +73,7 @@ export default {
     ...mapMutations("initialData", ["setNavStatus"]),
 
     enterDataset() {
-      this.$router.push({ name: "dataSummary" });
+      this.$router.push({ name: "preprocess" });
     },
     showTables() {
       let path = "http://localhost:5000/showTables";

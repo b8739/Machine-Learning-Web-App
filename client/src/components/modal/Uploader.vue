@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="40vw">
+  <v-dialog v-model="dialog" width="30vw">
     <v-card outlined class="py-10" @dragover.prevent @drop.stop.prevent="onDrop">
       <v-row justify="center" class="ma-0">
         <v-icon color="teal" class="mdi-48px"> mdi-briefcase-upload </v-icon>

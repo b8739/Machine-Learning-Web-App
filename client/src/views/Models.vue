@@ -17,15 +17,17 @@
             light
             outlined
             width="200px"
-            height="100px"
+            max-height="300px"
             v-for="(case_, index) in caseList"
             :key="index"
             class="mr-5 mt-5 cursor-pointer"
             @click="routeModelingResult(case_[case_name])"
           >
             <v-card-text class="font-weight-bold body-1">{{ case_["case_name"] }}</v-card-text>
-
-            <v-card-text class="font-weight-thin caption"> {{ case_["snippet"] }}</v-card-text>
+            <v-card-text class="font-weight-light caption pt-0">
+              {{ case_["snippet"] }}</v-card-text
+            >
+            <v-card-text class="font-weight-thin caption pt-0"> {{ case_["dataset"] }}</v-card-text>
           </v-sheet>
         </v-row>
       </v-container>
@@ -64,10 +66,13 @@ export default {
       Defines the method used by the component
     */
   methods: {
+    // 테이블 정보
     ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveCaseInfo"]),
+    ...mapMutations("modelingResult", ["saveCaseDataset"]),
+    // 시각화
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    // nav 정보
     ...mapMutations("initialData", ["setNavStatus"]),
 
     routeModelingResult(case_name) {

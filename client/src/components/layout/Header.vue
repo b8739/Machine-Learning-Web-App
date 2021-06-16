@@ -2,19 +2,21 @@
   <div>
     <a href="http://localhost:8080"><img class="logo" src="../../assets/attic_logo.png" alt=""/></a>
     <nav>
+      <!-- Dataset -->
       <router-link id="routerLink" :class="{ underline: navStatus == 'datasets' }" to="/datasets"
         >Datasets</router-link
       >
-      <router-link
-        id="routerLink"
-        :class="{ underline: navStatus == 'datasummary' }"
-        to="dataSummary"
+      <!-- Preprocess -->
+      <router-link id="routerLink" :class="{ underline: navStatus == 'preprocess' }" to="preprocess"
         >Preprocess</router-link
       >
-      <a id="routerLink" @click="openDialogue()">EDA</a>
+      <!-- EDA -->
+      <a id="routerLink" @click="openGraphBuilder()">EDA</a>
+      <!-- Modeling -->
       <router-link id="routerLink" :class="{ underline: navStatus == 'models' }" to="/models"
         >Modeling</router-link
       >
+      <!-- Optimize -->
       <router-link id="routerLink" :class="{ underline: navStatus == 'optimize' }" to=""
         >Optimize</router-link
       >
@@ -29,6 +31,26 @@ export default {
     return {};
   },
   methods: {
+    openGraphBuilder() {
+      let w = screen.width * 0.8;
+      let h = screen.height * 0.8;
+      let leftPosition = (screen.width - w) / 2;
+      let topPosition = (screen.height - h) / 2;
+      let url = "http://localhost:8080/eda";
+      window.open(
+        url,
+        "modelingResult",
+        "width=" +
+          w +
+          ",height=" +
+          h +
+          ",top=" +
+          topPosition +
+          ",left=" +
+          leftPosition +
+          ", scrollbars=no"
+      );
+    },
     openDialogue() {
       eventBus.$emit("openDialogue", true);
     }

@@ -44,7 +44,7 @@ export default {
           }
         })
         .then(res => {
-          // this.saveCaseInfo(res.data);
+          // this.saveCaseDataset(res.data);
           this.saveGraphSources(res.data[0]); // 그래프 값 저장
           this.saveModelingSummary(res.data[1]); // 테이블 값 저장
 

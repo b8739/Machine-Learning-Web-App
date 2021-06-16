@@ -47,16 +47,14 @@ def summarizeData(df):
 
   # 2-1-2 모든 numeric 변수들을 담고 있는 종합 Info 변수 생성
   df_numeric_info = pd.DataFrame(index=list(df_numeric.columns)) 
-
   # 2-1-3 Info 변수에 각 변수 투입
   df_numeric_info.insert(0,'mean',df_numeric_mean)
   df_numeric_info.insert(1,'std',df_numeric_std)
-  df_numeric_info.insert(2,'quantile1',df_numeric_quantile1)
-  df_numeric_info.insert(2,'quantile2',df_numeric_quantile2)
-  df_numeric_info.insert(2,'quantile3',df_numeric_quantile3)
-  df_numeric_info.insert(2,'quantile4',df_numeric_quantile4)
+  df_numeric_info.insert(2,'quantile_1',df_numeric_quantile1)
+  df_numeric_info.insert(2,'quantile_2',df_numeric_quantile2)
+  df_numeric_info.insert(2,'quantile_3',df_numeric_quantile3)
+  df_numeric_info.insert(2,'quantile_4',df_numeric_quantile4)
   df_numeric_info.insert(3,'numOfNA',df_numeric_numOfNA)
-  
   # distribution 데이터 (frequency) 
   distribution_features = []
   interval_features = []
@@ -76,20 +74,32 @@ def summarizeData(df):
   # 2-2-1) 각 category 관련 변수 생성
   df_categorical_columns = list((df_categorical).columns)
   # df_categorical_mostCommon = df_categorical.value_counts().idxmax()//argmax오류나서 일단 주석처리
-  df_categorical_numOfNA = df_categorical.isnull().sum()
+  series_categorical_numOfNa = df_categorical.isnull().sum()
+  print(df_categorical.mode())
+  df_categorical_etc = df_categorical.agg(['size', 'nunique'])
 
   # 2-2-2) 모든 category 변수들을 담고 있는 종합 Info 변수 생성
   df_categorical_info = pd.DataFrame(index=list(df_categorical.columns)) 
 
+
   # 2-2-3) Info 변수에 각 변수 투입
   # df_categorical_info.insert(0,'mostCommon',df_categorical_mostCommon) //argmax오류나서 일단 주석처리
-  df_categorical_info.insert(0,'numOfNA',df_categorical_numOfNA) # index 일단 0로 변경, 나중에 다시 1으로
+  df_categorical_info.insert(0,'numOfNA',series_categorical_numOfNa) # index 일단 0로 변경, 나중에 다시 1으로
+
+  df_categorical_etc_index = list(df_categorical_etc.index)
+
+  for index,value in enumerate(df_categorical_etc_index):
+    df_categorical_info.insert(index,value,df_categorical_etc.iloc[index])
+
   # df에서 ID의 mostCommon값을 수동으로 str로 변환해주어야, 'int 64 json not serializable' 메시지가 안뜸
+
   # df_categorical_info = df_categorical_info.astype({'mostCommon': 'str'})
   ''' 3) Return '''
 
 
 # 반환
-  summarizedDF = (df_numeric_info.to_dict(), df_categorical_info.to_dict())
-  return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns, distribution_features,interval_features)
-  # return Response(df_numeric_info.to_json(), df_categorical_info.to_json(),df_numeric_columns.to_json(),df_categorical_columns.to_json(), mimetype='application/json')
+  summarizedInfo = {'numeric':df_numeric_info.to_dict(), 'category':df_categorical_info.to_dict()}
+  summarizedColumns = {'numeric':df_numeric_columns,'category':df_categorical_columns}
+  finalSummary = {'summary':summarizedInfo,'columns':summarizedColumns,'distribution':distribution_features,'interval':interval_features}
+  # return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns, distribution_features,interval_features)
+  return jsonify(finalSummary)

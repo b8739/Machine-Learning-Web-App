@@ -6,7 +6,14 @@
         <v-list-item-title class="font-weight-bold">Cases</v-list-item-title>
       </v-list-item>
       <v-list-item v-for="(case_, index) in caseList" :key="index">
-        <v-sheet light outlined height="100" width="100%" @click="newWindow(case_[case_name])">
+        <v-sheet
+          class="cursor-pointer"
+          light
+          outlined
+          height="100"
+          width="100%"
+          @click="newWindow(case_[case_name])"
+        >
           <v-card-text class="font-weight-bold subheading pt-2 pb-0">
             {{ case_["case_name"] }}</v-card-text
           >
@@ -38,7 +45,7 @@ export default {
   },
   methods: {
     ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveCaseInfo"]),
+    ...mapMutations("modelingResult", ["saveCaseDataset"]),
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
     loadCases() {
