@@ -214,9 +214,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
-      indexNum: state => state.initialData.indexNum
-    })
+      dataset: state => state.initialData.dataset
+    }),
+    ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
     putIntoArray(jsonObject, targetArray, randomIndex) {

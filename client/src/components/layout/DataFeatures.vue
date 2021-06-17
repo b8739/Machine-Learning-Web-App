@@ -55,17 +55,27 @@
               <span>{{ category_info["numOfNA"][categoricalColumn] }}</span>
             </tr>
             <tr>
-              <span class="info_title">Size:</span>
+              <span class="info_title">Shape: </span>
               <span>{{ category_info["size"][categoricalColumn] }}</span>
             </tr>
             <tr>
-              <span class="info_title">Unique Values:</span>
+              <span class="info_title">Unique Values: </span>
               <span>{{ category_info["nunique"][categoricalColumn] }}</span>
             </tr>
           </td>
 
           <td>
-            <span class="info_title">Samples For Class:</span>
+            <p class="info_title">Samples For Class:</p>
+            <v-row
+              no-gutters
+              v-for="(sample, sampleIndex) in sampleForClass[categoricalColumn]"
+              :key="sampleIndex"
+            >
+              <v-col class="py-0"> {{ sampleIndex }}</v-col>
+              <v-spacer></v-spacer>
+              <v-col class="py-0">{{ sample }}% </v-col>
+              <v-col cols="12" class="pa-0"><v-divider></v-divider></v-col>
+            </v-row>
           </td>
         </tr>
 
@@ -190,8 +200,10 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      sampleForClass: null,
       categoryTypes: ["Category", "String", "Text", "Time-Series"],
       numericTypes: ["Numeric", "Float", "Int"],
+
       disabledTextFieldProps: {
         disabled: true,
         "hide-details": true,
@@ -252,10 +264,9 @@ export default {
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset,
-      indexNum: state => state.initialData.indexNum,
-      columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo
     }),
+    ...mapGetters("initialData", ["columns", "indexNum"]),
 
     categoryIndexAddOne() {
       return this.categoryIndex++;
@@ -263,7 +274,6 @@ export default {
   },
   methods: {
     ...mapActions("initialData", ["loadSummarizedData"]),
-    ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
 
     onDragEvent(evt) {
@@ -295,18 +305,20 @@ export default {
         });
     },
     changeColumnName(columnName, columnIndex) {
-      const api = "http://localhost:5000/changeColumnName";
-      axios
-        .get(api, {
-          params: {
-            columnName: columnName,
-            columnIndex: columnIndex
-          }
-        })
-        .then(res => {})
-        .catch(error => {
-          console.error(error);
-        });
+      console.log(columnName);
+      console.log(columnIndex);
+      // const api = "http://localhost:5000/changeColumnName";
+      // axios
+      //   .get(api, {
+      //     params: {
+      //       columnName: columnName,
+      //       columnIndex: columnIndex
+      //     }
+      //   })
+      //   .then(res => {})
+      //   .catch(error => {
+      //     console.error(error);
+      //   });
     },
     saveClickedIconIndex(index) {
       // v-icon click OFF
@@ -321,8 +333,8 @@ export default {
         else if (index >= 2 && this.numericColumns[index]) {
           this.changeColumnName(this.numericColumns[index - 2], index);
         }
-        this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
-        this.loadSummarizedData();
+        // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
+        // this.loadSummarizedData();
       } // v-icon click ON
       else {
         this.clickedIconIndex = index;
@@ -360,6 +372,7 @@ export default {
       }
       this.numericColumns = this.summarizedInfo["columns"]["numeric"];
       this.categoricalColumns = this.summarizedInfo["columns"]["category"];
+      this.sampleForClass = this.summarizedInfo["sampleForClass"];
     }
   },
   created() {

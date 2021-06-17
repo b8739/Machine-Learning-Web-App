@@ -46,7 +46,7 @@
 </template>
 <script>
 import { eventBus } from "@/main";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import draggable from "vuedraggable";
 export default {
   data() {
@@ -109,10 +109,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
-      indexNum: state => state.initialData.indexNum
-      // topColumns: state => state.topColumns
-    })
+      dataset: state => state.initialData.dataset
+    }),
+    ...mapGetters("initialData", ["indexNum"])
   },
   created() {
     eventBus.$on("hoverEffect", hoverStatus => {

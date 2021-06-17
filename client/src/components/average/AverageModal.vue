@@ -75,8 +75,10 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
+      dataset: state => state.initialData.dataset
+    }),
 
+    ...mapGetters({
       columns: state => state.initialData.columns
     }),
     fullTime() {

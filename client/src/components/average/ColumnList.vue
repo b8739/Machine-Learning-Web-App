@@ -27,7 +27,7 @@
   </v-row>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { eventBus } from "@/main";
 export default {
   data() {
@@ -73,11 +73,11 @@ export default {
       return selected;
     },
     ...mapState({
-      dataset: state => state.initialDatadataset,
-      indexNum: state => state.initialData.indexNum,
-      columns: state => state.initialData.columns
+      dataset: state => state.initialDatadataset
+
       // columns: state => state.columns
-    })
+    }),
+    ...mapGetters("initialData", ["columns", "indexNum"])
   }
 };
 </script>

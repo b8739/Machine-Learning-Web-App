@@ -88,7 +88,7 @@
   </v-card>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { eventBus } from "@/main";
 import ColumnList from "@/components/delete/ColumnList.vue";
 export default {
@@ -142,9 +142,8 @@ export default {
     });
   },
   computed: {
-    ...mapState({
+    ...mapGetters({
       columns: state => state.initialData.columns
-      // columns: state => state.columns
     }),
     fullCondition() {
       return this.featureName + " " + this.items[this.iconIndex].title + " " + this.featureValue;

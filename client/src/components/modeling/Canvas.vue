@@ -128,10 +128,12 @@ export default {
   components: {},
   computed: {
     ...mapState({
-      columns: state => state.initialData.columns,
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
       snippet: state => state.modelingData.snippet
+    }),
+    ...mapGetters({
+      columns: state => state.initialData.columns
     }),
     snippetProps() {
       if (this.snippet == "XGBoost") {

@@ -75,9 +75,8 @@ export default {
     draggable
   },
   computed: {
-    ...mapState({
+    ...mapGetters({
       columns: state => state.initialData.columns
-      // columns: state => state.columns
     })
   },
 

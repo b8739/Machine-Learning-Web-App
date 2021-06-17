@@ -28,7 +28,6 @@
               <DataFeatures
                 :class="{ visibilityHidden: showFeatures }"
                 :columnsWithoutIndex="columnsWithoutIndex"
-                :columns="columns"
                 :indexNum="indexNum"
               />
 
@@ -105,10 +104,7 @@ export default {
   },
   // props: ["summarizedInfo"],
   computed: {
-    ...mapState({
-      columns: state => state.initialData.columns
-      // summarizedInfo: state => state.initialData.summarizedInfo
-    }),
+    ...mapGetters("initialData", ["columns"]),
     columnsWithoutIndex() {
       const idIndex = this.columns.indexOf("ID");
       let tempColumns;

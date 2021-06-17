@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import draggable from "vuedraggable";
 import { eventBus } from "@/main";
 export default {
@@ -44,11 +44,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialDatadataset,
-      indexNum: state => state.initialData.indexNum,
-      columns: state => state.initialData.columns
-      // columns: state => state.columns
-    })
+      dataset: state => state.initialDatadataset
+    }),
+    ...mapGetters("initialData", ["columns", "indexNum"])
   }
 };
 </script>

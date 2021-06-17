@@ -28,7 +28,7 @@ def summarizeData(df):
   # 1-2 dtype에 따라서 df를 numeric과 categroical로 나눔
   df_numeric = df.select_dtypes(exclude = ['category']).copy()
   df_categorical = df.select_dtypes(include = ['category'] ).copy()
-
+  del df_categorical['ID']
   # 1-3 csv 파일이 크면 float이나 int도 object로 읽어지는 문제가 있음. 이에 따라 수동으로 데이터타입을 변경 (object -> unsigned numeric)
   for each in df_numeric:
     df[each] = pd.to_numeric(df[each], downcast="unsigned")
@@ -75,7 +75,11 @@ def summarizeData(df):
   df_categorical_columns = list((df_categorical).columns)
   # df_categorical_mostCommon = df_categorical.value_counts().idxmax()//argmax오류나서 일단 주석처리
   series_categorical_numOfNa = df_categorical.isnull().sum()
-  print(df_categorical.mode())
+
+  sampleForClass= {}
+  for value in df_categorical_columns:
+    sampleForClass[value] = (df_categorical[value].value_counts(normalize=True) * 100).round(2).to_dict()
+  # print(sampleForClass)
   df_categorical_etc = df_categorical.agg(['size', 'nunique'])
 
   # 2-2-2) 모든 category 변수들을 담고 있는 종합 Info 변수 생성
@@ -100,6 +104,6 @@ def summarizeData(df):
 # 반환
   summarizedInfo = {'numeric':df_numeric_info.to_dict(), 'category':df_categorical_info.to_dict()}
   summarizedColumns = {'numeric':df_numeric_columns,'category':df_categorical_columns}
-  finalSummary = {'summary':summarizedInfo,'columns':summarizedColumns,'distribution':distribution_features,'interval':interval_features}
+  finalSummary = {'summary':summarizedInfo,'columns':summarizedColumns,'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
   # return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns, distribution_features,interval_features)
   return jsonify(finalSummary)

@@ -61,7 +61,6 @@
 </template>
 <script>
 import TimeCondition from "@/components/delete/TimeCondition.vue";
-import ColumnList from "@/components/delete/ColumnList.vue";
 import FeatureCondition from "@/components/delete/FeatureCondition.vue";
 import axios from "axios";
 //vuex
@@ -81,9 +80,8 @@ export default {
     };
   },
   computed: {
-    ...mapState({
+    ...mapGetters({
       columns: state => state.initialData.columns
-      // columns: state => state.columns
     }),
     dynamicDeleteButtonProps() {
       if (this.tsCondition_from != null || this.featureConditions.length != 0) {
@@ -130,7 +128,7 @@ export default {
     }
   },
 
-  components: { TimeCondition, ColumnList, FeatureCondition },
+  components: { TimeCondition, FeatureCondition },
   created() {
     eventBus.$on("openDeleteRowModal", modalStatus => {
       this.dialog = modalStatus;

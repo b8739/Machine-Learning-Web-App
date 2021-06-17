@@ -4,33 +4,37 @@ const state = {
   //data
   dataset: {},
   summarizedInfo: [],
-  indexNum: "",
-  columns: [],
   tableList: [],
   navStatus: null
 };
 
+const getters = {
+  columns: function(state) {
+    let columns = [];
+    let columnValues = Object.keys(state.dataset);
+    for (const columnValue of columnValues) {
+      if (columnValue == "ID") {
+        continue;
+      } else columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
+    }
+    return columns;
+  },
+  indexNum: function(state) {
+    return Object.keys(state.dataset["ID"]).length - 1;
+  }
+};
+
 const mutations = {
   loadDataset(state, payload) {
-    state.dataset = Object.freeze(payload.data);
+    state.dataset = payload.data;
   },
-  loadIndexNum(state, payload) {
-    state.indexNum = payload;
-  },
+
   setNavStatus(state, payload) {
     state.navStatus = payload;
   },
-  saveResponseData(state) {
-    state.columns = [];
-    let columnValues = Object.keys(state.dataset);
-    for (const columnValue of columnValues) {
-      state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-      // state.updateForm[columnValue] = "";
-      // state.addForm[columnValue] = "";
-    }
-  },
+
   loadSummarizedInfo(state, payload) {
-    state.summarizedInfo = Object.freeze(payload);
+    state.summarizedInfo = payload;
   },
   changeColumnName_vuex(state, payload) {
     state.columns[payload.columnIndex] = payload.columnName;
@@ -50,11 +54,6 @@ const actions = {
       .get(path)
       .then(res => {
         commit("loadDataset", res);
-        // console.log(res);
-        commit("loadIndexNum", Object.keys(res.data["ID"]).length - 1);
-        // 데이터 추가 시 필요한 index number
-        //'처음' 데이터를 받아올때만 columns 받아오도록 처리
-        commit("saveResponseData");
       })
       .catch(error => {
         console.error(error);
@@ -76,6 +75,7 @@ const actions = {
 export default {
   namespaced: true,
   state,
+  getters,
   mutations,
   actions
 };

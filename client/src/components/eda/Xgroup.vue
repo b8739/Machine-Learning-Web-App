@@ -18,7 +18,7 @@
 </template>
 <script>
 import { eventBus } from "@/main";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import draggable from "vuedraggable";
 
 export default {
@@ -57,10 +57,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.dataset,
-      indexNum: state => state.indexNum
-      // columns: state => state.columns
-    })
+      dataset: state => state.dataset
+    }),
+    ...mapGetters("initialData", ["columns", "indexNum"])
   }
 };
 </script>

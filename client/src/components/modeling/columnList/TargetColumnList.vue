@@ -78,7 +78,7 @@ export default {
   },
   components: {},
   computed: {
-    ...mapState({
+    ...mapGetters({
       columns: state => state.initialData.columns
     }),
     withoutUndefined() {
