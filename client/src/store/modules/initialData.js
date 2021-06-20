@@ -13,14 +13,13 @@ const getters = {
     let columns = [];
     let columnValues = Object.keys(state.dataset);
     for (const columnValue of columnValues) {
-      if (columnValue == "ID") {
-        continue;
-      } else columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
+      columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
     }
     return columns;
   },
   indexNum: function(state) {
-    return Object.keys(state.dataset["ID"]).length - 1;
+    let columnValues = Object.keys(state.dataset);
+    return Object.keys(state.dataset[columnValues[0]]).length - 1;
   }
 };
 
@@ -37,7 +36,9 @@ const mutations = {
     state.summarizedInfo = payload;
   },
   changeColumnName_vuex(state, payload) {
-    state.columns[payload.columnIndex] = payload.columnName;
+    let oldName = Object.keys(state.dataset)[payload.columnIndex]; //여기가 문제 되고 있음
+    state.dataset[payload.newName] = state.dataset[oldName]; // 새로운 이름 생성 (복제)
+    delete state.dataset[oldName]; //예전 이름 삭제
   },
   loadSelectedColumns(state, payload) {
     state.selectedColumns.push(payload);

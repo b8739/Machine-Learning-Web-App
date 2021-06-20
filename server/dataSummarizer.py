@@ -39,10 +39,10 @@ def summarizeData(df):
   df_numeric_columns = list((df_numeric).columns)
   df_numeric_mean =  df_numeric.mean().round(1)
   df_numeric_std = df_numeric.std().round(1)
-  df_numeric_quantile1 = df_numeric.quantile(.25).round(2)
-  df_numeric_quantile2 = df_numeric.quantile(.5).round(2)
-  df_numeric_quantile3 = df_numeric.quantile(.75).round(2)
-  df_numeric_quantile4 = df_numeric.quantile(1).round(2)
+  df_numeric_Q1 = df_numeric.quantile(.25).round(2)
+  df_numeric_Q2 = df_numeric.quantile(.5).round(2)
+  df_numeric_Q3 = df_numeric.quantile(.75).round(2)
+  df_numeric_Q4 = df_numeric.quantile(1).round(2)
   df_numeric_numOfNA = df_numeric.isnull().sum()
 
   # 2-1-2 모든 numeric 변수들을 담고 있는 종합 Info 변수 생성
@@ -50,21 +50,21 @@ def summarizeData(df):
   # 2-1-3 Info 변수에 각 변수 투입
   df_numeric_info.insert(0,'mean',df_numeric_mean)
   df_numeric_info.insert(1,'std',df_numeric_std)
-  df_numeric_info.insert(2,'quantile_1',df_numeric_quantile1)
-  df_numeric_info.insert(2,'quantile_2',df_numeric_quantile2)
-  df_numeric_info.insert(2,'quantile_3',df_numeric_quantile3)
-  df_numeric_info.insert(2,'quantile_4',df_numeric_quantile4)
-  df_numeric_info.insert(3,'numOfNA',df_numeric_numOfNA)
+  df_numeric_info.insert(2,'Q1',df_numeric_Q1)
+  df_numeric_info.insert(3,'Q2',df_numeric_Q2)
+  df_numeric_info.insert(4,'Q3',df_numeric_Q3)
+  df_numeric_info.insert(5,'Q4',df_numeric_Q4)
+  df_numeric_info.insert(6,'numOfNA',df_numeric_numOfNA)
   # distribution 데이터 (frequency) 
-  distribution_features = []
-  interval_features = []
+  distribution_features = {}
+  interval_features = {}
   distribution_features_column = []
   for each in df_numeric.columns:
     dictdata = {'min':float(df_numeric[each].min())}
     dictdata['max'] = float(df_numeric[each].max())
-    interval_features.append(dictdata)
+    interval_features[each]=dictdata
       
-    distribution_features.append(df_numeric[each].value_counts(bins=20).to_list())
+    distribution_features[each]=df_numeric[each].value_counts(bins=20).to_list()
   #   배열 초기화
     dictdata = {}
     distribution_features_column = []
@@ -94,16 +94,32 @@ def summarizeData(df):
 
   for index,value in enumerate(df_categorical_etc_index):
     df_categorical_info.insert(index,value,df_categorical_etc.iloc[index])
-
   # df에서 ID의 mostCommon값을 수동으로 str로 변환해주어야, 'int 64 json not serializable' 메시지가 안뜸
 
   # df_categorical_info = df_categorical_info.astype({'mostCommon': 'str'})
-  ''' 3) Return '''
+  ''' type identify '''
+  typelist = []
+  typetype = {}
+  del df['ID']
+  for index,value in enumerate(df.columns):
+    if df[value].nunique() < threshold:
+      valueType = 'category'
+    else:
+      valueType = 'numeric'
+    # typetype[value] = valueType
+    typelist.append({'name':value,'type':valueType})
 
+  df_typetype = pd.DataFrame(typelist)
+  df_typetype = df_typetype.set_index('name')
+  print(df_typetype)
+
+  ''' 3) Return '''
 
 # 반환
   summarizedInfo = {'numeric':df_numeric_info.to_dict(), 'category':df_categorical_info.to_dict()}
   summarizedColumns = {'numeric':df_numeric_columns,'category':df_categorical_columns}
-  finalSummary = {'summary':summarizedInfo,'columns':summarizedColumns,'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
-  # return  jsonify(df_numeric_info.to_dict(), df_categorical_info.to_dict(),df_numeric_columns,df_categorical_columns, distribution_features,interval_features)
-  return jsonify(finalSummary)
+
+  finalSummary = {'datatype':df_typetype.to_dict(orient='index'),'categorical':df_categorical_info.to_dict(orient='index'),'numeric':df_numeric_info.to_dict(orient='index'),'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
+  print(finalSummary)
+  return  finalSummary
+  # return jsonify(finalSummary) 

@@ -172,6 +172,8 @@ def loadData():
     session = Session()
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
     data = pd.read_sql_table('temp_dataset', session.bind)
+    del data["ID"]
+    print(data)
     # return jsonify(data.to_dict())
     return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
 
