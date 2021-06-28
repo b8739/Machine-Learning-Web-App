@@ -63,6 +63,10 @@
                 <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["mean"] }}</span>
               </tr>
               <tr>
+                <span class="info_title">Median </span>
+                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["median"] }}</span>
+              </tr>
+              <tr>
                 <span class="info_title">Num of NA </span>
                 <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["numOfNA"] }}</span>
               </tr>

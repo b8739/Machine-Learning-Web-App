@@ -38,7 +38,9 @@ def summarizeData(df):
   '''2-1 Numeric'''
   # 2-1-1) 각 numeric 관련 변수 생성
   df_numeric_columns = list((df_numeric).columns)
+
   df_numeric_mean =  df_numeric.mean().round(1)
+  df_numeric_median =  df_numeric.median().round(1)
   df_numeric_std = df_numeric.std().round(1)
   df_numeric_Q1 = df_numeric.quantile(.25).round(2)
   df_numeric_Q2 = df_numeric.quantile(.5).round(2)
@@ -49,13 +51,15 @@ def summarizeData(df):
   # 2-1-2 모든 numeric 변수들을 담고 있는 종합 Info 변수 생성
   df_numeric_info = pd.DataFrame(index=list(df_numeric.columns)) 
   # 2-1-3 Info 변수에 각 변수 투입
+
   df_numeric_info.insert(0,'mean',df_numeric_mean)
-  df_numeric_info.insert(1,'std',df_numeric_std)
-  df_numeric_info.insert(2,'Q1',df_numeric_Q1)
-  df_numeric_info.insert(3,'Q2',df_numeric_Q2)
-  df_numeric_info.insert(4,'Q3',df_numeric_Q3)
-  df_numeric_info.insert(5,'Q4',df_numeric_Q4)
-  df_numeric_info.insert(6,'numOfNA',df_numeric_numOfNA)
+  df_numeric_info.insert(1,'median',df_numeric_median)
+  df_numeric_info.insert(2,'standard deviation',df_numeric_std)
+  df_numeric_info.insert(3,'Q1',df_numeric_Q1)
+  df_numeric_info.insert(4,'Q2',df_numeric_Q2)
+  df_numeric_info.insert(5,'Q3',df_numeric_Q3)
+  df_numeric_info.insert(6,'Q4',df_numeric_Q4)
+  df_numeric_info.insert(7,'numOfNA',df_numeric_numOfNA)
   # distribution 데이터 (frequency) 
   distribution_features =  OrderedDict()
   interval_features =  OrderedDict()
