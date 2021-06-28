@@ -1,15 +1,15 @@
 <template>
   <v-container>
     <v-row dense>
-      <v-col cols="12"> <v-checkbox label="Target" @change="selectAll"></v-checkbox></v-col>
+      <v-col cols="12"> <v-checkbox label="Input" @change="selectAll"></v-checkbox></v-col>
     </v-row>
     <v-row dense>
       <v-col>
         <div class="columnList">
           <v-checkbox
             v-for="(column, columnIndex) in columns"
+            v-model="inputs[columnIndex]"
             :key="columnIndex"
-            v-model="targets"
             :label="column"
             :value="column"
             @change="checkedEvent(columnIndex)"
@@ -25,7 +25,9 @@
 <script>
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+
 import { eventBus } from "@/main";
+
 export default {
   data() {
     return {
@@ -36,20 +38,22 @@ export default {
       clickedColumnItemStyle: {
         "background-color": "lightgrey"
       },
-      selected: [],
+      selected: [], //이미 Target에서 선택되어서, input에서는 선택할 수 없는 것들
       disabledProps: {
         disabled: true
       },
-      targets: []
+      //v-model
+      inputs: []
     };
   },
   props: [],
 
   methods: {
-    ...mapMutations("modelingData", ["saveTargets"]),
+    ...mapMutations("simulationData", ["saveSimulationInput"]),
+
     selectAll() {
       for (let i = 0; i < this.columns.length; i++) {
-        this.targets.push(this.columns[i]);
+        this.inputs.push(this.columns[i]);
       }
     },
     dynamicProps(columnIndex) {
@@ -60,8 +64,7 @@ export default {
       }
     },
     checkedEvent(columnIndex) {
-      console.log(columnIndex);
-      eventBus.$emit("targetColumnChecked", columnIndex);
+      eventBus.$emit("inputColumnChecked", columnIndex);
     },
     closeDialog() {
       eventBus.$emit("closeDialog", false);
@@ -81,7 +84,7 @@ export default {
     ...mapGetters("initialData", ["columns"]),
     withoutUndefined() {
       let cleansed = [];
-      this.targets.forEach(element => {
+      this.inputs.forEach(element => {
         if (element != undefined) {
           cleansed.push(element);
         }
@@ -96,15 +99,17 @@ export default {
         }
       });
       return selected;
-    },
-    ...mapState({})
+    }
   },
   created() {
-    eventBus.$on("inputColumnChecked", index => {
+    //중복 체크 방지
+    eventBus.$on("targetColumnChecked", index => {
       this.selected.push(index);
     });
-    eventBus.$on("stepTwoFinished", status => {
-      this.saveTargets(this.withoutUndefined);
+    //vuex에 저장
+    eventBus.$on("simulationColumnChecked", status => {
+      //from SimulationModal
+      this.saveSimulationInput(this.withoutUndefined);
     });
   }
 };

@@ -161,8 +161,8 @@ export default {
       cloned.addTo(this.graph);
     },
 
-    runModel(modelingOption) {
-      eventBus.$emit("modelingOption", modelingOption);
+    runModel(modelingParameter) {
+      eventBus.$emit("modelingParameter", modelingParameter);
       let path = "http://localhost:5000/";
       // define path
       if (this.snippet == "XGBoost") {
@@ -177,7 +177,7 @@ export default {
         .get(path, {
           params: {
             //snippetProp 전송
-            modelingOption: modelingOption
+            modelingParameter: modelingParameter
           }
         })
         .then(res => {
@@ -186,7 +186,7 @@ export default {
           this.saveModelingSummary(res.data[1]); //modeling summary (ex.MAPE)
           //canvas 감추기
 
-          eventBus.$emit("showModelingResult", true);
+          this.$router.push({ name: "modelingResult" });
         })
         .catch(error => {
           console.error(error);
@@ -195,7 +195,6 @@ export default {
   },
   created() {
     eventBus.$on("runModel", status => {
-      //from Modeling.vue
       this.runModel(this.selectedProps);
     });
     eventBus.$on("createBlock", index => {

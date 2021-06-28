@@ -7,7 +7,10 @@
         >Datasets</router-link
       >
       <!-- Preprocess -->
-      <router-link id="routerLink" :class="{ underline: navStatus == 'preprocess' }" to="preprocess"
+      <router-link
+        id="routerLink"
+        :class="{ underline: navStatus == 'preprocess' }"
+        to="/preprocess"
         >Preprocess</router-link
       >
       <!-- EDA -->
@@ -16,9 +19,12 @@
       <router-link id="routerLink" :class="{ underline: navStatus == 'models' }" to="/models"
         >Modeling</router-link
       >
-      <!-- Optimize -->
-      <router-link id="routerLink" :class="{ underline: navStatus == 'optimize' }" to=""
-        >Optimize</router-link
+      <!-- Simulation -->
+      <router-link
+        id="routerLink"
+        :class="{ underline: navStatus == 'simulation' }"
+        to="/Simulations"
+        >Simulation</router-link
       >
     </nav>
   </div>
@@ -71,7 +77,7 @@ body {
 
 /* base.html */
 .logo {
-  width: 4%;
+  width: 3%;
   position: absolute;
   top: 18px;
   left: 20px;

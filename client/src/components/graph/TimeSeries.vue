@@ -171,6 +171,12 @@ export default {
     };
   },
   watch: {
+    seriesName: function(data) {
+      console.log("seriesname change");
+      this.$refs.realtimeChart.updateSeries({
+        name: seriesName
+      });
+    },
     editModal_hidden: function(data) {
       console.log(data);
       if (data == true) {

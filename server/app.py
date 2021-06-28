@@ -14,12 +14,15 @@ from flask_sqlalchemy import SQLAlchemy
 import mysql.connector
 from flask_mysqldb import MySQL
 
+
+
 from config import DB_URL
 
 from werkzeug.utils  import secure_filename
 import os
 import sys
 sys.path.append('/Users/jeongjaeho/attic_project/mlApp/server/modeling')
+sys.path.append('/Users/jeongjaeho/attic_project/mlApp/server/simulation')
 import datetime
 import time
 import json
@@ -28,10 +31,17 @@ import json
 import pandas as pd 
 import numpy as np 
 
+# summarizer
 from dataSummarizer import summarizeData
+
+# modeling
 from xgboost_modeling import *
 from svr_modeling import *
 from rf_modeling import *
+
+# simulation
+from defaultSimulation import *
+from customizedSimulation import *
 
 
 # pyarrow
@@ -173,9 +183,9 @@ def loadData():
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
     data = pd.read_sql_table('temp_dataset', session.bind)
     del data["ID"]
-    print(data)
     # return jsonify(data.to_dict())
     return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
+    # return data.to_dict(orient='list')
 
   # ### 2) CSV 파일을 읽어서 DICT 형태로 RETURN해주는 방식 (1번 방식이 속도가 느려서 일단 2번으로 진행) ###
   # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
@@ -378,9 +388,9 @@ def loadSummarizedData():
 
 @app.route('/xgboost_modeling',methods=['GET'])
 def xgboost_modeling():
-  modelingOption_str = request.args.get('modelingOption')
-  # print(modelingOption_str)
-  modelingOption_list = modelingOption_str.split(',')
+  # modelingOption_str = request.args.get('modelingOption')
+  # modelingOption_list = modelingOption_str.split(',')
+  modelingOption_list = [1]
   # 개발 편의성 속성 직접 받지 않고 주석처리
   # for index,value in enumerate(modelingOption_list):
   #   # 문자에 .이 포함되어있으면 소수이니 float으로 변환
@@ -389,7 +399,7 @@ def xgboost_modeling():
   #   # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
   #   else: 
   #     modelingOption_list[index] = int(value)
-  print(modelingOption_list)
+
   return (xgboost(modelingOption_list))
 
 @app.route('/svr_modeling',methods=['GET'])
@@ -636,6 +646,16 @@ def loadProjects():
   session.commit()
   session.close
   return jsonify(project_list)
+
+@app.route('/simulation_default',methods=['GET'])
+def simulation_default():
+  simulationInput = request.args.get('simulationInput')
+  return (runDefaultSimulation(simulationInput))
+
+@app.route('/simulation_customized',methods=['GET'])
+def simulation_customized():
+  simulationInput = request.args.get('simulationInput')
+  return (runCustomizedSimulation(simulationInput))
 
 if __name__ == '__main__':
     app.run(debug=True)

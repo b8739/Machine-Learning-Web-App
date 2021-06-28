@@ -241,7 +241,7 @@ export default {
     createModel() {
       this.dialog = false;
       this.saveSnippet(this.chosenSnippet);
-      this.$router.push({ name: "modeling" });
+      this.$router.push({ name: "modelingProcess" });
     }
   },
   components: {

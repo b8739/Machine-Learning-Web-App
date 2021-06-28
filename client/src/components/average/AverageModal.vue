@@ -78,9 +78,6 @@ export default {
       dataset: state => state.initialData.dataset
     }),
 
-    ...mapGetters({
-      columns: state => state.initialData.columns
-    }),
     fullTime() {
       let fullDate = "";
 

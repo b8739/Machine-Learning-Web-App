@@ -142,9 +142,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters({
-      columns: state => state.initialData.columns
-    }),
+    ...mapState({}),
     fullCondition() {
       return this.featureName + " " + this.items[this.iconIndex].title + " " + this.featureValue;
     }

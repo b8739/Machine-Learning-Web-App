@@ -1,12 +1,20 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+
 import Projects from "../views/Projects";
 import Datasets from "../views/Datasets";
 import Preprocess from "../views/Preprocess";
-import Modeling from "../views/Modeling";
-import Models from "../views/Models";
+// modeling
+import ModelingProcess from "../views/modeling/ModelingProcess";
+import Models from "../views/modeling/Models";
+import ModelingResult from "../views/modeling/ModelingResult";
+import ModelingSingleResult from "../views/modeling/ModelingSingleResult";
+
 import GraphBuilder from "../views/GraphBuilder";
-import ModelingResult from "../components/modeling/ModelingResult";
+
+import Simulations from "../views/simulation/Simulations";
+import SimulationResult from "../views/simulation/SimulationResult";
+
 import "../assets/css/main.css";
 
 // import Login from "../views/Login";
@@ -45,21 +53,34 @@ const router = new VueRouter({
       props: true
     },
     {
-      path: "/modeling/:case",
-      name: "modeling",
-      component: Modeling,
+      path: "/modelingProcess",
+      name: "modelingProcess",
+      component: ModelingProcess,
       props: true
     },
-    // {
-    //   path: "/modeling",
-    //   name: "modeling",
-    //   component: Modeling,
-    //   props: true
-    // },
     {
-      path: "/modelingResult",
+      path: "/simulations",
+      name: "simulations",
+      component: Simulations,
+      props: true
+    },
+    {
+      path: "/simulation/result",
+      name: "simulationResult",
+      component: SimulationResult,
+      props: true
+    },
+
+    {
+      path: "/modelingResult/:case",
       name: "modelingResult",
       component: ModelingResult,
+      props: true
+    },
+    {
+      path: "/modelingSingleResult/:case",
+      name: "modelingSingleResult",
+      component: ModelingSingleResult,
       props: true
     }
   ]

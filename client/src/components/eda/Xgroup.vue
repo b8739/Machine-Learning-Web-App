@@ -57,9 +57,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.dataset
-    }),
-    ...mapGetters("initialData", ["columns", "indexNum"])
+      dataset: state => state.initialData.dataset
+    })
+    // ...mapGetters("initialData", ["columns", "indexNum"])
   }
 };
 </script>

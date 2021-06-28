@@ -1,10 +1,12 @@
 <template>
-  <v-navigation-drawer v-model="drawer" absolute width="100%">
+  <v-navigation-drawer v-model="drawer" absolute width="100%" height="100vh">
     <!-- <v-btn @click="loadCases">hello</v-btn> -->
     <v-list>
+      <!-- title -->
       <v-list-item>
         <v-list-item-title class="font-weight-bold">Cases</v-list-item-title>
       </v-list-item>
+      <!-- item -->
       <v-list-item v-for="(case_, index) in caseList" :key="index">
         <v-sheet
           class="cursor-pointer"
@@ -29,6 +31,7 @@
 </template>
 <script>
 import axios from "axios";
+import { eventBus } from "@/main";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 export default {
   data() {
@@ -63,7 +66,8 @@ export default {
       let h = 500;
       let leftPosition = (screen.width - w) / 2;
       let topPosition = (screen.height - h) / 2;
-      let url = "http://localhost:8080/modelingResult?" + case_name;
+      let url = "http://localhost:8080/modelingSingleResult/" + case_name;
+
       window.open(
         url,
         "modelingResult",
@@ -77,6 +81,7 @@ export default {
           leftPosition +
           ", scrollbars=no"
       );
+      eventBus.$emit("multiTab", true);
     }
   },
   created() {

@@ -22,7 +22,7 @@
   </div>
 </template>
 <script>
-import TimeSeries from "@/components/charts/TimeSeries";
+import TimeSeries from "@/components/graph/TimeSeries";
 import InfiniteTable from "@/components/layout/InfiniteTable";
 
 export default {

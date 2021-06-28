@@ -21,17 +21,37 @@
             v-for="(case_, index) in caseList"
             :key="index"
             class="mr-5 mt-5 cursor-pointer"
-            @click="routeModelingResult(case_[case_name])"
           >
+            <!-- @click="routeModelingResult(case_[case_name])" v-sheet-->
             <v-card-text class="font-weight-bold body-1">{{ case_["case_name"] }}</v-card-text>
             <v-card-text class="font-weight-light caption pt-0">
               {{ case_["snippet"] }}</v-card-text
             >
             <v-card-text class="font-weight-thin caption pt-0"> {{ case_["dataset"] }}</v-card-text>
+            <v-chip-group column>
+              <v-chip
+                class="ma-2"
+                color="success"
+                outlined
+                small
+                @click="routeModelingResult(case_[case_name])"
+              >
+                <v-icon left small>
+                  mdi-transit-connection
+                </v-icon>
+                Modeling
+              </v-chip>
+              <v-chip class="ma-2" color="primary" outlined small to="/simulation">
+                <v-icon left small>
+                  mdi-chart-bell-curve-cumulative
+                </v-icon>
+                Simulation
+              </v-chip>
+            </v-chip-group>
           </v-sheet>
         </v-row>
       </v-container>
-      <ModelingModal />
+      <Modal />
     </v-app>
   </div>
 </template>
@@ -77,7 +97,7 @@ export default {
 
     routeModelingResult(case_name) {
       //   console.log(case_name);
-      this.$router.push({ name: "modeling", params: { case: case_name } });
+      this.$router.push({ name: "modelingResult", params: { case: case_name } });
     },
     openModeling() {
       eventBus.$emit("openModeling", true);

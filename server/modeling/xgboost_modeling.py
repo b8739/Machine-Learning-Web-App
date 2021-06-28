@@ -19,6 +19,8 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
+import joblib
+
 from sklearn.model_selection import KFold, GridSearchCV
 import xgboost as xgb
 
@@ -32,11 +34,31 @@ def MAPE(y, pred):
   return np.mean(np.abs((y-pred)/y)*100)
 
 def xgboost(modelingOption):
-    #### REGRESSION MODEL : "Boston Housing" DATA SET ####
-
-    ## 01. OPEN DATA & PROCESSING ##
+      ## 01. OPEN DATA & PROCESSING ##
 
     df_00 = pd.read_csv("./boston_house.csv")
+
+    '''임시'''
+    T = df_00.drop('MEDV', axis = 1)
+    
+    X_mean = T.mean().round(2) #그 외 변수의 mean (평균)
+    X_std = T.std().round(1)*0.1 #그 외 변수의 std (표준편차)
+
+    X_info = pd.DataFrame({'mean':X_mean.values,'std':X_std.values})
+
+    randNumbers = []
+
+    # 난수를 생성함과 동시에 series로 형변환해서 randNumbers에 삽입
+    # randNumbers: series 난수들을 갖고 있는 배열
+    #  
+    for i,v in X_info.iterrows():
+        randNumbers.append(pd.Series(np.random.normal(v[0],v[1]*0.1,100)))
+    X_final = pd.DataFrame(randNumbers)
+    X_final = X_final.transpose() # 컬럼과 인덱스 순서 변경
+    X_final.columns = T.columns # 컬럼명 주기
+    #### REGRESSION MODEL : "Boston Housing" DATA SET ####
+
+
 
     # df_00 = df_00.drop('Unnamed: 0', axis = 1)
 
@@ -55,10 +77,11 @@ def xgboost(modelingOption):
     ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
     # X_test, X_valid, y_test, y_valid = train_test_split(X_test, y_test,test_size=0.5,random_state=123)
-
+ 
     # test
     train_X = X_train 
     test_X = X_test
+
     
     # valid
     valid_X = X_valid
@@ -69,6 +92,11 @@ def xgboost(modelingOption):
     train_Xn = scalerX.transform(train_X)
     test_Xn = scalerX.transform(test_X)
     valid_Xn = scalerX.transform(valid_X)
+    X_final_n = scalerX.transform(X_final)
+
+    #scaler 저장
+    # file_name = 'scaler_xgboost.pkl'
+    # joblib.dump(scalerX,file_name)
 
     ## CASE 03. 'XGBOOST' ALGORITHM ##
     # 기존 model
@@ -94,6 +122,7 @@ def xgboost(modelingOption):
 
     xgb_model_predict_test = xgb_model.predict(test_Xn)
     xgb_model_predict_valid = xgb_model.predict(valid_Xn)
+
 
     # test result
     rSquare_test = r2_score(y_test, xgb_model_predict_test)
@@ -123,5 +152,6 @@ def xgboost(modelingOption):
     modelingValues = {'test':None, 'valid':None}
     modelingValues['test'] = {'Actual':y_test.tolist(),'Predictive':xgb_model_predict_test.tolist()}
     modelingValues['valid'] = {'Actual':y_valid.tolist(),'Predictive':xgb_model_predict_valid.tolist()}
+
     return jsonify(modelingValues,modelingResult)
     # return Response(result.to_json( orient='records'), mimetype='application/json')

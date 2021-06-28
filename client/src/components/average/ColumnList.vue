@@ -73,11 +73,11 @@ export default {
       return selected;
     },
     ...mapState({
-      dataset: state => state.initialDatadataset
+      dataset: state => state.initialData.dataset
 
       // columns: state => state.columns
-    }),
-    ...mapGetters("initialData", ["columns", "indexNum"])
+    })
+    // ...mapGetters("initialData", ["columns", "indexNum"])
   }
 };
 </script>

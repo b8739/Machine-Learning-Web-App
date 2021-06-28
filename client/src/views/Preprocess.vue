@@ -1,11 +1,11 @@
 <template>
   <div id="wrap">
-    <Header></Header>
+    <Header> </Header>
     <v-app>
       <v-container id="mainWrapper" fluid>
         <v-row>
           <!-- 화면 좌측 -->
-          <v-col cols="2"><SideMenu /></v-col>
+          <v-col cols=""><SideMenu /></v-col>
           <!-- 화면 우측 -->
           <v-col cols="10">
             <v-toolbar elevation="1">
@@ -25,20 +25,11 @@
               <AverageModal />
               <ChangeOrder />
 
-              <DataFeatures
-                :class="{ visibilityHidden: showFeatures }"
-                :columnsWithoutIndex="columnsWithoutIndex"
-                :indexNum="indexNum"
-              />
+              <DataFeatures :class="{ visibilityHidden: showFeatures }" />
 
               <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
               <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
-              <AddModal
-                :columnsWithoutIndex="columnsWithoutIndex"
-                :addForm="addForm"
-                :indexNum="indexNum"
-                @loadDataStatus="loadData"
-              />
+              <!-- <AddModal :addForm="addForm" :indexNum="indexNum" @loadDataStatus="loadData" /> -->
             </v-row>
           </v-col>
         </v-row>
@@ -62,7 +53,7 @@ import SideMenu from "@/components/layout/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 import ChangeOrder from "@/components/changeOrder/ChangeOrder.vue";
 
-import Modeling from "./Modeling.vue";
+import ModelingProcess from "./modeling/ModelingProcess.vue";
 
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
@@ -100,21 +91,11 @@ export default {
     AverageModal,
     ChangeOrder,
 
-    Modeling
+    ModelingProcess
   },
   // props: ["summarizedInfo"],
   computed: {
-    ...mapGetters("initialData", ["columns"]),
-    columnsWithoutIndex() {
-      const idIndex = this.columns.indexOf("ID");
-      let tempColumns;
-      if (idIndex != -1) {
-        //처음엔 -1이라서 에러를 발생시킴, 때문에 if문으로 해당 경우의 수를 제거
-        tempColumns = this.columns.slice(); //copy by value
-        tempColumns.splice(this.columns, 1);
-      }
-      return tempColumns;
-    }
+    ...mapState({})
   },
   methods: {
     ...mapMutations("initialData", ["setHadLoaded"]),

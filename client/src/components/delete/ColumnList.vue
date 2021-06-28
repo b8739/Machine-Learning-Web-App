@@ -30,9 +30,9 @@ export default {
   components: {},
   computed: {
     ...mapState({
-      dataset: state => state.initialDatadataset
-    }),
-    ...mapGetters("initialData", ["columns", "indexNum"])
+      dataset: state => state.initialData.dataset
+    })
+    // ...mapGetters("initialData", ["columns", "indexNum"])
   }
 };
 </script>

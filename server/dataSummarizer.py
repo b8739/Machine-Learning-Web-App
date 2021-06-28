@@ -6,6 +6,7 @@ import json
 import matplotlib
 import json
 from app import jsonify, Response
+from collections import OrderedDict, defaultdict
 
 def summarizeData(df):
   
@@ -56,18 +57,20 @@ def summarizeData(df):
   df_numeric_info.insert(5,'Q4',df_numeric_Q4)
   df_numeric_info.insert(6,'numOfNA',df_numeric_numOfNA)
   # distribution 데이터 (frequency) 
-  distribution_features = {}
-  interval_features = {}
+  distribution_features =  OrderedDict()
+  interval_features =  OrderedDict()
   distribution_features_column = []
+
   for each in df_numeric.columns:
     dictdata = {'min':float(df_numeric[each].min())}
     dictdata['max'] = float(df_numeric[each].max())
     interval_features[each]=dictdata
-      
     distribution_features[each]=df_numeric[each].value_counts(bins=20).to_list()
+  
   #   배열 초기화
     dictdata = {}
     distribution_features_column = []
+
   
   #####################################################
   '''2-2 Category'''
@@ -111,15 +114,19 @@ def summarizeData(df):
 
   df_typetype = pd.DataFrame(typelist)
   df_typetype = df_typetype.set_index('name')
-  print(df_typetype)
+
 
   ''' 3) Return '''
 
 # 반환
   summarizedInfo = {'numeric':df_numeric_info.to_dict(), 'category':df_categorical_info.to_dict()}
   summarizedColumns = {'numeric':df_numeric_columns,'category':df_categorical_columns}
-
-  finalSummary = {'datatype':df_typetype.to_dict(orient='index'),'categorical':df_categorical_info.to_dict(orient='index'),'numeric':df_numeric_info.to_dict(orient='index'),'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
+  
+  finalSummary = OrderedDict()
+  
+  finalSummary = {'datatype':df_typetype.to_dict(orient='list',into=OrderedDict),'categorical':df_categorical_info.to_dict(orient='index',into=OrderedDict),'numeric':df_numeric_info.to_dict(orient='index'),'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
   print(finalSummary)
-  return  finalSummary
+  # return  finalSummary
+  return json.dumps(finalSummary)
+  
   # return jsonify(finalSummary) 
