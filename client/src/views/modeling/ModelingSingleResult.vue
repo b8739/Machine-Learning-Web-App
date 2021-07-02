@@ -222,7 +222,7 @@ export default {
         data: {
           case_name: this.case_name,
           modelingOption: this.modelingOption,
-          snippet: this.snippet,
+          algorithm: this.algorithm,
           graphSources: JSON.stringify(this.graphSources),
           modelingSummary: JSON.stringify(this.modelingSummary)
         }
@@ -238,7 +238,7 @@ export default {
       this.$axios
         .get(path, {
           params: {
-            //snippetProp 전송
+            //algorithmProp 전송
             case_name: case_name
           }
         })

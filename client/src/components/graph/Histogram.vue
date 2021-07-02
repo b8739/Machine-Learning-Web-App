@@ -42,22 +42,11 @@ export default {
       series: []
     };
   },
-  watch: {
-    // distribution: function(data) {
-    //   if (data != null) {
-    //     this.updateSeriesLine(this.distribution);
-    //   }
-    // },
-    // interval: function(data) {
-    //   if (data != null) {
-    //     this.putIntoArray(this.interval, this.intervalArray);
-    //     this.updateCategories(this.intervalArray);
-    //   }
-    // }
-  },
+  watch: {},
   created() {},
   mounted() {
     this.putIntoArray(this.interval, this.intervalArray);
+    this.intervalArray.sort(); //max보다 min이 앞에 있는 문제 해결
     this.updateCategories(this.intervalArray);
     this.updateSeriesLine(this.distribution);
   },

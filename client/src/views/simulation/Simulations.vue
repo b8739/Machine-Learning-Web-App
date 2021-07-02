@@ -1,35 +1,34 @@
 <template>
   <div>
     <Header></Header>
-    <v-app>
-      <v-container fluid class="pl-10 pt-10">
-        <v-row align="start" no-gutter dense>
-          <v-col cols="1">
-            <v-btn @click="newSimulation" block color="success">
-              <v-icon left class="mdi-24">
-                mdi-plus
-              </v-icon>
-              New Simulation
-            </v-btn>
-          </v-col>
-          <v-col cols="11"></v-col>
-          <v-sheet
-            light
-            outlined
-            min-width="200px"
-            max-height="300px"
-            v-for="(simulation, index) in simulationList"
-            :key="index"
-            class="mr-5 mt-5 cursor-pointer"
-          >
-            <v-card-text class="font-weight-bold body-1">Simulation #</v-card-text>
-            <v-card-text class="font-weight-light caption pt-0"> Explanation</v-card-text>
-            <v-card-text class="font-weight-thin caption pt-0"> Created __ ago</v-card-text>
-          </v-sheet>
-        </v-row>
-      </v-container>
-      <SimulationModal />
-    </v-app>
+
+    <v-container fluid class="pl-10 pt-10">
+      <v-row align="start" no-gutter dense>
+        <v-col cols="1">
+          <v-btn @click="newSimulation" block color="success">
+            <v-icon left class="mdi-24">
+              mdi-plus
+            </v-icon>
+            New Simulation
+          </v-btn>
+        </v-col>
+        <v-col cols="11"></v-col>
+        <v-sheet
+          light
+          outlined
+          min-width="200px"
+          max-height="300px"
+          v-for="(simulation, index) in simulationList"
+          :key="index"
+          class="mr-5 mt-5 cursor-pointer"
+        >
+          <v-card-text class="font-weight-bold body-1">Simulation #</v-card-text>
+          <v-card-text class="font-weight-light caption pt-0"> Explanation</v-card-text>
+          <v-card-text class="font-weight-thin caption pt-0"> Created __ ago</v-card-text>
+        </v-sheet>
+      </v-row>
+    </v-container>
+    <SimulationModal />
   </div>
 </template>
 <script>

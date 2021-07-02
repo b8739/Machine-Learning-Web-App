@@ -1,58 +1,57 @@
 <template>
   <div>
     <Header />
-    <v-app>
-      <v-container fluid class="pl-10 pt-10">
-        <v-row align="start" no-gutter dense>
-          <v-col cols="1">
-            <v-btn @click="openModeling" block color="success">
-              <v-icon left class="mdi-24">
-                mdi-plus
-              </v-icon>
-              New Model
-            </v-btn>
-          </v-col>
-          <v-col cols="11"></v-col>
-          <v-sheet
-            light
-            outlined
-            width="200px"
-            max-height="300px"
-            v-for="(case_, index) in caseList"
-            :key="index"
-            class="mr-5 mt-5 cursor-pointer"
+
+    <v-container fluid class="pl-10 pt-10">
+      <v-row align="start" no-gutter dense>
+        <v-col cols="1">
+          <v-btn @click="openModeling" block color="success">
+            <v-icon left class="mdi-24">
+              mdi-plus
+            </v-icon>
+            New Model
+          </v-btn>
+        </v-col>
+        <v-col cols="11"></v-col>
+        <v-sheet
+          light
+          outlined
+          width="200px"
+          max-height="300px"
+          v-for="(case_, index) in caseList"
+          :key="index"
+          class="mr-5 mt-5 cursor-pointer"
+        >
+          <!-- @click="routeModelingResult(case_[case_name])" v-sheet-->
+          <v-card-text class="font-weight-bold body-1">{{ case_["case_name"] }}</v-card-text>
+          <v-card-text class="font-weight-light caption pt-0">
+            {{ case_["algorithm"] }}</v-card-text
           >
-            <!-- @click="routeModelingResult(case_[case_name])" v-sheet-->
-            <v-card-text class="font-weight-bold body-1">{{ case_["case_name"] }}</v-card-text>
-            <v-card-text class="font-weight-light caption pt-0">
-              {{ case_["snippet"] }}</v-card-text
+          <v-card-text class="font-weight-thin caption pt-0"> {{ case_["dataset"] }}</v-card-text>
+          <v-chip-group column>
+            <v-chip
+              class="ma-2"
+              color="success"
+              outlined
+              small
+              @click="routeModelingResult(case_[case_name])"
             >
-            <v-card-text class="font-weight-thin caption pt-0"> {{ case_["dataset"] }}</v-card-text>
-            <v-chip-group column>
-              <v-chip
-                class="ma-2"
-                color="success"
-                outlined
-                small
-                @click="routeModelingResult(case_[case_name])"
-              >
-                <v-icon left small>
-                  mdi-transit-connection
-                </v-icon>
-                Modeling
-              </v-chip>
-              <v-chip class="ma-2" color="primary" outlined small to="/simulation">
-                <v-icon left small>
-                  mdi-chart-bell-curve-cumulative
-                </v-icon>
-                Simulation
-              </v-chip>
-            </v-chip-group>
-          </v-sheet>
-        </v-row>
-      </v-container>
-      <Modal />
-    </v-app>
+              <v-icon left small>
+                mdi-transit-connection
+              </v-icon>
+              Modeling
+            </v-chip>
+            <v-chip class="ma-2" color="primary" outlined small to="/simulations">
+              <v-icon left x-small>
+                mdi-chart-bell-curve-cumulative
+              </v-icon>
+              Simulation
+            </v-chip>
+          </v-chip-group>
+        </v-sheet>
+      </v-row>
+    </v-container>
+    <ModelingModal />
   </div>
 </template>
 
@@ -101,6 +100,7 @@ export default {
     },
     openModeling() {
       eventBus.$emit("openModeling", true);
+      this.$router.push({ name: "modelingProcess" });
     },
     loadCases() {
       console.log("loadCases");

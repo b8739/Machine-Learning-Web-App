@@ -22,6 +22,10 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 // vuetify
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
+// BaklavaVuePlugin
+import { BaklavaVuePlugin } from "@baklavajs/plugin-renderer-vue";
+import "@baklavajs/plugin-renderer-vue/dist/styles.css";
+Vue.use(BaklavaVuePlugin);
 
 //fort-awesome
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -43,6 +47,7 @@ Vue.config.productionTip = false;
 
 Vue.use(PortalVue);
 Vue.use(Vuetify);
+export default new Vuetify({});
 
 Vue.use(VueKonva);
 // Vue.use(Vuetify);
@@ -60,7 +65,6 @@ export const eventBus = new Vue();
 new Vue({
   router,
   store,
-
   vuetify: new Vuetify(),
   render: h => h(App)
 }).$mount("#app");

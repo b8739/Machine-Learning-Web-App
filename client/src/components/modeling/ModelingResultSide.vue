@@ -7,24 +7,26 @@
         <v-list-item-title class="font-weight-bold">Cases</v-list-item-title>
       </v-list-item>
       <!-- item -->
-      <v-list-item v-for="(case_, index) in caseList" :key="index">
-        <v-sheet
-          class="cursor-pointer"
-          light
-          outlined
-          height="100"
-          width="100%"
-          @click="newWindow(case_[case_name])"
-        >
-          <v-card-text class="font-weight-bold subheading pt-2 pb-0">
-            {{ case_["case_name"] }}</v-card-text
+      <v-list-item-group>
+        <v-list-item v-for="(case_, index) in caseList" :key="index">
+          <v-sheet
+            class="cursor-pointer"
+            light
+            outlined
+            height="100"
+            width="100%"
+            @click="newWindow(case_[case_name])"
           >
-          <v-card-text class="font-weight-light caption pt-2 pb-1">
-            {{ case_["snippet"] }}</v-card-text
-          >
-          <v-card-text class="font-weight-thin caption pt-1"> Created __ days ago</v-card-text>
-        </v-sheet>
-      </v-list-item>
+            <v-card-text class="font-weight-bold subheading pt-2 pb-0">
+              {{ case_["case_name"] }}</v-card-text
+            >
+            <v-card-text class="font-weight-light caption pt-2 pb-1">
+              {{ case_["algorithm"] }}</v-card-text
+            >
+            <v-card-text class="font-weight-thin caption pt-1"> Created __ days ago</v-card-text>
+          </v-sheet>
+        </v-list-item>
+      </v-list-item-group>
       <!-- 여기 chip 들어감 -->
     </v-list>
   </v-navigation-drawer>

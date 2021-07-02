@@ -71,8 +71,11 @@
                 <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["numOfNA"] }}</span>
               </tr>
               <tr>
-                <span class="info_title">StD </span>
-                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["std"] }}</span>
+                <span class="info_title">Standard Deviation </span>
+                <span
+                  >:
+                  {{ summarizedInfo["numeric"][columns[columnIndex]]["standard deviation"] }}</span
+                >
               </tr>
               <tr>
                 <span class="info_title">Quantile </span>

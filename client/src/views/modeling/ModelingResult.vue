@@ -1,61 +1,67 @@
 <template>
   <div>
     <Header></Header>
-    <v-app>
-      <v-container fluid>
-        <v-row>
-          <v-col cols="2">
-            <ModelingResultSide />
-          </v-col>
 
-          <v-col cols="10">
-            <v-toolbar elevation="1" dense>
+    <v-container fluid>
+      <v-row>
+        <v-col cols="2">
+          <ModelingResultSide />
+        </v-col>
+
+        <v-col cols="10">
+          <v-toolbar elevation="1" dense>
+            <v-spacer></v-spacer>
+
+            <v-btn @click="dialog = true" small color="info">
+              Save Model<v-icon right>mdi-content-save</v-icon>
+            </v-btn>
+
+            <v-btn small color="success" @click="modifyModeling" class="ml-1">
+              Modify Modeling
+              <v-icon right small>
+                mdi-transit-connection
+              </v-icon>
+            </v-btn>
+            <v-btn @click="runSimulation" class="ml-1" color="orange" dark small>
+              Run Simulation
+              <v-icon right small>
+                mdi-chart-bell-curve-cumulative
+              </v-icon>
+            </v-btn>
+          </v-toolbar>
+          <ApexChart
+            :graphNames="graphNames"
+            :graphOptions="graphOptions"
+            :graphHeight="graphHeight"
+            :graphType="graphType"
+            :graphSource="graphSources"
+          >
+          </ApexChart>
+          <ModelingSummary />
+        </v-col>
+      </v-row>
+      <!-- dialog -->
+      <v-dialog v-model="dialog" persistent max-width="400px">
+        <v-card>
+          <v-container fluid>
+            <span class="headline">Name of Case</span>
+            <!-- 최상단 메뉴 탭 -->
+
+            <v-text-field v-model="case_name" placeholder="Case 1" required></v-text-field>
+            <v-card-actions>
               <v-spacer></v-spacer>
-
-              <v-btn @click="dialog = true">
-                <v-icon left>mdi-content-save</v-icon> Save Model</v-btn
-              >
-              <v-btn @click="dialog = true" class="ml-1">
-                <v-icon left small>
-                  mdi-chart-bell-curve-cumulative
-                </v-icon>
-                Run Simulation</v-btn
-              >
-            </v-toolbar>
-            <ApexChart
-              :graphNames="graphNames"
-              :graphOptions="graphOptions"
-              :graphHeight="graphHeight"
-              :graphType="graphType"
-              :graphSource="graphSources"
-            >
-            </ApexChart>
-            <ModelingSummary />
-          </v-col>
-        </v-row>
-        <!-- dialog -->
-        <v-dialog v-model="dialog" persistent max-width="400px">
-          <v-card>
-            <v-container fluid>
-              <span class="headline">Name of Case</span>
-              <!-- 최상단 메뉴 탭 -->
-
-              <v-text-field v-model="case_name" placeholder="Case 1" required></v-text-field>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="dialog = !dialog" color="gray darken-1" text>
-                  Close
-                </v-btn>
-                <v-btn @click="saveModel" color="blue darken-1" @click.once="eventHandler" text>
-                  Confirm
-                </v-btn>
-              </v-card-actions>
-            </v-container>
-          </v-card>
-        </v-dialog>
-        <SaveChange />
-      </v-container>
-    </v-app>
+              <v-btn @click="dialog = !dialog" color="gray darken-1" text>
+                Close
+              </v-btn>
+              <v-btn @click="saveModel" color="blue darken-1" @click.once="eventHandler" text>
+                Confirm
+              </v-btn>
+            </v-card-actions>
+          </v-container>
+        </v-card>
+      </v-dialog>
+      <SaveChange />
+    </v-container>
   </div>
 </template>
 <script>
@@ -247,6 +253,13 @@ export default {
     ...mapMutations("modelingResult", ["saveCaseList"]),
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    modifyModeling() {
+      let modelingParameter = [500, 0.08, 0.3, 0.04, 0.75, 0.5, 7];
+      this.$router.push({ name: "modelingProcess" });
+    },
+    runSimulation() {
+      this.$router.push({ name: "simulations" });
+    },
     getPos(e) {
       let obj = e.target;
       this.left = obj.getBoundingClientRect().left;
@@ -270,7 +283,7 @@ export default {
         data: {
           case_name: this.case_name,
           modelingOption: this.modelingOption,
-          snippet: this.snippet,
+          algorithm: this.algorithm,
           graphSources: JSON.stringify(this.graphSources),
           modelingSummary: JSON.stringify(this.modelingSummary)
         }
@@ -286,7 +299,7 @@ export default {
       this.$axios
         .get(path, {
           params: {
-            //snippetProp 전송
+            //algorithmProp 전송
             case_name: case_name
           }
         })

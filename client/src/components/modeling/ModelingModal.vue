@@ -26,8 +26,8 @@
           <v-tab>1. Dataset</v-tab>
           <v-tab>2. Input/target</v-tab>
           <v-tab>3. Normalization</v-tab>
-          <v-tab>4. Snippet</v-tab>
-          <v-tab>5. Weights</v-tab>
+          <!-- <v-tab>4. Algorithm</v-tab> -->
+          <!-- <v-tab>5. Weights</v-tab> -->
         </v-tabs>
         <!-- 1. dataset -->
         <v-tabs-items v-model="tab">
@@ -135,8 +135,8 @@
               </v-row>
             </v-container>
           </v-tab-item>
-          <!-- 4.Snippet -->
-          <v-tab-item>
+          <!-- 4.Algorithm -->
+          <!-- <v-tab-item>
             <v-card elevation="0" min-height="393px">
               <v-list outlined selectable>
                 <v-list-group :value="true" no-action>
@@ -145,16 +145,16 @@
                       <v-icon>mdi-arrow-decision-auto</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>Snippets</v-list-item-title>
+                      <v-list-item-title>Algorithms</v-list-item-title>
                     </v-list-item-content>
                   </template>
                   <v-list-item-group v-model="model">
                     <v-list-item
-                      v-for="(snippet, index) in snippets"
+                      v-for="(algorithm, index) in algorithms"
                       :key="index"
-                      @click="snippetClicked(snippet)"
+                      @click="algorithmClicked(algorithm)"
                     >
-                      <v-list-item-title v-text="snippet"></v-list-item-title>
+                      <v-list-item-title v-text="algorithm"></v-list-item-title>
 
                       <v-list-item-icon>
                         <v-icon v-text="icon"></v-icon>
@@ -169,7 +169,8 @@
               <v-spacer></v-spacer>
               <v-btn color="primary" @click="createModel">Create</v-btn>
             </v-card-actions>
-          </v-tab-item>
+          </v-tab-item> -->
+
           <!-- 5.Weights -->
           <v-tab-item> </v-tab-item>
         </v-tabs-items>
@@ -193,12 +194,12 @@ export default {
       dataInfoLabels: ["Dataset", "Dataset Version", "Subset"],
       dataTypelabels: ["Training", "Validation", "Test"],
       datasetRatio: ["60%", "20%", "20%"],
-      snippets: ["XGBoost", "Random Forest", "SVR"],
+      algorithms: ["XGBoost", "Random Forest", "SVR"],
       normalization_items: ["Standard Scaler"],
       hideDetailsProps: {
         "hide-details": true
       },
-      chosenSnippet: null
+      chosenAlgorithm: null
     };
   },
   computed: {
@@ -207,9 +208,9 @@ export default {
     })
   },
   methods: {
-    ...mapMutations("modelingData", ["saveSnippet"]),
-    snippetClicked(snippet) {
-      this.chosenSnippet = snippet;
+    ...mapMutations("modelingData", ["saveAlgorithm"]),
+    algorithmClicked(algorithm) {
+      this.chosenAlgorithm = algorithm;
     },
     getItems(index) {
       if (index == 0) {
@@ -240,7 +241,7 @@ export default {
     },
     createModel() {
       this.dialog = false;
-      this.saveSnippet(this.chosenSnippet);
+      this.saveAlgorithm(this.chosenAlgorithm);
       this.$router.push({ name: "modelingProcess" });
     }
   },

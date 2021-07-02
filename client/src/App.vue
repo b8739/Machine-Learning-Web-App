@@ -1,8 +1,10 @@
 <template>
   <div id="app">
-    <div id="content" class="content">
-      <router-view></router-view>
-    </div>
+    <v-app>
+      <div id="content" class="content">
+        <router-view></router-view>
+      </div>
+    </v-app>
   </div>
 </template>
 
@@ -17,7 +19,8 @@ export default {
   components: {
     Header,
     Preprocess
-  }
+  },
+  mounted() {}
 };
 </script>
 

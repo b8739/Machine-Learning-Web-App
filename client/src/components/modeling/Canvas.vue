@@ -1,77 +1,23 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="10">
-        <v-btn @click="createShape">Create</v-btn>
-        <div id="myholder"></div
-      ></v-col>
-      <!-- Option -->
-      <v-col cols="2">
-        <!-- Snippet Option -->
-        <v-card v-show="showXgBoostOption" dark rounded min-height="300px" min-width="200px">
-          <v-container>
-            <v-row>
-              <v-col cols="12" v-for="(snippetProp, index) in snippetProps" :key="index">
-                <v-text-field
-                  hide-details
-                  outlined
-                  dense
-                  :label="snippetProp"
-                  placeholder=""
-                  v-model="selectedProps[index]"
-                ></v-text-field
-              ></v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-
-        <!-- Input Option -->
-        <v-card v-show="showInputOption" dark rounded max-height="400px" min-width="200px">
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <!-- <v-select outlined :items="columns" :label="column" dense hide-details> </v-select> -->
-                <div class="columnList">
-                  <v-checkbox
-                    v-for="(input, inputIndex) in xTrain"
-                    :key="inputIndex"
-                    v-model="inputs[inputIndex]"
-                    :label="input"
-                    dense
-                  >
-                  </v-checkbox>
-                </div>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-        <!-- Target Option -->
-        <!-- Input Option -->
-        <v-card v-show="showTargetOption" dark rounded max-height="400px" min-width="200px">
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <!-- <v-select outlined :items="columns" :label="column" dense hide-details> </v-select> -->
-                <div class="targetList">
-                  <v-checkbox
-                    v-for="(target, targetIndex) in yTrain"
-                    :key="targetIndex"
-                    v-model="targets[targetIndex]"
-                    :label="target"
-                    dense
-                  >
-                  </v-checkbox>
-                </div>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-      </v-col>
-    </v-row>
+    <div id="baklavaStage">
+      <baklava-editor :plugin="viewPlugin"></baklava-editor>
+    </div>
   </v-container>
 </template>
 <script>
+// baklavajs
+import { Editor } from "@baklavajs/core";
+import { ViewPlugin } from "@baklavajs/plugin-renderer-vue";
+import customNode from "@/components/customNode.js";
+
 import axios from "axios";
+// drawflow
+import Vue from "vue";
+import Drawflow from "drawflow";
+import styleDrawflow from "drawflow/dist/drawflow.min.css";
+import NodeAlgorithm from "@/components/NodeAlgorithm.vue";
+
 axios.defaults.paramsSerializer = function(paramObj) {
   const params = new URLSearchParams();
   for (const key in paramObj) {
@@ -80,17 +26,18 @@ axios.defaults.paramsSerializer = function(paramObj) {
 
   return params.toString();
 };
+
 import { eventBus } from "@/main";
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      shape: null,
-      graph: null,
-      showXgBoostOption: false,
-      showInputOption: false,
-      showTargetOption: false,
+      editor: new Editor(),
+      viewPlugin: new ViewPlugin(),
+
+      options: {},
+
       // props
       xgboost_props: [
         "n_estimators",
@@ -104,7 +51,7 @@ export default {
       svr_props: ["kernel", "C", "epsilon", "gamma"],
       randomForest_props: ["n_estimators", "min_samples_split"],
       // options
-      selectedProps: [],
+      selectedProps: [500, 0.08, 0.3, 0.04, 0.75, 0.5, 7],
       xTrain: [
         "CRIM",
         "ZN",
@@ -125,58 +72,49 @@ export default {
       inputView: null
     };
   },
-  components: {},
+  components: { NodeAlgorithm },
   computed: {
     ...mapState({
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
-      snippet: state => state.modelingData.snippet
+      algorithm: state => state.modelingData.algorithm,
+      parameters: state => state.modelingData.parameters
     }),
     ...mapGetters({
       columns: state => state.initialData.columns
     }),
-    snippetProps() {
-      if (this.snippet == "XGBoost") {
+    algorithmProps() {
+      if (this.algorithm == "XGBoost") {
         return this.xgboost_props;
-      } else if (this.snippet == "Random Forest") {
+      } else if (this.algorithm == "Random Forest") {
         return this.randomForest_props;
-      } else if (this.snippet == "SVR") {
+      } else if (this.algorithm == "SVR") {
         return this.svr_props;
       }
     }
   },
+
   methods: {
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
-    createInputBlock() {
-      let cloned = this.shape.clone();
-      cloned.position(700, 100);
-      cloned.attr(".label/text", "Input");
-      cloned.addTo(this.graph);
-    },
-    createTargetBlock() {
-      let cloned = this.shape.clone();
-      cloned.position(700, 520);
-      cloned.attr(".label/text", "Target");
-      cloned.addTo(this.graph);
-    },
+    ...mapMutations("modelingResult", ["saveParameters"]),
 
     runModel(modelingParameter) {
       eventBus.$emit("modelingParameter", modelingParameter);
       let path = "http://localhost:5000/";
       // define path
-      if (this.snippet == "XGBoost") {
+      if (this.algorithm == "XGBoost") {
         path += "xgboost_modeling";
-      } else if (this.snippet == "Random Forest") {
+      } else if (this.algorithm == "Random Forest") {
         path += "rf_modeling";
-      } else if (this.snippet == "SVR") {
+      } else if (this.algorithm == "SVR") {
         path += "svr_modeling";
       }
       // axios
       axios
         .get(path, {
           params: {
-            //snippetProp 전송
+            //algorithmProp 전송
             modelingParameter: modelingParameter
           }
         })
@@ -191,264 +129,52 @@ export default {
         .catch(error => {
           console.error(error);
         });
+    },
+    createNode(nodeInfo) {
+      // parameter ready
+      let hasParameter = null;
+      if (nodeInfo.nodeType == "algorithm") {
+        hasParameter = true;
+      } else {
+        hasParameter = false;
+      }
+      const props = { name: nodeInfo.node, hasParameter: hasParameter };
+      const options = {};
+      const data = {};
+      // register
+      this.editor.registerNode("Block", NodeAlgorithm, props, options);
+      this.editor.addNode("Name", 1, 1, 200, 100, "Class", data, "Block", "vue");
     }
   },
   created() {
+    this.editor.use(this.optionPlugin);
+    this.editor.use(this.viewPlugin);
+
+    // register your nodes, node options, node interface types, ...
+
+    this.editor.registerNodeType("customNode", customNode);
     eventBus.$on("runModel", status => {
       this.runModel(this.selectedProps);
+      this.saveParameters(this.selectedProps);
     });
-    eventBus.$on("createBlock", index => {
-      if (index == 0) {
-        this.createInputBlock();
-      } else {
-        this.createTargetBlock();
-      }
+    eventBus.$on("sendNodeInfo", nodeInfo => {
+      this.createNode(nodeInfo);
     });
   },
   mounted() {
-    //graph 정의
-    this.graph = new joint.dia.Graph();
-    //paper 정의
-    let paper = new joint.dia.Paper({
-      el: $("#myholder"),
-      width: "100%",
-      height: 800,
-      model: this.graph,
-      gridSize: 1
-    });
+    // drawflow
+    const id = document.getElementById("drawflow");
+    // editor
+    this.editor = new Drawflow(id, Vue);
+    this.editor.start();
+    const props = { name: "Input" };
 
-    // line이 connect 되지 않으면 사라지도록
-    paper.model.on("batch:stop", function() {
-      var links = paper.model.getLinks();
-      _.each(links, function(link) {
-        var source = link.get("source");
-        var target = link.get("target");
-        if (source.id === undefined || target.id === undefined) {
-          link.remove();
-        }
-      });
-    });
-    // default connector를 곡선으로 설정
-    paper.options.defaultConnector = {
-      name: "smooth",
-      args: {
-        radius: 20
-      }
-    };
+    // register
+    this.editor.registerNode("NodeAlgorithm1", NodeAlgorithm, props, this.options);
 
-    // Model 정의
-    this.shape = new joint.shapes.devs.Model({
-      position: {
-        x: 500,
-        y: 300
-      },
-      size: { width: 60, height: 30 },
-      inPorts: ["in"],
-      outPorts: ["out"],
-
-      ports: {
-        groups: {
-          in: {
-            position: "top",
-            attrs: {
-              ".port-body": {
-                r: 5,
-                padding: 3
-                // fill: "#16A085",
-              },
-
-              ".port-label": {
-                fill: "transparent"
-              }
-            }
-          },
-          out: {
-            position: "bottom",
-            attrs: {
-              ".port-body": {
-                r: 5
-                // fill: "#E74C3C"
-              },
-              ".port-label": {
-                fill: "transparent"
-              }
-            }
-          }
-        }
-      },
-      attrs: {
-        ".label": {
-          text: this.snippet,
-          "ref-x": 0.5,
-          "ref-y": 0.3,
-          "font-size": 12,
-          fill: "charcoal"
-        },
-        rect: {
-          fill: "#a9a9b0",
-          // add a corner radius
-          rx: 15,
-          ry: 15
-        }
-      }
-    });
-    //shape 화면의 render
-    this.shape.addTo(this.graph);
-    let shapeView = this.shape.findView(paper);
-    // Input
-    let cloned = this.shape.clone();
-    cloned.position(500, 100);
-    cloned.attr(".label/text", "Input");
-    cloned.addTo(this.graph);
-    var link = new joint.shapes.standard.Link({
-      source: { id: cloned.id, port: "out" },
-      target: { id: this.shape.id, port: "in" },
-      connector: { name: "rounded" }
-    });
-    this.graph.addCell(link);
-    // Target
-    cloned = this.shape.clone();
-    cloned.position(500, 520);
-    cloned.attr(".label/text", "Target");
-    cloned.addTo(this.graph);
-    var link = new joint.shapes.standard.Link({
-      source: { id: this.shape.id, port: "out" },
-      target: { id: cloned.id, port: "in" },
-      connector: { name: "rounded" }
-    });
-    this.graph.addCell(link);
-
-    // let x_position = 30;
-    // //Input Cloning
-    // for (let i = 0; i < this.xTrain.length; i++) {
-    //   let cloned = this.shape.clone();
-
-    //   cloned.position(x_position, 80);
-    //   cloned.attr(".label/text", this.xTrain[i]);
-
-    //   //화면에 렌더링
-    //   cloned.addTo(this.graph);
-    //   var link = new joint.shapes.standard.Link({
-    //     source: { id: cloned.id, port: "out" },
-    //     target: { id: this.shape.id, port: "in" },
-    //     connector: { name: "rounded" }
-    //   });
-    //   this.graph.addCell(link);
-
-    //   x_position = x_position + 80;
-    // }
-    // Target Cloning
-    // for (let i = 0; i < this.yTrain.length; i++) {
-    //   let cloned = this.shape.clone();
-    //   cloned.position(500, 520);
-    //   cloned.attr(".label/text", this.yTrain[i]);
-
-    //   //화면에 렌더링
-    //   cloned.addTo(this.graph);
-    //   var link = new joint.shapes.standard.Link({
-    //     source: { id: this.shape.id, port: "out" },
-    //     target: { id: cloned.id, port: "in" },
-    //     connector: { name: "rounded" }
-    //   });
-    //   this.graph.addCell(link);
-    // }
-
-    //Tools (shape)
-    let boundaryTool = new joint.elementTools.Boundary();
-    let removeButton = new joint.elementTools.Remove();
-
-    let toolsView = new joint.dia.ToolsView({
-      tools: [boundaryTool, removeButton]
-    });
-
-    shapeView.addTools(toolsView);
-    shapeView.hideTools();
-    //Tools (Link)
-    let tools = [
-      new joint.linkTools.Remove({
-        distance: 20,
-        action: function(evt) {
-          // do stuff and remove link using
-          this.model.remove({ ui: true, tool: this.cid });
-        }
-      })
-      // new joint.linkTools.TargetArrowhead({
-      //   display: "none"
-      // })
-    ];
-    // link hover 설정 (toolbar show/hide)
-    paper.on("link:mouseenter", function(linkView) {
-      linkView.addTools(
-        new joint.dia.ToolsView({
-          name: "onhover",
-          tools: tools
-        })
-      );
-    });
-    paper.on("link:mouseleave", function(linkView) {
-      linkView.hideTools();
-    });
-
-    // element hover 설정 (toolbar show/hide)
-    paper.on("element:contextmenu", function(shapeView) {
-      shapeView.showTools();
-    });
-    paper.on("element:pointerclick", shapeView => {
-      let labelName = shapeView.model.attr(".label/text");
-      if (labelName === "Input") {
-        this.showInputOption = !this.showInputOption;
-        this.showXgBoostOption = false;
-        this.showTargetOption = false;
-      } else if (labelName === "Target") {
-        this.showTargetOption = !this.showTargetOption;
-        this.showInputOption = false;
-        this.showXgBoostOption = false;
-      } else {
-        this.showXgBoostOption = !this.showXgBoostOption;
-        this.showInputOption = false;
-        this.showTargetOption = false;
-      }
-    });
-
-    paper.on("element:mouseleave", function(shapeView) {
-      shapeView.hideTools();
-      // console.log(shapeView);
-    });
-
-    // shapeView.addTools(toolsView);
-    // let rect = new joint.shapes.standard.Rectangle({});
-
-    // rect.position(100, 30);
-    // rect.resize(100, 40);
-    // rect.attr({
-    //   body: {
-    //     fill: "#a9a9a9",
-    //     rx: 5,
-    //     ry: 5
-    //   },
-    //   label: {
-    //     text: "SVR",
-    //     fill: "white"
-    //   }
-    // });
-
-    // let rect2 = rect.clone();
-    // rect2.translate(300);
-
-    // var link = new joint.shapes.standard.Link();
-
-    // link.source(rect);
-    // link.target(rect2);
-
-    // this.graph.addCells([rect, rect2, link]);
-
-    // var link2 = new joint.shapes.standard.Link();
-    // link2.prop("source", { x: 0, y: 0 });
-    // link2.prop("target", { x: 200, y: 200 });
-    // // link2.prop("vertices", [{ x: 450, y: 700 }]);
-    // link2.attr("root/title", "joint.shapes.standard.Link");
-    // link2.attr("line/stroke", "#fe854f");
-    // link2.addTo(this.graph);
+    const data = {};
+    this.editor.addNode("Name", 1, 1, 200, 100, "Class", data, "NodeAlgorithm1", "vue");
+    this.editor.addNode("Name", 1, 1, 300, 500, "Class", data, "NodeAlgorithm1", "vue");
   }
 };
 </script>
@@ -460,5 +186,14 @@ export default {
 .columnList {
   height: 400px;
   overflow-y: scroll;
+}
+/* drawflow */
+#drawflow {
+  width: 100%;
+  height: 100vh;
+}
+#baklavaStage {
+  width: 100%;
+  height: 100vh;
 }
 </style>

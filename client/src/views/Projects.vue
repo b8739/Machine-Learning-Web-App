@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <v-app-bar>
       <a href="http://localhost:8080"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
     </v-app-bar>
@@ -38,7 +38,7 @@
         <v-col cols=""> </v-col>
       </v-row>
     </v-container>
-  </v-app>
+  </div>
 </template>
 <script>
 import axios from "axios";

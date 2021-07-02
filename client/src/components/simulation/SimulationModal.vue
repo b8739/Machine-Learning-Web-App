@@ -67,8 +67,7 @@
                     </v-col>
                     <!-- customized -->
 
-                    <div>
-                      <!-- v-if="select.method == 'Customized Setting'" -->
+                    <div v-if="select.method == 'Customized Setting'">
                       <!-- toolbar -->
                       <v-toolbar outlined elevation="0">
                         <v-spacer></v-spacer>
@@ -79,9 +78,10 @@
                             outlined
                             :color="chipColors[index]"
                             @click="statisticFocused(statistic)"
-                            >{{ statistic }}</v-chip
-                          >
+                            >{{ statistic }}
+                          </v-chip>
                         </v-chip-group>
+                        <!--  -->
                         <v-spacer></v-spacer>
                       </v-toolbar>
 
@@ -137,9 +137,11 @@
                 </v-col>
               </v-row>
               <!-- 디버깅 -->
-              <!-- <p>focusedFeature: {{ focusedFeature }}</p>
-              <p>focusedStatistic: {{ focusedStatistic }}</p>
-              <p>startValues: {{ startValues }}</p> -->
+              <div v-show="false">
+                <p>focusedFeature: {{ focusedFeature }}</p>
+                <p>focusedStatistic: {{ focusedStatistic }}</p>
+                <p>startValues: {{ startValues }}</p>
+              </div>
 
               <!-- actions 2-->
               <v-row>
@@ -173,8 +175,9 @@ export default {
       length: 2,
       model: 1,
 
-      tab: 1,
+      tab: 0,
       statistics: ["Min", "Max", "Median", "Standard Deviation"],
+      distributionType: ["Uniform Distribution", "Normal Distribution"],
       focusedStatistic: null,
       focusedTextField: null,
       chipColors: ["green", "primary", "orange", "red"],
@@ -189,12 +192,12 @@ export default {
           explanation: "사용자가 직접 난수 (Random Number)가 생성될 구간을 설정합니다."
         }
       ],
-      dialog: true,
+      dialog: false,
 
       hideDetailsProps: {
         "hide-details": true
       },
-      chosenSnippet: null,
+      chosenAlgorithm: null,
       focusedFeature: null
     };
   },
@@ -252,8 +255,8 @@ export default {
       this.$router.push({ name: "simulationResult" });
     },
 
-    snippetClicked(snippet) {
-      this.chosenSnippet = snippet;
+    algorithmClicked(algorithm) {
+      this.chosenAlgorithm = algorithm;
     },
     getItems(index) {
       if (index == 0) {
@@ -284,7 +287,7 @@ export default {
     },
     createModel() {
       this.dialog = false;
-      this.saveSnippet(this.chosenSnippet);
+      this.saveAlgorithm(this.chosenAlgorithm);
       this.$router.push({ name: "modeling" });
     }
   },

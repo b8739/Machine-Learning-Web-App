@@ -1,24 +1,23 @@
 <template>
   <div>
     <Header></Header>
-    <v-app>
-      <v-container fluid>
-        <v-row>
-          <v-col cols="2">
-            <SimulationResultSide />
-          </v-col>
 
-          <v-col cols="10">
-            <v-toolbar elevation="1" dense>
-              <v-spacer></v-spacer>
+    <v-container fluid>
+      <v-row>
+        <v-col cols="2">
+          <SimulationResultSide />
+        </v-col>
 
-              <v-btn @click="dialog = true">Save Simulation</v-btn>
-            </v-toolbar>
-            <ApexChart> </ApexChart>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-app>
+        <v-col cols="10">
+          <v-toolbar elevation="1" dense>
+            <v-spacer></v-spacer>
+
+            <v-btn @click="dialog = true">Save Simulation</v-btn>
+          </v-toolbar>
+          <ApexChart> </ApexChart>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 <script>

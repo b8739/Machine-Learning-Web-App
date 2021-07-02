@@ -1,38 +1,37 @@
 <template>
   <div>
     <Header />
-    <v-app>
-      <v-container fluid class="pl-10 pt-10">
-        <v-row align="start" no-gutter dense>
-          <v-col cols="1">
-            <v-btn @click="openUploader" block color="success">
-              <v-icon left class="mdi-24">
-                mdi-plus
-              </v-icon>
-              Add Dataset
-            </v-btn>
-          </v-col>
-          <v-col cols="9"></v-col>
-          <v-sheet
-            light
-            outlined
-            width="350px"
-            v-for="(tableName, tableIndex) in tableList"
-            :key="tableIndex"
-            class="mr-5 mt-5 cursor-pointer"
-            @click="enterDataset"
-          >
-            <v-card-text class="font-weight-bold body-1">{{ tableName }}</v-card-text>
-            <v-card-text class="font-weight-light body-2 pt-0">Created Date:</v-card-text>
-            <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
-            <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text>
-          </v-sheet>
-        </v-row>
-        <!-- modal -->
-        <DefineDataset />
-        <Uploader />
-      </v-container>
-    </v-app>
+
+    <v-container fluid class="pl-10 pt-10">
+      <v-row align="start" no-gutter dense>
+        <v-col cols="1">
+          <v-btn @click="openUploader" block color="success">
+            <v-icon left class="mdi-24">
+              mdi-plus
+            </v-icon>
+            Add Dataset
+          </v-btn>
+        </v-col>
+        <v-col cols="9"></v-col>
+        <v-sheet
+          light
+          outlined
+          width="350px"
+          v-for="(tableName, tableIndex) in tableList"
+          :key="tableIndex"
+          class="mr-5 mt-5 cursor-pointer"
+          @click="enterDataset"
+        >
+          <v-card-text class="font-weight-bold body-1">{{ tableName }}</v-card-text>
+          <v-card-text class="font-weight-light body-2 pt-0">Created Date:</v-card-text>
+          <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
+          <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text>
+        </v-sheet>
+      </v-row>
+      <!-- modal -->
+      <DefineDataset />
+      <Uploader />
+    </v-container>
   </div>
 </template>
 

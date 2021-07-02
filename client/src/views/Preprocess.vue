@@ -1,40 +1,39 @@
 <template>
   <div id="wrap">
     <Header> </Header>
-    <v-app>
-      <v-container id="mainWrapper" fluid>
-        <v-row>
-          <!-- 화면 좌측 -->
-          <v-col cols=""><SideMenu /></v-col>
-          <!-- 화면 우측 -->
-          <v-col cols="10">
-            <v-toolbar elevation="1">
-              <!-- Preprocess/Table 교체 버튼 -->
-              <v-row>
-                <v-btn class="mr-2" @click="displaySwitch()">Feature</v-btn
-                ><v-btn @click="displaySwitch()">Table</v-btn>
 
-                <v-spacer></v-spacer>
-
-                <SaveMenu />
-              </v-row>
-            </v-toolbar>
+    <v-container id="mainWrapper" fluid>
+      <v-row>
+        <!-- 화면 좌측 -->
+        <v-col cols=""><SideMenu /></v-col>
+        <!-- 화면 우측 -->
+        <v-col cols="10">
+          <v-toolbar elevation="1">
+            <!-- Preprocess/Table 교체 버튼 -->
             <v-row>
-              <!-- <GraphBuilder :columns="columns" /> -->
-              <DeleteStepper />
-              <AverageModal />
-              <ChangeOrder />
+              <v-btn class="mr-2" @click="displaySwitch()">Feature</v-btn
+              ><v-btn @click="displaySwitch()">Table</v-btn>
 
-              <DataFeatures :class="{ visibilityHidden: showFeatures }" />
+              <v-spacer></v-spacer>
 
-              <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
-              <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
-              <!-- <AddModal :addForm="addForm" :indexNum="indexNum" @loadDataStatus="loadData" /> -->
+              <SaveMenu />
             </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-app>
+          </v-toolbar>
+          <v-row>
+            <!-- <GraphBuilder :columns="columns" /> -->
+            <DeleteStepper />
+            <AverageModal />
+            <ChangeOrder />
+
+            <DataFeatures :class="{ visibilityHidden: showFeatures }" />
+
+            <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
+            <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
+            <!-- <AddModal :addForm="addForm" :indexNum="indexNum" @loadDataStatus="loadData" /> -->
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 <script>

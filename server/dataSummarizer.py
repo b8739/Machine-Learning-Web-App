@@ -66,8 +66,8 @@ def summarizeData(df):
   distribution_features_column = []
 
   for each in df_numeric.columns:
-    dictdata = {'min':float(df_numeric[each].min())}
-    dictdata['max'] = float(df_numeric[each].max())
+    dictdata = {'min':float(df_numeric[each].min()),'max':float(df_numeric[each].max())}
+
     interval_features[each]=dictdata
     distribution_features[each]=df_numeric[each].value_counts(bins=20).to_list()
   

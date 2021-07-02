@@ -1,22 +1,21 @@
 <template>
   <div>
     <Header></Header>
-    <v-app>
-      <v-container fluid>
-        <v-row>
-          <v-col cols="2">
-            <ModelingSide />
-          </v-col>
-          <v-col cols="10">
-            <v-toolbar elevation="1" dense>
-              <v-spacer></v-spacer
-              ><v-btn @click="runModel"><v-icon left small>mdi-play-outline</v-icon> Run</v-btn>
-            </v-toolbar>
-            <Canvas></Canvas>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-app>
+
+    <v-container fluid>
+      <v-row>
+        <v-col cols="2">
+          <ModelingSide />
+        </v-col>
+        <v-col cols="10">
+          <v-toolbar elevation="1" dense>
+            <v-spacer></v-spacer
+            ><v-btn @click="runModel"><v-icon left small>mdi-play-outline</v-icon> Run</v-btn>
+          </v-toolbar>
+          <Canvas></Canvas>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 <script>
@@ -53,7 +52,7 @@ export default {
     ...mapState({
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
-      snippet: state => state.modelingData.snippet
+      algorithm: state => state.modelingData.algorithm
     })
   },
 

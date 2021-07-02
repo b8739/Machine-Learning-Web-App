@@ -1,18 +1,22 @@
 const state = {
   inputs: [],
   targets: [],
-  snippet: null
+  algorithm: null,
+  parameters: []
 };
 
 const mutations = {
-  saveSnippet(state, payload) {
-    state.snippet = payload;
+  saveAlgorithm(state, payload) {
+    state.algorithm = payload;
   },
   saveInputs(state, payload) {
     state.inputs = payload;
   },
   saveTargets(state, payload) {
     state.targets = payload;
+  },
+  saveParameters(state, payload) {
+    state.parameters = payload;
   }
 };
 

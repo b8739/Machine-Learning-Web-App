@@ -232,11 +232,6 @@ def infiniteLoading():
 	return Response(df.to_json( orient='records'), mimetype='application/json')
 
 
-@app.route('/dataSummarize',methods=['GET','POST'])
-def dataSummarize():
-  df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
-  return (summarizeData(df))
-
 @app.route('/deleteColumn',methods=['GET'])
 def deleteColumn():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
@@ -445,8 +440,8 @@ def saveModel():
   1. Case Name 
     -> case_list ['case_name'], 
 
-  2. Snippet 
-    -> case_list ['snippet'] 
+  2. algorithm 
+    -> case_list ['algorithm'] 
 
   3. Modeling Parameter 
     -> ['<case이름>_parameter']
@@ -464,13 +459,13 @@ def saveModel():
 
   """ 
   1. Case Name, 
-  2. Snippet 저장 
+  2. algorithm 저장 
   """
 
   case_name = request.get_json()['case_name']
-  snippet = request.get_json()['snippet']
+  algorithm = request.get_json()['algorithm']
 
-  dict = {'case_name':case_name,'snippet':snippet}
+  dict = {'case_name':case_name,'algorithm':algorithm}
 
   case_name_df = pd.DataFrame(dict,index=[0])
   case_name_df['dataset'] = 'dataset_1'
@@ -569,13 +564,13 @@ def loadCases():
 
   sql="select * from case_list"
   caseRow = session.execute(sql).fetchall()
-  caseDict={'case_name':'','snippet':'','dataset':''}
+  caseDict={'case_name':'','algorithm':'','dataset':''}
   caseList = []
   for index,case in enumerate(caseRow):
     caseDict['case_name']=caseRow[index][0]
-    caseDict['snippet']=caseRow[index][1]
+    caseDict['algorithm']=caseRow[index][1]
     caseDict['dataset']=caseRow[index][2]
-    caseList.append({'case_name':caseDict['case_name'],'snippet': caseDict['snippet'],
+    caseList.append({'case_name':caseDict['case_name'],'algorithm': caseDict['algorithm'],
     'dataset': caseDict['dataset']})
     # caseList.append(str(caseRow[index][0]))
   session.commit()

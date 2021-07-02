@@ -3,6 +3,7 @@
     <apexchart
       ref="simulationChart"
       type="line"
+      width="400"
       height="250"
       :options="simulationChartOption"
     ></apexchart>
