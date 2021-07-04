@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <div id="baklavaStage">
       <baklava-editor :plugin="viewPlugin"></baklava-editor>
     </div>
@@ -7,9 +7,13 @@
 </template>
 <script>
 // baklavajs
-import { Editor } from "@baklavajs/core";
+import { Editor, NodeBuilder, Node } from "@baklavajs/core";
 import { ViewPlugin } from "@baklavajs/plugin-renderer-vue";
-import customNode from "@/components/customNode.js";
+import { OptionPlugin } from "@baklavajs/plugin-options-vue";
+import CustomNode from "@/components/baklava/CustomNode.js";
+// baklava option
+import MyOption from "@/components/baklava/MyOption.vue";
+import ParameterOption from "@/components/baklava/ParameterOption.vue";
 
 import axios from "axios";
 // drawflow
@@ -33,12 +37,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      editor: new Editor(),
-      viewPlugin: new ViewPlugin(),
-
-      options: {},
-
-      // props
+      features: ["Input", "Target"],
       xgboost_props: [
         "n_estimators",
         "learning_rate",
@@ -48,26 +47,14 @@ export default {
         "colsample_bytree",
         "max_depth"
       ],
-      svr_props: ["kernel", "C", "epsilon", "gamma"],
-      randomForest_props: ["n_estimators", "min_samples_split"],
-      // options
-      selectedProps: [500, 0.08, 0.3, 0.04, 0.75, 0.5, 7],
-      xTrain: [
-        "CRIM",
-        "ZN",
-        "INDUS",
-        "CHAS",
-        "NOX",
-        "RM",
-        "AGE",
-        "DIS",
-        "RAD",
-        "TAX",
-        "PTRATIO",
-        "B",
-        "LSTAT"
-      ],
-      yTrain: ["MEDV"],
+      editor: new Editor(),
+      viewPlugin: new ViewPlugin(),
+      node: new Node(),
+      optionPlugin: new OptionPlugin(),
+      options: {},
+      algorithms: ["XGBoost", "SVR", "RF"],
+      // props
+
       inputList: [],
       inputView: null
     };
@@ -98,7 +85,65 @@ export default {
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
     ...mapMutations("modelingResult", ["saveParameters"]),
+    buildFeatureNodes(featureName) {
+      const featureNode = new NodeBuilder("FeatureNode")
+        .setName(featureName)
+        .addOption("Operation", "SelectOption", "Change Feature", undefined, {
+          items: this.features
+        })
+        .addOption("MyOption", "MyOption")
 
+        .addOutputInterface("Output")
+        .onCalculate(n => {
+          const n1 = n.getInterface("Number 1").value;
+          const n2 = n.getInterface("Number 2").value;
+          const operation = n.getOptionValue("Operation");
+          let result;
+          if (operation === "Add") {
+            result = n1 + n2;
+          } else if (operation === "Subtract") {
+            result = n1 - n2;
+          }
+          n.getInterface("Output").value = result;
+        })
+        .build();
+      // this.node.getOptionValue("MyOption");
+      let category = "Features";
+      this.editor.registerNodeType(featureName, featureNode, category);
+    },
+    buildAlgorithmNodes(algorithmName) {
+      const algorithmNode = new NodeBuilder("AlgorithmNode")
+        .setName(algorithmName)
+        .addOption("Operation", "SelectOption", "Change Algorithm", undefined, {
+          items: this.algorithms
+        })
+        .addOption("MyOption", "MyOption")
+        .addOption(
+          "Parameter",
+          "ButtonOption",
+          () => {
+            return { parameters: this.xgboost_props };
+          },
+          "ParameterOption"
+        )
+        .addOutputInterface("Output")
+        .onCalculate(n => {
+          const n1 = n.getInterface("Number 1").value;
+          const n2 = n.getInterface("Number 2").value;
+          const operation = n.getOptionValue("Operation");
+          let result;
+          if (operation === "Add") {
+            result = n1 + n2;
+          } else if (operation === "Subtract") {
+            result = n1 - n2;
+          }
+          n.getInterface("Output").value = result;
+        })
+        .build();
+      // this.node.getOptionValue("MyOption");
+      let category = "Algorithm";
+      this.editor.registerNodeType(algorithmName, algorithmNode, category);
+    },
     runModel(modelingParameter) {
       eventBus.$emit("modelingParameter", modelingParameter);
       let path = "http://localhost:5000/";
@@ -129,53 +174,25 @@ export default {
         .catch(error => {
           console.error(error);
         });
-    },
-    createNode(nodeInfo) {
-      // parameter ready
-      let hasParameter = null;
-      if (nodeInfo.nodeType == "algorithm") {
-        hasParameter = true;
-      } else {
-        hasParameter = false;
-      }
-      const props = { name: nodeInfo.node, hasParameter: hasParameter };
-      const options = {};
-      const data = {};
-      // register
-      this.editor.registerNode("Block", NodeAlgorithm, props, options);
-      this.editor.addNode("Name", 1, 1, 200, 100, "Class", data, "Block", "vue");
     }
   },
   created() {
+    // baklava js setting
     this.editor.use(this.optionPlugin);
     this.editor.use(this.viewPlugin);
-
-    // register your nodes, node options, node interface types, ...
-
-    this.editor.registerNodeType("customNode", customNode);
-    eventBus.$on("runModel", status => {
-      this.runModel(this.selectedProps);
-      this.saveParameters(this.selectedProps);
+    // 1) viewPlugin option setting
+    this.viewPlugin.registerOption("MyOption", MyOption);
+    this.viewPlugin.registerOption("ParameterOption", ParameterOption);
+    // 2) register algorithm nodes
+    this.features.forEach(element => {
+      this.buildFeatureNodes(element);
     });
-    eventBus.$on("sendNodeInfo", nodeInfo => {
-      this.createNode(nodeInfo);
+
+    this.algorithms.forEach(element => {
+      this.buildAlgorithmNodes(element);
     });
   },
-  mounted() {
-    // drawflow
-    const id = document.getElementById("drawflow");
-    // editor
-    this.editor = new Drawflow(id, Vue);
-    this.editor.start();
-    const props = { name: "Input" };
-
-    // register
-    this.editor.registerNode("NodeAlgorithm1", NodeAlgorithm, props, this.options);
-
-    const data = {};
-    this.editor.addNode("Name", 1, 1, 200, 100, "Class", data, "NodeAlgorithm1", "vue");
-    this.editor.addNode("Name", 1, 1, 300, 500, "Class", data, "NodeAlgorithm1", "vue");
-  }
+  mounted() {}
 };
 </script>
 <style>

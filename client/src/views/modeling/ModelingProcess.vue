@@ -4,10 +4,10 @@
 
     <v-container fluid>
       <v-row>
-        <v-col cols="2">
+        <!-- <v-col cols="2">
           <ModelingSide />
-        </v-col>
-        <v-col cols="10">
+        </v-col> -->
+        <v-col>
           <v-toolbar elevation="1" dense>
             <v-spacer></v-spacer
             ><v-btn @click="runModel"><v-icon left small>mdi-play-outline</v-icon> Run</v-btn>
