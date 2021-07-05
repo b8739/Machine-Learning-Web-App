@@ -1,51 +1,56 @@
 <template>
-  <div></div>
+  <div>
+    <!-- <button @click="clickme()">hello</button> -->
+    <v-select
+      :items="featureTypes"
+      dense
+      hide-details
+      v-model="select"
+      label="Change Feature"
+      dark
+    ></v-select>
+  </div>
 </template>
 <script>
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
 import { TextOption } from "@baklavajs/plugin-options-vue";
 export default {
-  props: ["value", "name"],
+  props: ["value", "name", "node", "editor"],
+  data() {
+    return {
+      select: null,
+      featureTypes: ["Input", "Target"]
+    };
+  },
+  watch: {
+    select: function(data) {
+      // 기존 node 위치 정보
+      const currentNodePosition = this.node.position;
+      // 새로운 Node 생성
+      let MyNode = this.node.editorInstance.nodeTypes.get(data);
+      let n = new MyNode();
+      this.node.editorInstance.addNode(n);
+      // 기존 node 삭제
+      this.node.editorInstance.removeNode(this.node);
+      // 새로운 Node 위치 수정
+      n.position = { x: currentNodePosition.x, y: currentNodePosition.y };
+    }
+  },
   components: {
     ButtonOption,
     InputOption
   },
-  data() {
-    return {
-      xgboost_props: [
-        "n_estimators",
-        "learning_rate",
-        "gamma",
-        "eta",
-        "subsample",
-        "colsample_bytree",
-        "max_depth"
-      ],
-      svr_props: ["kernel", "C", "epsilon", "gamma"],
-      randomForest_props: ["n_estimators", "min_samples_split"],
-      // options
-      selectedProps: [500, 0.08, 0.3, 0.04, 0.75, 0.5, 7],
-      xTrain: [
-        "CRIM",
-        "ZN",
-        "INDUS",
-        "CHAS",
-        "NOX",
-        "RM",
-        "AGE",
-        "DIS",
-        "RAD",
-        "TAX",
-        "PTRATIO",
-        "B",
-        "LSTAT"
-      ],
-      yTrain: ["MEDV"]
-    };
+  computed: {
+    selectOption() {
+      return this.node.getOptionValue("Operation");
+    }
   },
-  created() {
-    console.log(this.value);
+  methods: {
+    clickme() {
+      // console.log(this.node.events);
+      // console.log(this.node.getOptionValue("Operation"));
+    }
   }
 };
 </script>

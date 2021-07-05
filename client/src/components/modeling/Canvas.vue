@@ -1,5 +1,6 @@
 <template>
   <v-container fluid>
+    <button @click="checkNodes()">nodes</button>
     <div id="baklavaStage">
       <baklava-editor :plugin="viewPlugin"></baklava-editor>
     </div>
@@ -7,7 +8,7 @@
 </template>
 <script>
 // baklavajs
-import { Editor, NodeBuilder, Node } from "@baklavajs/core";
+import { Editor, NodeBuilder, Node, NodeOption } from "@baklavajs/core";
 import { ViewPlugin } from "@baklavajs/plugin-renderer-vue";
 import { OptionPlugin } from "@baklavajs/plugin-options-vue";
 import CustomNode from "@/components/baklava/CustomNode.js";
@@ -82,18 +83,25 @@ export default {
   },
 
   methods: {
+    checkNodes() {
+      console.log(this.editor.nodeTypes);
+    },
+    // mapmutations
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
     ...mapMutations("modelingResult", ["saveParameters"]),
+
+    // build node types
     buildFeatureNodes(featureName) {
-      const featureNode = new NodeBuilder("FeatureNode")
+      let newOption = new NodeOption();
+      // 원래 하던거
+      let featureNode = new NodeBuilder("FeatureNode")
         .setName(featureName)
-        .addOption("Operation", "SelectOption", "Change Feature", undefined, {
-          items: this.features
-        })
+
         .addOption("MyOption", "MyOption")
 
         .addOutputInterface("Output")
+
         .onCalculate(n => {
           const n1 = n.getInterface("Number 1").value;
           const n2 = n.getInterface("Number 2").value;
@@ -105,11 +113,21 @@ export default {
             result = n1 - n2;
           }
           n.getInterface("Output").value = result;
-        })
-        .build();
-      // this.node.getOptionValue("MyOption");
+        });
+      // Input과 달리, Target의 경우 Input Interface도 필요하므로 추가
+      if (featureName == "Target") {
+        featureNode.addInputInterface("Input");
+      }
+      // console.log(featureNode.events);
+      featureNode = featureNode.build();
+
       let category = "Features";
       this.editor.registerNodeType(featureName, featureNode, category);
+      //event
+      let myNode = new featureNode();
+      myNode.events.update.addListener(this, () => {
+        console.log(this.node.getOptionValue("Operation"));
+      });
     },
     buildAlgorithmNodes(algorithmName) {
       const algorithmNode = new NodeBuilder("AlgorithmNode")
@@ -126,6 +144,7 @@ export default {
           },
           "ParameterOption"
         )
+        .addInputInterface("Input")
         .addOutputInterface("Output")
         .onCalculate(n => {
           const n1 = n.getInterface("Number 1").value;
@@ -180,6 +199,7 @@ export default {
     // baklava js setting
     this.editor.use(this.optionPlugin);
     this.editor.use(this.viewPlugin);
+
     // 1) viewPlugin option setting
     this.viewPlugin.registerOption("MyOption", MyOption);
     this.viewPlugin.registerOption("ParameterOption", ParameterOption);
