@@ -13,7 +13,7 @@
 <script>
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
-import { TextOption } from "@baklavajs/plugin-options-vue";
+
 export default {
   props: ["value", "name", "node", "editor"],
   data() {

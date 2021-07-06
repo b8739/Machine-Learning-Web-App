@@ -6,7 +6,8 @@ export default new NodeBuilder("DisplayNode", {
 })
   .setName("Display")
   .addInputInterface("Input")
-  .addOption("ValueText", "InputOption")
+
+  .addOption("ValueText", "TextOption")
 
   .onCalculate(n => {
     let result = n.getInterface("Input").value;

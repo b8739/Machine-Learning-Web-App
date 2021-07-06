@@ -12,8 +12,11 @@ import { Editor, NodeBuilder, Node, NodeOption } from "@baklavajs/core";
 import { Engine } from "@baklavajs/plugin-engine";
 import { ViewPlugin } from "@baklavajs/plugin-renderer-vue";
 import { OptionPlugin } from "@baklavajs/plugin-options-vue";
+// nodes
 import CustomNode from "@/components/baklava/CustomNode.js";
 import DisplayNode from "@/components/baklava/DisplayNode.js";
+import InputNode from "@/components/baklava/feature/InputNode.js";
+import TargetNode from "@/components/baklava/feature/TargetNode.js";
 // baklava option
 import MyOption from "@/components/baklava/MyOption.vue";
 import FeatureOption from "@/components/baklava/feature/FeatureOption.vue";
@@ -44,7 +47,7 @@ export default {
   data() {
     return {
       features: ["Input", "Target"],
-      xgboost_props: [
+      xgboost_parameters: [
         "n_estimators",
         "learning_rate",
         "gamma",
@@ -53,15 +56,15 @@ export default {
         "colsample_bytree",
         "max_depth"
       ],
+      svr_parameters: ["n_estimators", "min_samples_split"],
+      rf_parameters: ["kernel", "C", "epsilon", "gamma"],
+      // barklava
       editor: new Editor(),
-
       viewPlugin: new ViewPlugin(),
       node: new Node(),
       optionPlugin: new OptionPlugin(),
-      options: {},
       algorithms: ["XGBoost", "SVR", "RF"],
       // props
-
       inputList: [],
       inputView: null
     };
@@ -71,8 +74,8 @@ export default {
     ...mapState({
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
-      algorithm: state => state.modelingData.algorithm,
-      parameters: state => state.modelingData.parameters
+      algorithm: state => state.modelingData.algorithm
+      // parameters: state => state.modelingData.parameters
     }),
     ...mapGetters("initialData", ["columns"]),
     algorithmProps() {
@@ -88,7 +91,7 @@ export default {
 
   methods: {
     checkNodes() {
-      console.log(this.editor.connections);
+      console.log(this.editor.nodes);
     },
     // mapmutations
     ...mapMutations("modelingResult", ["saveGraphSources"]),
@@ -97,13 +100,9 @@ export default {
 
     // build node types
     buildFeatureNodes(featureName) {
-      let newOption = new NodeOption();
-      // 원래 하던거
       let featureNode = new NodeBuilder("FeatureNode")
         .setName(featureName)
-
         .addOption("FeatureOption", "FeatureOption")
-
         .addOption(
           "Features",
           "ButtonOption",
@@ -112,23 +111,18 @@ export default {
           },
           "FeatureSidebar"
         )
-        .addOutputInterface("OUT")
+        .addOutputInterface("OUT");
 
-        .onCalculate(n => {
-          const n1 = n.getInterface("Number 1").value;
-          const n2 = n.getInterface("Number 2").value;
-          const operation = n.getOptionValue("Operation");
-          let result;
-          if (operation === "Add") {
-            result = n1 + n2;
-          } else if (operation === "Subtract") {
-            result = n1 - n2;
-          }
-          n.getInterface("Output").value = result;
-        });
       // Input과 달리, Target의 경우 Input Interface도 필요하므로 추가
       if (featureName == "Target") {
-        featureNode.addInputInterface("IN");
+        featureNode
+          .addInputInterface("IN")
+          .addOption("ValueText", "TextOption")
+          .onCalculate(n => {
+            let result = n.getInterface("IN").value;
+            console.log(result);
+            n.setOptionValue("ValueText", result);
+          });
       }
       // console.log(featureNode.events);
       featureNode = featureNode.build();
@@ -146,26 +140,31 @@ export default {
       }
     },
     buildAlgorithmNodes(algorithmName) {
+      // dynamic parameter assign
+      let parameters;
+      if (algorithmName == "XGBoost") {
+        parameters = this.xgboost_parameters;
+      } else if (algorithmName == "SVR") {
+        parameters = this.svr_parameters;
+      } else {
+        parameters = this.rf_parameters;
+      }
+      // Node type 생성
       const algorithmNode = new NodeBuilder("AlgorithmNode")
         .setName(algorithmName)
         .addOption(
           "Parameter",
           "ButtonOption",
           () => {
-            return { parameters: this.xgboost_props };
+            return { parameterKeys: parameters };
           },
           "ParameterSidebar"
         )
         .addInputInterface("IN")
         .addOutputInterface("OUT")
         .onCalculate(n => {
-          const test = n.getOptionValue("inputvalue");
-          // const operation = n.getOptionValue("Parameter");
-          // console.log(operation);
-          n.setOptionValue("ValueText", 1);
-          return test;
-          // console.log(n);
-          // n.getInterface("Output").value = operation;
+          let result = n.getOptionValue("Parameter");
+          n.getInterface("OUT").value = result;
         })
         .build();
       // this.node.getOptionValue("FeatureOption");
@@ -220,22 +219,24 @@ export default {
     this.viewPlugin.registerOption("FeatureSidebar", FeatureSidebar);
     this.viewPlugin.registerOption("ParameterSidebar", ParameterSidebar);
     // 2) register algorithm nodes
-    this.features.forEach(element => {
-      this.buildFeatureNodes(element);
-    });
 
     this.algorithms.forEach(element => {
       this.buildAlgorithmNodes(element);
     });
-    // test
-    this.editor.registerNodeType("CustomNode", CustomNode);
-    this.editor.registerNodeType("DisplayNode", DisplayNode);
-    //Add Node
-    let myNode = new CustomNode();
+    // InputNode
+    let category = "Features";
+    this.editor.registerNodeType("InputNode", InputNode, category);
+    this.editor.registerNodeType("TargetNode", TargetNode, category);
+
+    //Add Input Node
+    let myNode = new InputNode();
     this.editor.addNode(myNode);
-    //Add Node
-    myNode = new DisplayNode();
+    myNode.position = { x: 400, y: 300 };
+
+    //Add Target Node
+    myNode = new TargetNode();
     this.editor.addNode(myNode);
+    myNode.position = { x: 1100, y: 300 };
   },
 
   mounted() {}

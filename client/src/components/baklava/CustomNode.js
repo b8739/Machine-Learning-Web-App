@@ -17,7 +17,7 @@ export default new NodeBuilder("CustomNodeWithBuilder", {
     "ButtonOption",
     () => {
       return {
-        parameters: [
+        parameterKeys: [
           "n_estimators",
           "learning_rate",
           "gamma",

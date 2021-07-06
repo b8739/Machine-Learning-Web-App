@@ -1,10 +1,10 @@
 <template>
   <div>
     <v-btn @click="getValue">get value</v-btn>
-    <v-row align="center" justify="center" v-for="(parameter, index) in parameters" :key="index">
+    <v-row align="center" justify="center" v-for="(parameter, index) in parameterKeys" :key="index">
       <v-col> {{ parameter }}</v-col>
       <v-col>
-        <input type="text" class="dark-input" v-on="listeners" v-model="userProps[parameter]"
+        <input type="text" class="dark-input" v-on="listeners" v-model="parameterValues[parameter]"
       /></v-col>
     </v-row>
   </div>
@@ -13,27 +13,28 @@
 import { InputOption } from "@baklavajs/plugin-options-vue";
 export default {
   extends: InputOption,
+  props: ["node"],
   data() {
     return {
-      parameters: null,
-      userProps: {}
+      parameterKeys: null,
+      parameterValues: {}
     };
   },
   methods: {
     getValue() {
-      console.log(this.userProps);
+      console.log(this.node);
     }
   },
   computed: {
     listeners(ev) {
       return {
         ...this.$listeners,
-        input: ev => this.$emit("input", JSON.stringify(this.userProps))
+        input: ev => this.$emit("input", JSON.stringify(this.parameterValues))
       };
     }
   },
   mounted() {
-    this.parameters = this.value.parameters;
+    this.parameterKeys = this.value.parameterKeys;
   }
 };
 </script>
