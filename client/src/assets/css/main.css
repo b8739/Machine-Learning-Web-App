@@ -13,3 +13,7 @@ li {
 a {
   text-decoration: none;
 }
+/* vuetify */
+.v-label {
+  font-size: 13px !important;
+}

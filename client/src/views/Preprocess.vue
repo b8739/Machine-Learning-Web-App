@@ -94,7 +94,7 @@ export default {
   },
   // props: ["summarizedInfo"],
   computed: {
-    ...mapState({})
+    ...mapGetters("initialData", ["columns"])
   },
   methods: {
     ...mapMutations("initialData", ["setHadLoaded"]),
