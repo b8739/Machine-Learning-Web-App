@@ -22,14 +22,18 @@ export default {
   },
   methods: {
     getValue() {
-      console.log(this.node);
+      console.log(this.node.name);
     }
   },
   computed: {
+    algorithmInfo() {
+      let algorithmInfo = { name: this.node.name, parameters: this.parameterValues };
+      return algorithmInfo;
+    },
     listeners(ev) {
       return {
         ...this.$listeners,
-        input: ev => this.$emit("input", JSON.stringify(this.parameterValues))
+        input: ev => this.$emit("input", this.algorithmInfo)
       };
     }
   },

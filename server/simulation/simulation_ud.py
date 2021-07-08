@@ -12,27 +12,29 @@ import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.model_selection import train_test_split
 
-def runDefaultSimulation(simulationInput):
+def runSimulation_ud(observedVariable):
     df_00 = pd.read_csv("./boston_house.csv")
 
-    ''' 1. simulationInput 외 변수들'''
-    simulationInput = 'CRIM'
+    ''' 1. observedVariable 외 변수들'''
+    observedVariable = 'CRIM'
 
-    X = df_00.drop(['MEDV',simulationInput], axis = 1)
+    X = df_00.drop(['MEDV',observedVariable], axis = 1)
     
     X_mean = X.mean().round(2) #그 외 변수의 mean (평균)
     X_std = X.std().round(1)*0.1 #그 외 변수의 std (표준편차)
+    X_median = X.median() #그 외 변수의 std (표준편차)
 
-    X_info = pd.DataFrame({'mean':X_mean.values,'std':X_std.values})
+    X_info = pd.DataFrame({'median':X_median,'mean':X_mean.values,'std':X_std.values})
     randNumbers = []
-
     # 난수를 생성함과 동시에 series로 type converting해서 randNumbers에 삽입
     # randNumbers: series 난수들을 갖고 있는 배열
 
     for i,v in X_info.iterrows():
-        mean = v[0]
-        std = v[1]
-        randomized = np.random.normal(mean,std*0.01,1000)
+        # mean = v[0]
+        # std = v[1]
+        median = v[0]
+        randomized = np.full(5000,median)
+        print(randomized)
         randomized = pd.Series(randomized)
         randNumbers.append(randomized)
 
@@ -49,18 +51,18 @@ def runDefaultSimulation(simulationInput):
     # display(X_final)
   
 
-    ''' 2. simulationInput '''
+    ''' 2. observedVariable '''
     # df 추출
-    df_simulationInput = df_00[simulationInput]
+    df_observedVariable = df_00[observedVariable]
     
     # min & max 추출
-    simulationInput_min = df_simulationInput.min()
-    simulationInput_max = df_simulationInput.max()
+    observedVariable_min = df_observedVariable.min()
+    observedVariable_max = df_observedVariable.max()
 
     # random number 생성
-    simulationInput_rand = np.random.uniform(simulationInput_min,simulationInput_max,1000)
-    simulationInput_final = pd.Series(simulationInput_rand)
-    X_final[simulationInput] = simulationInput_final
+    observedVariable_rand = np.random.uniform(observedVariable_min,observedVariable_max,5000)
+    observedVariable_final = pd.Series(observedVariable_rand)
+    X_final[observedVariable] = observedVariable_final
 
     ## NORMALIZATION (저장된 scaler)##
     file_name = 'scaler_xgboost.pkl'
@@ -92,4 +94,4 @@ def runDefaultSimulation(simulationInput):
     totalFinal = X_final.sort_values(by='CRIM')
     
 
-    return jsonify({"predicted":totalFinal['MEDV'].tolist(),"simulated":totalFinal[simulationInput].tolist()})
+    return jsonify({"predicted":totalFinal['MEDV'].tolist(),"randNum":totalFinal[observedVariable].tolist()})

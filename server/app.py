@@ -40,8 +40,8 @@ from svr_modeling import *
 from rf_modeling import *
 
 # simulation
-from defaultSimulation import *
-from customizedSimulation import *
+from simulation_ud import *
+from simulation_nd import *
 
 
 # pyarrow
@@ -642,15 +642,15 @@ def loadProjects():
   session.close
   return jsonify(project_list)
 
-@app.route('/simulation_default',methods=['GET'])
-def simulation_default():
-  simulationInput = request.args.get('simulationInput')
-  return (runDefaultSimulation(simulationInput))
+@app.route('/simulation_ud',methods=['GET'])
+def simulation_ud():
+  observedVariable = request.args.get('observedVariable')
+  return (runSimulation_ud(observedVariable))
 
-@app.route('/simulation_customized',methods=['GET'])
-def simulation_customized():
-  simulationInput = request.args.get('simulationInput')
-  return (runCustomizedSimulation(simulationInput))
+@app.route('/simulation_nd',methods=['GET'])
+def simulation_nd():
+  observedVariable = request.args.get('observedVariable')
+  return (runSimulation_nd(observedVariable))
 
 if __name__ == '__main__':
     app.run(debug=True)

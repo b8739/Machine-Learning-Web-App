@@ -7,7 +7,8 @@ const columns = store.getters["initialData/columns"];
 export default new NodeBuilder("TargetNode", {})
   .setName("Target")
   .addInputInterface("IN")
-  .addOption("FeatureOption", "FeatureOption")
+  .addOutputInterface("OUT")
+  // .addOption("FeatureOption", "FeatureOption")
   .addOption(
     "Features",
     "ButtonOption",
@@ -17,10 +18,17 @@ export default new NodeBuilder("TargetNode", {})
     "FeatureSidebar"
   )
 
-  .addOption("ValueText", "TextOption")
+  // .addOption("ValueText", "TextOption")
   .onCalculate(n => {
-    let result = n.getInterface("IN").value;
-    console.log(result);
-    n.setOptionValue("ValueText", result);
+    let nodeResult = n.getInterface("IN").value;
+    let targets = n.getOptionValue("Features");
+    if (nodeResult != null) {
+      nodeResult["targets"] = targets;
+      n.getInterface("OUT").value = nodeResult;
+      return nodeResult;
+    }
+    console.log("ca");
+
+    // n.setOptionValue("ValueText", result);
   })
   .build();

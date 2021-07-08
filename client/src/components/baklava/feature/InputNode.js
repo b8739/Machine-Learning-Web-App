@@ -10,7 +10,7 @@ export default new NodeBuilder("InputNode", {
 })
   .setName("Input")
   .addOutputInterface("OUT")
-  .addOption("FeatureOption", "FeatureOption")
+  // .addOption("FeatureOption", "FeatureOption")
   .addOption(
     "Features",
     "ButtonOption",
@@ -19,11 +19,12 @@ export default new NodeBuilder("InputNode", {
     },
     "FeatureSidebar"
   )
-  .addOption("ValueText", "TextOption")
+  // .addOption("ValueText", "TextOption")
   .onCalculate(n => {
-    let result = n.getOptionValue("Features");
-    n.getInterface("OUT").value = result;
-    n.setOptionValue("ValueText", result);
+    let inputs = n.getOptionValue("Features");
+    let nodeResult = { inputs: inputs };
+    n.getInterface("OUT").value = nodeResult;
+    // n.setOptionValue("ValueText", result);
   })
 
   .build();

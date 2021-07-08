@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row dense>
-      <v-col cols="12"> <v-checkbox label="Input" @change="selectAll"></v-checkbox></v-col>
+      <v-col cols="12"> <v-checkbox label="Features" @change="selectAll"></v-checkbox></v-col>
     </v-row>
     <v-row dense>
       <v-col>
@@ -49,7 +49,7 @@ export default {
   props: [],
 
   methods: {
-    ...mapMutations("simulationData", ["saveSimulationInput"]),
+    ...mapMutations("simulationData", ["saveObservedVariable"]),
 
     selectAll() {
       for (let i = 0; i < this.columns.length; i++) {
@@ -109,7 +109,7 @@ export default {
     //vuex에 저장
     eventBus.$on("simulationColumnChecked", status => {
       //from SimulationModal
-      this.saveSimulationInput(this.withoutUndefined);
+      this.saveObservedVariable(this.withoutUndefined);
     });
   }
 };

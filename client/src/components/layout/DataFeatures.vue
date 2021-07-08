@@ -38,7 +38,7 @@
                   single-line
                   hide-details="true"
                   height="20"
-                  label="Category"
+                  :label="getDataType(columnIndex)"
                 >
                 </v-select>
               </tr>
@@ -242,10 +242,12 @@ export default {
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
-
+    getDataType(columnIndex) {
+      return this.summarizedInfo["datatype"]["type"][columnIndex];
+    },
     distinguishDataType(columnIndex) {
       let dataType = this.summarizedInfo["datatype"]["type"][columnIndex];
-      console.log(dataType);
+      // console.log(dataType);
       if (dataType == "category") {
         return true;
       } else if (dataType == "numeric") return false;

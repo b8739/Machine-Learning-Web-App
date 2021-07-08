@@ -1,11 +1,11 @@
 const state = {
-  simulationInput: [],
+  observedVariable: null,
   simulationMethod: null
 };
 
 const mutations = {
-  saveSimulationInput(state, payload) {
-    state.simulationInput = payload;
+  saveObservedVariable(state, payload) {
+    state.observedVariable = payload;
   },
   saveSimulationMethod(state, payload) {
     state.simulationMethod = payload;

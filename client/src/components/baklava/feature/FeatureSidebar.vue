@@ -1,11 +1,13 @@
 <template>
   <div>
-    <v-btn @click="getValue">get value</v-btn>
+    <!-- <v-btn @click="getValue">get value</v-btn> -->
     <v-card dark rounded color="#3f3f3f" elevation="0">
       <v-container>
+        <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
         <v-checkbox
           v-for="(feature, index) in inputFeatures"
           :key="index"
+          v-model="checkedFeatures[index]"
           dense
           :label="feature"
           @change="featureUpdate(feature)"
@@ -30,10 +32,20 @@ export default {
   data() {
     return {
       inputFeatures: null,
-      selectedFeatures: []
+      selectedFeatures: [],
+      checkedFeatures: []
     };
   },
   methods: {
+    selectAll() {
+      if (this.checkedFeatures.length == this.inputFeatures.length) {
+        this.checkedFeatures = [];
+      } else {
+        for (let i = 0; i < this.inputFeatures.length; i++) {
+          this.checkedFeatures.push(this.inputFeatures[i]);
+        }
+      }
+    },
     getValue() {
       console.log(this.node);
       console.log(this.selectedFeatures);
@@ -50,18 +62,8 @@ export default {
       this.$emit("input", this.selectedFeatures);
     }
   },
-  computed: {
-    // selectedFeatures_string() {
-    //   let stringConverted;
-    //   this.selectedFeatures.forEach(element => {
-    //     stringConverted += element;
-    //   });
-    //   return stringConverted;
-    // }
-  },
-  created() {
-    console.log(this.value);
-  },
+  computed: {},
+  created() {},
   mounted() {
     this.inputFeatures = this.value.features;
   }

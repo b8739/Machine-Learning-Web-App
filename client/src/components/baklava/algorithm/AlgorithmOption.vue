@@ -1,7 +1,7 @@
 <template>
   <div>
-    <InputOption />
-    <!-- <v-select
+    <!-- <InputOption /> -->
+    <v-select
       :items="algorithmTypes"
       dense
       hide-details
@@ -10,7 +10,7 @@
       no-data-text=""
       dark
     >
-    </v-select> -->
+    </v-select>
   </div>
 </template>
 <script>

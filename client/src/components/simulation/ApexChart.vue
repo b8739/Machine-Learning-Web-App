@@ -121,50 +121,26 @@ export default {
   watch: {
     graphSources: function(data) {
       this.updateChart();
-      this.updateCategories(this.graphSources["simulated"]);
+      this.updateCategories(this.graphSources["randNum"]);
     }
   },
   created() {
     this.chartStatus = true;
-    this.runSimulation();
+    eventBus.$on("updateChart", status => {
+      this.updateChart();
+      this.updateCategories(this.graphSources["randNum"]);
+    });
+    // this.runSimulation();
   },
-  mounted() {
-    this.updateChart();
-    this.updateCategories(this.graphSources["simulated"]);
-  },
+  mounted() {},
   computed: {
     ...mapState({
       graphSources: state => state.simulationResult.graphSources,
-      simulationInput: state => state.simulationData.simulationInput,
+      observedVariable: state => state.simulationData.observedVariable,
       simulationMethod: state => state.simulationData.simulationMethod
     })
   },
   methods: {
-    ...mapMutations("simulationResult", ["saveGraphSources"]),
-
-    runSimulation() {
-      // default
-      if (this.simulationMethod == "Default Setting") {
-        let path = "http://localhost:5000/simulation_default";
-        this.$axios
-          .get(path, {
-            params: {
-              simulationInput: this.simulationInput
-            }
-          })
-          .then(res => {
-            this.saveGraphSources(res.data); // 그래프 값 저장
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      }
-      // customzied
-      else if (this.simulationMethod == "Customized Setting") {
-        console.log("customized");
-      }
-    },
-
     updateChart() {
       this.$refs.simulationChart.updateSeries([
         {

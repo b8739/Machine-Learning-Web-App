@@ -1,7 +1,10 @@
 <template>
   <v-container fluid>
     <button @click="checkNodes()">nodes</button>
-    <div id="baklavaStage">
+
+    <CanvasSide />
+
+    <div id="baklavaStage" class="mt-1">
       <baklava-editor :plugin="viewPlugin"></baklava-editor>
     </div>
   </v-container>
@@ -30,6 +33,7 @@ import Vue from "vue";
 import Drawflow from "drawflow";
 import styleDrawflow from "drawflow/dist/drawflow.min.css";
 import NodeAlgorithm from "@/components/NodeAlgorithm.vue";
+import CanvasSide from "@/components/modeling/CanvasSide.vue";
 
 axios.defaults.paramsSerializer = function(paramObj) {
   const params = new URLSearchParams();
@@ -46,6 +50,8 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      algorithmRequest: null,
+      engine: null,
       features: ["Input", "Target"],
       xgboost_parameters: [
         "n_estimators",
@@ -69,7 +75,7 @@ export default {
       inputView: null
     };
   },
-  components: { NodeAlgorithm },
+  components: { NodeAlgorithm, CanvasSide },
   computed: {
     ...mapState({
       inputs: state => state.modelingData.inputs,
@@ -91,7 +97,14 @@ export default {
 
   methods: {
     checkNodes() {
-      console.log(this.editor.nodes);
+      this.calculate(this.engine);
+    },
+    async calculate(engine) {
+      const result = await engine.calculate();
+      console.log(result.values());
+      for (const v of result.values()) {
+        console.log(v);
+      }
     },
     // mapmutations
     ...mapMutations("modelingResult", ["saveGraphSources"]),
@@ -152,6 +165,7 @@ export default {
       // Node type 생성
       const algorithmNode = new NodeBuilder("AlgorithmNode")
         .setName(algorithmName)
+        .addOption("AlgorithmOption", "AlgorithmOption")
         .addOption(
           "Parameter",
           "ButtonOption",
@@ -163,22 +177,27 @@ export default {
         .addInputInterface("IN")
         .addOutputInterface("OUT")
         .onCalculate(n => {
-          let result = n.getOptionValue("Parameter");
-          n.getInterface("OUT").value = result;
+          let nodeResult = n.getInterface("IN").value;
+          if (nodeResult != null) {
+            let algorithmInfo = n.getOptionValue("Parameter");
+            nodeResult["algorithm"] = algorithmInfo;
+            n.getInterface("OUT").value = nodeResult;
+          }
         })
         .build();
       // this.node.getOptionValue("FeatureOption");
       let category = "Algorithm";
       this.editor.registerNodeType(algorithmName, algorithmNode, category);
       //Add Node
-      let myNode = new algorithmNode();
-      this.editor.addNode(myNode);
+      // let myNode = new algorithmNode();
+      // this.editor.addNode(myNode);
     },
-    runModel(modelingParameter) {
-      eventBus.$emit("modelingParameter", modelingParameter);
-      let path = "http://localhost:5000/";
+    runModel() {
+      this.algorithmRequest = this.calculate(this.engine);
+      // eventBus.$emit("modelingParameter", modelingParameter);
+      let path = "http://localhost:5000/xgboost_modeling";
       // define path
-      if (this.algorithm == "XGBoost") {
+      if (this.algorithmRequest.algorithm.name == "XGBoost") {
         path += "xgboost_modeling";
       } else if (this.algorithm == "Random Forest") {
         path += "rf_modeling";
@@ -188,10 +207,10 @@ export default {
       // axios
       axios
         .get(path, {
-          params: {
-            //algorithmProp 전송
-            modelingParameter: modelingParameter
-          }
+          // params: {
+          //   //algorithmProp 전송
+          //   modelingParameter: modelingParameter
+          // }
         })
         .then(res => {
           // vuex
@@ -207,11 +226,16 @@ export default {
     }
   },
   created() {
+    // eventbus
+    eventBus.$on("runModel", status => {
+      this.runModel();
+    });
     // baklava js setting
     this.editor.use(this.optionPlugin);
     this.editor.use(this.viewPlugin);
-    const engine = new Engine(true /* whether to automatically calculate on changes */);
-    this.editor.use(engine);
+    this.engine = new Engine(true /* whether to automatically calculate on changes */);
+    this.editor.use(this.engine);
+    this.viewPlugin.enableMinimap = true;
     // 1) viewPlugin option setting
     this.viewPlugin.registerOption("MyOption", MyOption);
     this.viewPlugin.registerOption("FeatureOption", FeatureOption);
@@ -225,18 +249,35 @@ export default {
     });
     // InputNode
     let category = "Features";
-    this.editor.registerNodeType("InputNode", InputNode, category);
-    this.editor.registerNodeType("TargetNode", TargetNode, category);
+    this.editor.registerNodeType("Input", InputNode, category);
+    this.editor.registerNodeType("Target", TargetNode, category);
 
     //Add Input Node
-    let myNode = new InputNode();
-    this.editor.addNode(myNode);
-    myNode.position = { x: 400, y: 300 };
+    let inputNode = new InputNode();
+    this.editor.addNode(inputNode);
+    inputNode.position = { x: 600, y: 330 };
 
     //Add Target Node
-    myNode = new TargetNode();
-    this.editor.addNode(myNode);
-    myNode.position = { x: 1100, y: 300 };
+    let targetNode = new TargetNode();
+    this.editor.addNode(targetNode);
+    // console.log(targetNode.interfaces);
+    targetNode.position = { x: 1200, y: 330 };
+
+    //Add Display Node
+    let displayNode = new DisplayNode();
+    this.editor.addNode(displayNode);
+    displayNode.position = { x: 1400, y: 330 };
+
+    this.editor.addConnection(
+      this.editor.addConnection(targetNode.getInterface("OUT"), displayNode.getInterface("IN"))
+    );
+
+    // this.engine.events.calculated.addListener(this, result => {
+    //   // result is a Map<Node, any> with the key being a node instance and the value being what the node's calculate function returned
+    //   for (const v of result.values()) {
+    //     console.log(v);
+    //   }
+    // });
   },
 
   mounted() {}

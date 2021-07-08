@@ -35,7 +35,29 @@ export default {
   computed: {
     ...mapState({})
   },
-  methods: {},
+  methods: {
+    ...mapMutations("simulationResult", ["saveGraphSources"]),
+    runSimulation() {
+      // default
+      // let path = "http://localhost:5000/simulation_ud";
+      let path = "http://localhost:5000/simulation_nd"; //normal (관찰변수:정규분포, 나머지:median)
+      this.$axios
+        .get(path, {
+          params: {
+            observedVariable: this.observedVariable
+          }
+        })
+        .then(res => {
+          this.saveGraphSources(res.data); // 그래프 값 저장
+          this.eventBus.$emit("updateChart", true);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+      // customzied
+    }
+  },
 
   created() {
     let caseNameFromUrl = window.location.search.substring(1);
@@ -45,6 +67,10 @@ export default {
     eventBus.$on("changeCase", caseNameFromUrl => {
       this.changeCase(caseNameFromUrl);
     });
+  },
+  mounted() {
+    console.log("mounted");
+    this.runSimulation();
   }
 };
 </script>
