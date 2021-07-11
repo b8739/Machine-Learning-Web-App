@@ -36,7 +36,6 @@
   },
   "devDependencies": {
     "@types/d3": "^6.3.0",
-    "@types/drawflow": "^0.0.1",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",

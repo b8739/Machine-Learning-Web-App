@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "drawflow": "^0.0.42",
     "vue-drag-resize": "^1.5.4"
   }
 }

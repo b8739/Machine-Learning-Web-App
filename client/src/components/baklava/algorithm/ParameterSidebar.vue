@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="node_sidebar">
     <v-btn @click="getValue">get value</v-btn>
     <v-row align="center" justify="center" v-for="(parameter, index) in parameterKeys" :key="index">
       <v-col> {{ parameter }}</v-col>

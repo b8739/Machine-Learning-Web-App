@@ -13,45 +13,83 @@
       <v-divider></v-divider>
 
       <v-list dense>
-        <v-card-text class="pt-0" v-show="mini == false">Choose Dataset</v-card-text>
-        <v-list-item
-          link
-          v-for="(dataInfo, indexOfDataInfo) in dataInfoLabels"
-          :key="indexOfDataInfo"
-        >
-          <v-list-item-icon>
-            <v-icon> mdi-database</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-autocomplete
-              outlined
-              clearable
-              dense
-              :label="dataInfoLabels[indexOfDataInfo]"
-              :items="getItems(indexOfDataInfo)"
-            ></v-autocomplete>
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-group prepend-icon="mdi-database" :value="true">
+          <template v-slot:activator>
+            <v-list-item-title>Dataset</v-list-item-title>
+          </template>
+          <v-list-item
+            link
+            v-for="(dataInfo, indexOfDataInfo) in dataInfoLabels"
+            :key="indexOfDataInfo"
+          >
+            <v-list-item-content>
+              <v-autocomplete
+                class="mt-3"
+                outlined
+                clearable
+                hide-details
+                dense
+                :label="dataInfoLabels[indexOfDataInfo]"
+                :items="getItems(indexOfDataInfo)"
+              ></v-autocomplete>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-group>
+
+        <v-divider></v-divider>
         <!-- splitting data -->
-        <v-card-text v-show="mini == false">Splitting Dataset</v-card-text>
-        <v-list-item v-for="(dataType, indexOfDataType) in dataTypeLabels" :key="indexOfDataType">
-          <v-list-item-icon>
+        <v-list-group prepend-icon="mdi-arrow-decision-outline" :value="true">
+          <!-- 1st Level -->
+          <template v-slot:activator>
+            <v-list-item-title>Data Split</v-list-item-title>
+          </template>
+          <!-- 2nd Level -->
+          <v-list-group sub-group :value="true">
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title>Validation</v-list-item-title>
+              </v-list-item-content>
+            </template>
+            <v-list-item>
+              <v-btn outlined small> Select Validation Data </v-btn>
+            </v-list-item>
+          </v-list-group>
+          <v-list-group sub-group :value="true">
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title>Training & Test</v-list-item-title>
+              </v-list-item-content>
+            </template>
+            <v-list-item>
+              <v-col cols="5"> <v-subheader>Training:</v-subheader></v-col>
+              <v-autocomplete dense outlined clearable hide-details></v-autocomplete>
+            </v-list-item>
+            <v-list-item>
+              <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col>
+              <v-autocomplete outlined dense clearable hide-details></v-autocomplete>
+            </v-list-item>
+          </v-list-group>
+        </v-list-group>
+        <v-dialog v-model="dialog">
+          <v-list-item v-for="(dataType, indexOfDataType) in dataTypeLabels" :key="indexOfDataType">
+            <!-- <v-list-item-icon>
             <v-icon>{{ items[indexOfDataType].icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-autocomplete
-              outlined
-              clearable
-              hide-details
-              dense
-              no-data-text=""
-              v-bind="hideDetails(indexOfDataType)"
-              :label="dataTypeLabels[indexOfDataType]"
-              :placeholder="datasetRatio[indexOfDataType]"
-              :items="datasetRatio[indexOfDataType]"
-            ></v-autocomplete>
-          </v-list-item-content>
-        </v-list-item>
+          </v-list-item-icon> -->
+            <v-list-item-content>
+              <v-autocomplete
+                outlined
+                clearable
+                hide-details
+                dense
+                no-data-text=""
+                v-bind="hideDetails(indexOfDataType)"
+                :label="dataTypeLabels[indexOfDataType]"
+                :placeholder="datasetRatio[indexOfDataType]"
+                :items="datasetRatio[indexOfDataType]"
+              ></v-autocomplete>
+            </v-list-item-content>
+          </v-list-item>
+        </v-dialog>
       </v-list>
     </v-navigation-drawer>
   </v-card>
@@ -64,9 +102,10 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      dialog: false,
       drawer: true,
       dataInfoLabels: ["Dataset"],
-      dataTypeLabels: ["Training", "Validation", "Test"],
+      dataTypeLabels: ["Training", "Test", "Validation"],
       datasetRatio: ["60%", "20%", "20%"],
       algorithms: ["XGBoost", "Random Forest", "SVR"],
       normalization_items: ["Standard Scaler"],
@@ -127,3 +166,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.v-list-item__icon {
+  /* margin-top: 0 !important; */
+}
+</style>

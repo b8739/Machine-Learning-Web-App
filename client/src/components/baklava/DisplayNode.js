@@ -5,7 +5,7 @@ export default new NodeBuilder("DisplayNode", {
   width: 200
 })
   .setName("Display")
-  .addInputInterface("IN")
+  .addInputInterface("In")
 
   .addOption("InputList", "TextOption")
   .addOption("AlgorithmName", "TextOption")
@@ -13,7 +13,7 @@ export default new NodeBuilder("DisplayNode", {
   .addOption("TargetList", "TextOption")
 
   .onCalculate(n => {
-    let nodeResult = n.getInterface("IN").value;
+    let nodeResult = n.getInterface("In").value;
     if (nodeResult != null) {
       let inputList = "Inputs: " + JSON.stringify(nodeResult["inputs"]);
       let algorithmName = "Algorithm Name: " + JSON.stringify(nodeResult["algorithm"]["name"]);

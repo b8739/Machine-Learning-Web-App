@@ -9,7 +9,7 @@ export default new NodeBuilder("InputNode", {
   //   width: 200
 })
   .setName("Input")
-  .addOutputInterface("OUT")
+  .addOutputInterface("Out")
   // .addOption("FeatureOption", "FeatureOption")
   .addOption(
     "Features",
@@ -23,7 +23,7 @@ export default new NodeBuilder("InputNode", {
   .onCalculate(n => {
     let inputs = n.getOptionValue("Features");
     let nodeResult = { inputs: inputs };
-    n.getInterface("OUT").value = nodeResult;
+    n.getInterface("Out").value = nodeResult;
     // n.setOptionValue("ValueText", result);
   })
 

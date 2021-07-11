@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <button @click="checkNodes()">nodes</button>
+    <!-- <button @click="checkNodes()">nodes</button> -->
 
     <CanvasSide />
 
@@ -28,10 +28,7 @@ import AlgorithmOption from "@/components/baklava/algorithm/AlgorithmOption.vue"
 import ParameterSidebar from "@/components/baklava/algorithm/ParameterSidebar.vue";
 
 import axios from "axios";
-// drawflow
-import Vue from "vue";
-import Drawflow from "drawflow";
-import styleDrawflow from "drawflow/dist/drawflow.min.css";
+
 import NodeAlgorithm from "@/components/NodeAlgorithm.vue";
 import CanvasSide from "@/components/modeling/CanvasSide.vue";
 
@@ -124,15 +121,15 @@ export default {
           },
           "FeatureSidebar"
         )
-        .addOutputInterface("OUT");
+        .addOutputInterface("Out");
 
       // Input과 달리, Target의 경우 Input Interface도 필요하므로 추가
       if (featureName == "Target") {
         featureNode
-          .addInputInterface("IN")
+          .addInputInterface("In")
           .addOption("ValueText", "TextOption")
           .onCalculate(n => {
-            let result = n.getInterface("IN").value;
+            let result = n.getInterface("In").value;
             console.log(result);
             n.setOptionValue("ValueText", result);
           });
@@ -174,14 +171,14 @@ export default {
           },
           "ParameterSidebar"
         )
-        .addInputInterface("IN")
-        .addOutputInterface("OUT")
+        .addInputInterface("In")
+        .addOutputInterface("Out")
         .onCalculate(n => {
-          let nodeResult = n.getInterface("IN").value;
+          let nodeResult = n.getInterface("In").value;
           if (nodeResult != null) {
             let algorithmInfo = n.getOptionValue("Parameter");
             nodeResult["algorithm"] = algorithmInfo;
-            n.getInterface("OUT").value = nodeResult;
+            n.getInterface("Out").value = nodeResult;
           }
         })
         .build();
@@ -269,7 +266,7 @@ export default {
     displayNode.position = { x: 1400, y: 330 };
 
     this.editor.addConnection(
-      this.editor.addConnection(targetNode.getInterface("OUT"), displayNode.getInterface("IN"))
+      this.editor.addConnection(targetNode.getInterface("Out"), displayNode.getInterface("In"))
     );
 
     // this.engine.events.calculated.addListener(this, result => {
@@ -292,13 +289,49 @@ export default {
   height: 400px;
   overflow-y: scroll;
 }
-/* drawflow */
-#drawflow {
-  width: 100%;
-  height: 100vh;
-}
+/* baklava custom css */
 #baklavaStage {
   width: 100%;
   height: 100vh;
+}
+/* 배경 */
+.node-editor .background {
+  background-color: white !important;
+  background-image: 
+  /* 큰 네모 가로 세로 */ linear-gradient(
+      rgb(228, 225, 225) 2px,
+      transparent 2px
+    ),
+    linear-gradient(90deg, rgb(228, 225, 225) 2px, transparent 2px),
+    /* 작은 네모 가로 세로*/ linear-gradient(rgb(228, 225, 225), transparent 1px),
+    linear-gradient(90deg, rgb(228, 225, 225) 1px, transparent 1px) !important;
+}
+.node {
+  background-color: rgb(255, 255, 255) !important;
+  border: 1px solid;
+  color: black !important;
+}
+/* node 상단 */
+.node .__title {
+  /* background-color: rgb(62, 62, 62) !important; */
+  background-color: rgb(67, 66, 66) !important;
+}
+/* node 버튼/dropdown */
+.node-option {
+  background-color: rgb(154, 154, 154) !important;
+  color: white !important;
+  /* border: 1px solid; */
+  /* background-color: rgb(62, 62, 62) !important; */
+}
+
+/* node 선 */
+.node-editor .connection {
+  stroke: rgb(28, 28, 28);
+}
+.node-interface .__port {
+  border: 1px solid rgba(0, 0, 0, 0.632);
+}
+.node_sidebar {
+  background-color: #3f3f3f !important;
 }
 </style>
