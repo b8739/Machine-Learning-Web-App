@@ -39,10 +39,10 @@ export default {
     ...mapMutations("simulationResult", ["saveGraphSources"]),
     runSimulation() {
       //uniform (관찰변수:min & max(np.random.uniform), 나머지:median) mode uniform 통일,일단은 Median값이지만 수정가능하도록
-      // let path = "http://localhost:5000/simulation_ud";
+      let path = "http://localhost:5000/simulation_ud";
 
       //normal (관찰변수:정규분포 (np.random.normal), 나머지:median)
-      let path = "http://localhost:5000/simulation_nd"; 
+      // let path = "http://localhost:5000/simulation_nd";
       this.$axios
         .get(path, {
           params: {

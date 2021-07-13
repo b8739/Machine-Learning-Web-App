@@ -4,7 +4,7 @@ export default new NodeBuilder("DisplayNode", {
   twoColumn: true,
   width: 200
 })
-  .setName("Display")
+  .setName("Debugger")
   .addInputInterface("In")
 
   .addOption("InputList", "TextOption")

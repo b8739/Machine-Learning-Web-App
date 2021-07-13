@@ -1,12 +1,23 @@
 <template>
   <div class="node_sidebar">
-    <v-btn @click="getValue">get value</v-btn>
-    <v-row align="center" justify="center" v-for="(parameter, index) in parameterKeys" :key="index">
-      <v-col> {{ parameter }}</v-col>
-      <v-col>
-        <input type="text" class="dark-input" v-on="listeners" v-model="parameterValues[parameter]"
-      /></v-col>
-    </v-row>
+    <v-card style="background-color:transparent" class="pt-2" elevation="0" dark>
+      <!-- <v-btn @click="getValue">get value</v-btn> -->
+      <v-row
+        align="center"
+        justify="center"
+        v-for="(parameter, index) in parameterKeys"
+        :key="index"
+      >
+        <v-col> {{ parameter }}</v-col>
+        <v-col>
+          <input
+            type="text"
+            class="dark-input"
+            v-on="listeners"
+            v-model="parameterValues[parameter]"
+        /></v-col>
+      </v-row>
+    </v-card>
   </div>
 </template>
 <script>

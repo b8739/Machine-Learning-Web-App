@@ -8,7 +8,7 @@
       v-model="select"
       label="Change Algorithm"
       no-data-text=""
-      dark
+      light
     >
     </v-select>
   </div>
@@ -51,4 +51,10 @@ export default {
   }
 };
 </script>
-<style></style>
+<style scoped>
+/* .v-select__selection,
+.v-select__selection--comma,
+.v-select.v-text-field input {
+  color: blue !important;
+} */
+</style>

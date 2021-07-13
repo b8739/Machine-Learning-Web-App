@@ -308,20 +308,29 @@ export default {
 }
 .node {
   background-color: rgb(255, 255, 255) !important;
-  border: 1px solid;
+  /* border: 1px solid; */
   color: black !important;
 }
 /* node 상단 */
 .node .__title {
-  /* background-color: rgb(62, 62, 62) !important; */
-  background-color: rgb(67, 66, 66) !important;
+  /* background-color: rgb(67, 66, 66) !important; */
+  background-color: #737373 !important;
+}
+.node .__title {
+  text-align: center;
+}
+.node .__title span {
+  font-weight: 600;
 }
 /* node 버튼/dropdown */
 .node-option {
-  background-color: rgb(169, 167, 167) !important;
-  color: white !important;
+  /* background-color: rgb(169, 167, 167) !important; */
+  font-weight: 500;
+  background-color: rgb(223, 223, 223) !important;
+  /* border: 0.5px solid rgb(70, 70, 70) !important; */
+  /* color: rgba(0, 0, 0, 0.632) !important; */
+  color: rgb(43, 42, 42) !important;
   /* border: 1px solid; */
-  /* background-color: rgb(62, 62, 62) !important; */
 }
 
 /* node 선 */

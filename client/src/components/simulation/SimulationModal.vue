@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="1000">
+  <v-dialog v-model="dialog" width="1200">
     <!-- <v-btn @click="rangeValues['start'].push(1)">hello</v-btn> -->
     <v-container fluid class="pa-0">
       <v-card rounded>
@@ -70,6 +70,7 @@
                         :length="paginationLength"
                         circle
                       ></v-pagination>
+
                       <v-row
                         v-for="(column, columnIndex) in columns"
                         v-show="previousPage - 1 < columnIndex && columnIndex < currentPage"
@@ -95,9 +96,18 @@
                         <v-col cols="2" class="pl-0" style="text-align:center">
                           <v-card-text>{{ column }}</v-card-text></v-col
                         >
-
+                        <v-col cols="2">
+                          <v-radio-group hide-details v-model="radioModel[columnIndex]">
+                            <v-radio
+                              v-for="(radio, radioIndex) in radioLabels"
+                              :key="radioIndex"
+                              :label="radio"
+                              @change="radio_nd(column, columnIndex)"
+                            ></v-radio> </v-radio-group
+                        ></v-col>
                         <v-col cols="2" align-self="center">
                           <v-text-field
+                            :disabled="radioModel[columnIndex] == 1"
                             style="text-align:right"
                             @click="
                               openHelper(column, columnIndex);
@@ -115,6 +125,7 @@
 
                         <v-col cols="2">
                           <v-text-field
+                            :disabled="radioModel[columnIndex] == 1"
                             hide-details
                             @click="
                               openHelper(column, columnIndex);
@@ -127,8 +138,9 @@
                           ></v-text-field>
                         </v-col>
                       </v-row>
+
                       <v-card
-                        max-width="300"
+                        max-width="250"
                         min-height="300"
                         color="rgba(80, 79, 79, 0.817)"
                         dark
@@ -151,7 +163,7 @@
                               light
                             >
                               <v-tab class="vtab">Statistics</v-tab>
-                              <v-tab class="vtab">Normal Distribution </v-tab>
+                              <!-- <v-tab class="vtab">Normal Distribution </v-tab> -->
                             </v-tabs>
                             <v-container>
                               <v-tabs-items v-model="tab_rangeMethod">
@@ -166,7 +178,7 @@
                                       :key="index"
                                     >
                                       <v-col offset="2">
-                                        <v-tooltip left>
+                                        <v-tooltip left open-delay="250">
                                           <template v-slot:activator="{ on, attrs }">
                                             <v-chip
                                               v-bind="attrs"
@@ -198,7 +210,7 @@
                                       :key="index"
                                     >
                                       <v-col offset="2">
-                                        <v-tooltip left>
+                                        <v-tooltip left open-delay="250">
                                           <template v-slot:activator="{ on, attrs }">
                                             <v-chip
                                               dark
@@ -229,7 +241,7 @@
                                     :key="index"
                                   >
                                     <v-col offset="2">
-                                      <v-tooltip left>
+                                      <v-tooltip left open-delay="250">
                                         <template v-slot:activator="{ on, attrs }">
                                           <v-chip
                                             v-bind="attrs"
@@ -290,6 +302,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      radioGroup: 1,
       // range helper
       helperStatus: true,
       helperColumn: null,
@@ -299,6 +312,7 @@ export default {
       selectedStatistic: [],
       userInput: null,
       values: [],
+      radioModel: [],
 
       distributionSelected: null,
       // tab
@@ -314,6 +328,7 @@ export default {
       numericStatistics: ["Min", "Max", "Mean", "Mode", "Median"],
       categoryStatistics: ["Mode", "Median"],
       distribution_info: ["Min", "Max"],
+      radioLabels: ["Manually", "Normal Distribution"],
       chipColors: [],
 
       // focused info
@@ -360,6 +375,11 @@ export default {
     // },
     ...mapActions("initialData", ["loadRandomData"]),
     ...mapMutations("simulationData", ["saveSimulationMethod"]),
+    radio_nd(column, columnIndex) {
+      this.helperColumn = column;
+      Vue.set(this.rangeValues["start"], columnIndex, this.randomRange[this.helperColumn]["min"]);
+      Vue.set(this.rangeValues["end"], columnIndex, this.randomRange[this.helperColumn]["max"]);
+    },
     isObservedVariable(column) {
       if (column == this.observedVariable) return true;
     },
@@ -545,6 +565,10 @@ export default {
     eventBus.$on("openSimulation", dialogStatus => {
       this.dialog = dialogStatus;
     });
+    // radio button default 를 0으로
+    this.columns.forEach(element => {
+      this.radioModel.push(0);
+    });
     //rand range
     this.loadRandomData();
   }
@@ -560,7 +584,7 @@ export default {
 .rangeHelper {
   position: absolute;
 
-  top: 90px;
+  top: 120px;
   right: 30px;
   /* background-color: rgba(80, 79, 79, 0.817);:  */
 }

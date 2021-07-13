@@ -62,11 +62,11 @@
             </template>
             <v-list-item>
               <v-col cols="5"> <v-subheader>Training:</v-subheader></v-col>
-              <v-autocomplete dense outlined clearable hide-details></v-autocomplete>
+              <v-text-field suffix="%" dense outlined clearable hide-details></v-text-field>
             </v-list-item>
             <v-list-item>
               <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col>
-              <v-autocomplete outlined dense clearable hide-details></v-autocomplete>
+              <v-text-field suffix="%" outlined dense clearable hide-details></v-text-field>
             </v-list-item>
           </v-list-group>
         </v-list-group>

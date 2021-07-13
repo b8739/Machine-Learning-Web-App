@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-btn @click="getValue">get value</v-btn>
-    <v-card dark rounded color="#3f3f3f" elevation="0">
+    <!-- <v-btn @click="getValue">get value</v-btn> -->
+    <v-card dark color="#3f3f3f" class="rounded-0" elevation="0">
       <v-container>
         <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
         <v-checkbox
