@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="1200">
+  <v-dialog v-model="dialog" width="1000">
     <!-- <v-btn @click="rangeValues['start'].push(1)">hello</v-btn> -->
     <v-container fluid class="pa-0">
       <v-card rounded>
@@ -71,110 +71,196 @@
                         circle
                       ></v-pagination>
 
-                      <v-row
-                        v-for="(column, columnIndex) in columns"
-                        v-show="previousPage - 1 < columnIndex && columnIndex < currentPage"
-                        :key="columnIndex"
-                        align="center"
-                        class="mt-5"
-                      >
-                        <div style="width:40px">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-icon
-                                class="ml-7"
-                                right
-                                v-bind="attrs"
-                                v-on="on"
-                                v-if="isObservedVariable(column)"
-                                >mdi-check</v-icon
-                              >
-                            </template>
-                            <span>Observed Variable</span>
-                          </v-tooltip>
-                        </div>
-                        <v-col cols="2" class="pl-0" style="text-align:center">
-                          <v-card-text>{{ column }}</v-card-text></v-col
+                      <v-simple-table>
+                        <template v-slot:default>
+                          <thead>
+                            <tr>
+                              <th>Observe</th>
+                              <th>Feature Name</th>
+                              <th>Method</th>
+                              <th style="width:200px">Range Min</th>
+                              <th style="width:200px">Range Max</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="(column, columnIndex) in columns"
+                              v-show="previousPage - 1 < columnIndex && columnIndex < currentPage"
+                              :key="columnIndex"
+                            >
+                              <td>
+                                <div style="width:50px">
+                                  <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                      <v-icon
+                                        class="ml-7"
+                                        right
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        v-if="isObservedVariable(column)"
+                                        >mdi-check</v-icon
+                                      >
+                                    </template>
+                                    <span>Observed Variable</span>
+                                  </v-tooltip>
+                                </div>
+                              </td>
+                              <td>
+                                <v-col cols="" class="pl-0" style="text-align:center">
+                                  <v-card-text>{{ column }}</v-card-text></v-col
+                                >
+                              </td>
+                              <td>
+                                <v-col cols="" class="px-0">
+                                  <v-radio-group hide-details v-model="radioModel[columnIndex]">
+                                    <v-radio
+                                      v-for="(radio, radioIndex) in radioLabels"
+                                      :key="radioIndex"
+                                      :label="radio"
+                                      @change="radio_nd(column, columnIndex)"
+                                    ></v-radio> </v-radio-group
+                                ></v-col>
+                              </td>
+                              <td>
+                                <v-col cols="" align-self="center">
+                                  <v-text-field
+                                    :disabled="radioModel[columnIndex] == 1"
+                                    style="text-align:right"
+                                    @click="
+                                      openHelper(column, columnIndex);
+                                      getHelperValues(column);
+                                      setTargetTextField(columnIndex, 'start');
+                                    "
+                                    hide-details
+                                    label="Min"
+                                    class="mt-0 pt-0"
+                                    v-model="rangeValues['start'][columnIndex]"
+                                  ></v-text-field>
+                                </v-col>
+                              </td>
+
+                              <td>
+                                <v-col cols="">
+                                  <v-text-field
+                                    :disabled="radioModel[columnIndex] == 1"
+                                    hide-details
+                                    @click="
+                                      openHelper(column, columnIndex);
+                                      getHelperValues(column);
+                                      setTargetTextField(columnIndex, 'end');
+                                    "
+                                    v-model="rangeValues['end'][columnIndex]"
+                                    label="Max"
+                                    class="mt-0 pt-0"
+                                  ></v-text-field>
+                                </v-col>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+
+                      <!-- range helper -->
+                      <v-navigation-drawer v-model="drawer" absolute bottom temporary>
+                        <v-card
+                          max-width="250"
+                          min-height="300"
+                          color="rgba(80, 79, 79, 0.817)"
+                          dark
+                          class=""
+                          :disabled="helperStatus"
                         >
-                        <v-col cols="2">
-                          <v-radio-group hide-details v-model="radioModel[columnIndex]">
-                            <v-radio
-                              v-for="(radio, radioIndex) in radioLabels"
-                              :key="radioIndex"
-                              :label="radio"
-                              @change="radio_nd(column, columnIndex)"
-                            ></v-radio> </v-radio-group
-                        ></v-col>
-                        <v-col cols="2" align-self="center">
-                          <v-text-field
-                            :disabled="radioModel[columnIndex] == 1"
-                            style="text-align:right"
-                            @click="
-                              openHelper(column, columnIndex);
-                              getHelperValues(column);
-                              setTargetTextField(columnIndex, 'start');
-                            "
-                            hide-details
-                            label="Min"
-                            class="mt-0 pt-0"
-                            v-model="rangeValues['start'][columnIndex]"
-                          ></v-text-field>
-                        </v-col>
-
-                        <v-icon x-small>mdi-tilde</v-icon>
-
-                        <v-col cols="2">
-                          <v-text-field
-                            :disabled="radioModel[columnIndex] == 1"
-                            hide-details
-                            @click="
-                              openHelper(column, columnIndex);
-                              getHelperValues(column);
-                              setTargetTextField(columnIndex, 'end');
-                            "
-                            v-model="rangeValues['end'][columnIndex]"
-                            label="Max"
-                            class="mt-0 pt-0"
-                          ></v-text-field>
-                        </v-col>
-                      </v-row>
-
-                      <v-card
-                        max-width="250"
-                        min-height="300"
-                        color="rgba(80, 79, 79, 0.817)"
-                        dark
-                        class="rangeHelper"
-                        :disabled="helperStatus"
-                      >
-                        <v-container>
-                          <v-row align="center" justify="center">
-                            <v-card-text style="text-align:center"
-                              >Range Setting Helper</v-card-text
-                            >
-                            <v-card-text style="text-align:center" class="subheading pt-0">
-                              {{ helperColumn }}</v-card-text
-                            >
-                            <v-tabs
-                              centered
-                              v-model="tab_rangeMethod"
-                              dark
-                              background-color="rgba(80, 79, 79, 0.817)"
-                              light
-                            >
-                              <v-tab class="vtab">Statistics</v-tab>
-                              <!-- <v-tab class="vtab">Normal Distribution </v-tab> -->
-                            </v-tabs>
-                            <v-container>
-                              <v-tabs-items v-model="tab_rangeMethod">
-                                <!-- Statistics -->
-                                <v-tab-item>
-                                  <!-- numeric -->
-                                  <div v-if="isNumeric()">
+                          <v-container>
+                            <v-row align="center" justify="center">
+                              <v-card-text style="text-align:center"
+                                >Range Setting Helper</v-card-text
+                              >
+                              <v-card-text style="text-align:center" class="subheading pt-0">
+                                {{ helperColumn }}</v-card-text
+                              >
+                              <v-tabs
+                                centered
+                                v-model="tab_rangeMethod"
+                                dark
+                                background-color="rgba(80, 79, 79, 0.817)"
+                                light
+                              >
+                                <v-tab class="vtab">Statistics</v-tab>
+                                <!-- <v-tab class="vtab">Normal Distribution </v-tab> -->
+                              </v-tabs>
+                              <v-container>
+                                <v-tabs-items v-model="tab_rangeMethod">
+                                  <!-- Statistics -->
+                                  <v-tab-item>
+                                    <!-- numeric -->
+                                    <div v-if="isNumeric()">
+                                      <v-row
+                                        align="center"
+                                        justify="center"
+                                        v-for="(statistic, index) in numericStatistics"
+                                        :key="index"
+                                      >
+                                        <v-col offset="2">
+                                          <v-tooltip left open-delay="250">
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                label
+                                                dark
+                                                outlined
+                                                @mouseover="setStatisticValue(statistic)"
+                                                @click="setStatisticValue(statistic), closeHelper()"
+                                                >{{ statistic }}</v-chip
+                                              >
+                                            </template>
+                                            <span>Click to Get Value</span>
+                                          </v-tooltip>
+                                        </v-col>
+                                        <v-col cols="">
+                                          <v-card-text class="py-0">{{
+                                            helperValues[statistic]
+                                          }}</v-card-text></v-col
+                                        >
+                                      </v-row>
+                                    </div>
+                                    <!-- category -->
+                                    <div v-else>
+                                      <v-row
+                                        align="center"
+                                        justify="center"
+                                        v-for="(statistic, index) in categoryStatistics"
+                                        :key="index"
+                                      >
+                                        <v-col offset="2">
+                                          <v-tooltip left open-delay="250">
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                dark
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                label
+                                                outlined
+                                                @mouseover="setStatisticValue(statistic)"
+                                                @click="setStatisticValue(statistic)"
+                                                >{{ statistic }}</v-chip
+                                              >
+                                            </template>
+                                            <span>Click to Get Value</span>
+                                          </v-tooltip>
+                                        </v-col>
+                                        <v-col cols="">
+                                          <v-card-text class="py-0">0</v-card-text></v-col
+                                        >
+                                      </v-row>
+                                    </div>
+                                  </v-tab-item>
+                                  <!-- Distribution -->
+                                  <v-tab-item class="transparent-body">
                                     <v-row
                                       align="center"
                                       justify="center"
-                                      v-for="(statistic, index) in numericStatistics"
+                                      v-for="(info, index) in distribution_info"
                                       :key="index"
                                     >
                                       <v-col offset="2">
@@ -184,91 +270,29 @@
                                               v-bind="attrs"
                                               v-on="on"
                                               label
-                                              dark
                                               outlined
-                                              @mouseover="setStatisticValue(statistic)"
-                                              @click="setStatisticValue(statistic)"
-                                              >{{ statistic }}</v-chip
+                                              dark
+                                              @mouseover="setDistributionValue(info.toLowerCase())"
+                                              @click="setDistributionValue(info.toLowerCase())"
+                                              >{{ info }}</v-chip
                                             >
                                           </template>
                                           <span>Click to Get Value</span>
                                         </v-tooltip>
                                       </v-col>
                                       <v-col cols="">
-                                        <v-card-text class="py-0">{{
-                                          helperValues[statistic]
-                                        }}</v-card-text></v-col
+                                        <v-card-text class="py-0" v-if="helperColumn != null">
+                                          {{ randomRange[helperColumn][info.toLowerCase()] }}
+                                        </v-card-text></v-col
                                       >
                                     </v-row>
-                                  </div>
-                                  <!-- category -->
-                                  <div v-else>
-                                    <v-row
-                                      align="center"
-                                      justify="center"
-                                      v-for="(statistic, index) in categoryStatistics"
-                                      :key="index"
-                                    >
-                                      <v-col offset="2">
-                                        <v-tooltip left open-delay="250">
-                                          <template v-slot:activator="{ on, attrs }">
-                                            <v-chip
-                                              dark
-                                              v-bind="attrs"
-                                              v-on="on"
-                                              label
-                                              outlined
-                                              @mouseover="setStatisticValue(statistic)"
-                                              @click="setStatisticValue(statistic)"
-                                              >{{ statistic }}</v-chip
-                                            >
-                                          </template>
-                                          <span>Click to Get Value</span>
-                                        </v-tooltip>
-                                      </v-col>
-                                      <v-col cols="">
-                                        <v-card-text class="py-0">0</v-card-text></v-col
-                                      >
-                                    </v-row>
-                                  </div>
-                                </v-tab-item>
-                                <!-- Distribution -->
-                                <v-tab-item class="transparent-body">
-                                  <v-row
-                                    align="center"
-                                    justify="center"
-                                    v-for="(info, index) in distribution_info"
-                                    :key="index"
-                                  >
-                                    <v-col offset="2">
-                                      <v-tooltip left open-delay="250">
-                                        <template v-slot:activator="{ on, attrs }">
-                                          <v-chip
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            label
-                                            outlined
-                                            dark
-                                            @mouseover="setDistributionValue(info.toLowerCase())"
-                                            @click="setDistributionValue(info.toLowerCase())"
-                                            >{{ info }}</v-chip
-                                          >
-                                        </template>
-                                        <span>Click to Get Value</span>
-                                      </v-tooltip>
-                                    </v-col>
-                                    <v-col cols="">
-                                      <v-card-text class="py-0" v-if="helperColumn != null">
-                                        {{ randomRange[helperColumn][info.toLowerCase()] }}
-                                      </v-card-text></v-col
-                                    >
-                                  </v-row>
-                                </v-tab-item>
-                              </v-tabs-items>
-                            </v-container>
-                          </v-row>
-                        </v-container>
-                      </v-card>
+                                  </v-tab-item>
+                                </v-tabs-items>
+                              </v-container>
+                            </v-row>
+                          </v-container>
+                        </v-card>
+                      </v-navigation-drawer>
                     </v-card>
                   </v-card>
                 </v-col>
@@ -302,7 +326,10 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      radioGroup: 1,
+      // drawer
+      drawer: false,
+      // radio
+      radioModel: [],
       // range helper
       helperStatus: true,
       helperColumn: null,
@@ -312,7 +339,6 @@ export default {
       selectedStatistic: [],
       userInput: null,
       values: [],
-      radioModel: [],
 
       distributionSelected: null,
       // tab
@@ -396,6 +422,10 @@ export default {
       this.helperColumn = column;
       this.helperColumnIndex = columnIndex;
       this.helperStatus = false; //helper 활성화
+      this.drawer = true; //helper 활성화
+    },
+    closeHelper() {
+      this.drawer = false;
     },
     getHelperValues(column) {
       let min = this.summarizedInfo["interval"][column]["min"];
@@ -429,106 +459,6 @@ export default {
         this.tooltipStatus = true;
       }
     },
-
-    // setNormalDistribution() {
-    //   this.setNormalLabel();
-    //   // 초기화 (push 하기 전)
-    //   this.rangeValues['start'] = [];
-    //   this.rangeValues['end'] = [];
-    //   // loop
-    //   let index = 0;
-    //   this.columns.forEach(element => {
-    //     // 관찰 변수일 경우에는 3 시그마 값
-    //     // 3시그마 값 계산
-    //     if (element == this.observedVariable) {
-    //       let mean = this.summarizedInfo["numeric"][element]["mean"];
-
-    //       let std = this.summarizedInfo["numeric"][element]["standard deviation"];
-    //       let sigma_3_min = mean - 3 * std;
-    //       let sigma_3_max = mean + 3 * std;
-    //       // console.log(
-    //       //   `mean:${mean},std:${std},sigma_3_min:${sigma_3_min},sigma_3_max:${sigma_3_max},`
-    //       // );
-
-    //       // 계산된 3시그마 값 지정
-    //       this.rangeValues['start'].push(sigma_3_min.toFixed(2));
-    //       this.rangeValues['end'].push(sigma_3_max.toFixed(2));
-    //     }
-    //     // 그 외 변수들일 경우에는 min,max 값 적용
-    //     else {
-    //       // category 일 경우, '일단' category라는 string 값 넣어둠
-    //       if (this.summarizedInfo["datatype"]["type"][index] == "category") {
-    //         this.rangeValues['start'].push(0);
-    //         // this.rangeValues['end'].push(0);
-    //       }
-    //       // numeric 일 경우
-    //       else {
-    //         this.rangeValues['start'].push(this.summarizedInfo["numeric"][element]["median"]);
-    //         // this.rangeValues['end'].push(this.summarizedInfo["interval"][element]["max"]);
-    //       }
-    //     }
-    //     index++;
-    //   });
-    // },
-    // setUniformLabel() {
-    //   this.startLabel = [];
-    //   this.endLabel = [];
-    //   this.columns.forEach(element => {
-    //     // 관찰 변수일 경우에는 min max 값 적용
-    //     if (element == this.observedVariable) {
-    //       this.startLabel.push("Min");
-    //       this.endLabel.push("Max");
-    //     }
-    //     // 그 외 변수들일 경우에는 median 값 적용
-    //     else {
-    //       this.startLabel.push("Median");
-    //       // this.endLabel.push("Median");
-    //     }
-    //   });
-    // },
-    // setNormalLabel() {
-    //   this.startLabel = [];
-    //   this.endLabel = [];
-    //   this.columns.forEach(element => {
-    //     // 관찰 변수일 경우에는 min max 값 적용
-    //     if (element == this.observedVariable) {
-    //       this.startLabel.push("3 Sigma Min");
-    //       this.endLabel.push("3 Sigma Max");
-    //     }
-    //     // 그 외 변수들일 경우에는 median 값 적용
-    //     else {
-    //       // this.startLabel.push("Min");
-    //       // this.endLabel.push("Max");
-    //     }
-    //   });
-    // },
-    // setUniformDistribution() {
-    //   this.setUniformLabel();
-    //   // 초기화 (push 하기 전)
-    //   this.rangeValues['start'] = [];
-    //   this.rangeValues['end'] = [];
-    //   // loop
-    //   let index = 0;
-    //   this.columns.forEach(element => {
-    //     // 관찰 변수일 경우에는 min max 값 적용
-    //     if (element == this.observedVariable) {
-    //       this.rangeValues['start'].push(this.summarizedInfo["interval"][element]["min"]);
-    //       this.rangeValues['end'].push(this.summarizedInfo["interval"][element]["max"]);
-    //     }
-    //     // 그 외 변수들일 경우에는 median 값 적용
-    //     else {
-    //       // category 일 경우 '일단' category라는 string 값 넣어둠
-    //       if (this.summarizedInfo["datatype"]["type"][index] == "category") {
-    //         this.rangeValues['start'].push(0);
-    //         // this.rangeValues['end'].push(0);
-    //       } else {
-    //         this.rangeValues['start'].push(this.summarizedInfo["numeric"][element]["median"]);
-    //         // this.rangeValues['end'].push(this.summarizedInfo["numeric"][element]["median"]);
-    //       }
-    //     }
-    //     index++;
-    //   });
-    // },
 
     stepOneFinished() {
       this.tab = 1;
@@ -585,7 +515,7 @@ export default {
   position: absolute;
 
   top: 120px;
-  right: 30px;
+  right: -200px;
   /* background-color: rgba(80, 79, 79, 0.817);:  */
 }
 .vtab {
