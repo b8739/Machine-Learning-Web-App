@@ -318,7 +318,7 @@ export default {
 }
 /* node 버튼/dropdown */
 .node-option {
-  background-color: rgb(154, 154, 154) !important;
+  background-color: rgb(169, 167, 167) !important;
   color: white !important;
   /* border: 1px solid; */
   /* background-color: rgb(62, 62, 62) !important; */

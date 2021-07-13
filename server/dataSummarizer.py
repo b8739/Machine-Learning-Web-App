@@ -39,7 +39,8 @@ def summarizeData(df):
   # 2-1-1) 각 numeric 관련 변수 생성
   df_numeric_columns = list((df_numeric).columns)
 
-  df_numeric_mean =  df_numeric.mean().round(1)
+  df_numeric_mean =  df_numeric.mean().round(2)
+  df_numeric_mode =  df_numeric.round(3).mode().loc[0]
   df_numeric_median =  df_numeric.median().round(1)
   df_numeric_std = df_numeric.std().round(1)
   df_numeric_Q1 = df_numeric.quantile(.25).round(2)
@@ -53,13 +54,16 @@ def summarizeData(df):
   # 2-1-3 Info 변수에 각 변수 투입
 
   df_numeric_info.insert(0,'mean',df_numeric_mean)
-  df_numeric_info.insert(1,'median',df_numeric_median)
-  df_numeric_info.insert(2,'standard deviation',df_numeric_std)
-  df_numeric_info.insert(3,'Q1',df_numeric_Q1)
-  df_numeric_info.insert(4,'Q2',df_numeric_Q2)
-  df_numeric_info.insert(5,'Q3',df_numeric_Q3)
-  df_numeric_info.insert(6,'Q4',df_numeric_Q4)
-  df_numeric_info.insert(7,'numOfNA',df_numeric_numOfNA)
+  df_numeric_info.insert(1,'mode',df_numeric_mode)
+  df_numeric_info.insert(2,'median',df_numeric_median)
+  df_numeric_info.insert(3,'standard deviation',df_numeric_std)
+  df_numeric_info.insert(4,'Q1',df_numeric_Q1)
+  df_numeric_info.insert(5,'Q2',df_numeric_Q2)
+  df_numeric_info.insert(6,'Q3',df_numeric_Q3)
+  df_numeric_info.insert(7,'Q4',df_numeric_Q4)
+  df_numeric_info.insert(8,'numOfNA',df_numeric_numOfNA)
+
+  # print(df_numeric_info)
   # distribution 데이터 (frequency) 
   distribution_features =  OrderedDict()
   interval_features =  OrderedDict()
@@ -129,7 +133,7 @@ def summarizeData(df):
   finalSummary = OrderedDict()
   
   finalSummary = {'datatype':df_typetype.to_dict(orient='list',into=OrderedDict),'categorical':df_categorical_info.to_dict(orient='index',into=OrderedDict),'numeric':df_numeric_info.to_dict(orient='index'),'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
-  print(finalSummary)
+  # print(finalSummary)
   # return  finalSummary
   return json.dumps(finalSummary)
   
