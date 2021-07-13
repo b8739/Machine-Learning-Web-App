@@ -1,11 +1,11 @@
 <template>
   <v-dialog v-model="dialog" width="1000">
-    <v-btn @click="rangeStartValues.push(1)">hello</v-btn>
+    <!-- <v-btn @click="rangeValues['start'].push(1)">hello</v-btn> -->
     <v-container fluid class="pa-0">
       <v-card rounded>
         <v-row class="ma-0 ">
           <v-spacer></v-spacer>
-          <v-btn x-small min-width="20" min-height="30" @click="closeStepper"
+          <v-btn x-small min-width="20" min-height="30" @click="closeModal"
             ><v-icon small>mdi-close</v-icon>
           </v-btn>
         </v-row>
@@ -81,7 +81,7 @@
                           <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
                               <v-icon
-                                class="pl-7"
+                                class="ml-7"
                                 right
                                 v-bind="attrs"
                                 v-on="on"
@@ -95,21 +95,19 @@
                         <v-col cols="2" class="pl-0" style="text-align:center">
                           <v-card-text>{{ column }}</v-card-text></v-col
                         >
-                        <!-- <v-col cols="2"
-                          ><v-select hide-details label="Distribution  (Optional)"></v-select
-                        ></v-col> -->
 
                         <v-col cols="2" align-self="center">
                           <v-text-field
+                            style="text-align:right"
                             @click="
                               openHelper(column);
                               getHelperValues(column);
                               setTargetTextField(columnIndex, 'start');
                             "
                             hide-details
-                            label="Range Min"
+                            label="Min"
                             class="mt-0 pt-0"
-                            v-model="rangeStartValues[columnIndex]"
+                            v-model="rangeValues['start'][columnIndex]"
                           ></v-text-field>
                         </v-col>
 
@@ -123,8 +121,8 @@
                               getHelperValues(column);
                               setTargetTextField(columnIndex, 'end');
                             "
-                            v-model="rangeEndValues[columnIndex]"
-                            label="Range Max"
+                            v-model="rangeValues['end'][columnIndex]"
+                            label="Max"
                             class="mt-0 pt-0"
                           ></v-text-field>
                         </v-col>
@@ -147,42 +145,84 @@
                             >
                             <v-tabs
                               centered
-                              v-model="tab_method"
+                              v-model="tab_rangeMethod"
                               dark
                               background-color="rgba(80, 79, 79, 0.817)"
                               light
                             >
                               <v-tab class="vtab">Statistics</v-tab>
-                              <v-tab class="vtab">Distribution </v-tab>
+                              <v-tab class="vtab">Normal Distribution </v-tab>
                             </v-tabs>
-                          </v-row>
-                          <v-row
-                            align="center"
-                            justify="center"
-                            v-for="(statistic, index) in statistics"
-                            :key="index"
-                          >
-                            <v-col offset="2">
-                              <v-tooltip left>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    label
-                                    outlined
-                                    @mouseover="setStatisticValue(statistic)"
-                                    @click="setStatisticValue(statistic)"
-                                    >{{ statistic }}</v-chip
-                                  >
-                                </template>
-                                <span>Click to Get Value</span>
-                              </v-tooltip>
-                            </v-col>
-                            <v-col cols="">
-                              <v-card-text class="py-0">{{
-                                helperValues[statistic]
-                              }}</v-card-text></v-col
-                            >
+                            <v-container>
+                              <v-tabs-items v-model="tab_rangeMethod">
+                                <!-- Statistics -->
+                                <v-tab-item>
+                                  <v-card color="rgba(80, 79, 79, 0.817)" dark>
+                                    <v-row
+                                      align="center"
+                                      justify="center"
+                                      v-for="(statistic, index) in statistics"
+                                      :key="index"
+                                    >
+                                      <v-col offset="2">
+                                        <v-tooltip left>
+                                          <template v-slot:activator="{ on, attrs }">
+                                            <v-chip
+                                              v-bind="attrs"
+                                              v-on="on"
+                                              label
+                                              outlined
+                                              @mouseover="setStatisticValue(statistic)"
+                                              @click="setStatisticValue(statistic)"
+                                              >{{ statistic }}</v-chip
+                                            >
+                                          </template>
+                                          <span>Click to Get Value</span>
+                                        </v-tooltip>
+                                      </v-col>
+                                      <v-col cols="">
+                                        <v-card-text class="py-0">{{
+                                          helperValues[statistic]
+                                        }}</v-card-text></v-col
+                                      >
+                                    </v-row>
+                                  </v-card>
+                                </v-tab-item>
+                                <!-- Distribution -->
+                                <v-tab-item>
+                                  <v-card color="rgba(80, 79, 79, 0.817)" dark>
+                                    <v-row
+                                      align="center"
+                                      justify="center"
+                                      v-for="(info, index) in distribution_info"
+                                      :key="index"
+                                    >
+                                      <v-col offset="2">
+                                        <v-tooltip left>
+                                          <template v-slot:activator="{ on, attrs }">
+                                            <v-chip
+                                              v-bind="attrs"
+                                              v-on="on"
+                                              label
+                                              outlined
+                                              @mouseover="setDistributionValue(info.toLowerCase())"
+                                              @click="setDistributionValue(info.toLowerCase())"
+                                              >{{ info }}</v-chip
+                                            >
+                                          </template>
+                                          <span>Click to Get Value</span>
+                                        </v-tooltip>
+                                      </v-col>
+                                      <v-col cols="">
+                                        <v-card-text class="py-0" v-if="helperColumn != null">
+                                          {{ randomRange[helperColumn][info.toLowerCase()] }}
+                                        </v-card-text></v-col
+                                      >
+                                    </v-row>
+                                  </v-card></v-tab-item
+                                >
+                              </v-tabs-items>
+                            </v-container>
                           </v-row>
                         </v-container>
                       </v-card>
@@ -210,6 +250,7 @@
 </template>
 <script>
 import Vue from "vue";
+import NormalDistribution from "normal-distribution";
 import { eventBus } from "@/main";
 import InputColumnList from "@/components/simulation/columnList/InputColumnList.vue";
 import TargetColumnList from "@/components/simulation/columnList/TargetColumnList.vue";
@@ -218,43 +259,35 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      // helper
+      // range helper
       helperStatus: true,
       helperColumn: null,
       helperValues: [],
-      rangeStartValues: [null, null, null, null],
-      rangeEndValues: [],
+      // range values(v-model)
+      rangeValues: { start: [], end: [] },
       selectedStatistic: [],
       userInput: null,
       values: [],
-      searchInput: "s",
-      people: [
-        { name: "Sandra Adams", group: "Group 1" },
-        { name: "Ali Connors", group: "Group 1" },
-        { name: "Trevor Hansen", group: "Group 1" },
-        { name: "Tucker Smith", group: "Group 1" }
-      ],
+
       distributionSelected: null,
       // tab
       tab: 1,
-      tab_distribution: 0,
-      tab_method: 0,
-
-      // vmodel values
-      rangeValues: [],
+      tab_rangeMethod: 0,
 
       // page
       page: 1,
       length: 2,
       model: 1,
 
+      // v-for
       statistics: ["Min", "Max", "Mean", "Mode", "Median"],
-      distributionType: ["Uniform Distribution", "Normal Distribution"],
-      focusedStatistic: null,
-      focusedIndex: null,
-
-      focusedTextField: null,
+      distribution_info: ["Min", "Max"],
       chipColors: [],
+
+      // focused info
+      focusedIndex: null,
+      focusedTextField: null,
+
       select: { method: "", explanation: "" },
 
       dialog: true,
@@ -264,47 +297,20 @@ export default {
 
       hideDetailsProps: {
         "hide-details": true
-      },
-      chosenAlgorithm: null,
-      focusedFeature: null,
-      hasSaved: false,
-      isEditing: null,
-
-      items: [
-        { name: "Min", value: "FL" },
-        { name: "Max", value: "GA" },
-        { name: "Mean", value: "NE" },
-        { name: "Mode", value: "CA" },
-        { name: "Median", value: "NY" }
-      ]
+      }
     };
   },
-  watch: {
-    e6: function(data) {
-      if (data > 2) {
-        // this.setUniformDistribution();
-      }
-    }
-  },
+  watch: {},
   computed: {
     ...mapState({
       tableList: state => state.initialData.tableList,
       observedVariable: state => state.simulationData.observedVariable,
-      summarizedInfo: state => state.initialData.summarizedInfo
+      summarizedInfo: state => state.initialData.summarizedInfo,
+      randomRange: state => state.initialData.randomRange
     }),
 
     ...mapGetters("initialData", ["columns"]),
-    statistic_items() {
-      let array;
-      array = [
-        { name: "Min" },
-        { name: "Max", value: "not yet" },
-        { name: "Mean", value: "not yet" },
-        { name: "Median", value: "not yet" },
-        { name: "Mode", value: "not yet" }
-      ];
-      return array;
-    },
+    // page
     paginationLength() {
       return Math.ceil(this.columns.length / 5);
     },
@@ -318,10 +324,16 @@ export default {
   },
   methods: {
     // hello() {
-    //   Vue.set(this.rangeStartValues, 0, 1);
+    //   Vue.set(this.rangeValues['start'], 0, 1);
     // },
-    setStatisticValue(statistic) {
-      Vue.set(this.focusedTextField, this.focusedIndex, this.helperValues[statistic]);
+    ...mapActions("initialData", ["loadRandomData"]),
+    ...mapMutations("simulationData", ["saveSimulationMethod"]),
+    isObservedVariable(column) {
+      if (column == this.observedVariable) return true;
+    },
+    openHelper(column) {
+      this.helperColumn = column;
+      this.helperStatus = false; //helper 활성화
     },
     getHelperValues(column) {
       let min = this.summarizedInfo["interval"][column]["min"];
@@ -336,15 +348,18 @@ export default {
     setTargetTextField(columnIndex, textFieldType) {
       this.focusedIndex = columnIndex;
       if (textFieldType == "start") {
-        this.focusedTextField = this.rangeStartValues;
+        this.focusedTextField = this.rangeValues["start"];
       } else {
-        this.focusedTextField = this.rangeEndValues;
+        this.focusedTextField = this.rangeValues["end"];
       }
     },
-    openHelper(column) {
-      this.helperColumn = column;
-      this.helperStatus = false; //helper 활성화
+    setStatisticValue(statistic) {
+      Vue.set(this.focusedTextField, this.focusedIndex, this.helperValues[statistic]);
     },
+    setDistributionValue(info) {
+      Vue.set(this.focusedTextField, this.focusedIndex, this.randomRange[this.helperColumn][info]);
+    },
+
     toggleTooltip(event) {
       if (event == "blur") {
         this.tooltipStatus = false;
@@ -352,34 +367,12 @@ export default {
         this.tooltipStatus = true;
       }
     },
-    test(columnIndex) {
-      console.log(columnIndex);
-      this.selectedStatistic[columnIndex] = "Min";
-    },
-    ...mapMutations("simulationData", ["saveSimulationMethod"]),
-    showDistributionSet() {
-      if (this.distributionSelected == 0) {
-        this.setUniformDistribution();
-      } else {
-        this.setNormalDistribution();
-      }
 
-      this.e6 = 2;
-    },
-    defineProps(column) {
-      // uniform일 경우 (this.distributionSelected == 0),
-
-      //  observed variable 빼고 (column != this.observedVariable) 다 비활성화
-      if (column != this.observedVariable) return this.disabledProps;
-    },
-    isObservedVariable(column) {
-      if (column == this.observedVariable) return true;
-    },
     // setNormalDistribution() {
     //   this.setNormalLabel();
     //   // 초기화 (push 하기 전)
-    //   this.rangeStartValues = [];
-    //   this.rangeEndValues = [];
+    //   this.rangeValues['start'] = [];
+    //   this.rangeValues['end'] = [];
     //   // loop
     //   let index = 0;
     //   this.columns.forEach(element => {
@@ -396,20 +389,20 @@ export default {
     //       // );
 
     //       // 계산된 3시그마 값 지정
-    //       this.rangeStartValues.push(sigma_3_min.toFixed(2));
-    //       this.rangeEndValues.push(sigma_3_max.toFixed(2));
+    //       this.rangeValues['start'].push(sigma_3_min.toFixed(2));
+    //       this.rangeValues['end'].push(sigma_3_max.toFixed(2));
     //     }
     //     // 그 외 변수들일 경우에는 min,max 값 적용
     //     else {
     //       // category 일 경우, '일단' category라는 string 값 넣어둠
     //       if (this.summarizedInfo["datatype"]["type"][index] == "category") {
-    //         this.rangeStartValues.push(0);
-    //         // this.rangeEndValues.push(0);
+    //         this.rangeValues['start'].push(0);
+    //         // this.rangeValues['end'].push(0);
     //       }
     //       // numeric 일 경우
     //       else {
-    //         this.rangeStartValues.push(this.summarizedInfo["numeric"][element]["median"]);
-    //         // this.rangeEndValues.push(this.summarizedInfo["interval"][element]["max"]);
+    //         this.rangeValues['start'].push(this.summarizedInfo["numeric"][element]["median"]);
+    //         // this.rangeValues['end'].push(this.summarizedInfo["interval"][element]["max"]);
     //       }
     //     }
     //     index++;
@@ -450,59 +443,40 @@ export default {
     // setUniformDistribution() {
     //   this.setUniformLabel();
     //   // 초기화 (push 하기 전)
-    //   this.rangeStartValues = [];
-    //   this.rangeEndValues = [];
+    //   this.rangeValues['start'] = [];
+    //   this.rangeValues['end'] = [];
     //   // loop
     //   let index = 0;
     //   this.columns.forEach(element => {
     //     // 관찰 변수일 경우에는 min max 값 적용
     //     if (element == this.observedVariable) {
-    //       this.rangeStartValues.push(this.summarizedInfo["interval"][element]["min"]);
-    //       this.rangeEndValues.push(this.summarizedInfo["interval"][element]["max"]);
+    //       this.rangeValues['start'].push(this.summarizedInfo["interval"][element]["min"]);
+    //       this.rangeValues['end'].push(this.summarizedInfo["interval"][element]["max"]);
     //     }
     //     // 그 외 변수들일 경우에는 median 값 적용
     //     else {
     //       // category 일 경우 '일단' category라는 string 값 넣어둠
     //       if (this.summarizedInfo["datatype"]["type"][index] == "category") {
-    //         this.rangeStartValues.push(0);
-    //         // this.rangeEndValues.push(0);
+    //         this.rangeValues['start'].push(0);
+    //         // this.rangeValues['end'].push(0);
     //       } else {
-    //         this.rangeStartValues.push(this.summarizedInfo["numeric"][element]["median"]);
-    //         // this.rangeEndValues.push(this.summarizedInfo["numeric"][element]["median"]);
+    //         this.rangeValues['start'].push(this.summarizedInfo["numeric"][element]["median"]);
+    //         // this.rangeValues['end'].push(this.summarizedInfo["numeric"][element]["median"]);
     //       }
     //     }
     //     index++;
     //   });
     // },
-    statisticFocused(statistic) {
-      let index = this.columns.indexOf(this.focusedFeature);
-      this.focusedStatistic = statistic.toLowerCase();
-      if (this.focusedStatistic == "min" || this.focusedStatistic == "max") {
-        this.focusedTextField[index] = this.summarizedInfo["interval"][this.focusedFeature][
-          this.focusedStatistic
-        ];
-      } else {
-        this.focusedTextField[index] = this.summarizedInfo["numeric"][this.focusedFeature][
-          this.focusedStatistic
-        ];
-        // console.log(this.focusedTextField[index]);
-      }
-    },
 
     stepOneFinished() {
       this.tab = 1;
-      this.setUniformDistribution();
-
       eventBus.$emit("simulationColumnChecked", true);
     },
     stepTwoFinished() {
-      this.saveSimulationMethod(this.select.method);
+      // this.saveSimulationMethod(this.select.method);
       this.$router.push({ name: "simulationResult" });
     },
 
-    algorithmClicked(algorithm) {
-      this.chosenAlgorithm = algorithm;
-    },
     getItems(index) {
       if (index == 0) {
         return this.tableList;
@@ -517,13 +491,8 @@ export default {
       this.tab = 2;
       eventBus.$emit("stepTwoFinished", true);
     },
-    closeStepper() {
+    closeModal() {
       this.dialog = false;
-    },
-    createModel() {
-      this.dialog = false;
-      this.saveAlgorithm(this.chosenAlgorithm);
-      this.$router.push({ name: "modeling" });
     }
   },
   components: {
@@ -534,6 +503,8 @@ export default {
     eventBus.$on("openSimulation", dialogStatus => {
       this.dialog = dialogStatus;
     });
+    //rand range
+    this.loadRandomData();
   }
 };
 </script>
@@ -556,8 +527,5 @@ export default {
 }
 .v-tabs-bar__content {
   background-color: grey !important;
-}
-.v-text-field .v-label input {
-  text-align: center !important;
 }
 </style>

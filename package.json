@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "normal-distribution": "^1.1.1",
     "vue-drag-resize": "^1.5.4"
   }
 }

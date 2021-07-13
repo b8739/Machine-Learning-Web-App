@@ -33,6 +33,7 @@ import numpy as np
 
 # summarizer
 from dataSummarizer import summarizeData
+from normalDistribution import randGenerator_nd
 
 # modeling
 from xgboost_modeling import *
@@ -380,6 +381,11 @@ def changeColumnOrder():
 def loadSummarizedData():
   df = pd.read_sql_table('temp_dataset', session.bind)
   return (summarizeData(df))
+
+@app.route('/loadRandomInfo',methods=['GET'])
+def loadDistributionData():
+  # df = pd.read_sql_table('temp_dataset', session.bind)
+  return (randGenerator_nd())
 
 @app.route('/xgboost_modeling',methods=['GET'])
 def xgboost_modeling():

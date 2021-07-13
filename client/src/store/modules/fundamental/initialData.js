@@ -6,7 +6,8 @@ const state = {
   dataset: {},
   summarizedInfo: [],
   tableList: [],
-  navStatus: null
+  navStatus: null,
+  randomRange: null
   // columns: []
 };
 
@@ -65,6 +66,9 @@ const mutations = {
   },
   loadTableList(state, payload) {
     state.tableList = payload;
+  },
+  loadRandomInfo(state, payload) {
+    state.randomRange = payload;
   }
 };
 
@@ -87,6 +91,17 @@ const actions = {
       .get(path)
       .then(res => {
         commit("loadSummarizedInfo", res.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  },
+  loadRandomData({ commit }) {
+    const path = "http://localhost:5000/loadRandomInfo";
+    axios
+      .get(path)
+      .then(res => {
+        commit("loadRandomInfo", res.data);
       })
       .catch(error => {
         console.error(error);

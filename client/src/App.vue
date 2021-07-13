@@ -43,5 +43,6 @@ a {
 .v-label {
   font-size: 5px;
 }
+
 /* base.html */
 </style>

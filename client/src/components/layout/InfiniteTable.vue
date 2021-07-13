@@ -16,6 +16,7 @@
     <!-- dataTable -->
     <table class="dataTable">
       <thead @click="locateTableOption" v-click-outside="onClickOutside">
+        <th>Index</th>
         <th
           v-for="(column, thIndex) in columns"
           :key="thIndex"
@@ -31,6 +32,7 @@
           :key="trIndex"
           :class="{ rowSelected: rowSelectedFlags[trIndex] }"
         >
+          <td>{{ trIndex + 1 }}</td>
           <td
             v-for="(column, thIndex) in columns"
             :key="thIndex"
