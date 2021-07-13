@@ -100,7 +100,7 @@
                           <v-text-field
                             style="text-align:right"
                             @click="
-                              openHelper(column);
+                              openHelper(column, columnIndex);
                               getHelperValues(column);
                               setTargetTextField(columnIndex, 'start');
                             "
@@ -117,7 +117,7 @@
                           <v-text-field
                             hide-details
                             @click="
-                              openHelper(column);
+                              openHelper(column, columnIndex);
                               getHelperValues(column);
                               setTargetTextField(columnIndex, 'end');
                             "
@@ -157,11 +157,12 @@
                               <v-tabs-items v-model="tab_rangeMethod">
                                 <!-- Statistics -->
                                 <v-tab-item>
-                                  <v-card color="rgba(80, 79, 79, 0.817)" dark>
+                                  <!-- numeric -->
+                                  <div v-if="isNumeric()">
                                     <v-row
                                       align="center"
                                       justify="center"
-                                      v-for="(statistic, index) in statistics"
+                                      v-for="(statistic, index) in numericStatistics"
                                       :key="index"
                                     >
                                       <v-col offset="2">
@@ -171,6 +172,7 @@
                                               v-bind="attrs"
                                               v-on="on"
                                               label
+                                              dark
                                               outlined
                                               @mouseover="setStatisticValue(statistic)"
                                               @click="setStatisticValue(statistic)"
@@ -186,41 +188,70 @@
                                         }}</v-card-text></v-col
                                       >
                                     </v-row>
-                                  </v-card>
-                                </v-tab-item>
-                                <!-- Distribution -->
-                                <v-tab-item>
-                                  <v-card color="rgba(80, 79, 79, 0.817)" dark>
+                                  </div>
+                                  <!-- category -->
+                                  <div v-else>
                                     <v-row
                                       align="center"
                                       justify="center"
-                                      v-for="(info, index) in distribution_info"
+                                      v-for="(statistic, index) in categoryStatistics"
                                       :key="index"
                                     >
                                       <v-col offset="2">
                                         <v-tooltip left>
                                           <template v-slot:activator="{ on, attrs }">
                                             <v-chip
+                                              dark
                                               v-bind="attrs"
                                               v-on="on"
                                               label
                                               outlined
-                                              @mouseover="setDistributionValue(info.toLowerCase())"
-                                              @click="setDistributionValue(info.toLowerCase())"
-                                              >{{ info }}</v-chip
+                                              @mouseover="setStatisticValue(statistic)"
+                                              @click="setStatisticValue(statistic)"
+                                              >{{ statistic }}</v-chip
                                             >
                                           </template>
                                           <span>Click to Get Value</span>
                                         </v-tooltip>
                                       </v-col>
                                       <v-col cols="">
-                                        <v-card-text class="py-0" v-if="helperColumn != null">
-                                          {{ randomRange[helperColumn][info.toLowerCase()] }}
-                                        </v-card-text></v-col
+                                        <v-card-text class="py-0">0</v-card-text></v-col
                                       >
                                     </v-row>
-                                  </v-card></v-tab-item
-                                >
+                                  </div>
+                                </v-tab-item>
+                                <!-- Distribution -->
+                                <v-tab-item class="transparent-body">
+                                  <v-row
+                                    align="center"
+                                    justify="center"
+                                    v-for="(info, index) in distribution_info"
+                                    :key="index"
+                                  >
+                                    <v-col offset="2">
+                                      <v-tooltip left>
+                                        <template v-slot:activator="{ on, attrs }">
+                                          <v-chip
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            label
+                                            outlined
+                                            dark
+                                            @mouseover="setDistributionValue(info.toLowerCase())"
+                                            @click="setDistributionValue(info.toLowerCase())"
+                                            >{{ info }}</v-chip
+                                          >
+                                        </template>
+                                        <span>Click to Get Value</span>
+                                      </v-tooltip>
+                                    </v-col>
+                                    <v-col cols="">
+                                      <v-card-text class="py-0" v-if="helperColumn != null">
+                                        {{ randomRange[helperColumn][info.toLowerCase()] }}
+                                      </v-card-text></v-col
+                                    >
+                                  </v-row>
+                                </v-tab-item>
                               </v-tabs-items>
                             </v-container>
                           </v-row>
@@ -280,7 +311,8 @@ export default {
       model: 1,
 
       // v-for
-      statistics: ["Min", "Max", "Mean", "Mode", "Median"],
+      numericStatistics: ["Min", "Max", "Mean", "Mode", "Median"],
+      categoryStatistics: ["Mode", "Median"],
       distribution_info: ["Min", "Max"],
       chipColors: [],
 
@@ -331,8 +363,18 @@ export default {
     isObservedVariable(column) {
       if (column == this.observedVariable) return true;
     },
-    openHelper(column) {
+    getDataType(columnIndex) {
+      return this.summarizedInfo["datatype"]["type"][columnIndex];
+    },
+    isNumeric() {
+      let dataType = this.getDataType(this.helperColumnIndex);
+      if (dataType == "numeric") {
+        return true;
+      } else return false;
+    },
+    openHelper(column, columnIndex) {
       this.helperColumn = column;
+      this.helperColumnIndex = columnIndex;
       this.helperStatus = false; //helper 활성화
     },
     getHelperValues(column) {
@@ -527,5 +569,8 @@ export default {
 }
 .v-tabs-bar__content {
   background-color: grey !important;
+}
+.v-tabs-items {
+  background: transparent !important;
 }
 </style>
