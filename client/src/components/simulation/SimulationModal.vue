@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="1000">
+  <v-dialog v-model="dialog" width="950">
     <!-- <v-btn @click="rangeValues['start'].push(1)">hello</v-btn> -->
     <v-container fluid class="pa-0">
       <v-card rounded>
@@ -50,7 +50,7 @@
           </v-tab-item>
           <!-- 2.Simulation -->
           <v-tab-item>
-            <v-container>
+            <v-container class="px-10">
               <v-subheader>
                 Set the Range of Random Number
               </v-subheader>
@@ -62,24 +62,22 @@
                     <!-- toolbar -->
 
                     <!-- text-field -->
-
+                    <v-pagination
+                      class="mt-4 mb-4"
+                      v-model="page"
+                      :length="paginationLength"
+                      circle
+                    ></v-pagination>
                     <v-card outlined min-height="550px" class="rangeCard">
-                      <v-pagination
-                        class="mt-4"
-                        v-model="page"
-                        :length="paginationLength"
-                        circle
-                      ></v-pagination>
-
                       <v-simple-table>
-                        <template v-slot:default>
+                        <template>
                           <thead>
                             <tr>
-                              <th>Observe</th>
-                              <th>Feature Name</th>
-                              <th>Method</th>
-                              <th style="width:200px">Range Min</th>
-                              <th style="width:200px">Range Max</th>
+                              <th class="thStyle">Observe</th>
+                              <th class="thStyle">Feature Name</th>
+                              <th class="thStyle" style="width:200px">Method</th>
+                              <th class="thStyle" style="width:200px">Range Min</th>
+                              <th class="thStyle" style="width:200px">Range Max</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -93,7 +91,7 @@
                                   <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                       <v-icon
-                                        class="ml-7"
+                                        class="pl-5"
                                         right
                                         v-bind="attrs"
                                         v-on="on"
@@ -112,7 +110,11 @@
                               </td>
                               <td>
                                 <v-col cols="" class="px-0">
-                                  <v-radio-group hide-details v-model="radioModel[columnIndex]">
+                                  <v-radio-group
+                                    dense
+                                    hide-details
+                                    v-model="radioModel[columnIndex]"
+                                  >
                                     <v-radio
                                       v-for="(radio, radioIndex) in radioLabels"
                                       :key="radioIndex"
@@ -124,6 +126,7 @@
                               <td>
                                 <v-col cols="" align-self="center">
                                   <v-text-field
+                                    clearable
                                     :disabled="radioModel[columnIndex] == 1"
                                     style="text-align:right"
                                     @click="
@@ -142,6 +145,7 @@
                               <td>
                                 <v-col cols="">
                                   <v-text-field
+                                    clearable
                                     :disabled="radioModel[columnIndex] == 1"
                                     hide-details
                                     @click="
@@ -161,10 +165,16 @@
                       </v-simple-table>
 
                       <!-- range helper -->
-                      <v-navigation-drawer v-model="drawer" absolute bottom temporary>
+                      <v-navigation-drawer
+                        v-model="drawer"
+                        absolute
+                        bottom
+                        temporary
+                        overlay-opacity="0.1"
+                      >
                         <v-card
-                          max-width="250"
-                          min-height="300"
+                          width="100%"
+                          height="100%"
                           color="rgba(80, 79, 79, 0.817)"
                           dark
                           class=""
@@ -342,7 +352,7 @@ export default {
 
       distributionSelected: null,
       // tab
-      tab: 1,
+      tab: 0,
       tab_rangeMethod: 0,
 
       // page
@@ -526,5 +536,8 @@ export default {
 }
 .v-tabs-items {
   background: transparent !important;
+}
+.thStyle {
+  text-align: center !important;
 }
 </style>

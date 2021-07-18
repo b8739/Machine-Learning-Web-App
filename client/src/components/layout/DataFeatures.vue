@@ -117,11 +117,9 @@
             <!-- category 일 경우: -- 표시 -->
             <td v-if="distinguishDataType(columnIndex)"></td>
             <!-- numeric 일 경우: Graph 표시 -->
-            <td v-else>
+            <td v-else @click="openEditModal(dataset, indexNum, selectedColumnIndex)">
               <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
               <TimeSeries
-                :rawDataset="dataset[column]"
-                :date="dataset['ts']"
                 :graphWidth="graphWidth"
                 :graphHeight="graphHeight"
                 :seriesName="column"
@@ -130,18 +128,6 @@
           </tr>
         </tbody>
       </table>
-
-      <!-- <EditModal
-      :class="{ visibilityHidden: editModal_hidden }"
-      :dataValue="editModal_dataValue"
-      :date="editModal_date"
-      :indexNum="editModal_indexNum"
-      :columns="columns"
-      @newEditModalStatus="closeEditModal"
-      :editModal_hidden="editModal_hidden"
-      :selectedColumnIndex="selectedColumnIndex"
-    /> -->
-      <portal-target name="destination"> </portal-target>
     </div>
   </div>
 </template>
@@ -322,10 +308,9 @@ export default {
         return this.activatedName_props;
       } else return this.inactivatedName_props;
     },
-    openEditModal(dataset, date, indexNum, selectedColumnIndex) {
+    openEditModal(dataset, indexNum, selectedColumnIndex) {
       this.editModal_hidden = false;
       this.editModal_dataValue = dataset;
-      this.editModal_date = date;
       this.editModal_indexNum = indexNum;
       this.selectedColumnIndex = selectedColumnIndex;
     },

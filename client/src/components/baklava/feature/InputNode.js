@@ -19,6 +19,14 @@ export default new NodeBuilder("InputNode", {
     },
     "FeatureSidebar"
   )
+  .addOption(
+    "Normalization",
+    "ButtonOption",
+    () => {
+      return { features: columns };
+    },
+    "NormalizationSidebar"
+  )
   // .addOption("ValueText", "TextOption")
   .onCalculate(n => {
     let inputs = n.getOptionValue("Features");

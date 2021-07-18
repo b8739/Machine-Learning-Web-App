@@ -24,6 +24,7 @@ import TargetNode from "@/components/baklava/feature/TargetNode.js";
 import MyOption from "@/components/baklava/MyOption.vue";
 import FeatureOption from "@/components/baklava/feature/FeatureOption.vue";
 import FeatureSidebar from "@/components/baklava/feature/FeatureSidebar.vue";
+import NormalizationSidebar from "@/components/baklava/feature/NormalizationSidebar.vue";
 import AlgorithmOption from "@/components/baklava/algorithm/AlgorithmOption.vue";
 import ParameterSidebar from "@/components/baklava/algorithm/ParameterSidebar.vue";
 
@@ -194,13 +195,13 @@ export default {
       // eventBus.$emit("modelingParameter", modelingParameter);
       let path = "http://localhost:5000/xgboost_modeling";
       // define path
-      if (this.algorithmRequest.algorithm.name == "XGBoost") {
-        path += "xgboost_modeling";
-      } else if (this.algorithm == "Random Forest") {
-        path += "rf_modeling";
-      } else if (this.algorithm == "SVR") {
-        path += "svr_modeling";
-      }
+      // if (this.algorithmRequest.algorithm.name == "XGBoost") {
+      //   path += "xgboost_modeling";
+      // } else if (this.algorithm == "Random Forest") {
+      //   path += "rf_modeling";
+      // } else if (this.algorithm == "SVR") {
+      //   path += "svr_modeling";
+      // }
       // axios
       axios
         .get(path, {
@@ -238,6 +239,7 @@ export default {
     this.viewPlugin.registerOption("FeatureOption", FeatureOption);
     this.viewPlugin.registerOption("AlgorithmOption", AlgorithmOption);
     this.viewPlugin.registerOption("FeatureSidebar", FeatureSidebar);
+    this.viewPlugin.registerOption("NormalizationSidebar", NormalizationSidebar);
     this.viewPlugin.registerOption("ParameterSidebar", ParameterSidebar);
     // 2) register algorithm nodes
 
@@ -342,5 +344,8 @@ export default {
 }
 .node_sidebar {
   background-color: #3f3f3f !important;
+}
+.__options button {
+  margin-bottom: 5px;
 }
 </style>

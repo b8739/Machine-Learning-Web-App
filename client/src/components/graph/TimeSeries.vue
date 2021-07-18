@@ -1,5 +1,6 @@
 <template>
   <div id="chart">
+    <!-- <v-btn @click="rerender()">rerender</v-btn> -->
     <apexchart
       ref="realtimeChart"
       type="line"
@@ -12,19 +13,20 @@
 </template>
 
 <script>
+import Vue from "vue";
 // randomize function
 import * as randomizer from "@/assets/js/randomizer.js";
 
 //vuex
-import { mapActions } from "vuex";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
+
 export default {
   name: "TimeSeries",
-  props: ["graphWidth", "graphHeight", "date", "rawDataset", "seriesName"],
+  props: ["graphWidth", "graphHeight", "seriesName"],
 
   data() {
     return {
+      newDataset: [],
       dataArray: [],
       randomIndexArray: [],
       dateArray: [],
@@ -36,7 +38,7 @@ export default {
       options: {
         // chart
         chart: {
-          type: "area",
+          type: "line",
           toolbar: {
             show: true,
             autoSelected: "selection",
@@ -146,12 +148,13 @@ export default {
         },
         xaxis: {
           // type: "datetime",
+          tickAmount: 5,
           labels: {
             minHeight: 50,
             rotate: -30,
             rotateAlways: true,
             hideOverlappingLabels: false,
-            format: "yy/MM/dd",
+
             style: {
               fontSize: "10px",
               fontWeight: 200
@@ -171,51 +174,53 @@ export default {
     };
   },
   watch: {
-    seriesName: function(data) {
-      console.log("seriesname change");
-      this.$refs.realtimeChart.updateSeries({
-        name: seriesName
-      });
-    },
+    // seriesName: function(data) {
+    //   console.log("seriesname change");
+    //   this.$refs.realtimeChart.updateSeries({
+    //     name: seriesName
+    //   });
+    // },
     editModal_hidden: function(data) {
       console.log(data);
       if (data == true) {
         this.resetSeries();
       }
     },
-    rawDataset: function(data) {
-      this.resetSeries();
-      if (data != null) {
-        this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
-        this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-        this.updateSeriesLine(this.dataArray, this.seriesName);
-      }
-    },
-    date: function(data) {
-      if (data != null) {
-        this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
-        this.updateCategories(this.dateArray);
-      }
-    },
+    // newDataset: function(data) {
+    //          this.resetSeries();
+    //   if (data != null) {
+
+    //     this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length);
+    //     randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+    //     this.updateSeriesLine(this.dataArray, this.seriesName);
+    //   }
+    // },
+
+    // date: function(data) {
+    //   if (data != null) {
+    //     this.convertToArray(this.date, this.dateArray, this.randomIndexArray);
+    //     this.updateCategories(this.dateArray);
+    //   }
+    // },
     immediate: true
   },
 
   created() {
-    if (this.rawDataset != null || this.rawDataset != undefined) {
-      let objectLength = Object.keys(this.rawDataset).length;
-      if (objectLength != 0) {
-        this.firstMount = true;
-      }
-    }
+    this.dataset.forEach(element => {
+      this.newDataset.push(element[this.seriesName]);
+    });
   },
   mounted() {
     if (this.firstMount == true) {
-      this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
-      this.putIntoArray(this.rawDataset, this.dataArray, this.randomIndexArray);
+      // this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length);
+      // randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+      // // this.convertToArray(this.rawDataset, this.dataArray, this.randomIndexArray);
+    }
+    this.resetSeries();
+    if (this.newDataset != null) {
+      this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 1);
+      randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
       this.updateSeriesLine(this.dataArray, this.seriesName);
-      // time series 아니라서 일단 밑에 2줄 주석 처리
-      // this.putIntoArray(this.date, this.dateArray, this.randomIndexArray);
-      // this.updateCategories(this.dateArray);
     }
   },
   computed: {
@@ -225,7 +230,10 @@ export default {
     ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
-    putIntoArray(jsonObject, targetArray, randomIndex) {
+    rerender() {
+      this.updateSeriesLine(this.dataArray, this.seriesName);
+    },
+    convertToArray(jsonObject, targetArray, randomIndex) {
       for (let i = 0; i < randomIndex.length; i++) {
         targetArray.push(jsonObject[randomIndex[i]]);
       }

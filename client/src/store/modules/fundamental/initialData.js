@@ -14,7 +14,7 @@ const state = {
 const getters = {
   columns(state) {
     let columns = [];
-    let columnValues = Object.keys(state.dataset);
+    let columnValues = Object.keys(state.dataset[0]);
 
     for (const columnValue of columnValues) {
       columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
@@ -79,7 +79,6 @@ const actions = {
       .get(path)
       .then(res => {
         commit("loadDataset", res.data);
-        console.log(Object.keys(res.data));
       })
       .catch(error => {
         console.error(error);

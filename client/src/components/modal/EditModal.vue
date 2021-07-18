@@ -6,25 +6,19 @@
       <div class="graphContainer">
         <TimeSeries
           :rawDataset="dataValue"
-          :date="date"
-          :indexNum="indexNum"
-          @xaxis="getXaxis"
-          :editModal_hidden="editModal_hidden"
+          :graphWidth="100"
+          :graphHeight="100"
+          :seriesName="column"
         />
       </div>
-      <InfiniteTable
-        :xaxis="xaxis"
-        :columns="columns"
-        :date="date"
-        :selectedColumnIndex="selectedColumnIndex"
-      />
+      <InfiniteTable :xaxis="xaxis" :selectedColumnIndex="selectedColumnIndex" />
     </div>
   </div>
 </template>
 <script>
 import TimeSeries from "@/components/graph/TimeSeries";
 import InfiniteTable from "@/components/layout/InfiniteTable";
-
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -32,10 +26,14 @@ export default {
       yaxis: {}
     };
   },
-  props: ["dataValue", "date", "indexNum", "columns", "editModal_hidden", "selectedColumnIndex"],
+  props: ["dataValue", "editModal_hidden", "selectedColumnIndex"],
+
   components: {
     TimeSeries,
     InfiniteTable
+  },
+  computed: {
+    ...mapGetters("initialData", ["columns", "indexNum"])
   },
   methods: {
     getXaxis(xaxis) {

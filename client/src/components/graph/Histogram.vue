@@ -45,13 +45,13 @@ export default {
   watch: {},
   created() {},
   mounted() {
-    this.putIntoArray(this.interval, this.intervalArray);
+    this.convertToArray(this.interval, this.intervalArray);
     this.intervalArray.sort(); //max보다 min이 앞에 있는 문제 해결
     this.updateCategories(this.intervalArray);
     this.updateSeriesLine(this.distribution);
   },
   methods: {
-    putIntoArray(jsonObject, targetArray) {
+    convertToArray(jsonObject, targetArray) {
       for (var key in jsonObject) {
         targetArray.push(jsonObject[key]);
         targetArray.reverse();

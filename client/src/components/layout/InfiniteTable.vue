@@ -1,59 +1,30 @@
 <template>
-  <div class="wrapper">
-    <!-- <SaveChange /> -->
-    <!-- v-menu -->
-    <div class="tableOption" :style="tableOptionStyle">
-      <v-card v-if="showTableOption" class="mx-auto" max-width="300" tile>
-        <v-list dense dark>
-          <v-list-item-group>
-            <v-list-item active-class="white" color="#fff">열 삽입</v-list-item>
-            <v-list-item color="#fff" @click="deleteColumn">열 삭제</v-list-item>
-            <v-list-item color="#fff">열 정보</v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-card>
-    </div>
+  <v-container fluid class="wrapper">
+    <v-row>
+      <v-col cols="2">
+        <v-select v-model="filterFeature" :items="columns" label="Select Feature"></v-select>
+      </v-col>
+      <v-col cols="2">
+        <v-text-field v-model="filterGreaterThan" type="number" label="Greater than"></v-text-field
+      ></v-col>
+      <v-col cols="2">
+        <v-text-field v-model="filterLessThan" type="number" label="Less than"></v-text-field
+      ></v-col>
+    </v-row>
     <!-- dataTable -->
-    <table class="dataTable">
-      <thead @click="locateTableOption" v-click-outside="onClickOutside">
-        <th>Index</th>
-        <th
-          v-for="(column, thIndex) in columns"
-          :key="thIndex"
-          :class="{ grayBackground: thCompareClickedColumns(thIndex) }"
-          @click="getColumnInfo(thIndex)"
-        >
-          {{ columns[thIndex] }}
-        </th>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(data, trIndex) in dataSet"
-          :key="trIndex"
-          :class="{ rowSelected: rowSelectedFlags[trIndex] }"
-        >
-          <td>{{ trIndex + 1 }}</td>
-          <td
-            v-for="(column, thIndex) in columns"
-            :key="thIndex"
-            :class="{ grayBackground: tdCompareClickedColumns(trIndex, thIndex) }"
-            @click="saveClickedColumnInfo(trIndex, thIndex)"
-          >
-            {{ data[columns[thIndex]] }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <!-- <v-data-table
+    <v-data-table
       :headers="headers"
-      :items="dataSet"
+      :items="datasetItems"
+      dense
+      disable-pagination
       class="elevation-1"
-      disable-pagination="true"
-      dense="true"
-    ></v-data-table> -->
+      :item-key="columns[0]"
+      show-select
+    ></v-data-table>
+
     <infinite-loading @infinite="infiniteHandler" spinner="waveDots"></infinite-loading>
     <SaveChange />
-  </div>
+  </v-container>
 </template>
 <!-- :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }" -->
 <script>
@@ -62,19 +33,21 @@ import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
 import vClickOutside from "v-click-outside";
 import SaveChange from "@/components/save/SaveChange";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   directives: {
     clickOutside: vClickOutside.directive
   },
   data() {
     return {
-      // v-menu
-      // selectedItem: 1,
-      // items: [{ text: "열 삭제" }, { text: "열 복사" }],
+      filterLessThan: "",
+      filterGreaterThan: "",
+      filterFeature: null,
+
       // InfiniteLoading
       limit: 0,
       // dataset
-      dataSet: [],
+      datasetItems: [],
       // hovering & selection
       rowSelectedFlags: [],
       columnSelectedFlags: [],
@@ -94,16 +67,41 @@ export default {
     };
   },
   computed: {
+    ...mapGetters("initialData", ["columns"]),
     headers() {
       let headers = [];
+
       this.columns.forEach(element => {
-        let header = { text: element, value: element };
+        let header = {
+          text: element,
+          value: element
+        };
+        if (element == this.filterFeature) {
+          header["filter"] = value => {
+            // 두 조건 모두 입력 안 된 경우, true를 반환해서 탈출
+            if (!this.filterLessThan && !this.filterGreaterThan) return true;
+            // 두 조건 모두 입력된 경우,
+            if (this.filterLessThan && this.filterGreaterThan) {
+              return (
+                parseFloat(this.filterGreaterThan) < value &&
+                value < parseFloat(this.filterLessThan)
+              );
+            }
+            // 한 조건만 입력된 경우,
+            else if (this.filterLessThan && !this.filterGreaterThan) {
+              return value < parseFloat(this.filterLessThan);
+            } else {
+              return parseFloat(this.filterGreaterThan) < value;
+            }
+          };
+        }
+
         headers.push(header);
       });
       return headers;
     }
   },
-  props: ["xaxis", "columns", "date", "selectedColumnIndex"],
+  props: ["xaxis", "selectedColumnIndex"],
   components: {
     InfiniteLoading,
     SaveChange
@@ -115,6 +113,29 @@ export default {
     }
   },
   methods: {
+    hello() {
+      alert("s");
+    },
+    columnSearch(column, thIndex) {
+      if (this.searchValueName != null) {
+        // 대문자로 변형시켜서 대소문자 차이를 무시
+        let targetColumn = column.toUpperCase();
+        let searchColumn = this.searchValueName.toUpperCase();
+        // 검색값과 일치하지 않을 때, 대상 hide
+        if (targetColumn.indexOf(searchColumn) == -1) {
+          this.tdVisibility[thIndex] = false;
+          return false;
+        }
+        // 검색값과 일치할 때, 대상 show
+        else {
+          this.tdVisibility[thIndex] = true;
+          return true;
+        }
+      } else {
+        this.tdVisibility[thIndex] = true;
+        return true;
+      }
+    },
     saveClickedColumnInfo(rowIndex, columnIndex) {
       this.clickedColumnInfo.rowIndex = rowIndex;
       this.clickedColumnInfo.columnIndex = columnIndex;
@@ -192,7 +213,7 @@ export default {
         })
         .then(({ data }) => {
           this.limit += 45; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
-          this.dataSet.push(...data);
+          this.datasetItems.push(...data);
         });
     },
     infiniteHandler($state) {
@@ -207,7 +228,7 @@ export default {
           // console.log(data);
           if (data.length) {
             this.limit += 45;
-            this.dataSet.push(...data);
+            this.datasetItems.push(...data);
             $state.loaded();
           } else {
             $state.complete();
@@ -230,7 +251,7 @@ export default {
       eventBus.$emit("openSaveChange", true);
     },
     resetTableData() {
-      this.dataSet = [];
+      this.datasetItems = [];
       this.limit = 0;
     }
   },

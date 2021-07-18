@@ -297,7 +297,7 @@ export default {
         this.resetdataArrays();
         //preprocess before update graph
         this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
-        this.putIntoArray(targetObject, this.dateArray, this.randomIndexArray);
+        this.convertToArray(targetObject, this.dateArray, this.randomIndexArray);
         this.updateCategories(this.dateArray);
       }
     },
@@ -312,12 +312,12 @@ export default {
 
         //yaxis를 처음 추가할 때
         if (this.numOfDragElement == 0) {
-          this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
+          this.convertToArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
           this.updateSeries(axisName, this.dataArrays[axisName]);
         }
         //yaxis가 이미 1개 이상 존재할 때
         else {
-          this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
+          this.convertToArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
           let gapOfDatasets = Math.abs(
             this.dataArrays[this.axisName[this.axisName.length - 2]][0] - targetObject[0]
           );
@@ -405,7 +405,7 @@ export default {
       this.axisName.push(axisName);
       let targetObject = this.dataset[axisName];
       this.dataArrays[axisName] = [];
-      this.putIntoArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
+      this.convertToArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
     });
     eventBus.$on("removeSyncBottom", axisInfo => {
       this.numOfSyncChart.pop();
@@ -449,7 +449,7 @@ export default {
         return this.quantileInfo[index - 1];
       }
     },
-    putIntoArray(jsonObject, targetArray, randomIndex) {
+    convertToArray(jsonObject, targetArray, randomIndex) {
       for (let i = 0; i < randomIndex.length; i++) {
         targetArray.push(jsonObject[randomIndex[i]]);
       }

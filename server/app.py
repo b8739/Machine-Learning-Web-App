@@ -49,6 +49,9 @@ from simulation_nd import *
 import pyarrow as pa
 from pyarrow import csv
 
+# collections
+from collections import OrderedDict, defaultdict
+
 # Python API
 # from model import *
 
@@ -182,11 +185,13 @@ def loadData():
     Session = sessionmaker(bind=engine_dataset,autocommit=False)
     session = Session()
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
+
     data = pd.read_sql_table('temp_dataset', session.bind)
     del data["ID"]
     # return jsonify(data.to_dict())
-    return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
-    # return data.to_dict(orient='list')
+    # return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
+    print(data.to_dict(orient='records',into=OrderedDict))
+    return json.dumps(data.to_dict(orient='records',into=OrderedDict))
 
   # ### 2) CSV 파일을 읽어서 DICT 형태로 RETURN해주는 방식 (1번 방식이 속도가 느려서 일단 2번으로 진행) ###
   # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')

@@ -1,5 +1,5 @@
 export function getCount(datasetLength) {
-  return Math.round(datasetLength * 0.02);
+  return Math.round(datasetLength * 0.5);
 }
 export function getRandom(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -29,17 +29,16 @@ export function getRandomArray(min, max) {
   return sortedRandomArray;
 }
 //preprocess methods
-export function randomizeDataset(dataset_unrandomized, dataset_randomized, randomIndex) {
-  let tempArray = [];
-  for (let i = 0; i < randomIndex.length; i++) {
-    tempArray.push(dataset_unrandomized[randomIndex[i]]); //이게 정말 randomize되는것
+export function randomizeDataset(dataset_unrandomized, dataset_randomized, randomIndexArray) {
+  for (let i = 0; i < randomIndexArray.length; i++) {
+    dataset_randomized.push(dataset_unrandomized[randomIndexArray[i]]); //이게 정말 randomize되는것
     // targetArray.push(dataset_unrandomized[i]);
   }
-  dataset_randomized.push(tempArray);
+  return dataset_randomized;
 }
-export function randomizeDate(dataset_unrandomized, dataset_randomized, randomIndex) {
-  for (let i = 0; i < randomIndex.length; i++) {
-    dataset_randomized.push(dataset_unrandomized[randomIndex[i]]); //이게 정말 randomize되는것
+export function randomizeDate(dataset_unrandomized, dataset_randomized, randomIndexArray) {
+  for (let i = 0; i < randomIndexArray.length; i++) {
+    dataset_randomized.push(dataset_unrandomized[randomIndexArray[i]]); //이게 정말 randomize되는것
     // targetArray.push(dataset_unrandomized[i]);
   }
 }

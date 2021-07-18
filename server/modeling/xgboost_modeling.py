@@ -37,25 +37,6 @@ def xgboost(modelingOption):
       ## 01. OPEN DATA & PROCESSING ##
 
     df_00 = pd.read_csv("./boston_house.csv")
-
-    '''임시'''
-    T = df_00.drop('MEDV', axis = 1)
-    
-    X_mean = T.mean().round(2) #그 외 변수의 mean (평균)
-    X_std = T.std().round(1)*0.1 #그 외 변수의 std (표준편차)
-
-    X_info = pd.DataFrame({'mean':X_mean.values,'std':X_std.values})
-
-    randNumbers = []
-
-    # 난수를 생성함과 동시에 series로 형변환해서 randNumbers에 삽입
-    # randNumbers: series 난수들을 갖고 있는 배열
-    #  
-    for i,v in X_info.iterrows():
-        randNumbers.append(pd.Series(np.random.normal(v[0],v[1]*0.1,100)))
-    X_final = pd.DataFrame(randNumbers)
-    X_final = X_final.transpose() # 컬럼과 인덱스 순서 변경
-    X_final.columns = T.columns # 컬럼명 주기
     #### REGRESSION MODEL : "Boston Housing" DATA SET ####
 
 
@@ -92,7 +73,6 @@ def xgboost(modelingOption):
     train_Xn = scalerX.transform(train_X)
     test_Xn = scalerX.transform(test_X)
     valid_Xn = scalerX.transform(valid_X)
-    X_final_n = scalerX.transform(X_final)
 
     #scaler 저장
     # file_name = 'scaler_xgboost.pkl'
