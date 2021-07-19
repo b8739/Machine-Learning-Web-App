@@ -18,7 +18,7 @@ import Vue from "vue";
 import * as randomizer from "@/assets/js/randomizer.js";
 
 //vuex
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 export default {
   name: "TimeSeries",
@@ -32,7 +32,7 @@ export default {
       dateArray: [],
       xaxisWhenZoomed: {},
       xaxisWhenSelected: {},
-      firstMount: false,
+      firstMount: true,
 
       dateByName: [],
       options: {
@@ -211,25 +211,29 @@ export default {
     });
   },
   mounted() {
-    if (this.firstMount == true) {
-      // this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length);
-      // randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-      // // this.convertToArray(this.rawDataset, this.dataArray, this.randomIndexArray);
-    }
     this.resetSeries();
-    if (this.newDataset != null) {
-      this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 1);
-      randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-      this.updateSeriesLine(this.dataArray, this.seriesName);
+    if (this.apexChartDataset[this.seriesName] != null) {
+      this.updateSeriesLine(this.apexChartDataset[this.seriesName], this.seriesName);
+    } else {
+      if (this.newDataset != null) {
+        this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 1);
+        randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+        this.updateSeriesLine(this.dataArray, this.seriesName);
+        let payload = { featureName: this.seriesName, dataset: this.dataArray };
+        // vuex에 저장
+        this.setApexChartDataset(payload);
+      }
     }
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset
+      dataset: state => state.initialData.dataset,
+      apexChartDataset: state => state.apexchartGraph.apexChartDataset
     }),
     ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
+    ...mapMutations("apexchartGraph", ["setApexChartDataset"]),
     rerender() {
       this.updateSeriesLine(this.dataArray, this.seriesName);
     },

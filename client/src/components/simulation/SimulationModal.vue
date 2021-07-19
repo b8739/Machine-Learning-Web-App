@@ -1,5 +1,6 @@
 <template>
   <v-dialog v-model="dialog" width="950">
+    <v-btn @click="ndTest()"></v-btn>
     <!-- <v-btn @click="rangeValues['start'].push(1)">hello</v-btn> -->
     <v-container fluid class="pa-0">
       <v-card rounded>
@@ -127,7 +128,6 @@
                                 <v-col cols="" align-self="center">
                                   <v-text-field
                                     clearable
-                                    :disabled="radioModel[columnIndex] == 1"
                                     style="text-align:right"
                                     @click="
                                       openHelper(column, columnIndex);
@@ -146,7 +146,6 @@
                                 <v-col cols="">
                                   <v-text-field
                                     clearable
-                                    :disabled="radioModel[columnIndex] == 1"
                                     hide-details
                                     @click="
                                       openHelper(column, columnIndex);
@@ -327,7 +326,8 @@
 </template>
 <script>
 import Vue from "vue";
-import NormalDistribution from "normal-distribution";
+import * as normalDistribution from "@/assets/js/normalDistribution.js";
+// import NormalDistribution from "normal-distribution";
 import { eventBus } from "@/main";
 import InputColumnList from "@/components/simulation/columnList/InputColumnList.vue";
 import TargetColumnList from "@/components/simulation/columnList/TargetColumnList.vue";
@@ -352,7 +352,7 @@ export default {
 
       distributionSelected: null,
       // tab
-      tab: 0,
+      tab: 1,
       tab_rangeMethod: 0,
 
       // page
@@ -406,6 +406,15 @@ export default {
     }
   },
   methods: {
+    ...mapMutations("simulationResult", ["saveGraphSources"]),
+    ndTest() {
+      let value = [];
+      for (let i = 0; i < 1000; i++) {
+        value.push(normalDistribution.randn_bm(1, 10, 1).toFixed(2));
+      }
+
+      alert(value);
+    },
     // hello() {
     //   Vue.set(this.rangeValues['start'], 0, 1);
     // },
@@ -475,7 +484,41 @@ export default {
       eventBus.$emit("simulationColumnChecked", true);
     },
     stepTwoFinished() {
-      // this.saveSimulationMethod(this.select.method);
+      let rangeInfo = {};
+      this.radioModel.forEach((element, index) => {
+        let featureName = this.columns[index];
+        let rangeMin = this.rangeValues["start"][index];
+        let rangeMax = this.rangeValues["end"][index];
+
+        if (element == 1) {
+          //radio가 normal distribution이 체크되어있을때
+          rangeInfo[featureName] = { method: "normal", min: rangeMin, max: rangeMax };
+        } else {
+          rangeInfo[featureName] = { method: "manual", min: 0, max: 1 };
+        }
+        delete rangeInfo["MEDV"];
+      });
+      // axios
+      let path = "http://localhost:5000/runSimulation";
+
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          observedVariable: this.observedVariable,
+          rangeInfo: rangeInfo
+        }
+      })
+        .then(res => {
+          this.saveGraphSources(res.data); // 그래프 값 저장
+          this.eventBus.$emit("updateChart", true);
+          console.log(res);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+      // customzied
       this.$router.push({ name: "simulationResult" });
     },
 

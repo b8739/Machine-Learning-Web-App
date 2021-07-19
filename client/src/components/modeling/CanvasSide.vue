@@ -51,7 +51,29 @@
               </v-list-item-content>
             </template>
             <v-list-item>
-              <v-btn outlined small> Select Validation Data </v-btn>
+              <!-- <v-expansion-panels>
+                <v-expansion-panel>
+                  <v-expansion-panel-header> Extract</v-expansion-panel-header>
+                  <v-expansion-panel-content> hi</v-expansion-panel-content>
+                </v-expansion-panel></v-expansion-panels
+              > -->
+              <v-row justify="center" align="center">
+                <v-col cols="9">
+                  <v-row justify="center" align="center">
+                    <v-col cols="4" class="px-0">From</v-col>
+                    <v-col cols="8" class="px-0"
+                      ><v-text-field hide-details dense label="Start Index"></v-text-field
+                    ></v-col>
+                    <v-col cols="4" class="px-0">To</v-col>
+                    <v-col cols="8" class="px-0"
+                      ><v-text-field hide-details dense label="End Index"></v-text-field
+                    ></v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="3">
+                  <v-btn fab x-small> <v-icon>mdi-plus</v-icon></v-btn>
+                </v-col>
+              </v-row>
             </v-list-item>
           </v-list-group>
           <v-list-group sub-group :value="true">

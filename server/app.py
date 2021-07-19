@@ -41,8 +41,7 @@ from svr_modeling import *
 from rf_modeling import *
 
 # simulation
-from simulation_ud import *
-from simulation_nd import *
+from simulation import getSimulationResult
 
 
 # pyarrow
@@ -653,15 +652,12 @@ def loadProjects():
   session.close
   return jsonify(project_list)
 
-@app.route('/simulation_ud',methods=['GET'])
-def simulation_ud():
-  observedVariable = request.args.get('observedVariable')
-  return (runSimulation_ud(observedVariable))
-
-@app.route('/simulation_nd',methods=['GET'])
-def simulation_nd():
-  observedVariable = request.args.get('observedVariable')
-  return (runSimulation_nd(observedVariable))
-
+@app.route('/runSimulation',methods=['POST'])
+def runSimulation():
+  observedVariable = request.get_json()['observedVariable']
+  rangeInfo = request.get_json()['rangeInfo']
+  print(request.get_json())
+  return getSimulationResult(observedVariable,rangeInfo)
+  # return jsonify('hi')
 if __name__ == '__main__':
     app.run(debug=True)

@@ -103,7 +103,6 @@ export default {
       this.$router.push({ name: "modelingProcess" });
     },
     loadCases() {
-      console.log("loadCases");
       let path = "http://localhost:5000/loadCases";
       axios
         .get(path)

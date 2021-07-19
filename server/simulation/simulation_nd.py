@@ -101,6 +101,6 @@ def runSimulation_nd(observedVariable):
 
     # 오름차순으로 정렬 (증감 변화를 확인하는것이 목적이기 때문)
     totalFinal = X_final.sort_values(by='CRIM')
-    
+    print(MEDV_predicted.tolist())
 
     return jsonify({"predicted":MEDV_predicted.tolist(),"randNum":totalFinal['CRIM'].tolist()})

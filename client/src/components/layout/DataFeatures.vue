@@ -341,9 +341,7 @@ export default {
       this.columns_vue.push(element);
     });
   },
-  mounted() {
-    console.log("datafeature mounted");
-  }
+  mounted() {}
 };
 </script>
 <style scoped>
