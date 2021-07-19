@@ -38,9 +38,31 @@ export default {
     Canvas
   },
   methods: {
+    ...mapMutations("modelingResult", ["saveGraphSources"]),
+    ...mapMutations("modelingResult", ["saveModelingSummary"]),
     runModel() {
       eventBus.$emit("saveRequest_canvas", true); // to Canvas.vue
       eventBus.$emit("saveRequest_canvasSide", true); // to Canvas.vue
+
+      // axios
+      let path = "http://localhost:5000/xgboost_modeling";
+
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          modelingRequest: this.modelingRequest,
+          splitRatio: this.splitRatio
+        }
+      })
+        .then(res => {
+          this.saveGraphSources(res.data[0]); // Test and Valid dataset
+          this.saveModelingSummary(res.data[1]); //modeling summary (ex.MAPE)
+          this.$router.push({ name: "modelingResult" });
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
 
     getPos(e) {
@@ -53,7 +75,8 @@ export default {
     ...mapState({
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
-      algorithm: state => state.modelingData.algorithm
+      modelingRequest: state => state.modelingData.modelingRequest,
+      splitRatio: state => state.modelingData.splitRatio
     })
   },
 

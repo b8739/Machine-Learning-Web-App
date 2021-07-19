@@ -33,27 +33,29 @@ from app import jsonify, Response
 def MAPE(y, pred):
   return np.mean(np.abs((y-pred)/y)*100)
 
-def xgboost(modelingOption):
+def xgboost(splitRatio,modelingRequest):
       ## 01. OPEN DATA & PROCESSING ##
 
     df_00 = pd.read_csv("./boston_house.csv")
     #### REGRESSION MODEL : "Boston Housing" DATA SET ####
-
-
 
     # df_00 = df_00.drop('Unnamed: 0', axis = 1)
 
     ## EXTRACT X & y SEPARATELY ##
     X = df_00.drop('MEDV', axis = 1)
     y = df_00['MEDV']
+    print(splitRatio)
 
     ## Valid Data (20%) 사전에 추출 ##
-    startIndex = round(len(df_00)*0.8)
-    X_valid = X[startIndex:]
-    y_valid = y[startIndex:]
+    # startIndex = round(len(df_00)*0.8)
+    startIndex=int(splitRatio['validation'][0]['start'])
+    endIndex=int(splitRatio['validation'][0]['end'])
 
-    X= X.drop(X.index[startIndex:])
-    y= y.drop(y.index[startIndex:])
+    X_valid = X[startIndex:endIndex]
+    y_valid = y[startIndex:endIndex]
+
+    X= X.drop(X.index[startIndex:endIndex])
+    y= y.drop(y.index[startIndex:endIndex])
 
     ## SET 'TRAIN', 'TEST' DATA, TRAIN/TEST RATIO, & 'WAY OF RANDOM SAMPLING' ##
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 123)
@@ -81,20 +83,29 @@ def xgboost(modelingOption):
     ## CASE 03. 'XGBOOST' ALGORITHM ##
     # 기존 model
     # 개발 편의성 속성 직접 받지 않고 주석처리
-    xgb_model = xgb.XGBRegressor(n_estimators = 500, 
-                                learning_rate = 0.08, 
-                                gamma = 0.3, 
-                                eta = 0.04,
-                                subsample = 0.75,
-                                colsample_bytree = 0.5, 
-                                max_depth = 7)
-    # xgb_model = xgb.XGBRegressor(n_estimators = modelingOption[0], 
-    #                           learning_rate = modelingOption[1], 
-    #                           gamma = modelingOption[2], 
-    #                           eta = modelingOption[3],
-    #                           subsample = modelingOption[4],
-    #                           colsample_bytree = modelingOption[5], 
-    #                           max_depth = modelingOption[6])
+    # xgb_model = xgb.XGBRegressor(n_estimators = 500, 
+    #                             learning_rate = 0.08, 
+    #                             gamma = 0.3, 
+    #                             eta = 0.04,
+    #                             subsample = 0.75,
+    #                             colsample_bytree = 0.5, 
+    #                             max_depth = 7)
+    parameters = modelingRequest['algorithm']['parameters']
+    for key,value in parameters.items():
+      if parameters[key].find('.') != -1:
+        parameters[key] = float(value)
+    # 아니라면 (.이 포함되어 있지 않으면) 정수이니 int로 변환
+      else: 
+        parameters[key] = int(value)
+    print(parameters[key])
+
+    xgb_model = xgb.XGBRegressor(n_estimators = parameters['n_estimators'], 
+                              learning_rate = parameters['learning_rate'], 
+                              gamma = parameters['gamma'], 
+                              eta = parameters['eta'],
+                              subsample = parameters['subsample'],
+                              colsample_bytree =parameters['colsample_bytree'], 
+                              max_depth = parameters['max_depth'])
 
     xgb_model.fit(train_Xn, y_train)
 

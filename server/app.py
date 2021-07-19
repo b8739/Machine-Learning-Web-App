@@ -395,7 +395,7 @@ def loadDistributionData():
 def xgboost_modeling():
   modelingRequest = request.get_json()['modelingRequest']
   splitRatio = request.get_json()['splitRatio']
-  print(splitRatio)
+  print('splitRatio',splitRatio)
   # splitRatio = request.get_json()['splitRatio']
 
   # modelingOption_list = [1]
@@ -408,8 +408,8 @@ def xgboost_modeling():
   #   else: 
   #     modelingOption_list[index] = int(value)
 
-  # return (xgboost(modelingOption_list))
-  return jsonify(modelingRequest)
+  return (xgboost(splitRatio,modelingRequest))
+  # return jsonify(modelingRequest)
 
 @app.route('/svr_modeling',methods=['GET'])
 def svr_modeling():

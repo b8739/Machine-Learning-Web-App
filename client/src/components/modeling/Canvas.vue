@@ -197,25 +197,6 @@ export default {
     },
     saveRequest() {
       this.calculate(this.engine);
-
-      let path = "http://localhost:5000/xgboost_modeling";
-
-      this.$axios({
-        method: "post",
-        url: path,
-        data: {
-          modelingRequest: this.modelingRequest,
-          splitRatio: this.splitRatio
-        }
-      })
-        .then(res => {
-          // this.saveGraphSources(res.data[0]); // Test and Valid dataset
-          // this.saveModelingSummary(res.data[1]); //modeling summary (ex.MAPE)
-          //canvas 감추기
-        })
-        .catch(error => {
-          console.error(error);
-        });
     }
   },
   created() {
