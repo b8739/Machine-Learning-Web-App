@@ -391,11 +391,14 @@ def loadDistributionData():
   # df = pd.read_sql_table('temp_dataset', session.bind)
   return (randGenerator_nd())
 
-@app.route('/xgboost_modeling',methods=['GET'])
+@app.route('/xgboost_modeling',methods=['POST'])
 def xgboost_modeling():
-  # modelingOption_str = request.args.get('modelingOption')
-  # modelingOption_list = modelingOption_str.split(',')
-  modelingOption_list = [1]
+  modelingRequest = request.get_json()['modelingRequest']
+  splitRatio = request.get_json()['splitRatio']
+  print(splitRatio)
+  # splitRatio = request.get_json()['splitRatio']
+
+  # modelingOption_list = [1]
   # 개발 편의성 속성 직접 받지 않고 주석처리
   # for index,value in enumerate(modelingOption_list):
   #   # 문자에 .이 포함되어있으면 소수이니 float으로 변환
@@ -405,7 +408,8 @@ def xgboost_modeling():
   #   else: 
   #     modelingOption_list[index] = int(value)
 
-  return (xgboost(modelingOption_list))
+  # return (xgboost(modelingOption_list))
+  return jsonify(modelingRequest)
 
 @app.route('/svr_modeling',methods=['GET'])
 def svr_modeling():

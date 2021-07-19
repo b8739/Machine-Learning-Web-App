@@ -23,14 +23,15 @@ export default new NodeBuilder("InputNode", {
     "Normalization",
     "ButtonOption",
     () => {
-      return { features: columns };
+      return {};
     },
     "NormalizationSidebar"
   )
   // .addOption("ValueText", "TextOption")
   .onCalculate(n => {
     let inputs = n.getOptionValue("Features");
-    let nodeResult = { inputs: inputs };
+    let normalization = n.getOptionValue("Normalization");
+    let nodeResult = { inputs: inputs, normalization: normalization };
     n.getInterface("Out").value = nodeResult;
     // n.setOptionValue("ValueText", result);
   })

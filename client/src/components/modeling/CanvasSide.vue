@@ -47,7 +47,7 @@
           <v-list-group sub-group :value="true">
             <template v-slot:activator>
               <v-list-item-content>
-                <v-list-item-title>Validation</v-list-item-title>
+                <v-list-item-title>Extract Validation Set</v-list-item-title>
               </v-list-item-content>
             </template>
             <v-list-item>
@@ -57,23 +57,60 @@
                   <v-expansion-panel-content> hi</v-expansion-panel-content>
                 </v-expansion-panel></v-expansion-panels
               > -->
-              <v-row justify="center" align="center">
-                <v-col cols="9">
-                  <v-row justify="center" align="center">
-                    <v-col cols="4" class="px-0">From</v-col>
-                    <v-col cols="8" class="px-0"
-                      ><v-text-field hide-details dense label="Start Index"></v-text-field
-                    ></v-col>
-                    <v-col cols="4" class="px-0">To</v-col>
-                    <v-col cols="8" class="px-0"
-                      ><v-text-field hide-details dense label="End Index"></v-text-field
-                    ></v-col>
-                  </v-row>
-                </v-col>
-                <v-col cols="3">
-                  <v-btn fab x-small> <v-icon>mdi-plus</v-icon></v-btn>
-                </v-col>
-              </v-row>
+              <v-container>
+                <v-row justify="center" align="center">
+                  <v-col cols="9">
+                    <v-row>
+                      <v-card-text class="body-2 font-weight-medium pa-0">
+                        Total Rows: {{ dataset.length }}</v-card-text
+                      >
+                    </v-row>
+                    <v-row justify="center" align="center">
+                      <v-col cols="4" class="px-0"
+                        ><v-card-text class="body-2 pa-0">From</v-card-text>
+                      </v-col>
+                      <v-col cols="8" class="px-0"
+                        ><v-text-field
+                          v-model="validationStartIndex"
+                          hide-details
+                          dense
+                          label="Start Index"
+                        ></v-text-field
+                      ></v-col>
+                      <v-col cols="4" class="px-0"
+                        ><v-card-text class="body-2 pa-0">To</v-card-text></v-col
+                      >
+                      <v-col cols="8" class="px-0 mb-2"
+                        ><v-text-field
+                          v-model="validationEndIndex"
+                          hide-details
+                          dense
+                          label="End Index"
+                        ></v-text-field
+                      ></v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-btn fab x-small cursor-pointer @click="addValidationIndex">
+                      <v-icon>mdi-plus</v-icon></v-btn
+                    >
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-chip-group>
+                    <v-chip
+                      v-for="(validationIndex, index) in validationIndexArray"
+                      :key="index"
+                      close
+                      @click:close="validationIndexArray.splice(index, 1)"
+                      outlined
+                      small
+                    >
+                      {{ validationIndex.start }}~{{ validationIndex.end }}
+                    </v-chip>
+                  </v-chip-group>
+                </v-row>
+              </v-container>
             </v-list-item>
           </v-list-group>
           <v-list-group sub-group :value="true">
@@ -84,11 +121,25 @@
             </template>
             <v-list-item>
               <v-col cols="5"> <v-subheader>Training:</v-subheader></v-col>
-              <v-text-field suffix="%" dense outlined clearable hide-details></v-text-field>
+              <v-text-field
+                suffix="%"
+                dense
+                outlined
+                clearable
+                hide-details
+                v-model="trainSet"
+              ></v-text-field>
             </v-list-item>
             <v-list-item>
               <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col>
-              <v-text-field suffix="%" outlined dense clearable hide-details></v-text-field>
+              <v-text-field
+                suffix="%"
+                outlined
+                dense
+                clearable
+                hide-details
+                v-model="testSet"
+              ></v-text-field>
             </v-list-item>
           </v-list-group>
         </v-list-group>
@@ -124,8 +175,13 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      validationEndIndex: null,
+      validationStartIndex: null,
+      validationIndexArray: [],
       dialog: false,
       drawer: true,
+      trainSet: null,
+      testSet: null,
       dataInfoLabels: ["Dataset"],
       dataTypeLabels: ["Training", "Test", "Validation"],
       datasetRatio: ["60%", "20%", "20%"],
@@ -145,11 +201,24 @@ export default {
   },
   computed: {
     ...mapState({
-      tableList: state => state.initialData.tableList
-    })
+      tableList: state => state.initialData.tableList,
+      dataset: state => state.initialData.dataset
+    }),
+    ...mapGetters("initialData", ["columns", "indexNum"]),
+    splitRatio() {
+      return { validation: this.validationIndexArray, train: this.trainSet, test: this.testSet };
+    }
   },
   methods: {
-    ...mapMutations("modelingData", ["saveAlgorithm"]),
+    ...mapMutations("modelingData", ["saveSplitRatio"]),
+    addValidationIndex() {
+      this.validationIndexArray.push({
+        start: this.validationStartIndex,
+        end: this.validationEndIndex
+      });
+      this.validationStartIndex = null;
+      this.validationEndIndex = null;
+    },
     algorithmClicked(algorithm) {
       this.chosenAlgorithm = algorithm;
     },
@@ -168,6 +237,9 @@ export default {
       //   return ;
       // }
     },
+    saveRequest() {
+      this.saveSplitRatio(this.splitRatio);
+    },
     hideDetails(index) {
       if (index == 2) {
         return this.hideDetailsProps;
@@ -179,12 +251,12 @@ export default {
     },
     closeStepper() {
       this.dialog = false;
-    },
-    createModel() {
-      this.dialog = false;
-      this.saveAlgorithm(this.chosenAlgorithm);
-      this.$router.push({ name: "modelingProcess" });
     }
+  },
+  created() {
+    eventBus.$on("saveRequest_canvasSide", status => {
+      this.saveRequest();
+    });
   }
 };
 </script>

@@ -511,7 +511,7 @@ export default {
       })
         .then(res => {
           this.saveGraphSources(res.data); // 그래프 값 저장
-          this.eventBus.$emit("updateChart", true);
+          eventBus.$emit("updateChart", true);
           console.log(res);
         })
         .catch(error => {

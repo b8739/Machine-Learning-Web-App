@@ -1,22 +1,14 @@
 const state = {
-  inputs: [],
-  targets: [],
-  algorithm: null,
-  parameters: []
+  modelingRequest: null,
+  splitRatio: null
 };
 
 const mutations = {
-  saveAlgorithm(state, payload) {
-    state.algorithm = payload;
+  saveModelingRequest(state, payload) {
+    state.modelingRequest = payload;
   },
-  saveInputs(state, payload) {
-    state.inputs = payload;
-  },
-  saveTargets(state, payload) {
-    state.targets = payload;
-  },
-  saveParameters(state, payload) {
-    state.parameters = payload;
+  saveSplitRatio(state, payload) {
+    state.splitRatio = payload;
   }
 };
 

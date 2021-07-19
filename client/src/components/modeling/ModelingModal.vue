@@ -238,11 +238,6 @@ export default {
     },
     closeStepper() {
       this.dialog = false;
-    },
-    createModel() {
-      this.dialog = false;
-      this.saveAlgorithm(this.chosenAlgorithm);
-      this.$router.push({ name: "modelingProcess" });
     }
   },
   components: {

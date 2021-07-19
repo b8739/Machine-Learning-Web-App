@@ -39,7 +39,8 @@ export default {
   },
   methods: {
     runModel() {
-      eventBus.$emit("runModel", true); // to Canvas.vue
+      eventBus.$emit("saveRequest_canvas", true); // to Canvas.vue
+      eventBus.$emit("saveRequest_canvasSide", true); // to Canvas.vue
     },
 
     getPos(e) {

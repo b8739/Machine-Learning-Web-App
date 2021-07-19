@@ -78,7 +78,8 @@ export default {
     ...mapState({
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
-      algorithm: state => state.modelingData.algorithm
+      modelingRequest: state => state.modelingData.modelingRequest,
+      splitRatio: state => state.modelingData.splitRatio
       // parameters: state => state.modelingData.parameters
     }),
     ...mapGetters("initialData", ["columns"]),
@@ -100,11 +101,15 @@ export default {
     async calculate(engine) {
       const result = await engine.calculate();
       console.log(result.values());
+      this.algorithmRequest = null;
       for (const v of result.values()) {
-        console.log(v);
+        this.algorithmRequest = v;
       }
+      this.saveModelingRequest(this.algorithmRequest);
     },
     // mapmutations
+    ...mapMutations("modelingData", ["saveModelingRequest"]),
+
     ...mapMutations("modelingResult", ["saveGraphSources"]),
     ...mapMutations("modelingResult", ["saveModelingSummary"]),
     ...mapMutations("modelingResult", ["saveParameters"]),
@@ -190,33 +195,23 @@ export default {
       // let myNode = new algorithmNode();
       // this.editor.addNode(myNode);
     },
-    runModel() {
-      this.algorithmRequest = this.calculate(this.engine);
-      // eventBus.$emit("modelingParameter", modelingParameter);
-      let path = "http://localhost:5000/xgboost_modeling";
-      // define path
-      // if (this.algorithmRequest.algorithm.name == "XGBoost") {
-      //   path += "xgboost_modeling";
-      // } else if (this.algorithm == "Random Forest") {
-      //   path += "rf_modeling";
-      // } else if (this.algorithm == "SVR") {
-      //   path += "svr_modeling";
-      // }
-      // axios
-      axios
-        .get(path, {
-          // params: {
-          //   //algorithmProp 전송
-          //   modelingParameter: modelingParameter
-          // }
-        })
-        .then(res => {
-          // vuex
-          this.saveGraphSources(res.data[0]); // Test and Valid dataset
-          this.saveModelingSummary(res.data[1]); //modeling summary (ex.MAPE)
-          //canvas 감추기
+    saveRequest() {
+      this.calculate(this.engine);
 
-          this.$router.push({ name: "modelingResult" });
+      let path = "http://localhost:5000/xgboost_modeling";
+
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          modelingRequest: this.modelingRequest,
+          splitRatio: this.splitRatio
+        }
+      })
+        .then(res => {
+          // this.saveGraphSources(res.data[0]); // Test and Valid dataset
+          // this.saveModelingSummary(res.data[1]); //modeling summary (ex.MAPE)
+          //canvas 감추기
         })
         .catch(error => {
           console.error(error);
@@ -225,8 +220,8 @@ export default {
   },
   created() {
     // eventbus
-    eventBus.$on("runModel", status => {
-      this.runModel();
+    eventBus.$on("saveRequest_canvas", status => {
+      this.saveRequest();
     });
     // baklava js setting
     this.editor.use(this.optionPlugin);
