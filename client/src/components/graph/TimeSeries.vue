@@ -187,10 +187,9 @@ export default {
       }
     },
     // newDataset: function(data) {
-    //          this.resetSeries();
-    //   if (data != null) {
-
-    //     this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length);
+    //   if (this.newDataset.length == this.dataset.length) {
+    //     this.resetSeries();
+    //     this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
     //     randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
     //     this.updateSeriesLine(this.dataArray, this.seriesName);
     //   }
@@ -212,17 +211,14 @@ export default {
   },
   mounted() {
     this.resetSeries();
-    if (this.apexChartDataset[this.seriesName] != null) {
-      this.updateSeriesLine(this.apexChartDataset[this.seriesName], this.seriesName);
-    } else {
-      if (this.newDataset != null) {
-        this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 1);
-        randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-        this.updateSeriesLine(this.dataArray, this.seriesName);
-        let payload = { featureName: this.seriesName, dataset: this.dataArray };
-        // vuex에 저장
-        this.setApexChartDataset(payload);
-      }
+
+    if (this.newDataset != null) {
+      this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
+      randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+      this.updateSeriesLine(this.dataArray, this.seriesName);
+      let payload = { featureName: this.seriesName, dataset: this.dataArray };
+      // vuex에 저장
+      this.setApexChartDataset(payload);
     }
   },
   computed: {

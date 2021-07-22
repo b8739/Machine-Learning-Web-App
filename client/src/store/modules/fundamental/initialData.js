@@ -13,13 +13,12 @@ const state = {
 
 const getters = {
   columns(state) {
-    let columns = [];
     let columnValues = Object.keys(state.dataset[0]);
-
-    for (const columnValue of columnValues) {
-      columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-    }
-    return columns;
+    return columnValues;
+  },
+  numericColumns(state) {
+    let columnValues = Object.keys(state.summarizedInfo["numeric"]);
+    return columnValues;
   },
 
   indexNum(state) {
@@ -78,6 +77,7 @@ const actions = {
     axios
       .get(path)
       .then(res => {
+        console.log(res.data);
         commit("loadDataset", res.data);
       })
       .catch(error => {

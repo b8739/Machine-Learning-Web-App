@@ -14,22 +14,33 @@ def summarizeData(df):
   # 1-1 object로 분류된 category 데이터의 dtype을 'category'로 변경 
   category_features = []
   threshold = 10
- 
+
+  dataType = {}
+
+  ''' type identify '''
+  del df['ID']
   for each in df.columns:
     if df[each].nunique() < threshold:
         category_features.append(each)
+        valueType = 'category'
     elif each == 'ts':
         category_features.append(each)
+        valueType = 'category'
+    else:
+      valueType = 'numeric'
+  
+    dataType[each]=valueType
 
+  ''' object -> category '''
   for each in category_features:
     df[each] = df[each].astype('category')
     
-  df['ID'] = df['ID'].astype('category')
+  # df['ID'] = df['ID'].astype('category')
 
   # 1-2 dtype에 따라서 df를 numeric과 categroical로 나눔
   df_numeric = df.select_dtypes(exclude = ['category']).copy()
   df_categorical = df.select_dtypes(include = ['category'] ).copy()
-  del df_categorical['ID']
+  # del df_categorical['ID']
   # 1-3 csv 파일이 크면 float이나 int도 object로 읽어지는 문제가 있음. 이에 따라 수동으로 데이터타입을 변경 (object -> unsigned numeric)
   for each in df_numeric:
     df[each] = pd.to_numeric(df[each], downcast="unsigned")
@@ -108,20 +119,21 @@ def summarizeData(df):
   # df에서 ID의 mostCommon값을 수동으로 str로 변환해주어야, 'int 64 json not serializable' 메시지가 안뜸
 
   # df_categorical_info = df_categorical_info.astype({'mostCommon': 'str'})
-  ''' type identify '''
-  typelist = []
-  typetype = {}
-  del df['ID']
-  for index,value in enumerate(df.columns):
-    if df[value].nunique() < threshold:
-      valueType = 'category'
-    else:
-      valueType = 'numeric'
-    # typetype[value] = valueType
-    typelist.append({'name':value,'type':valueType})
+  # ''' type identify '''
+  # dataTypeList = []
+  # dataType = {}
+  # del df['ID']
+  # for index,value in enumerate(df.columns):
+  #   if df[value].nunique() < threshold:
+  #     valueType = 'category'
+  #   else:
+  #     valueType = 'numeric'
+  #   # dataType[value] = valueType
+  #   dataTypeList.append({'name':value,'type':valueType})
 
-  df_typetype = pd.DataFrame(typelist)
-  df_typetype = df_typetype.set_index('name')
+  # df_dataType = pd.DataFrame(dataTypeList)
+  # print(df_dataType)
+  # df_dataType = df_dataType.set_index('name')
 
 
   ''' 3) Return '''
@@ -132,7 +144,7 @@ def summarizeData(df):
   
   finalSummary = OrderedDict()
   
-  finalSummary = {'datatype':df_typetype.to_dict(orient='list',into=OrderedDict),'categorical':df_categorical_info.to_dict(orient='index',into=OrderedDict),'numeric':df_numeric_info.to_dict(orient='index'),'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
+  finalSummary = {'datatype':dataType,'categorical':df_categorical_info.to_dict(orient='index',into=OrderedDict),'numeric':df_numeric_info.to_dict(orient='index'),'distribution':distribution_features,'interval':interval_features,'sampleForClass':sampleForClass}
   # print(finalSummary)
   # return  finalSummary
   return json.dumps(finalSummary)

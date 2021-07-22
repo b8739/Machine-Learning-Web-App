@@ -187,10 +187,13 @@ def loadData():
 
     data = pd.read_sql_table('temp_dataset', session.bind)
     del data["ID"]
+    data = data.to_dict(orient='records',into=OrderedDict)
     # return jsonify(data.to_dict())
-    # return Response(data.to_json(), mimetype='application/json') #json array로 반환됨
-    print(data.to_dict(orient='records',into=OrderedDict))
-    return json.dumps(data.to_dict(orient='records',into=OrderedDict))
+    # return Response(data, mimetype='application/json') #json object로 반환됨 (data.csv 정상작동, 허나 컬럼별 object)
+    # print(data.to_dict(orient='records',into=OrderedDict))
+    return json.dumps(data)
+    # return jsonify(data)
+    # return Response(json.dumps(data),mimetype='application/json') #boston은 정상적으로 json array 반환 (행별), data.csv는 string이 반환됨
 
   # ### 2) CSV 파일을 읽어서 DICT 형태로 RETURN해주는 방식 (1번 방식이 속도가 느려서 일단 2번으로 진행) ###
   # df = pd.read_csv('./static/uploadsDB/all_stocks_2017-01-01_to_2018-01-01.csv')
@@ -395,7 +398,7 @@ def loadDistributionData():
 def xgboost_modeling():
   modelingRequest = request.get_json()['modelingRequest']
   splitRatio = request.get_json()['splitRatio']
-  print('splitRatio',splitRatio)
+  # print('splitRatio',splitRatio)
   # splitRatio = request.get_json()['splitRatio']
 
   # modelingOption_list = [1]
@@ -420,7 +423,7 @@ def svr_modeling():
   # 개발 편의상 주석처리
   for index,value in enumerate(modelingOption_list):
     #str이 아닐 때 (int/float일 때)만 if 문 작동
-    print(modelingOption_list[index].isalpha()==False)
+    # print(modelingOption_list[index].isalpha()==False)
     if modelingOption_list[index].isalpha()==False:
       # 문자에 .이 포함되어있으면 소수이니 float으로 변환
       if modelingOption_list[index].find('.') != -1:
@@ -639,7 +642,7 @@ def changeCase():
   modeling_summary = {'test':{'MAPE':listConverted[0][0],'RMSE':listConverted[0][1],'R_square':listConverted[0][2]},
   'valid':{'MAPE':listConverted[1][0],'RMSE':listConverted[1][1],'R_square':listConverted[1][2]}}
 
-  print(modeling_summary)
+  # print(modeling_summary)
 
   return jsonify(modeling_dataset,modeling_summary)
 
@@ -651,7 +654,7 @@ def loadProjects():
   project_list = []
   for i,v in enumerate(session.execute(sql).fetchall()):
     project_list = project_list+list(v)
-  print(project_list)
+  # print(project_list)
   session.commit()
   session.close
   return jsonify(project_list)
@@ -660,7 +663,6 @@ def loadProjects():
 def runSimulation():
   observedVariable = request.get_json()['observedVariable']
   rangeInfo = request.get_json()['rangeInfo']
-  print(request.get_json())
   return getSimulationResult(observedVariable,rangeInfo)
   # return jsonify('hi')
 if __name__ == '__main__':

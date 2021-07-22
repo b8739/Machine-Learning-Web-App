@@ -38,7 +38,7 @@
                   single-line
                   hide-details="true"
                   height="20"
-                  :label="getDataType(columnIndex)"
+                  :label="getDataType(column)"
                 >
                 </v-select>
               </tr>
@@ -46,54 +46,52 @@
 
             <!-- 3rd Column -->
             <!-- category 일 경우: category summary 표시 -->
-            <td v-if="distinguishDataType(columnIndex)">
-              <tr
+            <td v-if="distinguishDataType(column)">
+              <!-- <tr
                 v-for="(summary, categorySummaryIndex) in categorySummary"
                 :key="categorySummaryIndex"
               >
                 <span class="info_title">{{ summary }} </span>
                 <span>: {{ summarizedInfo["categorical"][columns[columnIndex]][summary] }}</span>
-              </tr>
+              </tr> -->
+              <tr></tr>
             </td>
 
             <!-- numeric 일 경우: numeric summary 표시 -->
             <td v-else>
-              <tr>
+              <!-- <tr>
                 <span class="info_title">Mean </span>
-                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["mean"] }}</span>
+                <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
               </tr>
               <tr>
                 <span class="info_title">Mode </span>
-                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["mode"] }}</span>
+                <span>: {{ summarizedInfo["numeric"][column]["mode"] }}</span>
               </tr>
               <tr>
                 <span class="info_title">Median </span>
-                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["median"] }}</span>
+                <span>: {{ summarizedInfo["numeric"][column]["median"] }}</span>
               </tr>
               <tr>
                 <span class="info_title">Num of NA </span>
-                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["numOfNA"] }}</span>
+                <span>: {{ summarizedInfo["numeric"][column]["numOfNA"] }}</span>
               </tr>
               <tr>
                 <span class="info_title">Standard Deviation </span>
-                <span
-                  >:
-                  {{ summarizedInfo["numeric"][columns[columnIndex]]["standard deviation"] }}</span
-                >
+                <span>: {{ summarizedInfo["numeric"][column]["standard deviation"] }}</span>
               </tr>
               <tr>
                 <span class="info_title">Quantile </span>
-                <span>: {{ summarizedInfo["numeric"][columns[columnIndex]]["Q1"] }}, </span>
-                <span>{{ summarizedInfo["numeric"][columns[columnIndex]]["Q2"] }}, </span>
-                <span>{{ summarizedInfo["numeric"][columns[columnIndex]]["Q3"] }}, </span>
-                <span>{{ summarizedInfo["numeric"][columns[columnIndex]]["Q4"] }}, </span>
-              </tr>
+                <span>: {{ summarizedInfo["numeric"][column]["Q1"] }}, </span>
+                <span>{{ summarizedInfo["numeric"][column]["Q2"] }}, </span>
+                <span>{{ summarizedInfo["numeric"][column]["Q3"] }}, </span>
+                <span>{{ summarizedInfo["numeric"][column]["Q4"] }}, </span>
+              </tr> -->
             </td>
 
             <!-- 4th Column -->
             <!-- category 일 경우: sample for class 표시 -->
-            <td v-if="distinguishDataType(columnIndex)">
-              <p class="info_title">Samples For Class:</p>
+            <td v-if="distinguishDataType(column)">
+              <!-- <p class="info_title">Samples For Class:</p>
               <v-row
                 no-gutters
                 v-for="(sample, sampleIndex) in summarizedInfo['sampleForClass'][column]"
@@ -103,7 +101,7 @@
                 <v-spacer></v-spacer>
                 <v-col class="py-0">{{ sample }}% </v-col>
                 <v-col cols="12" class="pa-0"><v-divider></v-divider></v-col>
-              </v-row>
+              </v-row> -->
             </td>
             <!-- numeric 일 경우: distribution 표시 -->
             <td v-else>
@@ -115,7 +113,7 @@
               />
             </td>
             <!-- category 일 경우: -- 표시 -->
-            <td v-if="distinguishDataType(columnIndex)"></td>
+            <td v-if="distinguishDataType(column)"></td>
             <!-- numeric 일 경우: Graph 표시 -->
             <td v-else @click="openEditModal(dataset, indexNum, selectedColumnIndex)">
               <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
@@ -163,7 +161,6 @@ export default {
       graphWidth: "260px",
       graphHeight: "200px",
       // numeric/categorical columns
-      numericColumns: {},
       categoricalColumns: {},
       //summary contents
       numeric_info: {
@@ -211,7 +208,7 @@ export default {
       summarizedInfo: state => state.initialData.summarizedInfo
       // columns: state => state.initialData.columns
     }),
-    ...mapGetters("initialData", ["indexNum", "columns"]),
+    ...mapGetters("initialData", ["indexNum", "columns", "numericColumns"]),
     categorySummary() {
       let categoricalColumn = Object.keys(this.summarizedInfo["categorical"]);
       let categorySummary = [];
@@ -232,12 +229,11 @@ export default {
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
-    getDataType(columnIndex) {
-      return this.summarizedInfo["datatype"]["type"][columnIndex];
+    getDataType(column) {
+      return this.summarizedInfo["datatype"][column];
     },
-    distinguishDataType(columnIndex) {
-      let dataType = this.summarizedInfo["datatype"]["type"][columnIndex];
-      // console.log(dataType);
+    distinguishDataType(column) {
+      let dataType = this.summarizedInfo["datatype"][column];
       if (dataType == "category") {
         return true;
       } else if (dataType == "numeric") return false;

@@ -16,6 +16,7 @@ from sklearn.model_selection import train_test_split
 def randn_bm(min,max,skew):
     u = 0
     v = 0
+    
     while u == 0:
         u = np.random.rand()
     while v == 0:
@@ -38,21 +39,27 @@ def getSimulationResult(observedVariable,rangeInfo):
     # rand number 생성
     randNumbers = []
     for key,value in rangeInfo.items():
-        min = value['min']
-        max = value['max']
+        intervals = {}
+        # intervals['min'] = value['interval']['min']
+        # intervals['max'] = value['interval']['max']
+        for nestedKey,nestedValue in value['interval'].items():
+            intervalValue = value['interval'][nestedKey]
+            if isinstance(intervalValue, str) == True:
+                intervals[nestedKey] = int(intervalValue)
+            else:
+                intervals[nestedKey] = intervalValue
         randomized = []
         #normal 일 때
         if value['method'] == 'normal': 
             for i in range(1000):
-                randValue = round(randn_bm(min,max,1),3)
+                randValue = round(randn_bm(intervals['min'],intervals['max'],1),3)
                 randomized.append(randValue)
             randomized= pd.Series(randomized)
             randNumbers.append(randomized)
         # manual 일 때
         else: 
-            randomized=(np.random.uniform(min,max,1000).round(2))
+            randomized=(np.random.uniform(intervals['min'],intervals['max'],1000).round(2))
             randomized= pd.Series(randomized)
-            
             randNumbers.append(randomized)
     X_final = pd.DataFrame(randNumbers)
 

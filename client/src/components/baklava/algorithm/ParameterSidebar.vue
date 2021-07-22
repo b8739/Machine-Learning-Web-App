@@ -11,11 +11,13 @@
         <v-col> {{ parameter }}</v-col>
         <v-col>
           <input
+            :tabIndex="index"
             type="text"
             class="dark-input"
             v-on="listeners"
             v-model="parameterValues[parameter]"
-        /></v-col>
+          />
+        </v-col>
       </v-row>
     </v-card>
   </div>

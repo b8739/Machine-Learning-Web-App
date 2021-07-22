@@ -1,7 +1,16 @@
 <template>
   <div id="wrap">
     <Header> </Header>
-
+    <div class="text-center">
+      <v-dialog v-model="dialog1" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text>
+            Please stand by
+            <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </div>
     <v-container id="mainWrapper" fluid>
       <v-row>
         <!-- 화면 좌측 -->
@@ -64,6 +73,7 @@ export default {
   data() {
     return {
       // dataSet: {},
+      dialog1: false,
       indexNum: "",
       addForm: {}, //ex. sepal-width:' ' , sepal-length: ' ' ...
       updateForm: {},
@@ -188,6 +198,11 @@ export default {
     this.loadSummarizedData();
     this.setNavStatus("preprocess");
   }
+  // beforeRouteEnter(to, from, next) {
+  //   next(vm => {
+  //     vm.dialog1 = true;
+  //   });
+  // }
 };
 </script>
 

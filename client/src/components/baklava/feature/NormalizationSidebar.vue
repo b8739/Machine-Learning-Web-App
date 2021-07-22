@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn @click="getValue">get value</v-btn>
+    <!-- <v-btn @click="getValue">get value</v-btn> -->
     <v-card dark color="#3f3f3f" class="rounded-0" elevation="0">
       <v-container>
         <v-row> <v-card-text class="pb-0">Standard Scaler</v-card-text></v-row>
@@ -52,11 +52,12 @@ export default {
   data() {
     return {
       inputFeatures: null,
-      checkboxLabel: ["Test X", "Train X", "Valid X"],
+      checkboxLabel: ["Train X", "Test X", "Valid X"],
       scaleType: ["Fit", "Transform"],
       checkboxModel: {
-        "Test X": { Fit: false, Transform: false },
         "Train X": { Fit: false, Transform: false },
+        "Test X": { Fit: false, Transform: false },
+
         "Valid X": { Fit: false, Transform: false }
       },
       selectAllFlag: false

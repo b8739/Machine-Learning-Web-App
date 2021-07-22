@@ -492,9 +492,9 @@ export default {
 
         if (element == 1) {
           //radio가 normal distribution이 체크되어있을때
-          rangeInfo[featureName] = { method: "normal", min: rangeMin, max: rangeMax };
+          rangeInfo[featureName] = { method: "normal", interval: { min: rangeMin, max: rangeMax } };
         } else {
-          rangeInfo[featureName] = { method: "manual", min: 0, max: 1 };
+          rangeInfo[featureName] = { method: "manual", interval: { min: rangeMin, max: rangeMax } };
         }
         delete rangeInfo["MEDV"];
       });
