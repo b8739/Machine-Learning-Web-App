@@ -68,6 +68,9 @@ export default {
   },
   computed: {
     ...mapGetters("initialData", ["columns"]),
+    ...mapState({
+      dataset: state => state.initialData.dataset
+    }),
     headers() {
       let headers = [];
 

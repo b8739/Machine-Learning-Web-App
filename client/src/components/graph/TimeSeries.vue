@@ -19,10 +19,11 @@ import * as randomizer from "@/assets/js/randomizer.js";
 
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+import { eventBus } from "@/main";
 
 export default {
   name: "TimeSeries",
-  props: ["graphWidth", "graphHeight", "seriesName"],
+  props: ["graphWidth", "graphHeight", "seriesName", "dialog"],
 
   data() {
     return {
@@ -180,27 +181,22 @@ export default {
     //     name: seriesName
     //   });
     // },
+    dialog: function(data) {
+      if (data == null) {
+      }
+      if (data == true) {
+        this.renderDataset();
+      }
+
+      // this.rerender();
+    },
     editModal_hidden: function(data) {
       console.log(data);
       if (data == true) {
         this.resetSeries();
       }
     },
-    // newDataset: function(data) {
-    //   if (this.newDataset.length == this.dataset.length) {
-    //     this.resetSeries();
-    //     this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
-    //     randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-    //     this.updateSeriesLine(this.dataArray, this.seriesName);
-    //   }
-    // },
 
-    // date: function(data) {
-    //   if (data != null) {
-    //     this.convertToArray(this.date, this.dateArray, this.randomIndexArray);
-    //     this.updateCategories(this.dateArray);
-    //   }
-    // },
     immediate: true
   },
 
@@ -210,16 +206,7 @@ export default {
     });
   },
   mounted() {
-    this.resetSeries();
-
-    if (this.newDataset != null) {
-      this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
-      randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-      this.updateSeriesLine(this.dataArray, this.seriesName);
-      let payload = { featureName: this.seriesName, dataset: this.dataArray };
-      // vuex에 저장
-      this.setApexChartDataset(payload);
-    }
+    this.renderDataset();
   },
   computed: {
     ...mapState({
@@ -230,6 +217,18 @@ export default {
   },
   methods: {
     ...mapMutations("apexchartGraph", ["setApexChartDataset"]),
+    renderDataset() {
+      this.resetSeries();
+
+      if (this.newDataset != null) {
+        this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
+        randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+        this.updateSeriesLine(this.dataArray, this.seriesName);
+        let payload = { featureName: this.seriesName, dataset: this.dataArray };
+        // vuex에 저장
+        this.setApexChartDataset(payload);
+      }
+    },
     rerender() {
       this.updateSeriesLine(this.dataArray, this.seriesName);
     },

@@ -428,11 +428,11 @@ export default {
     isObservedVariable(column) {
       if (column == this.observedVariable) return true;
     },
-    getDataType(columnIndex) {
-      return this.summarizedInfo["datatype"]["type"][columnIndex];
+    getDataType(column) {
+      return this.summarizedInfo["datatype"][column];
     },
     isNumeric() {
-      let dataType = this.getDataType(this.helperColumnIndex);
+      let dataType = this.getDataType(this.helperColumn);
       if (dataType == "numeric") {
         return true;
       } else return false;

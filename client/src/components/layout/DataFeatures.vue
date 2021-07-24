@@ -2,6 +2,7 @@
   <div>
     <div class="container">
       <!-- 테이블 -->
+
       <table class="dataTable">
         <tbody>
           <!-- 행 -->
@@ -47,19 +48,19 @@
             <!-- 3rd Column -->
             <!-- category 일 경우: category summary 표시 -->
             <td v-if="distinguishDataType(column)">
-              <!-- <tr
+              <tr
                 v-for="(summary, categorySummaryIndex) in categorySummary"
                 :key="categorySummaryIndex"
               >
                 <span class="info_title">{{ summary }} </span>
                 <span>: {{ summarizedInfo["categorical"][columns[columnIndex]][summary] }}</span>
-              </tr> -->
+              </tr>
               <tr></tr>
             </td>
 
             <!-- numeric 일 경우: numeric summary 표시 -->
             <td v-else>
-              <!-- <tr>
+              <tr>
                 <span class="info_title">Mean </span>
                 <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
               </tr>
@@ -85,7 +86,7 @@
                 <span>{{ summarizedInfo["numeric"][column]["Q2"] }}, </span>
                 <span>{{ summarizedInfo["numeric"][column]["Q3"] }}, </span>
                 <span>{{ summarizedInfo["numeric"][column]["Q4"] }}, </span>
-              </tr> -->
+              </tr>
             </td>
 
             <!-- 4th Column -->
@@ -115,7 +116,7 @@
             <!-- category 일 경우: -- 표시 -->
             <td v-if="distinguishDataType(column)"></td>
             <!-- numeric 일 경우: Graph 표시 -->
-            <td v-else @click="openEditModal(dataset, indexNum, selectedColumnIndex)">
+            <td v-else @click="openEditModal(column)">
               <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
               <TimeSeries
                 :graphWidth="graphWidth"
@@ -126,6 +127,7 @@
           </tr>
         </tbody>
       </table>
+      <EditModal />
     </div>
   </div>
 </template>
@@ -142,6 +144,7 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      editModalDialog: false,
       sampleForClass: null,
       categoryTypes: ["Category", "String", "Text", "Time-Series"],
       numericTypes: ["Numeric", "Float", "Int"],
@@ -304,18 +307,10 @@ export default {
         return this.activatedName_props;
       } else return this.inactivatedName_props;
     },
-    openEditModal(dataset, indexNum, selectedColumnIndex) {
-      this.editModal_hidden = false;
-      this.editModal_dataValue = dataset;
-      this.editModal_indexNum = indexNum;
-      this.selectedColumnIndex = selectedColumnIndex;
+    openEditModal(column) {
+      eventBus.$emit("openEditModal", column);
     },
-    closeEditModal() {
-      this.editModal_hidden = true;
-      // this.editModal_dataValue = {};
-      // this.editModal_date = {};
-      // this.editModal_indexNum = {};
-    },
+    closeEditModal() {},
     showTimeSeriesGraph() {
       this.show_timeSeriesGraph = !this.show_timeSeriesGraph;
     },

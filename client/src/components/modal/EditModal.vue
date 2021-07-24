@@ -1,32 +1,41 @@
 <template>
-  <div class="outerWrap">
-    <div class="innerWrap">
-      <button class="exitButton" @click="closeEditModal()">Close</button>
-      <h1 class="title">Edit Data</h1>
-      <div class="graphContainer">
-        <TimeSeries
-          :rawDataset="dataValue"
-          :graphWidth="100"
-          :graphHeight="100"
-          :seriesName="column"
-        />
-      </div>
-      <InfiniteTable :xaxis="xaxis" :selectedColumnIndex="selectedColumnIndex" />
-    </div>
-  </div>
+  <v-dialog v-model="dialog">
+    <v-btn x-small min-width="20" min-height="30" @click="hideEditModal()"
+      ><v-icon small>mdi-close</v-icon>
+    </v-btn>
+    <v-card>
+      <v-container>
+        <v-card-text style="text-align:center" class="title">Edit Data</v-card-text>
+        <v-row justify="center" align="center">
+          <TimeSeries :graphWidth="500" :graphHeight="500" :seriesName="column" :dialog="dialog"
+        /></v-row>
+        <v-row> <InfiniteTable /></v-row>
+      </v-container>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
 import TimeSeries from "@/components/graph/TimeSeries";
 import InfiniteTable from "@/components/layout/InfiniteTable";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+import { eventBus } from "@/main";
+
 export default {
   data() {
     return {
-      xaxis: {},
-      yaxis: {}
+      dialog: false,
+      column: null
     };
   },
-  props: ["dataValue", "editModal_hidden", "selectedColumnIndex"],
+  watch: {
+    // dialog: function(data) {
+    //   if (data == false) {
+    //     this.resetSeries();
+    //     console.log("reset");
+    //   }
+    // }
+  },
+  props: [],
 
   components: {
     TimeSeries,
@@ -36,54 +45,15 @@ export default {
     ...mapGetters("initialData", ["columns", "indexNum"])
   },
   methods: {
-    getXaxis(xaxis) {
-      this.xaxis = xaxis;
-    },
-    closeEditModal() {
-      const newEditModalStatus = true;
-      this.$emit("newEditModalStatus", newEditModalStatus);
+    hideEditModal() {
+      // eventBus.$emit("hideEditModal", true);
     }
+  },
+  created() {
+    eventBus.$on("openEditModal", column => {
+      this.dialog = true;
+      this.column = column;
+    });
   }
 };
 </script>
-<style scoped>
-.innerWrap {
-  padding: 25px 10px;
-}
-.title {
-  text-align: center;
-}
-.graphContainer {
-  width: 500px;
-  margin: 0 auto;
-}
-.innerWrap {
-  width: 850px;
-  height: 850px;
-  background-color: #fff;
-  position: absolute;
-  transform: translate(61%, 25%);
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  overflow: scroll;
-  overflow-x: hidden;
-}
-
-.innerWrap .exitButton {
-  width: 90px;
-  margin-left: 5px;
-  background: #d8d6d6;
-  border: none;
-  border-radius: 5px;
-  color: rgb(29, 27, 27);
-  display: inline-block;
-  font-size: 1.2em;
-  font-weight: bold;
-  padding: 1px 0;
-  text-align: center;
-  text-transform: capitalize;
-  position: absolute;
-  right: 20px;
-}
-</style>

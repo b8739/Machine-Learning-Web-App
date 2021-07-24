@@ -1,23 +1,17 @@
 <template>
   <v-container>
-    <v-navigation-drawer v-model="drawer" absolute>
-      <!-- <v-list-item class="pt-2">
-        <v-list-item-title class="text-uppercase">Options</v-list-item-title>
+    <v-navigation-drawer v-model="drawer" absolute :mini-variant.sync="mini">
+      <v-list-item class="mt-10 px-2">
+        <v-list-item-avatar>
+          <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
+        </v-list-item-avatar>
+
+        <v-list-item-title>User123</v-list-item-title>
+
+        <v-btn icon @click.stop="mini = !mini">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
       </v-list-item>
-
-      <v-divider></v-divider> -->
-      <!-- 
-      <v-list dense>
-        <v-list-item v-for="item in items" :key="item.title" link @click="callOption(item.title)">
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <p class="grey--text text--darken-3 body-2">{{ item.title }}</p>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list> -->
       <v-list dense>
         <v-list-group v-model="activeState">
           <template v-slot:activator>
@@ -43,18 +37,6 @@
           </v-list-item>
         </v-list-group>
       </v-list>
-      <!-- <v-list-item class="">
-        <v-list-item-title class="body-1">List of Datasets</v-list-item-title>
-      </v-list-item> -->
-      <!-- 테이블 리스트 -->
-      <!-- <v-divider></v-divider>
-      <v-list dense>
-        <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
-          <v-list-item-content>
-            <v-list-item-title @click="clickTableNameEvent">{{ tableName }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list> -->
     </v-navigation-drawer>
   </v-container>
 </template>
@@ -75,7 +57,8 @@ export default {
         { title: "Change Order", icon: "mdi-swap-vertical" },
         { title: "Moving Average", icon: "mdi-chart-timeline-variant" }
       ],
-      activeState: true
+      activeState: true,
+      mini: true
     };
   },
   components: {},

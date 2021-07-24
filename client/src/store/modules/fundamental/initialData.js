@@ -77,7 +77,7 @@ const actions = {
     axios
       .get(path)
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         commit("loadDataset", res.data);
       })
       .catch(error => {
