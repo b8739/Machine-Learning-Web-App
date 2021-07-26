@@ -27,6 +27,12 @@ export default {
 
   data() {
     return {
+      selectionTimer: null,
+      xaxisMin: null,
+      yaxisMin: null,
+      xaxisMax: null,
+      yaxisMax: null,
+      testArray: [],
       newDataset: [],
       dataArray: [],
       randomIndexArray: [],
@@ -52,12 +58,19 @@ export default {
                   index: 6,
                   title: "tooltip of the icon",
                   class: "custom-icon",
-                  click: function(chart, options, e) {
-                    console.log(options);
+                  // click: function(chart, options, e) {
+                  //   // console.log(options);
+
+                  // }
+                  click: (chart, options, e) => {
+                    this.renderDataset();
                   }
                 }
               ]
             }
+          },
+          tooltip: {
+            intersect: true
           },
           //zoom
           zoom: {
@@ -90,34 +103,24 @@ export default {
               color: "black",
               opacity: 0.4
             }
+            // xaxis: {
+            //   min: 0,
+            //   max: 5
+            // },
+            // yaxis: {
+            //   min: 0,
+            //   max: 5
+            // }
           },
 
           events: {
-            // zoom events
-            // beforeZoom: (chartContext, { xaxis }) => {
-            //   this.updateSelection();
-            //   this.xaxisWhenZoomed = xaxis;
-            //   this.$emit("xaxis", this.xaxisWhenZoomed);
-            //   this.toggleDataPointSelection(xaxis);
-            //   return {
-            //     xaxis: {
-            //       min: 0
-            //     }
-            //   };
-            // },
             legendClick: function(chartContext, seriesIndex, config) {
               // console.log(seriesIndex);
               // ...
             },
             // selection events
             selection: (chartContext, { xaxis, yaxis }) => {
-              let yaxisObject = { min: null, max: null };
-              console.log(xaxis);
-              // yaxisObject.min = yaxis[0]["min"];
-              // yaxisObject.max = yaxis[0]["max"];
-              // this.yaxisWhenSelected = yaxisObject;
-              this.xaxisWhenSelected = xaxis;
-              this.$emit("xaxis", this.xaxisWhenSelected);
+              this.dataSelected(xaxis, yaxis);
             }
           }
         },
@@ -162,6 +165,9 @@ export default {
             }
           }
         },
+        yaxis: {
+          decimalsInFloat: 2
+        },
         legend: {
           show: true,
           showForSingleSeries: true,
@@ -185,10 +191,9 @@ export default {
       if (data == null) {
       }
       if (data == true) {
-        this.renderDataset();
+        console.log("watchs");
+        this.resetOriginalState();
       }
-
-      // this.rerender();
     },
     editModal_hidden: function(data) {
       console.log(data);
@@ -204,10 +209,19 @@ export default {
     this.dataset.forEach(element => {
       this.newDataset.push(element[this.seriesName]);
     });
+    console.log("time series created");
   },
   mounted() {
-    this.renderDataset();
+    // this.renderDataset();
+    // this.resetOriginalState();
+    if (this.firstMount) {
+      this.renderDataset();
+      console.log("timeseries mounted");
+      // s;
+      this.firstMount = !this.firstMount;
+    }
   },
+
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset,
@@ -217,9 +231,34 @@ export default {
   },
   methods: {
     ...mapMutations("apexchartGraph", ["setApexChartDataset"]),
+    dataSelected(xaxis, yaxis) {
+      this.testArray = [];
+      this.xaxisMin = Math.floor(xaxis.min);
+      this.xaxisMax = Math.floor(xaxis.max);
+      this.yaxisMin = Math.floor(yaxis.min);
+      this.yaxisMax = Math.floor(yaxis.max);
+      console.log(this.xaxisMin);
+      console.log(this.xaxisMax);
+      console.log(this.yaxisMin);
+      console.log(this.yaxisMax);
+      for (let i = this.xaxisMin; i < this.xaxisMax; i++) {
+        let index = this.randomIndexArray[i];
+        let dataValue = this.newDataset[index];
+        if (dataValue >= this.yaxisMin && dataValue <= this.yaxisMax) {
+          this.testArray.push(i);
+        }
+      }
+      if (this.selectionTimer == null) {
+        this.selectionTimer = setTimeout(() => {
+          eventBus.$emit("dataSelected", this.testArray);
+        }, 1);
+      }
+      let timer = setTimeout(() => {
+        this.selectionTimer = null;
+      }, 2000);
+    },
     renderDataset() {
       this.resetSeries();
-
       if (this.newDataset != null) {
         this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
         randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
@@ -262,6 +301,9 @@ export default {
           categories: newCategories
         }
       });
+    },
+    resetOriginalState() {
+      this.$refs.realtimeChart.resetSeries();
     },
     updateSelection() {
       this.$refs.realtimeChart.updateOptions({

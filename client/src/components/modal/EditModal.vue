@@ -1,18 +1,29 @@
-<template>
-  <v-dialog v-model="dialog">
-    <v-btn x-small min-width="20" min-height="30" @click="hideEditModal()"
-      ><v-icon small>mdi-close</v-icon>
-    </v-btn>
-    <v-card>
-      <v-container>
-        <v-card-text style="text-align:center" class="title">Edit Data</v-card-text>
-        <v-row justify="center" align="center">
-          <TimeSeries :graphWidth="500" :graphHeight="500" :seriesName="column" :dialog="dialog"
-        /></v-row>
-        <v-row> <InfiniteTable /></v-row>
-      </v-container>
-    </v-card>
-  </v-dialog>
+<template
+  ><div>
+    <v-dialog v-model="dialog">
+      <v-card v>
+        <v-btn x-small right absolute min-width="20" min-height="30" @click="hideEditModal()"
+          ><v-icon small>mdi-close</v-icon>
+        </v-btn>
+        <v-container>
+          <v-card-text style="text-align:center" class="title">Edit Data</v-card-text>
+          <v-row justify="center" align="center">
+            <portal-target name="destination"> </portal-target>
+          </v-row>
+          <v-row> <InfiniteTable /></v-row>
+        </v-container>
+      </v-card>
+    </v-dialog>
+    <portal to="destination">
+      <TimeSeries
+        v-if="dialog"
+        :graphWidth="500"
+        :graphHeight="500"
+        :seriesName="column"
+        :dialog="dialog"
+      />
+    </portal>
+  </div>
 </template>
 <script>
 import TimeSeries from "@/components/graph/TimeSeries";
@@ -24,7 +35,8 @@ export default {
   data() {
     return {
       dialog: false,
-      column: null
+      column: null,
+      graphReady: false
     };
   },
   watch: {
@@ -46,7 +58,7 @@ export default {
   },
   methods: {
     hideEditModal() {
-      // eventBus.$emit("hideEditModal", true);
+      this.dialog = false;
     }
   },
   created() {

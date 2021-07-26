@@ -118,6 +118,7 @@
             <!-- numeric 일 경우: Graph 표시 -->
             <td v-else @click="openEditModal(column)">
               <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
+
               <TimeSeries
                 :graphWidth="graphWidth"
                 :graphHeight="graphHeight"
@@ -331,8 +332,12 @@ export default {
     this.columns.forEach(element => {
       this.columns_vue.push(element);
     });
+    console.log("datafeature created");
   },
-  mounted() {}
+  mounted() {
+    console.log("datafeature mounted");
+  }
+  // s
 };
 </script>
 <style scoped>

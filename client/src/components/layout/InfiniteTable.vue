@@ -12,15 +12,27 @@
       ></v-col>
     </v-row>
     <!-- dataTable -->
+    {{ checkModel }}
     <v-data-table
       :headers="headers"
       :items="datasetItems"
+      :show-select="true"
       dense
       disable-pagination
       class="elevation-1"
       :item-key="columns[0]"
-      show-select
-    ></v-data-table>
+    >
+      <template v-slot:body="{ items }">
+        <tbody>
+          <tr v-for="(item, itemIndex) in items" :key="itemIndex">
+            <td>
+              <v-checkbox v-model="checkModel" :value="itemIndex" hide-details />
+            </td>
+            <td v-for="(column, columnIndex) in columns" :key="columnIndex">{{ item[column] }}</td>
+          </tr>
+        </tbody>
+      </template>
+    </v-data-table>
 
     <infinite-loading @infinite="infiniteHandler" spinner="waveDots"></infinite-loading>
     <SaveChange />
@@ -40,6 +52,7 @@ export default {
   },
   data() {
     return {
+      checkModel: [],
       filterLessThan: "",
       filterGreaterThan: "",
       filterFeature: null,
@@ -263,6 +276,14 @@ export default {
     eventBus.$on("reloadInfiniteTable", reloadStatus => {
       this.resetTableData();
       this.infiniteLoadingCreated();
+    });
+    // dataselected
+    eventBus.$on("dataSelected", testArray => {
+      console.log("eventbus");
+      this.checkModel.splice(0, this.checkModel.length);
+      testArray.forEach(element => {
+        this.checkModel.push(element);
+      });
     });
   },
   mounted() {},
