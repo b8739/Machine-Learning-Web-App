@@ -20,8 +20,8 @@
           <v-toolbar elevation="1">
             <!-- Preprocess/Table 교체 버튼 -->
             <v-row>
-              <v-btn class="mr-2" @click="displaySwitch()">Feature</v-btn
-              ><v-btn @click="displaySwitch()">Table</v-btn>
+              <v-btn class="mr-2" @click="changeComponent('DataFeatures')">Feature</v-btn
+              ><v-btn @click="changeComponent('InfiniteTable')">Table</v-btn>
 
               <v-spacer></v-spacer>
 
@@ -33,12 +33,10 @@
             <DeleteStepper />
             <AverageModal />
             <ChangeOrder />
-
-            <DataFeatures :class="{ visibilityHidden: showFeatures }" />
-
-            <InfiniteTable :class="{ visibilityHidden: showTable }" :columns="columns" />
-            <!-- rowIndex는 update 체크박스 만들기 위한 배열 (key: ID, value: true/false) -->
-            <!-- <AddModal :addForm="addForm" :indexNum="indexNum" @loadDataStatus="loadData" /> -->
+            <!-- Table and Features (Dynamic Component) -->
+            <keep-alive>
+              <component v-bind:is="comp"></component>
+            </keep-alive>
           </v-row>
         </v-col>
       </v-row>
@@ -84,7 +82,8 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      modelingPreprocessFlag: false
+      modelingPreprocessFlag: false,
+      comp: "DataFeatures"
     };
   },
   components: {
@@ -115,6 +114,9 @@ export default {
     // showDrawer() {
     //   eventBus.$emit("showDrawer", true);
     // },
+    changeComponent(componentName) {
+      this.comp = componentName;
+    },
     loadData() {
       const path = "http://localhost:5000/loadData";
       axios
@@ -220,77 +222,5 @@ export default {
   /* width: 70%; */
   /* float: left; */
   /* padding: 20px; */
-}
-
-.toggle-summary button {
-  width: 8%;
-  height: 8%;
-  margin-left: 5px;
-  background: #d8d6d6;
-  border: none;
-  border-radius: 5px;
-  color: rgb(29, 27, 27);
-  display: inline-block;
-  font-size: 0.9em;
-  font-weight: bold;
-  padding: 1px 0;
-  text-align: center;
-  position: relative;
-  text-transform: capitalize;
-}
-/* button styling */
-/* GENERAL BUTTON STYLING */
-.toggle-summary button,
-.toggle-summary button::after {
-  -webkit-transition: all 0.3s;
-  -moz-transition: all 0.3s;
-  -o-transition: all 0.3s;
-  transition: all 0.3s;
-}
-.toggle-summary button::before,
-.toggle-summary button::after {
-  background: rgb(13, 189, 113);
-  content: "";
-  position: absolute;
-  z-index: -1;
-  border-radius: 5px;
-}
-.toggle-summary button:hover {
-  color: #fff;
-  background: none;
-}
-/* BUTTON 1 */
-.btn-1::after {
-  height: 0;
-  left: 0;
-  top: 0;
-  width: 100%;
-}
-.btn-1:hover:after {
-  height: 100%;
-}
-/* editData */
-.editData button {
-  /* top: 10px; */
-  width: 100%;
-  height: 50px;
-  display: block;
-  border: 0.5px solid #d8d6d6;
-  position: relative;
-}
-.editData button::before,
-.editData button::after {
-  background: rgb(13, 189, 113);
-  content: "";
-  position: absolute;
-  z-index: -1;
-  border-radius: 5px;
-}
-.editData button:hover {
-  color: #fff;
-  background: none;
-}
-.visibilityHidden {
-  display: none;
 }
 </style>
