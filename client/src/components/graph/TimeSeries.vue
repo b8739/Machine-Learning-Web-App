@@ -1,6 +1,7 @@
 <template>
   <div id="chart">
     <!-- <v-btn @click="rerender()">rerender</v-btn> -->
+
     <apexchart
       ref="realtimeChart"
       type="line"
@@ -47,22 +48,23 @@ export default {
         chart: {
           type: "line",
           toolbar: {
-            show: true,
-            autoSelected: "selection",
-
+            show: false,
+            autoSelected: "zoom",
+            // "<i class='fas fa-trash' style='padding-left:5px; width:20px''></i>"
             tools: {
               download: false,
               customIcons: [
                 {
-                  icon: '<p  width="20"> G<p>',
+                  icon:
+                    "<span class='material-icons' style=font-size:20px;padding-top:3px;padding-left:2px>delete</span>",
                   index: 6,
                   title: "tooltip of the icon",
-                  class: "custom-icon",
-                  // click: function(chart, options, e) {
-                  //   // console.log(options);
 
-                  // }
+                  class: "custom-icon",
+
                   click: (chart, options, e) => {
+                    eventBus.$emit("deleteDataFromGraph", this.seriesName);
+                    this.createNewDataset();
                     this.renderDataset();
                   }
                 }
@@ -188,17 +190,15 @@ export default {
     //   });
     // },
     dialog: function(data) {
-      if (data == null) {
-      }
-      if (data == true) {
-        console.log("watchs");
-        this.resetOriginalState();
-      }
-    },
-    editModal_hidden: function(data) {
-      console.log(data);
-      if (data == true) {
-        this.resetSeries();
+      if (data) {
+        console.log(true);
+        this.$refs.realtimeChart.updateOptions({
+          chart: {
+            toolbar: {
+              show: true
+            }
+          }
+        });
       }
     },
 
@@ -206,17 +206,15 @@ export default {
   },
 
   created() {
-    this.dataset.forEach(element => {
-      this.newDataset.push(element[this.seriesName]);
-    });
-    console.log("time series created");
+    this.createNewDataset();
   },
   mounted() {
     // this.renderDataset();
     // this.resetOriginalState();
     if (this.firstMount) {
       this.renderDataset();
-      console.log("timeseries mounted");
+
+      // console.log("timeseries mounted");
       // s;
       this.firstMount = !this.firstMount;
     }
@@ -231,16 +229,19 @@ export default {
   },
   methods: {
     ...mapMutations("apexchartGraph", ["setApexChartDataset"]),
+    createNewDataset() {
+      this.newDataset = [];
+      this.dataset.forEach(element => {
+        this.newDataset.push(element[this.seriesName]);
+      });
+    },
     dataSelected(xaxis, yaxis) {
       this.testArray = [];
       this.xaxisMin = Math.floor(xaxis.min);
       this.xaxisMax = Math.floor(xaxis.max);
       this.yaxisMin = Math.floor(yaxis.min);
       this.yaxisMax = Math.floor(yaxis.max);
-      console.log(this.xaxisMin);
-      console.log(this.xaxisMax);
-      console.log(this.yaxisMin);
-      console.log(this.yaxisMax);
+
       for (let i = this.xaxisMin; i < this.xaxisMax; i++) {
         let index = this.randomIndexArray[i];
         let dataValue = this.newDataset[index];
@@ -266,6 +267,15 @@ export default {
         let payload = { featureName: this.seriesName, dataset: this.dataArray };
         // vuex에 저장
         this.setApexChartDataset(payload);
+      }
+      if (this.dialog) {
+        this.$refs.realtimeChart.updateOptions({
+          chart: {
+            toolbar: {
+              show: true
+            }
+          }
+        });
       }
     },
     rerender() {

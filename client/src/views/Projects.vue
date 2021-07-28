@@ -13,7 +13,7 @@
             New Project
           </v-btn>
           <v-card height="900px">
-            <v-navigation-drawer v-model="drawer" width="100%">
+            <v-navigation-drawer width="100%">
               <!-- <v-btn @click="loadCases">hello</v-btn> -->
               <v-list>
                 <v-list-item>

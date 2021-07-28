@@ -12,7 +12,7 @@
       ></v-col>
     </v-row>
     <!-- dataTable -->
-    {{ checkModel }}
+    {{ checkedRows }}
     <v-data-table
       :headers="headers"
       :items="datasetItems"
@@ -26,7 +26,7 @@
         <tbody>
           <tr v-for="(item, itemIndex) in items" :key="itemIndex">
             <td>
-              <v-checkbox v-model="checkModel" :value="itemIndex" hide-details />
+              <v-checkbox v-model="checkedRows" :value="itemIndex" hide-details />
             </td>
             <td v-for="(column, columnIndex) in columns" :key="columnIndex">{{ item[column] }}</td>
           </tr>
@@ -34,7 +34,7 @@
       </template>
     </v-data-table>
 
-    <infinite-loading @infinite="infiniteHandler" spinner="waveDots"></infinite-loading>
+    <infinite-loading @infinite="infiniteHandlerCustom" spinner="waveDots"></infinite-loading>
     <SaveChange />
   </v-container>
 </template>
@@ -52,7 +52,7 @@ export default {
   },
   data() {
     return {
-      checkModel: [],
+      checkedRows: [],
       filterLessThan: "",
       filterGreaterThan: "",
       filterFeature: null,
@@ -129,9 +129,8 @@ export default {
     }
   },
   methods: {
-    hello() {
-      alert("s");
-    },
+    ...mapMutations("initialData", ["deleteDataFromGraph"]),
+
     columnSearch(column, thIndex) {
       if (this.searchValueName != null) {
         // 대문자로 변형시켜서 대소문자 차이를 무시
@@ -251,6 +250,20 @@ export default {
           }
         });
     },
+    // infinteLoading
+
+    infiniteHandlerCustom($state) {
+      // console.log(data);
+      if (this.dataset.length) {
+        for (let i = this.limit; i < this.limit + 50; i++) {
+          this.datasetItems.push(this.dataset[i]);
+        }
+        $state.loaded();
+      } else {
+        $state.complete();
+      }
+      this.limit += 45;
+    },
     toggleRowFlags(xaxis) {
       let dateObjectLength = Object.keys(this.date).length;
       for (const key in this.date) {
@@ -272,7 +285,7 @@ export default {
     }
   },
   created() {
-    this.infiniteLoadingCreated();
+    // this.infiniteLoadingCreated();
     eventBus.$on("reloadInfiniteTable", reloadStatus => {
       this.resetTableData();
       this.infiniteLoadingCreated();
@@ -280,10 +293,21 @@ export default {
     // dataselected
     eventBus.$on("dataSelected", testArray => {
       console.log("eventbus");
-      this.checkModel.splice(0, this.checkModel.length);
+      this.checkedRows.splice(0, this.checkedRows.length);
       testArray.forEach(element => {
-        this.checkModel.push(element);
+        this.checkedRows.push(element);
       });
+    });
+    //deleteDataFromGraph
+
+    eventBus.$on("deleteDataFromGraph", seriesName => {
+      // vuex dataset에서 삭제
+      this.payload = { featureName: seriesName, checkedRows: this.checkedRows };
+      this.deleteDataFromGraph(this.payload);
+      // infinite table 초기화
+      this.checkedRows = [];
+      this.datasetItems.splice(45);
+      this.limit = 0;
     });
   },
   mounted() {},

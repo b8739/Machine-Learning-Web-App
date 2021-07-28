@@ -68,6 +68,13 @@ const mutations = {
   },
   loadRandomInfo(state, payload) {
     state.randomRange = payload;
+  },
+  deleteDataFromGraph(state, payload) {
+    payload.checkedRows.forEach(element => {
+      // Vue.delete(state.dataset[element], payload.featureName);
+      Vue.set(state.dataset[element], payload.featureName, null);
+    });
+    // console.log(state.dataset);
   }
 };
 

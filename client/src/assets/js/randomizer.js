@@ -1,5 +1,5 @@
 export function getCount(datasetLength) {
-  return Math.round(datasetLength * 0.5);
+  return Math.round(datasetLength * 0.1);
 }
 export function getRandom(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);

@@ -3,7 +3,7 @@
     <v-navigation-drawer v-model="drawer" absolute :mini-variant.sync="mini">
       <v-list-item class="mt-10 px-2">
         <v-list-item-avatar>
-          <!-- <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img> -->
+          <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
         </v-list-item-avatar>
 
         <v-list-item-title>User123</v-list-item-title>
@@ -49,7 +49,7 @@ export default {
   data() {
     return {
       drawer: true,
-      mini: true,
+      mini: false,
       items: [
         { title: "Add Column", icon: "mdi-plus-circle-outline" },
         { title: "Update Column", icon: "mdi-select-drag" },
@@ -57,8 +57,7 @@ export default {
         { title: "Change Order", icon: "mdi-swap-vertical" },
         { title: "Moving Average", icon: "mdi-chart-timeline-variant" }
       ],
-      activeState: true,
-      mini: true
+      activeState: true
     };
   },
   components: {},

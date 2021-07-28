@@ -332,11 +332,8 @@ export default {
     this.columns.forEach(element => {
       this.columns_vue.push(element);
     });
-    console.log("datafeature created");
   },
-  mounted() {
-    console.log("datafeature mounted");
-  }
+  mounted() {}
   // s
 };
 </script>

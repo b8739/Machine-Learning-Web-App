@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="dialog" width="950">
-    <v-btn @click="ndTest()"></v-btn>
+  <v-dialog v-model="dialog" width="1000px">
+    <!-- <v-btn @click="ndTest()"></v-btn> -->
     <!-- <v-btn @click="rangeValues['start'].push(1)">hello</v-btn> -->
     <v-container fluid class="pa-0">
       <v-card rounded>
@@ -27,7 +27,7 @@
         </v-row>
         <v-tabs centered v-model="tab">
           <v-tab>1. Observed Variable</v-tab>
-          <v-tab>2. Random Number </v-tab>
+          <v-tab>2. Create Samples </v-tab>
         </v-tabs>
         <v-tabs-items v-model="tab">
           <!-- 1. Input/target -->
@@ -53,32 +53,22 @@
           <v-tab-item>
             <v-container class="px-10">
               <v-subheader>
-                Set the Range of Random Number
+                Create Sample Values
               </v-subheader>
               <v-row class="py-5" justify="center">
                 <v-col>
                   <v-card width="100%" min-height="300px" elevation="0">
-                    <!-- customized -->
-
-                    <!-- toolbar -->
-
-                    <!-- text-field -->
-                    <v-pagination
-                      class="mt-4 mb-4"
-                      v-model="page"
-                      :length="paginationLength"
-                      circle
-                    ></v-pagination>
-                    <v-card outlined min-height="550px" class="rangeCard">
+                    <v-card outlined min-height="400" class="rangeCard">
+                      <!-- table -->
                       <v-simple-table>
                         <template>
                           <thead>
                             <tr>
                               <th class="thStyle">Observe</th>
                               <th class="thStyle">Feature Name</th>
-                              <th class="thStyle" style="width:200px">Method</th>
-                              <th class="thStyle" style="width:200px">Range Min</th>
-                              <th class="thStyle" style="width:200px">Range Max</th>
+                              <th class="thStyle">Sample Type</th>
+                              <th class="thStyle">Distribution Type</th>
+                              <th class="thStyle" style="width:300px">Range</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -87,76 +77,127 @@
                               v-show="previousPage - 1 < columnIndex && columnIndex < currentPage"
                               :key="columnIndex"
                             >
+                              <!-- 1. Observe -->
                               <td>
-                                <div style="width:50px">
-                                  <v-tooltip bottom>
-                                    <template v-slot:activator="{ on, attrs }">
-                                      <v-icon
-                                        class="pl-5"
-                                        right
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        v-if="isObservedVariable(column)"
-                                        >mdi-check</v-icon
-                                      >
-                                    </template>
-                                    <span>Observed Variable</span>
-                                  </v-tooltip>
-                                </div>
+                                <v-tooltip bottom>
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-row align="center" justify="center">
+                                      <v-col cols="1">
+                                        <v-icon
+                                          v-bind="attrs"
+                                          v-on="on"
+                                          v-if="isObservedVariable(column)"
+                                          >mdi-check</v-icon
+                                        >
+                                      </v-col>
+                                    </v-row>
+                                  </template>
+                                  <span>Observed Variable</span>
+                                </v-tooltip>
                               </td>
+                              <!-- 2. Feature 명 -->
                               <td>
                                 <v-col cols="" class="pl-0" style="text-align:center">
                                   <v-card-text>{{ column }}</v-card-text></v-col
                                 >
                               </td>
-                              <td>
-                                <v-col cols="" class="px-0">
-                                  <v-radio-group
-                                    dense
-                                    hide-details
-                                    v-model="radioModel[columnIndex]"
-                                  >
-                                    <v-radio
-                                      v-for="(radio, radioIndex) in radioLabels"
-                                      :key="radioIndex"
-                                      :label="radio"
-                                      @change="radio_nd(column, columnIndex)"
-                                    ></v-radio> </v-radio-group
-                                ></v-col>
-                              </td>
-                              <td>
-                                <v-col cols="" align-self="center">
-                                  <v-text-field
-                                    clearable
-                                    style="text-align:right"
-                                    @click="
-                                      openHelper(column, columnIndex);
-                                      getHelperValues(column);
-                                      setTargetTextField(columnIndex, 'start');
-                                    "
-                                    hide-details
-                                    label="Min"
-                                    class="mt-0 pt-0"
-                                    v-model="rangeValues['start'][columnIndex]"
-                                  ></v-text-field>
-                                </v-col>
+                              <!-- 3. Samples (Fixed/Random) -->
+                              <td justify="center" align="center">
+                                <v-row>
+                                  <v-col offset="2" class="px-0">
+                                    <v-radio-group
+                                      dense
+                                      hide-details
+                                      v-model="samplesRadioModel[columnIndex]"
+                                    >
+                                      <v-radio
+                                        v-for="(radio, radioIndex) in samplesRadioLabel"
+                                        :key="radioIndex"
+                                        :label="radio"
+                                        @change="sampleChange(radioIndex, columnIndex)"
+                                      ></v-radio>
+                                    </v-radio-group>
+                                  </v-col>
+                                </v-row>
                               </td>
 
+                              <!-- 3. Distribution (Enter the Value/Normal Distribution) -->
                               <td>
-                                <v-col cols="">
-                                  <v-text-field
-                                    clearable
-                                    hide-details
-                                    @click="
-                                      openHelper(column, columnIndex);
-                                      getHelperValues(column);
-                                      setTargetTextField(columnIndex, 'end');
-                                    "
-                                    v-model="rangeValues['end'][columnIndex]"
-                                    label="Max"
-                                    class="mt-0 pt-0"
-                                  ></v-text-field>
-                                </v-col>
+                                <v-row justify="center" align="center">
+                                  <v-col offset="3" class="px-0">
+                                    <v-radio-group
+                                      dense
+                                      hide-details
+                                      v-model="distributionRadioModel[columnIndex]"
+                                    >
+                                      <v-radio
+                                        v-for="(radio, radioIndex) in distributionRadioLabel"
+                                        :key="radioIndex"
+                                        :label="radio"
+                                        :disabled="samplesRadioModel[columnIndex] == 0"
+                                        @change="distributionChange(radioIndex, columnIndex)"
+                                      ></v-radio>
+                                    </v-radio-group>
+                                  </v-col>
+                                </v-row>
+                              </td>
+                              <!-- 4. Range -->
+                              <td>
+                                <!-- RangedFixed -->
+                                <v-row
+                                  v-if="samplesRadioModel[columnIndex] == 0"
+                                  justify="center"
+                                  align="center"
+                                >
+                                  <v-col cols="6">
+                                    <v-text-field
+                                      clearable
+                                      hide-details
+                                      dense
+                                      label="Fixed Value"
+                                      v-model="fixedValues[columnIndex]"
+                                      @click="
+                                        openHelper(column, columnIndex);
+                                        getHelperValues(column);
+                                        setTargetTextField(columnIndex, 'fixed');
+                                      "
+                                    ></v-text-field>
+                                  </v-col>
+                                </v-row>
+                                <!-- RangedRandom -->
+                                <v-row justify="center" align="center" v-else>
+                                  <v-col cols="" align-self="center" class="">
+                                    <v-text-field
+                                      hide-details
+                                      label="Min"
+                                      class="mt-0"
+                                      v-model="rangeValues['start'][columnIndex]"
+                                      clearable
+                                      dense
+                                      style="text-align:right"
+                                      @click="
+                                        openHelper(column, columnIndex);
+                                        getHelperValues(column);
+                                        setTargetTextField(columnIndex, 'start');
+                                      "
+                                    ></v-text-field>
+                                  </v-col>
+                                  <v-col cols="" class="">
+                                    <v-text-field
+                                      clearable
+                                      dense
+                                      hide-details
+                                      v-model="rangeValues['end'][columnIndex]"
+                                      label="Max"
+                                      class="mt-0"
+                                      @click="
+                                        openHelper(column, columnIndex);
+                                        getHelperValues(column);
+                                        setTargetTextField(columnIndex, 'end');
+                                      "
+                                    ></v-text-field>
+                                  </v-col>
+                                </v-row>
                               </td>
                             </tr>
                           </tbody>
@@ -165,6 +206,7 @@
 
                       <!-- range helper -->
                       <v-navigation-drawer
+                        :hide-overlay="true"
                         v-model="drawer"
                         absolute
                         bottom
@@ -303,6 +345,12 @@
                         </v-card>
                       </v-navigation-drawer>
                     </v-card>
+                    <v-pagination
+                      class="mt-4 mb-4"
+                      v-model="page"
+                      :length="paginationLength"
+                      circle
+                    ></v-pagination>
                   </v-card>
                 </v-col>
               </v-row>
@@ -339,13 +387,17 @@ export default {
       // drawer
       drawer: false,
       // radio
-      radioModel: [],
+      distributionRadioModel: [],
+      distributionRadioLabel: ["Uniform", "Normal"],
+      samplesRadioModel: [],
+      samplesRadioLabel: ["Fixed Value", "Random Value"],
       // range helper
       helperStatus: true,
       helperColumn: null,
       helperValues: [],
       // range values(v-model)
       rangeValues: { start: [], end: [] },
+      fixedValues: [],
       selectedStatistic: [],
       userInput: null,
       values: [],
@@ -364,7 +416,7 @@ export default {
       numericStatistics: ["Min", "Max", "Mean", "Mode", "Median"],
       categoryStatistics: ["Mode", "Median"],
       distribution_info: ["Min", "Max"],
-      radioLabels: ["Manually", "Normal Distribution"],
+
       chipColors: [],
 
       // focused info
@@ -407,23 +459,29 @@ export default {
   },
   methods: {
     ...mapMutations("simulationResult", ["saveGraphSources"]),
-    ndTest() {
-      let value = [];
-      for (let i = 0; i < 1000; i++) {
-        value.push(normalDistribution.randn_bm(1, 10, 1).toFixed(2));
+    ...mapActions("initialData", ["loadRandomData"]),
+    ...mapMutations("simulationData", ["saveSimulationMethod"]),
+    sampleChange(radioIndex, columnIndex) {
+      //Random value
+      if (radioIndex == 1) {
+        Vue.set(this.distributionRadioModel, columnIndex, 0);
+      } else {
+        Vue.set(this.distributionRadioModel, columnIndex, null);
       }
-
-      alert(value);
     },
     // hello() {
     //   Vue.set(this.rangeValues['start'], 0, 1);
     // },
-    ...mapActions("initialData", ["loadRandomData"]),
-    ...mapMutations("simulationData", ["saveSimulationMethod"]),
-    radio_nd(column, columnIndex) {
-      this.helperColumn = column;
-      Vue.set(this.rangeValues["start"], columnIndex, this.randomRange[this.helperColumn]["min"]);
-      Vue.set(this.rangeValues["end"], columnIndex, this.randomRange[this.helperColumn]["max"]);
+
+    distributionChange(radioIndex, columnIndex) {
+      if (radioIndex == 1) {
+        this.helperColumn = this.columns[columnIndex];
+        Vue.set(this.rangeValues["start"], columnIndex, this.randomRange[this.helperColumn]["min"]);
+        Vue.set(this.rangeValues["end"], columnIndex, this.randomRange[this.helperColumn]["max"]);
+      } else {
+        Vue.set(this.rangeValues["start"], columnIndex, null);
+        Vue.set(this.rangeValues["end"], columnIndex, null);
+      }
     },
     isObservedVariable(column) {
       if (column == this.observedVariable) return true;
@@ -457,11 +515,15 @@ export default {
       return this.helperValues;
     },
     setTargetTextField(columnIndex, textFieldType) {
+      // 대상 index 설정
       this.focusedIndex = columnIndex;
+      // 대상 field 설정 (range start/ ranged end/fixed)
       if (textFieldType == "start") {
         this.focusedTextField = this.rangeValues["start"];
-      } else {
+      } else if (textFieldType == "end") {
         this.focusedTextField = this.rangeValues["end"];
+      } else {
+        this.focusedTextField = this.fixedValues;
       }
     },
     setStatisticValue(statistic) {
@@ -485,7 +547,7 @@ export default {
     },
     stepTwoFinished() {
       let rangeInfo = {};
-      this.radioModel.forEach((element, index) => {
+      this.distributionRadioModel.forEach((element, index) => {
         let featureName = this.columns[index];
         let rangeMin = this.rangeValues["start"][index];
         let rangeMax = this.rangeValues["end"][index];
@@ -550,7 +612,7 @@ export default {
     });
     // radio button default 를 0으로
     this.columns.forEach(element => {
-      this.radioModel.push(0);
+      this.samplesRadioModel.push(0);
     });
     //rand range
     this.loadRandomData();
@@ -559,7 +621,7 @@ export default {
 </script>
 <style scoped>
 .centered-input input {
-  text-align: center;
+  text-align: center !important;
 }
 .rangeCard {
   position: relative;

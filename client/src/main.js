@@ -33,10 +33,12 @@ import { faChartLine } from "@fortawesome/free-solid-svg-icons";
 import { faChartArea } from "@fortawesome/free-solid-svg-icons";
 import { faChartBar } from "@fortawesome/free-solid-svg-icons";
 import { faChartPie } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import "..//node_modules/jointjs/css/layout.css";
 
 library.add(faChartLine);
+library.add(faTrash);
 library.add(faChartArea);
 library.add(faChartBar);
 library.add(faChartPie);

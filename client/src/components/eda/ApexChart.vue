@@ -20,7 +20,7 @@
               ref="edaChart"
               type="line"
               :width="graphWidth"
-              :height="numOfSyncChart.length === 2 ? 200 : auto"
+              :height="numOfSyncChart.length === 2 ? 200 : 'auto'"
               :options="firstGroupingChartOption"
               :series="series[IndexSyncChart]"
             ></apexchart>
@@ -47,6 +47,7 @@ export default {
 
   data() {
     return {
+      newDataset: [],
       removedYaxisName: null,
       series: [[{ data: [] }]],
       numOfDragElement: 0,
@@ -117,8 +118,9 @@ export default {
           text: "Loading..."
         },
         xaxis: {
-          type: "datetime",
+          // type: "datetime",
           // floating: true,
+          tickAmount: 5,
           labels: {
             offsetX: 0,
             // show: false,
@@ -292,32 +294,32 @@ export default {
       if (data != null || data != undefined) {
         // console.log(`newXaxisInfo: ${this.newXaxisInfo["axisPosition"]}`);
         let axisName = this.newXaxisInfo["evt"].added.element;
-        let targetObject = this.dataset[axisName];
-        // reset
-        this.resetdataArrays();
-        //preprocess before update graph
-        this.randomIndexArray = randomizer.getRandomArray(0, this.indexNum);
-        this.convertToArray(targetObject, this.dateArray, this.randomIndexArray);
-        this.updateCategories(this.dateArray);
+        this.newDataset = [];
+        this.createDataArray(this.newDataset, axisName);
+        this.updateCategories(this.newDataset);
       }
     },
     newYaxisInfo: function(data) {
       if (data != null || data != undefined) {
-        // console.log(`newYaxisInfo: ${this.newYaxisInfo["axisPosition"]}`);
+        // axisName 설정 (ex.CRIM)
         this.axisName.push(this.newYaxisInfo["evt"].added.element);
         let axisName = this.axisName[this.axisName.length - 1];
-        this.dataArrays[axisName] = [];
-        let targetObject = this.dataset[axisName];
+        console.log(axisName);
+        // 배열 초기화
+        this.newDataset = [];
+        // APEX 용 배열 초기화
+        this.dataArrays[axisName] = this.createDataArray(this.newDataset, axisName);
+        let dataArray = this.dataArrays[axisName];
+        // 현재 그래프 개수 확인
         this.numOfDragElement = this.newYaxisInfo["numOfDragElement"];
 
         //yaxis를 처음 추가할 때
         if (this.numOfDragElement == 0) {
-          this.convertToArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
-          this.updateSeries(axisName, this.dataArrays[axisName]);
+          console.log("update 0");
+          this.updateSeries(axisName, dataArray);
         }
         //yaxis가 이미 1개 이상 존재할 때
         else {
-          this.convertToArray(targetObject, this.dataArrays[axisName], this.randomIndexArray);
           let gapOfDatasets = Math.abs(
             this.dataArrays[this.axisName[this.axisName.length - 2]][0] - targetObject[0]
           );
@@ -329,11 +331,11 @@ export default {
             );
             // console.log(minOfDataset);
             this.updateYaxis(this.axisName, minOfDataset);
-            this.appendSeries(axisName, this.dataArrays[axisName]);
+            this.appendSeries(axisName, dataArray);
 
             //2개의 데이터셋의 격차가 적어서, yaxis를 공유하는 경우
           } else {
-            this.appendSeries(axisName, this.dataArrays[axisName]);
+            this.appendSeries(axisName, dataArray);
           }
           // console.log(this.dataArrays);
         }
@@ -431,12 +433,24 @@ export default {
     ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
-    something() {
-      console.log(Object.keys(this.dataArrays).indexOf(this.axisName[0]));
-
-      // this.makeSyncChart();
-      // this.series[0][0].data = [];
-      // console.log(this.series);
+    createDataArray(array, axisName) {
+      this.dataset.forEach(element => {
+        array.push(element[axisName]);
+      });
+      return array;
+    },
+    //APEX CHART
+    updateSeriesLine(dataSet, seriesName) {
+      this.$refs.edaChart[0].updateSeries(
+        [
+          {
+            name: seriesName,
+            data: dataSet
+          }
+        ],
+        false,
+        true
+      );
     },
 
     makeSyncChart() {

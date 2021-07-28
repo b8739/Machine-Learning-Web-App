@@ -1,5 +1,11 @@
 <template>
   <div id="app">
+    <!-- <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+      integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+      crossorigin="anonymous"
+    /> -->
     <v-app>
       <div id="content" class="content">
         <router-view></router-view>
@@ -12,6 +18,7 @@
 import Header from "./components/layout/Header.vue";
 // import Sidebar from "./components/Sidebar.vue"
 import Preprocess from "./views/Preprocess.vue";
+// import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export default {
   name: "App",
