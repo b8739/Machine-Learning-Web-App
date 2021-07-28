@@ -268,6 +268,7 @@ export default {
         // vuex에 저장
         this.setApexChartDataset(payload);
       }
+      // dialog(edit modal)일때만 toolbar 활성화
       if (this.dialog) {
         this.$refs.realtimeChart.updateOptions({
           chart: {

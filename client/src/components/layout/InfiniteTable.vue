@@ -1,41 +1,53 @@
 <template>
   <v-container fluid class="wrapper">
-    <v-row>
-      <v-col cols="2">
-        <v-select v-model="filterFeature" :items="columns" label="Select Feature"></v-select>
-      </v-col>
-      <v-col cols="2">
-        <v-text-field v-model="filterGreaterThan" type="number" label="Greater than"></v-text-field
-      ></v-col>
-      <v-col cols="2">
-        <v-text-field v-model="filterLessThan" type="number" label="Less than"></v-text-field
-      ></v-col>
-    </v-row>
-    <!-- dataTable -->
-    {{ checkedRows }}
-    <v-data-table
-      :headers="headers"
-      :items="datasetItems"
-      :show-select="true"
-      dense
-      disable-pagination
-      class="elevation-1"
-      :item-key="columns[0]"
-    >
-      <template v-slot:body="{ items }">
-        <tbody>
-          <tr v-for="(item, itemIndex) in items" :key="itemIndex">
-            <td>
-              <v-checkbox v-model="checkedRows" :value="itemIndex" hide-details />
-            </td>
-            <td v-for="(column, columnIndex) in columns" :key="columnIndex">{{ item[column] }}</td>
-          </tr>
-        </tbody>
-      </template>
-    </v-data-table>
+    <v-card min-height="100%" elevation="0">
+      <v-row>
+        <v-col cols="2">
+          <v-select v-model="filterFeature" :items="columns" label="Select Feature"></v-select>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            v-model="filterGreaterThan"
+            type="number"
+            label="Greater than"
+          ></v-text-field
+        ></v-col>
+        <v-col cols="2">
+          <v-text-field v-model="filterLessThan" type="number" label="Less than"></v-text-field
+        ></v-col>
+      </v-row>
 
-    <infinite-loading @infinite="infiniteHandlerCustom" spinner="waveDots"></infinite-loading>
-    <SaveChange />
+      <!-- dataTable -->
+      {{ checkedRows }}
+      <v-data-table
+        :headers="headers"
+        :items="datasetItems"
+        :show-select="true"
+        dense
+        disable-pagination
+        class="elevation-1"
+        :item-key="columns[0]"
+      >
+        <template v-slot:header.data-table-select="{ on, props }">
+          <v-simple-checkbox @input="checkAll()" v-bind="props" v-on="on"></v-simple-checkbox>
+        </template>
+        <template v-slot:body="{ items }">
+          <tbody>
+            <tr v-for="(item, itemIndex) in items" :key="itemIndex">
+              <td>
+                <v-checkbox dense v-model="checkedRows" :value="itemIndex" hide-details />
+              </td>
+              <td v-for="(column, columnIndex) in columns" :key="columnIndex">
+                {{ item[column] }}
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-data-table>
+
+      <infinite-loading @infinite="infiniteHandlerCustom" spinner="waveDots"></infinite-loading>
+      <SaveChange />
+    </v-card>
   </v-container>
 </template>
 <!-- :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }" -->
@@ -75,8 +87,9 @@ export default {
       showTableOption: false,
       columnToDeleteInfo: { name: null, index: null },
       deleteDetector: 0,
-      vListItemInputValue: false
+      vListItemInputValue: false,
       // style
+      checkAllFlag: false
     };
   },
   computed: {
@@ -130,7 +143,18 @@ export default {
   },
   methods: {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
+    checkAll() {
+      this.checkedRows = [];
+      if (!this.checkAllFlag) {
+        // datasetItems 길이만큼 (scroll 되어있는 row)만 checkedRows에 집어넣음 (for performance)
+        Object.keys(this.datasetItems).forEach(element => {
+          this.checkedRows.push(parseInt(element));
+        });
+        console.log();
+      }
 
+      this.checkAllFlag = !this.checkAllFlag;
+    },
     columnSearch(column, thIndex) {
       if (this.searchValueName != null) {
         // 대문자로 변형시켜서 대소문자 차이를 무시
@@ -256,13 +280,22 @@ export default {
       // console.log(data);
       if (this.dataset.length) {
         for (let i = this.limit; i < this.limit + 50; i++) {
+          // 원본 데이터셋의 길이와 같아지는 순간 종료
+          if (i >= this.dataset.length) {
+            $state.complete();
+            break;
+          }
+          // 아니라면 계속 불러오기
           this.datasetItems.push(this.dataset[i]);
+          if (this.checkAllFlag == true) {
+            this.checkedRows.push(i);
+          }
         }
         $state.loaded();
+        this.limit += 50;
       } else {
         $state.complete();
       }
-      this.limit += 45;
     },
     toggleRowFlags(xaxis) {
       let dateObjectLength = Object.keys(this.date).length;

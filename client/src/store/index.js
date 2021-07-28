@@ -11,6 +11,8 @@ import modelingResult from "@/store/modules/modeling/modelingResult.js";
 // simulation
 import simulationData from "@/store/modules/simulation/simulationData.js";
 import simulationResult from "@/store/modules/simulation/simulationResult.js";
+// save
+import saveFlag from "@/store/modules/save/saveFlag.js";
 
 Vue.use(Vuex);
 
@@ -21,7 +23,8 @@ export default new Vuex.Store({
     modelingData,
     modelingResult,
     simulationData,
-    simulationResult
+    simulationResult,
+    saveFlag
   },
   plugins: [
     createPersistedState({

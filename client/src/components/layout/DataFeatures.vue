@@ -145,6 +145,7 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      hi: null,
       editModalDialog: false,
       sampleForClass: null,
       categoryTypes: ["Category", "String", "Text", "Time-Series"],
@@ -192,6 +193,7 @@ export default {
       selectedColumnIndex: null,
       //etc (for dataset parsing)
       show_timeSeriesGraph: false
+      // save flag
     };
   },
   components: {
@@ -204,13 +206,24 @@ export default {
   watch: {
     summarizedInfo: function(data) {
       deep: true, this.loadDataSummary();
+    },
+
+    columns_vue: {
+      handler(newValue, oldValue) {
+        console.log(`old: ${oldValue}`);
+        console.log(`new: ${newValue}`);
+        this.ChangeColmnNameFlag(true);
+      },
+      deep: true,
+      immediate: true
     }
   },
+
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset,
-      summarizedInfo: state => state.initialData.summarizedInfo
-      // columns: state => state.initialData.columns
+      summarizedInfo: state => state.initialData.summarizedInfo,
+      columnNameFlag: state => state.saveFlag.summarizedInfo
     }),
     ...mapGetters("initialData", ["indexNum", "columns", "numericColumns"]),
     categorySummary() {
@@ -233,6 +246,7 @@ export default {
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
+    ...mapMutations("saveFlag", ["ChangeColmnNameFlag"]),
     getDataType(column) {
       return this.summarizedInfo["datatype"][column];
     },

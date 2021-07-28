@@ -23,6 +23,9 @@
           </v-list-item-group>
         </v-list>
       </v-container>
+      <v-card-actions>
+        <v-btn right @click="ChangeColumnOrderFlag(true)">Confirm</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -39,6 +42,7 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("saveFlag", ["ChangeColumnOrderFlag"]),
     closeStepper() {
       this.dialog = false;
     },

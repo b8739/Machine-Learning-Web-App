@@ -134,13 +134,13 @@ def dataupload():
 			chunksize=10000,
 		) 
     # duplicate table
-    sql = "drop table if exists temp_dataset;"
-    session.execute(sql)
+    # sql = "drop table if exists temp_dataset;"
+    # session.execute(sql)
 
-    sql = "create table temp_dataset as select * from dataset;"
-    session.execute(sql)
-    session.commit()
-    session.close
+    # sql = "create table temp_dataset as select * from dataset;"
+    # session.execute(sql)
+    # session.commit()
+    # session.close
 
   # method='multi'
   # traditional한 sql에선 method multi를 하면 더 느려진다고 함
@@ -235,7 +235,7 @@ infinite-loading Test:
 def infiniteLoading():
 	limit = request.args.get('limit')
 	conn = engine_dataset.connect()
-	df = pd.read_sql_query("select * from temp_dataset limit "+limit+",45;", conn)
+	df = pd.read_sql_query("select * from dataset limit "+limit+",45;", conn)
 	conn.close
 	return Response(df.to_json( orient='records'), mimetype='application/json')
 
@@ -245,7 +245,7 @@ def deleteColumn():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
   columnToDelete = request.args.get('columnToDelete')
-  sql = "alter table temp_dataset drop column "+ columnToDelete+";"
+  sql = "alter table dataset drop column "+ columnToDelete+";"
   session.execute(sql)
 #   session.commit()
   session.close()
@@ -255,14 +255,10 @@ def deleteColumn():
 def overwriteTable():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
-  sql = "drop table dataset"
+    ##여기 logic이 들어감
+  sql = ""
   session.execute(sql)
     
-  sql = "rename table temp_dataset to dataset"
-  session.execute(sql)
-
-  sql = "create table temp_dataset as select * from dataset;"
-  session.execute(sql)
   
   session.commit()
   session.close()
@@ -284,7 +280,7 @@ def deleteRow():
 
   timeSeriesCondition = request.args.get('timeSeriesCondition')
   featureConditions = request.args.getlist('featureConditions[]')
-  sql = "delete from temp_dataset where"
+  sql = "delete from dataset where"
   if (timeSeriesCondition!=None):
     tsConditionQuery = " ts like '%"+timeSeriesCondition+"%'"
     sql+=tsConditionQuery
@@ -308,15 +304,15 @@ def deleteRowByPeriod():
 
 #  query
   
-  getFirstIndexQuery="select ID from temp_dataset where ts like '%"+getFullTimeSeries_from+"%' limit 1;"
+  getFirstIndexQuery="select ID from dataset where ts like '%"+getFullTimeSeries_from+"%' limit 1;"
   startIndex =  str(session.execute(getFirstIndexQuery).fetchall()[0][0])
   # print(startIndex)
 
-  getEndIndexQuery="select ID from temp_dataset where ts like '%"+getFullTimeSeries_to+"%' order by id DESC LIMIT 1;"
+  getEndIndexQuery="select ID from dataset where ts like '%"+getFullTimeSeries_to+"%' order by id DESC LIMIT 1;"
   endIndex =  str(session.execute(getEndIndexQuery).fetchall()[0][0])
 
 
-  deleteRowByIndexQuery="delete from temp_dataset where ID >= " +startIndex+ " && ID <= "+endIndex  
+  deleteRowByIndexQuery="delete from dataset where ID >= " +startIndex+ " && ID <= "+endIndex  
   session.execute(deleteRowByIndexQuery)
 
   session.commit()

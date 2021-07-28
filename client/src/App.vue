@@ -50,6 +50,9 @@ a {
 .v-label {
   font-size: 5px;
 }
+.v-input__slot label {
+  margin-bottom: 0;
+}
 
 /* base.html */
 </style>
