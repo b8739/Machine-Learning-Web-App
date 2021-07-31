@@ -28,9 +28,11 @@
         class="elevation-1"
         :item-key="columns[0]"
       >
+        <!-- header 첫번째 checkbox -->
         <template v-slot:header.data-table-select="{ on, props }">
           <v-simple-checkbox @input="checkAll()" v-bind="props" v-on="on"></v-simple-checkbox>
         </template>
+        <!-- data table item -->
         <template v-slot:body="{ items }">
           <tbody>
             <tr v-for="(item, itemIndex) in items" :key="itemIndex">
@@ -40,9 +42,19 @@
               <td v-for="(column, columnIndex) in columns" :key="columnIndex">
                 {{ item[column] }}
               </td>
+              <!-- <td>
+                <v-icon small class="mr-2">
+                  mdi-pencil
+                </v-icon>
+                <v-icon small>
+                  mdi-delete
+                </v-icon>
+              </td> -->
             </tr>
           </tbody>
         </template>
+        <!-- table actions -->
+        <!-- <template v-slot:item.actions="{ item }"> </template> -->
       </v-data-table>
 
       <infinite-loading @infinite="infiniteHandlerCustom" spinner="waveDots"></infinite-loading>
@@ -127,6 +139,7 @@ export default {
 
         headers.push(header);
       });
+      // headers.push({ text: "Actions", value: "actions", sortable: false });
       return headers;
     }
   },

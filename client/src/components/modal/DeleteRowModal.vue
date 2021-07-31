@@ -30,6 +30,7 @@
                 <v-autocomplete
                   v-model="fromDateValues[indexOfFormFields]"
                   :items="getFormFieldItem(indexOfFormFields)"
+                  :tabindex="indexOfFormFields + 1"
                   outlined
                   clearable
                   dense
