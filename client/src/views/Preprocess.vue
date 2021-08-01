@@ -11,36 +11,38 @@
         </v-card>
       </v-dialog>
     </div>
-    <v-container id="mainWrapper" fluid>
-      <v-row>
-        <!-- 화면 좌측 -->
-        <v-col cols=""><SideMenu /></v-col>
-        <!-- 화면 우측 -->
-        <v-col cols="10">
-          <v-toolbar elevation="1">
-            <!-- Preprocess/Table 교체 버튼 -->
+    <v-main>
+      <v-container id="mainWrapper" fluid>
+        <v-row>
+          <!-- 화면 좌측 -->
+          <v-col cols=""><SideMenu /></v-col>
+          <!-- 화면 우측 -->
+          <v-col cols="10">
+            <v-toolbar elevation="1">
+              <!-- Preprocess/Table 교체 버튼 -->
+              <v-row>
+                <v-btn class="mr-2" @click="changeComponent('DataFeatures')">Feature</v-btn
+                ><v-btn @click="changeComponent('InfiniteTable')">Table</v-btn>
+
+                <v-spacer></v-spacer>
+
+                <SaveMenu />
+              </v-row>
+            </v-toolbar>
             <v-row>
-              <v-btn class="mr-2" @click="changeComponent('DataFeatures')">Feature</v-btn
-              ><v-btn @click="changeComponent('InfiniteTable')">Table</v-btn>
-
-              <v-spacer></v-spacer>
-
-              <SaveMenu />
+              <!-- <GraphBuilder :columns="columns" /> -->
+              <DeleteStepper />
+              <AverageModal />
+              <ChangeOrder />
+              <!-- Table and Features (Dynamic Component) -->
+              <keep-alive>
+                <component v-bind:is="comp"></component>
+              </keep-alive>
             </v-row>
-          </v-toolbar>
-          <v-row>
-            <!-- <GraphBuilder :columns="columns" /> -->
-            <DeleteStepper />
-            <AverageModal />
-            <ChangeOrder />
-            <!-- Table and Features (Dynamic Component) -->
-            <keep-alive>
-              <component v-bind:is="comp"></component>
-            </keep-alive>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
   </div>
 </template>
 <script>

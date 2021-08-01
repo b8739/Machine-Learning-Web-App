@@ -134,10 +134,10 @@ def dataupload():
 			chunksize=10000,
 		) 
     # duplicate table
-    # sql = "drop table if exists temp_dataset;"
+    # sql = "drop table if exists dataset;"
     # session.execute(sql)
 
-    # sql = "create table temp_dataset as select * from dataset;"
+    # sql = "create table dataset as select * from dataset;"
     # session.execute(sql)
     # session.commit()
     # session.close
@@ -185,7 +185,7 @@ def loadData():
     session = Session()
   ### 1) 데이터를 SQL에 저장하고 해당 SQL을 TABLE로 불러오던 기존 방식 ###
 
-    data = pd.read_sql_table('temp_dataset', session.bind)
+    data = pd.read_sql_table('dataset', session.bind)
     del data["ID"]
     data = data.to_dict(orient='records',into=OrderedDict)
     # return jsonify(data.to_dict())
@@ -267,7 +267,7 @@ def overwriteTable():
 @app.route('/duplicateTable',methods=['GET'])
 def duplicateTable():
   newTableName = request.args.get('newTableName')
-  sql = "create table "+newTableName+" as select * from temp_dataset;"
+  sql = "create table "+newTableName+" as select * from dataset;"
   session.execute(sql)
   session.commit()
   session.close()
@@ -343,13 +343,13 @@ def changeColumnName():
   newName = request.args.get('columnName')
   columnIndex = str(int(request.args.get('columnIndex'))+1)
   # sql
-  getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'temp_dataset' and ordinal_position = "+columnIndex
+  getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'dataset' and ordinal_position = "+columnIndex
   originalName = session.execute(getOriginalNameQuery).fetchall()[0][0]
   
-  getOriginalTypeQuery="select data_type from information_schema.columns where table_name = 'temp_dataset' and column_name = '"+originalName+"'"
+  getOriginalTypeQuery="select data_type from information_schema.columns where table_name = 'dataset' and column_name = '"+originalName+"'"
   originalType=session.execute(getOriginalTypeQuery).fetchall()[0][0]
 
-  changeNameQuery = 'ALTER TABLE temp_dataset CHANGE '+ originalName +' '+ newName+' '+originalType
+  changeNameQuery = 'ALTER TABLE dataset CHANGE '+ originalName +' '+ newName+' '+originalType
 
   session.execute(changeNameQuery)
   session.commit()
@@ -365,16 +365,16 @@ def changeColumnOrder():
   newIndex = request.args.get('newIndex')
 
   # get original name
-  getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'temp_dataset' and ordinal_position = "+newIndex
+  getOriginalNameQuery="select column_name from information_schema.columns where table_name = 'dataset' and ordinal_position = "+newIndex
   originalName=session.execute(getOriginalNameQuery).fetchall()[0][0]
   # get original type
-  getOriginalTypeQuery="select data_type from information_schema.columns where table_name = 'temp_dataset' and column_name = '"+originalName+"'"
+  getOriginalTypeQuery="select data_type from information_schema.columns where table_name = 'dataset' and column_name = '"+originalName+"'"
   originalType=session.execute(getOriginalTypeQuery).fetchall()[0][0]
   # position (right/left)에 따라서 구분
   if (position == 'left'):
-    sql = "ALTER TABLE temp_dataset MODIFY COLUMN " +movedColumnName+ ' ' +originalType+ ' BEFORE '+ originalName
+    sql = "ALTER TABLE dataset MODIFY COLUMN " +movedColumnName+ ' ' +originalType+ ' BEFORE '+ originalName
   elif (position == 'right'):
-    sql = "ALTER TABLE temp_dataset MODIFY COLUMN " +movedColumnName+ ' ' +originalType+ ' AFTER '+ originalName
+    sql = "ALTER TABLE dataset MODIFY COLUMN " +movedColumnName+ ' ' +originalType+ ' AFTER '+ originalName
   session.execute(sql)
   session.commit()
   session.close()
@@ -382,12 +382,12 @@ def changeColumnOrder():
 
 @app.route('/loadSummarizedData',methods=['GET'])
 def loadSummarizedData():
-  df = pd.read_sql_table('temp_dataset', session.bind)
+  df = pd.read_sql_table('dataset', session.bind)
   return (summarizeData(df))
 
 @app.route('/loadRandomInfo',methods=['GET'])
 def loadDistributionData():
-  # df = pd.read_sql_table('temp_dataset', session.bind)
+  # df = pd.read_sql_table('dataset', session.bind)
   return (randGenerator_nd())
 
 @app.route('/xgboost_modeling',methods=['POST'])

@@ -1,63 +1,140 @@
 <template>
-  <v-container fluid class="wrapper">
-    <v-card min-height="100%" elevation="0">
-      <v-row>
+  <v-container fluid id="wrapper mt-4">
+    <v-card elevation="0" height="100vh">
+      <v-row align="center">
+        <v-subheader>
+          Search Filter:
+        </v-subheader>
+
         <v-col cols="2">
-          <v-select v-model="filterFeature" :items="columns" label="Select Feature"></v-select>
+          <v-select
+            v-model="filterFeature"
+            :items="columns"
+            placeholder="Select Feature"
+            dense
+            hide-details
+          ></v-select>
         </v-col>
         <v-col cols="2">
           <v-text-field
             v-model="filterGreaterThan"
             type="number"
-            label="Greater than"
+            placeholder="Greater than"
+            dense
+            hide-details
           ></v-text-field
         ></v-col>
         <v-col cols="2">
-          <v-text-field v-model="filterLessThan" type="number" label="Less than"></v-text-field
+          <v-text-field
+            v-model="filterLessThan"
+            type="number"
+            placeholder="Less than"
+            dense
+            hide-details
+          ></v-text-field
         ></v-col>
       </v-row>
 
-      <!-- dataTable -->
+      <!-- toolbar -->
       {{ checkedRows }}
-      <v-data-table
-        :headers="headers"
-        :items="datasetItems"
-        :show-select="true"
-        dense
-        disable-pagination
-        class="elevation-1"
-        :item-key="columns[0]"
-      >
-        <!-- header 첫번째 checkbox -->
-        <template v-slot:header.data-table-select="{ on, props }">
-          <v-simple-checkbox @input="checkAll()" v-bind="props" v-on="on"></v-simple-checkbox>
-        </template>
-        <!-- data table item -->
-        <template v-slot:body="{ items }">
-          <tbody>
-            <tr v-for="(item, itemIndex) in items" :key="itemIndex">
-              <td>
-                <v-checkbox dense v-model="checkedRows" :value="itemIndex" hide-details />
-              </td>
-              <td v-for="(column, columnIndex) in columns" :key="columnIndex">
-                {{ item[column] }}
-              </td>
-              <!-- <td>
-                <v-icon small class="mr-2">
-                  mdi-pencil
-                </v-icon>
-                <v-icon small>
-                  mdi-delete
-                </v-icon>
-              </td> -->
-            </tr>
-          </tbody>
-        </template>
-        <!-- table actions -->
-        <!-- <template v-slot:item.actions="{ item }"> </template> -->
-      </v-data-table>
+      <v-toolbar dense elevation="1">
+        <v-row justify="" align="center">
+          <v-col cols="5">
+            <v-btn small color="primary" outlined class="py-2 mr-2">
+              <v-icon left>
+                mdi-plus
+              </v-icon>
+              Add Row(s)
+            </v-btn>
 
-      <infinite-loading @infinite="infiniteHandlerCustom" spinner="waveDots"></infinite-loading>
+            <v-btn small color="success" outlined class="py-2 mr-2">
+              <v-icon left>
+                mdi-pencil
+              </v-icon>
+              Update Row(s)
+            </v-btn>
+
+            <v-btn small color="error" outlined class="py-2 mr-2">
+              <v-icon left>
+                mdi-delete
+              </v-icon>
+              Delete Row(s)
+            </v-btn>
+          </v-col>
+          <v-col>
+            <span class="caption">
+              <v-icon small @click="scrollTable('left')" class="px-1">
+                mdi-arrow-collapse-left</v-icon
+              >Horizontal Slide
+              <v-icon small @click="scrollTable('right')" class="px-1"
+                >mdi-arrow-collapse-right</v-icon
+              ></span
+            >
+          </v-col>
+          <v-col cols="5">
+            <v-row justify="end">
+              <span class="caption py-2">
+                {{ datasetItems.length }} of {{ dataset.length }}
+                <v-icon small @click="scrollTable('top')" class="px-1"
+                  >mdi-arrow-expand-up</v-icon
+                ></span
+              >
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-toolbar>
+      <!-- datatable -->
+      <v-sheet>
+        <v-data-table
+          ref="dataTable"
+          :headers="headers"
+          :items="datasetItems"
+          :show-select="true"
+          fixed-header
+          height="72vh"
+          dense
+          disable-pagination
+          class="dataTable elevation-1"
+          :item-key="columns[0]"
+          :hide-default-footer="true"
+        >
+          <!-- checkbox -->
+          <template v-slot:header.data-table-select="{ on, props }">
+            <v-simple-checkbox @input="checkAll()" v-bind="props" v-on="on"></v-simple-checkbox>
+          </template>
+          <!-- data table item -->
+          <template v-slot:body="{ items }">
+            <tbody>
+              <tr v-for="(item, itemIndex) in items" :key="itemIndex">
+                <td>
+                  <v-checkbox dense v-model="checkedRows" :value="itemIndex" hide-details />
+                </td>
+                <td
+                  v-for="(column, columnIndex) in columns"
+                  :key="columnIndex"
+                  style="min-width:150px"
+                >
+                  {{ item[column] }}
+                </td>
+                <td>
+                  <v-icon small class="mr-2">
+                    mdi-pencil
+                  </v-icon>
+                  <v-icon small>
+                    mdi-delete
+                  </v-icon>
+                </td>
+              </tr>
+            </tbody>
+            <infinite-loading
+              @infinite="infiniteHandlerCustom"
+              spinner="waveDots"
+            ></infinite-loading>
+          </template>
+          <!-- table actions -->
+          <!-- <template v-slot:item.actions="{ item }"> </template> -->
+        </v-data-table>
+      </v-sheet>
       <SaveChange />
     </v-card>
   </v-container>
@@ -109,6 +186,9 @@ export default {
     ...mapState({
       dataset: state => state.initialData.dataset
     }),
+    dataTableWidth() {
+      return this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper").offsetWidth;
+    },
     headers() {
       let headers = [];
 
@@ -139,7 +219,7 @@ export default {
 
         headers.push(header);
       });
-      // headers.push({ text: "Actions", value: "actions", sortable: false });
+      headers.push({ text: "Actions", value: "actions", sortable: false });
       return headers;
     }
   },
@@ -156,6 +236,17 @@ export default {
   },
   methods: {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
+
+    scrollTable(direction) {
+      let obj = this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper");
+      if (direction == "top") {
+        obj.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (direction == "right") {
+        obj.scrollBy({ left: this.dataTableWidth * 0.5, top: 0, behavior: "smooth" });
+      } else {
+        obj.scrollBy({ left: -(this.dataTableWidth * 0.5), top: 0, behavior: "smooth" });
+      }
+    },
     checkAll() {
       this.checkedRows = [];
       if (!this.checkAllFlag) {
@@ -363,65 +454,10 @@ export default {
 </script>
 <style scoped>
 .wrapper {
-  min-width: 95%;
-  min-height: 50vh;
-  max-height: 85vh;
-  overflow: scroll;
+  /* overflow-x: auto; */
 }
 .dataTable {
-  text-transform: capitalize;
-  font-size: 11px;
-  margin: 0 auto;
-  margin-top: 50px;
-  text-align: center;
-  vertical-align: middle;
-}
-.dataTable tbody tr.rowSelected {
-  background-color: rgba(154, 189, 243, 0.863);
-}
-.dataTable tbody tr td.columnSelected {
-  background-color: rgba(57, 132, 243, 0.863);
-}
-/* .datatable */
-
-/* row hovering effect */
-
-/* .dataTable tr:hover {
-  background-color: #b6b6b6;
-  cursor: pointer;
-} */
-.dataTable td:first-child {
-  font-weight: 600;
-}
-.dataTable td {
-  border: 0.5px solid rgba(212, 214, 213, 0.623);
-}
-.dataTable th {
-  min-width: 70px;
-  max-width: 75px;
-  border: 0.5px solid rgba(212, 214, 213, 0.623);
-  /* background-color: rgba(239, 239, 239, 0.907); */
-  padding: 5px 10px;
-}
-/* datatable odd,even */
-.dataTable tr:nth-child(odd) {
-  /* background-color: #d9e1f2; */
-}
-.dataTable tr:nth-child(even) {
-  /* background-color: #f0f8ff; */
-}
-.grayBackground {
-  background-color: #b6b6b6;
-  cursor: pointer;
-}
-.blueBackground {
-  background-color: #7390ee;
-  cursor: pointer;
-}
-/* options */
-.tableOption {
-}
-.white {
-  background-color: rgb(0, 0, 0);
+  overflow-x: auto;
+  width: 100vw;
 }
 </style>
