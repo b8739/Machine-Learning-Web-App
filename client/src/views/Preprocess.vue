@@ -33,7 +33,9 @@
               <!-- <GraphBuilder :columns="columns" /> -->
               <DeleteStepper />
               <AverageModal />
+
               <ChangeOrder />
+
               <!-- Table and Features (Dynamic Component) -->
               <keep-alive>
                 <component v-bind:is="comp"></component>
@@ -105,7 +107,7 @@ export default {
   },
   // props: ["summarizedInfo"],
   computed: {
-    ...mapGetters("initialData", ["columns"])
+    ...mapState("initialData", ["columns"])
   },
   methods: {
     ...mapMutations("initialData", ["setHadLoaded"]),

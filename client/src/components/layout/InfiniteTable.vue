@@ -10,7 +10,8 @@
           <v-select
             v-model="filterFeature"
             :items="columns"
-            placeholder="Select Feature"
+            outlined
+            label="Select Feature"
             dense
             hide-details
           ></v-select>
@@ -18,17 +19,20 @@
         <v-col cols="2">
           <v-text-field
             v-model="filterGreaterThan"
+            outlined
             type="number"
-            placeholder="Greater than"
+            label="Greater than"
             dense
             hide-details
           ></v-text-field
         ></v-col>
+        <v-icon x-small>mdi-tilde</v-icon>
         <v-col cols="2">
           <v-text-field
+            outlined
             v-model="filterLessThan"
             type="number"
-            placeholder="Less than"
+            label="Less than"
             dense
             hide-details
           ></v-text-field
@@ -38,7 +42,7 @@
       <!-- toolbar -->
       {{ checkedRows }}
       <v-toolbar dense elevation="1">
-        <v-row justify="" align="center">
+        <v-row align="center">
           <v-col cols="5">
             <v-btn small color="primary" outlined class="py-2 mr-2">
               <v-icon left>
@@ -54,7 +58,7 @@
               Update Row(s)
             </v-btn>
 
-            <v-btn small color="error" outlined class="py-2 mr-2">
+            <v-btn small color="error" outlined class="py-2 mr-2" @click="deleteRow()">
               <v-icon left>
                 mdi-delete
               </v-icon>
@@ -102,27 +106,24 @@
           <template v-slot:header.data-table-select="{ on, props }">
             <v-simple-checkbox @input="checkAll()" v-bind="props" v-on="on"></v-simple-checkbox>
           </template>
-          <!-- data table item -->
+          <!-- Data Table items -->
           <template v-slot:body="{ items }">
             <tbody>
               <tr v-for="(item, itemIndex) in items" :key="itemIndex">
                 <td>
                   <v-checkbox dense v-model="checkedRows" :value="itemIndex" hide-details />
                 </td>
+                <td style="min-width:70px">
+                  <!-- ID index -->
+                  {{ itemIndex }}
+                </td>
+                <!-- Feature Value -->
                 <td
                   v-for="(column, columnIndex) in columns"
                   :key="columnIndex"
                   style="min-width:150px"
                 >
                   {{ item[column] }}
-                </td>
-                <td>
-                  <v-icon small class="mr-2">
-                    mdi-pencil
-                  </v-icon>
-                  <v-icon small>
-                    mdi-delete
-                  </v-icon>
                 </td>
               </tr>
             </tbody>
@@ -131,8 +132,6 @@
               spinner="waveDots"
             ></infinite-loading>
           </template>
-          <!-- table actions -->
-          <!-- <template v-slot:item.actions="{ item }"> </template> -->
         </v-data-table>
       </v-sheet>
       <SaveChange />
@@ -141,6 +140,7 @@
 </template>
 <!-- :class="{ columnSelected: columnSelectedFlags[thIndex] && rowSelectedFlags[trIndex] }" -->
 <script>
+import Vue from "vue";
 import { eventBus } from "@/main";
 import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
@@ -182,16 +182,17 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("initialData", ["columns"]),
+    // ...mapGetters("initialData", ["columns"]),
     ...mapState({
-      dataset: state => state.initialData.dataset
+      dataset: state => state.initialData.dataset,
+      columns: state => state.initialData.columns
     }),
     dataTableWidth() {
       return this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper").offsetWidth;
     },
     headers() {
       let headers = [];
-
+      headers.push({ text: "ID", value: "ID" });
       this.columns.forEach(element => {
         let header = {
           text: element,
@@ -219,7 +220,6 @@ export default {
 
         headers.push(header);
       });
-      headers.push({ text: "Actions", value: "actions", sortable: false });
       return headers;
     }
   },
@@ -236,7 +236,15 @@ export default {
   },
   methods: {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
-
+    deleteRow() {
+      let numOfRows = this.checkedRows.length;
+      this.checkedRows.forEach(element => {
+        console.log(element);
+        Vue.delete(this.datasetItems, element);
+      });
+      this.checkedRows = []; //체크 초기화
+      alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
+    },
     scrollTable(direction) {
       let obj = this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper");
       if (direction == "top") {

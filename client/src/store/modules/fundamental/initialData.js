@@ -7,15 +7,15 @@ const state = {
   summarizedInfo: [],
   tableList: [],
   navStatus: null,
-  randomRange: null
-  // columns: []
+  randomRange: null,
+  columns: []
 };
 
 const getters = {
-  columns(state) {
-    let columnValues = Object.keys(state.dataset[0]);
-    return columnValues;
-  },
+  // columns(state) {
+  //   let columnValues = Object.keys(state.dataset[0]);
+  //   return columnValues;
+  // },
   numericColumns(state) {
     let columnValues = Object.keys(state.summarizedInfo["numeric"]);
     return columnValues;
@@ -35,6 +35,18 @@ const mutations = {
   //     state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
   //   }
   // },
+  changedColumnOrder(state, payload) {
+    getters.columns;
+    payload.forEach(element => {
+      state.modifiedColumns.push(element);
+    });
+  },
+  setColumns(state, payload) {
+    state.columns = [];
+    Object.keys(state.dataset[0]).forEach(element => {
+      state.columns.push(element);
+    });
+  },
   loadDataset(state, payload) {
     state.dataset = payload;
   },
@@ -75,6 +87,12 @@ const mutations = {
       Vue.set(state.dataset[element], payload.featureName, null);
     });
     // console.log(state.dataset);
+  },
+  updateColumnOrder(state, payload) {
+    state.columns = [];
+    payload.forEach(element => {
+      state.columns.push(element);
+    });
   }
 };
 
@@ -86,6 +104,7 @@ const actions = {
       .then(res => {
         // console.log(res.data);
         commit("loadDataset", res.data);
+        commit("setColumns");
       })
       .catch(error => {
         console.error(error);

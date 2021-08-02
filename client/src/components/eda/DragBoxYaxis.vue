@@ -8,7 +8,7 @@
       :list="topColumns"
       :class="{ hoverEffectOn: hoverStatus }"
     >
-      <v-chip v-for="(column, columnIndex) in bottomColumns" :key="columnIndex" small outlined>{{
+      <v-chip v-for="(column, columnIndex) in topColumns" :key="columnIndex" small outlined>{{
         column
       }}</v-chip>
     </draggable>

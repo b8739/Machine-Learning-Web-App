@@ -1,19 +1,27 @@
 const state = {
-  columnNameFlag: false,
-  columnOrderFlag: false,
-  columnsModified: null
+  featureNameFlag: false,
+  featureOrderFlag: false,
+  modifiedColumns: []
 };
 
 const mutations = {
-  ChangeColmnNameFlag(state, payload) {
-    state.columnNameFlag = payload;
+  ChangeColumnNameFlag(state, payload) {
+    state.featureNameFlag = payload;
   },
   ChangeColumnOrderFlag(state, payload) {
-    state.columnOrderFlag = payload;
+    state.featureOrderFlag = payload;
   }
 };
 
-const actions = {};
+const actions = {
+  // updateChangedColumn({ commit, rootState }, payload) {
+  //   rootState.columns = [];
+  //   payload.forEach(element => {
+  //     console.log(rootState.columns);
+  //     rootState.columns.push(element);
+  //   });
+  // }
+};
 
 export default {
   namespaced: true,

@@ -213,22 +213,18 @@ export default {
     // this.resetOriginalState();
     if (this.firstMount) {
       this.renderDataset();
-
-      // console.log("timeseries mounted");
-      // s;
       this.firstMount = !this.firstMount;
     }
+    console.log("ts mounted");
   },
 
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
-      apexChartDataset: state => state.apexchartGraph.apexChartDataset
+      dataset: state => state.initialData.dataset
     }),
     ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
-    ...mapMutations("apexchartGraph", ["setApexChartDataset"]),
     createNewDataset() {
       this.newDataset = [];
       this.dataset.forEach(element => {
@@ -266,7 +262,6 @@ export default {
         this.updateSeriesLine(this.dataArray, this.seriesName);
         let payload = { featureName: this.seriesName, dataset: this.dataArray };
         // vuex에 저장
-        this.setApexChartDataset(payload);
       }
       // dialog(edit modal)일때만 toolbar 활성화
       if (this.dialog) {

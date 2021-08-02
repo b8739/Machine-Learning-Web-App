@@ -79,10 +79,11 @@ export default {
       inputs: state => state.modelingData.inputs,
       targets: state => state.modelingData.targets,
       modelingRequest: state => state.modelingData.modelingRequest,
-      splitRatio: state => state.modelingData.splitRatio
+      splitRatio: state => state.modelingData.splitRatio,
+      columns: state => state.initialData.columns
       // parameters: state => state.modelingData.parameters
     }),
-    ...mapGetters("initialData", ["columns"]),
+    // ...mapGetters("initialData", ["columns"]),
     algorithmProps() {
       if (this.algorithm == "XGBoost") {
         return this.xgboost_props;

@@ -13,8 +13,8 @@
         <v-divider></v-divider>
         <v-list outlined dense>
           <v-list-item-group active-class="border">
-            <draggable :list="columns" @change="onDragEvent">
-              <v-list-item v-for="(column, columnIndex) in columns" :key="columnIndex">
+            <draggable v-model="duplicatedColumns">
+              <v-list-item v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
                 <v-list-item-content>
                   <v-list-item-title>{{ column }}</v-list-item-title>
                 </v-list-item-content>
@@ -24,7 +24,7 @@
         </v-list>
       </v-container>
       <v-card-actions>
-        <v-btn right @click="ChangeColumnOrderFlag(true)">Confirm</v-btn>
+        <v-btn right @click="confirmChanges()">Confirm</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -38,11 +38,19 @@ import axios from "axios";
 export default {
   data() {
     return {
-      dialog: false
+      dialog: false,
+      duplicatedColumns: []
     };
   },
   methods: {
     ...mapMutations("saveFlag", ["ChangeColumnOrderFlag"]),
+    // ...mapMutations("saveFlag", ["updateChangedColumn"]),
+    ...mapMutations("initialData", ["updateColumnOrder"]),
+    confirmChanges() {
+      this.ChangeColumnOrderFlag(true);
+      this.updateColumnOrder(this.duplicatedColumns);
+      eventBus.$emit("columnOrderUpdated", this.duplicatedColumns);
+    },
     closeStepper() {
       this.dialog = false;
     },
@@ -52,11 +60,11 @@ export default {
       let newIndex = evt.moved.newIndex + 3;
       //컬럼 left 이동
       if (oldIndex > newIndex) {
-        this.changeColumnOrder("left", movedColumnName, newIndex);
+        // this.changeColumnOrder("left", movedColumnName, newIndex);
       }
       //컬럼 right 이동
       else {
-        this.changeColumnOrder("right", movedColumnName, newIndex);
+        // this.changeColumnOrder("right", movedColumnName, newIndex);
       }
     },
     changeColumnOrder(position, movedColumnName, newIndex) {
@@ -79,15 +87,18 @@ export default {
     draggable
   },
   computed: {
-    ...mapGetters("initialData", ["columns"]),
+    // ...mapGetters("initialData", ["columns"]),
     ...mapState({
-      // columns: state => state.columns
+      columns: state => state.initialData.columns
     })
   },
 
   created() {
     eventBus.$on("openChangeOrderModal", dialogStatus => {
       this.dialog = dialogStatus;
+    });
+    this.columns.forEach(element => {
+      this.duplicatedColumns.push(element);
     });
   }
 };

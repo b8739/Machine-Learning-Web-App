@@ -54,7 +54,8 @@ export default {
     InfiniteTable
   },
   computed: {
-    ...mapGetters("initialData", ["columns", "indexNum"])
+    ...mapState("initialData", ["columns"]),
+    ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
     hideEditModal() {

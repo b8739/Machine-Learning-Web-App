@@ -81,7 +81,8 @@ export default {
   },
   components: {},
   computed: {
-    ...mapGetters("initialData", ["columns"]),
+    ...mapState("initialData", ["columns"]),
+    // ...mapGetters("initialData", ["columns"]),
     withoutUndefined() {
       let cleansed = [];
       this.inputs.forEach(element => {

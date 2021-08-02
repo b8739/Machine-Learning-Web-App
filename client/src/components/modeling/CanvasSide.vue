@@ -202,9 +202,10 @@ export default {
   computed: {
     ...mapState({
       tableList: state => state.initialData.tableList,
-      dataset: state => state.initialData.dataset
+      dataset: state => state.initialData.dataset,
+      columns: state => state.initialData.columns
     }),
-    ...mapGetters("initialData", ["columns", "indexNum"]),
+    ...mapGetters("initialData", ["indexNum"]),
     splitRatio() {
       return { validation: this.validationIndexArray, train: this.trainSet, test: this.testSet };
     }

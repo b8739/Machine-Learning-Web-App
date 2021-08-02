@@ -5,94 +5,91 @@
 
       <table class="dataTable">
         <tbody>
-          <!-- 행 -->
-          <tr v-for="(column, columnIndex) in columns" :key="columnIndex">
-            <!-- Columns -->
+          <draggable tag="tbody" v-model="duplicatedColumns" @change="onDragEvent">
+            <!-- 행 -->
+            <tr v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
+              <!-- Columns -->
 
-            <!-- 1st Column -->
-            <td>
-              <v-row>
-                <v-col cols="1"
-                  ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(columnIndex)"
-                    >mdi-pencil</v-icon
-                  ></v-col
+              <!-- 1st Column -->
+              <td>
+                <v-row>
+                  <v-col cols="1"
+                    ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(columnIndex)"
+                      >mdi-pencil</v-icon
+                    ></v-col
+                  >
+                  <v-col
+                    ><v-text-field v-bind="activateName(column)" :value="column"></v-text-field>
+                  </v-col>
+                </v-row>
+              </td>
+              <!-- 2nd Column -->
+              <td class="secondColumn">
+                <tr>
+                  <span class="info_title">Col #: </span>
+                  <span> {{ columnIndex }} </span>
+                </tr>
+                <tr>
+                  <v-select
+                    :items="categoryTypes"
+                    dense
+                    single-line
+                    hide-details="true"
+                    height="20"
+                    :label="getDataType(column)"
+                  >
+                  </v-select>
+                </tr>
+              </td>
+
+              <!-- 3rd Column -->
+              <!-- category 일 경우: category summary 표시 -->
+              <td v-if="distinguishDataType(column)">
+                <tr
+                  v-for="(summary, categorySummaryIndex) in categorySummary"
+                  :key="categorySummaryIndex"
                 >
-                <v-col
-                  ><v-text-field
-                    v-bind="activateName(columnIndex)"
-                    :value="column"
-                    v-model="columns_vue[columnIndex]"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </td>
-            <!-- 2nd Column -->
-            <td class="secondColumn">
-              <tr>
-                <span class="info_title">Col #: </span>
-                <span> {{ columnIndex }} </span>
-              </tr>
-              <tr>
-                <v-select
-                  :items="categoryTypes"
-                  dense
-                  single-line
-                  hide-details="true"
-                  height="20"
-                  :label="getDataType(column)"
-                >
-                </v-select>
-              </tr>
-            </td>
+                  <span class="info_title">{{ summary }} </span>
+                  <span>: {{ summarizedInfo["categorical"][column][summary] }}</span>
+                </tr>
+                <tr></tr>
+              </td>
 
-            <!-- 3rd Column -->
-            <!-- category 일 경우: category summary 표시 -->
-            <td v-if="distinguishDataType(column)">
-              <tr
-                v-for="(summary, categorySummaryIndex) in categorySummary"
-                :key="categorySummaryIndex"
-              >
-                <span class="info_title">{{ summary }} </span>
-                <span>: {{ summarizedInfo["categorical"][columns[columnIndex]][summary] }}</span>
-              </tr>
-              <tr></tr>
-            </td>
+              <!-- numeric 일 경우: numeric summary 표시 -->
+              <td v-else>
+                <tr>
+                  <span class="info_title">Mean </span>
+                  <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
+                </tr>
+                <tr>
+                  <span class="info_title">Mode </span>
+                  <span>: {{ summarizedInfo["numeric"][column]["mode"] }}</span>
+                </tr>
+                <tr>
+                  <span class="info_title">Median </span>
+                  <span>: {{ summarizedInfo["numeric"][column]["median"] }}</span>
+                </tr>
+                <tr>
+                  <span class="info_title">Num of NA </span>
+                  <span>: {{ summarizedInfo["numeric"][column]["numOfNA"] }}</span>
+                </tr>
+                <tr>
+                  <span class="info_title">Standard Deviation </span>
+                  <span>: {{ summarizedInfo["numeric"][column]["standard deviation"] }}</span>
+                </tr>
+                <tr>
+                  <span class="info_title">Quantile </span>
+                  <span>: {{ summarizedInfo["numeric"][column]["Q1"] }}, </span>
+                  <span>{{ summarizedInfo["numeric"][column]["Q2"] }}, </span>
+                  <span>{{ summarizedInfo["numeric"][column]["Q3"] }}, </span>
+                  <span>{{ summarizedInfo["numeric"][column]["Q4"] }}, </span>
+                </tr>
+              </td>
 
-            <!-- numeric 일 경우: numeric summary 표시 -->
-            <td v-else>
-              <tr>
-                <span class="info_title">Mean </span>
-                <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
-              </tr>
-              <tr>
-                <span class="info_title">Mode </span>
-                <span>: {{ summarizedInfo["numeric"][column]["mode"] }}</span>
-              </tr>
-              <tr>
-                <span class="info_title">Median </span>
-                <span>: {{ summarizedInfo["numeric"][column]["median"] }}</span>
-              </tr>
-              <tr>
-                <span class="info_title">Num of NA </span>
-                <span>: {{ summarizedInfo["numeric"][column]["numOfNA"] }}</span>
-              </tr>
-              <tr>
-                <span class="info_title">Standard Deviation </span>
-                <span>: {{ summarizedInfo["numeric"][column]["standard deviation"] }}</span>
-              </tr>
-              <tr>
-                <span class="info_title">Quantile </span>
-                <span>: {{ summarizedInfo["numeric"][column]["Q1"] }}, </span>
-                <span>{{ summarizedInfo["numeric"][column]["Q2"] }}, </span>
-                <span>{{ summarizedInfo["numeric"][column]["Q3"] }}, </span>
-                <span>{{ summarizedInfo["numeric"][column]["Q4"] }}, </span>
-              </tr>
-            </td>
-
-            <!-- 4th Column -->
-            <!-- category 일 경우: sample for class 표시 -->
-            <td v-if="distinguishDataType(column)">
-              <!-- <p class="info_title">Samples For Class:</p>
+              <!-- 4th Column -->
+              <!-- category 일 경우: sample for class 표시 -->
+              <td v-if="distinguishDataType(column)">
+                <!-- <p class="info_title">Samples For Class:</p>
               <v-row
                 no-gutters
                 v-for="(sample, sampleIndex) in summarizedInfo['sampleForClass'][column]"
@@ -103,29 +100,30 @@
                 <v-col class="py-0">{{ sample }}% </v-col>
                 <v-col cols="12" class="pa-0"><v-divider></v-divider></v-col>
               </v-row> -->
-            </td>
-            <!-- numeric 일 경우: distribution 표시 -->
-            <td v-else>
-              <span class="tdTitle">Distribution</span>
-              <Histogram
-                :distribution="summarizedInfo['distribution'][column]"
-                :interval="summarizedInfo['interval'][column]"
-                :indexNum="indexNum"
-              />
-            </td>
-            <!-- category 일 경우: -- 표시 -->
-            <td v-if="distinguishDataType(column)"></td>
-            <!-- numeric 일 경우: Graph 표시 -->
-            <td v-else @click="openEditModal(column)">
-              <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
+              </td>
+              <!-- numeric 일 경우: distribution 표시 -->
+              <td v-else>
+                <span class="tdTitle">Distribution</span>
+                <Histogram
+                  :distribution="summarizedInfo['distribution'][column]"
+                  :interval="summarizedInfo['interval'][column]"
+                  :indexNum="indexNum"
+                />
+              </td>
+              <!-- category 일 경우: -- 표시 -->
+              <td v-if="distinguishDataType(column)"></td>
+              <!-- numeric 일 경우: Graph 표시 -->
+              <td v-else @click="openEditModal(column)">
+                <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
 
-              <TimeSeries
-                :graphWidth="graphWidth"
-                :graphHeight="graphHeight"
-                :seriesName="column"
-              />
-            </td>
-          </tr>
+                <TimeSeries
+                  :graphWidth="graphWidth"
+                  :graphHeight="graphHeight"
+                  :seriesName="column"
+                />
+              </td>
+            </tr>
+          </draggable>
         </tbody>
       </table>
       <EditModal />
@@ -145,7 +143,7 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
-      hi: null,
+      duplicatedColumns: [],
       editModalDialog: false,
       sampleForClass: null,
       categoryTypes: ["Category", "String", "Text", "Time-Series"],
@@ -161,7 +159,7 @@ export default {
         "hide-details": true,
         dense: true
       },
-      clickedIconIndex: null,
+      clickedIconKey: null,
       columns_vue: [],
       graphWidth: "260px",
       graphHeight: "200px",
@@ -210,22 +208,23 @@ export default {
 
     columns_vue: {
       handler(newValue, oldValue) {
-        console.log(`old: ${oldValue}`);
-        console.log(`new: ${newValue}`);
-        this.ChangeColmnNameFlag(true);
+        // console.log(`old: ${oldValue}`);
+        // console.log(`new: ${newValue}`);
+        this.ChangeColumnNameFlag(true);
       },
       deep: true,
-      immediate: true
+      immediate: false
     }
   },
 
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset,
+      columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo,
-      columnNameFlag: state => state.saveFlag.summarizedInfo
+      featureNameFlag: state => state.saveFlag.summarizedInfo
     }),
-    ...mapGetters("initialData", ["indexNum", "columns", "numericColumns"]),
+    ...mapGetters("initialData", ["indexNum", "numericColumns"]),
     categorySummary() {
       let categoricalColumn = Object.keys(this.summarizedInfo["categorical"]);
       let categorySummary = [];
@@ -246,7 +245,7 @@ export default {
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
-    ...mapMutations("saveFlag", ["ChangeColmnNameFlag"]),
+    ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
     getDataType(column) {
       return this.summarizedInfo["datatype"][column];
     },
@@ -257,17 +256,17 @@ export default {
       } else if (dataType == "numeric") return false;
     },
     onDragEvent(evt) {
-      let movedColumnName = evt.moved.element;
-      let oldIndex = evt.moved.oldIndex + 3;
-      let newIndex = evt.moved.newIndex + 3;
-      //컬럼 left 이동
-      if (oldIndex > newIndex) {
-        this.changeColumnOrder("left", movedColumnName, newIndex);
-      }
-      //컬럼 right 이동
-      else {
-        this.changeColumnOrder("right", movedColumnName, newIndex);
-      }
+      // let movedColumnName = evt.moved.element;
+      // let oldIndex = evt.moved.oldIndex + 3;
+      // let newIndex = evt.moved.newIndex + 3;
+      // //컬럼 left 이동
+      // if (oldIndex > newIndex) {
+      //   this.changeColumnOrder("left", movedColumnName, newIndex);
+      // }
+      // //컬럼 right 이동
+      // else {
+      //   this.changeColumnOrder("right", movedColumnName, newIndex);
+      // }
     },
     changeColumnOrder(position, movedColumnName, newIndex) {
       const api = "http://localhost:5000/changeColumnOrder";
@@ -302,23 +301,23 @@ export default {
       //     console.error(error);
       //   });
     },
-    saveClickedIconIndex(index) {
+    saveClickedIconIndex(column) {
       // v-icon click OFF
-      if (this.clickedIconIndex == index) {
-        this.clickedIconIndex = null;
+      if (this.clickedIconKey == column) {
+        this.clickedIconKey = null;
         // category 일 때
 
-        this.changeColumnName_vue(this.columns[index], index);
+        // this.changeColumnName_vue(this.columns[index], index);
 
         // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
         // this.loadSummarizedData();
       } // v-icon click ON
       else {
-        this.clickedIconIndex = index;
+        this.clickedIconKey = column;
       }
     },
-    activateName(index) {
-      if (this.clickedIconIndex == index) {
+    activateName(column) {
+      if (this.clickedIconKey == column) {
         return this.activatedName_props;
       } else return this.inactivatedName_props;
     },
@@ -346,8 +345,20 @@ export default {
     this.columns.forEach(element => {
       this.columns_vue.push(element);
     });
+    // draggable
+    this.columns.forEach(element => {
+      this.duplicatedColumns.push(element);
+    });
+    eventBus.$on("columnOrderUpdated", duplicatedColumns => {
+      this.duplicatedColumns = [];
+      duplicatedColumns.forEach(element => {
+        this.duplicatedColumns.push(element);
+      });
+    });
   },
-  mounted() {}
+  mounted() {
+    console.log("df mounted");
+  }
   // s
 };
 </script>

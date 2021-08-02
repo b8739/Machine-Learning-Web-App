@@ -105,8 +105,7 @@ export default {
   },
   // props: ["columns"],
   computed: {
-    ...mapState({}),
-    ...mapGetters("initialData", ["columns"])
+    ...mapState("initialData", ["columns"])
   },
   methods: {
     ...mapMutations("initialData", ["setNavStatus"])

@@ -441,10 +441,11 @@ export default {
       tableList: state => state.initialData.tableList,
       observedVariable: state => state.simulationData.observedVariable,
       summarizedInfo: state => state.initialData.summarizedInfo,
-      randomRange: state => state.initialData.randomRange
+      randomRange: state => state.initialData.randomRange,
+      columns: state => state.initialData.columns
     }),
 
-    ...mapGetters("initialData", ["columns"]),
+    // ...mapGetters("initialData", ["columns"]),
     // page
     paginationLength() {
       return Math.ceil(this.columns.length / 5);
