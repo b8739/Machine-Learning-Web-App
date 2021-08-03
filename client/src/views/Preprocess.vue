@@ -208,6 +208,13 @@ export default {
   //   next(vm => {
   //     vm.dialog1 = true;
   //   });
+  // },
+  // beforeRouteLeave(to, from, next) {
+  //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
+  //     //
+  //   } else {
+  //     next();
+  //   }
   // }
 };
 </script>

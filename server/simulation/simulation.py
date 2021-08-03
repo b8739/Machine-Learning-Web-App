@@ -56,9 +56,13 @@ def getSimulationResult(observedVariable,rangeInfo):
                 randomized.append(randValue)
             randomized= pd.Series(randomized)
             randNumbers.append(randomized)
-        # manual 일 때
-        else: 
+        # uniform 일 때
+        elif value['method'] =='uniform': 
             randomized=(np.random.uniform(intervals['min'],intervals['max'],1000).round(2))
+            randomized= pd.Series(randomized)
+            randNumbers.append(randomized)
+        else:
+            randomized = np.full(1000,intervals['fixedValue'])
             randomized= pd.Series(randomized)
             randNumbers.append(randomized)
     X_final = pd.DataFrame(randNumbers)

@@ -548,19 +548,26 @@ export default {
     },
     stepTwoFinished() {
       let rangeInfo = {};
-      this.distributionRadioModel.forEach((element, index) => {
+
+      this.samplesRadioModel.forEach((element, index) => {
         let featureName = this.columns[index];
         let rangeMin = this.rangeValues["start"][index];
         let rangeMax = this.rangeValues["end"][index];
-
-        if (element == 1) {
-          //radio가 normal distribution이 체크되어있을때
-          rangeInfo[featureName] = { method: "normal", interval: { min: rangeMin, max: rangeMax } };
+        if (element == 0) {
+          //fixed value
+          rangeInfo[featureName] = {
+            method: "fixed",
+            interval: { fixedValue: this.fixedValues[index] }
+          };
         } else {
-          rangeInfo[featureName] = { method: "manual", interval: { min: rangeMin, max: rangeMax } };
+          //random value
+          rangeInfo[featureName] = { interval: { min: rangeMin, max: rangeMax } };
+          if (this.distributionRadioModel[index] == 0) rangeInfo[featureName]["method"] = "uniform";
+          else rangeInfo[featureName]["method"] = "normal";
         }
         delete rangeInfo["MEDV"];
       });
+      console.log(rangeInfo);
       // axios
       let path = "http://localhost:5000/runSimulation";
 

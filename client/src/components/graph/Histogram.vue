@@ -25,7 +25,14 @@ export default {
           type: "bar",
           toolbar: {
             show: false
+          },
+          animations: {
+            enabled: false
           }
+        },
+        tooltip: {
+          enabled: false
+          // intersect: true
         },
         dataLabels: {
           enabled: false

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-navigation-drawer v-model="drawer" absolute :mini-variant.sync="mini">
-      <v-list-item class="mt-10 px-2">
+      <v-list-item class="mt-10 px-2" v-once>
         <v-list-item-avatar>
           <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
         </v-list-item-avatar>
@@ -12,7 +12,7 @@
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
       </v-list-item>
-      <v-list dense>
+      <v-list dense v-once>
         <v-list-group v-model="activeState">
           <template v-slot:activator>
             <v-list-item-title active>Options</v-list-item-title>

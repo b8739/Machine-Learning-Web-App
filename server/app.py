@@ -660,6 +660,7 @@ def runSimulation():
   observedVariable = request.get_json()['observedVariable']
   rangeInfo = request.get_json()['rangeInfo']
   return getSimulationResult(observedVariable,rangeInfo)
-  # return jsonify('hi')
+  # print (rangeInfo)
+  return jsonify('hi')
 if __name__ == '__main__':
     app.run(debug=True)

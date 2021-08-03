@@ -1,8 +1,9 @@
 <template>
   <div id="chart">
-    <!-- <v-btn @click="rerender()">rerender</v-btn> -->
+    <!-- <v-btn @click="mount = true">rerender</v-btn> -->
 
     <apexchart
+      v-if="series"
       ref="realtimeChart"
       type="line"
       :width="graphWidth"
@@ -28,13 +29,14 @@ export default {
 
   data() {
     return {
+      mount: false,
       selectionTimer: null,
       xaxisMin: null,
       yaxisMin: null,
       xaxisMax: null,
       yaxisMax: null,
       testArray: [],
-      newDataset: [],
+      // newDataset: [],
       dataArray: [],
       randomIndexArray: [],
       dateArray: [],
@@ -49,7 +51,7 @@ export default {
           type: "line",
           toolbar: {
             show: false,
-            autoSelected: "zoom",
+            autoSelected: "selection",
             // "<i class='fas fa-trash' style='padding-left:5px; width:20px''></i>"
             tools: {
               download: false,
@@ -71,9 +73,10 @@ export default {
               ]
             }
           },
-          tooltip: {
-            intersect: true
+          animations: {
+            enabled: false
           },
+
           //zoom
           zoom: {
             type: "xy",
@@ -123,8 +126,13 @@ export default {
             // selection events
             selection: (chartContext, { xaxis, yaxis }) => {
               this.dataSelected(xaxis, yaxis);
+              console.log(chartContext);
             }
           }
+        },
+        tooltip: {
+          enabled: false
+          // intersect: true
         },
         states: {
           active: {
@@ -138,7 +146,7 @@ export default {
         dataLabels: {
           enabled: false
         },
-        series: [],
+
         title: {},
         markers: {
           size: 1,
@@ -178,8 +186,7 @@ export default {
         stroke: {
           width: 1
         }
-      },
-      series: []
+      }
     };
   },
   watch: {
@@ -189,6 +196,22 @@ export default {
     //     name: seriesName
     //   });
     // },
+
+    // newDataset: {
+    //   handler(data) {
+    //     if (data.length == this.dataset.length) {
+    //       this.renderDataset();
+    //     }
+    //   },
+    //   deep: true,
+    //   immediate: false
+    // },
+    // case1: datafeature에서 createNewDataset하는 방식
+    // newDataset: function(data) {
+    //   if (data.length == this.dataset.length) {
+    //     this.renderDataset();
+    //   }
+    // },
     dialog: function(data) {
       if (data) {
         console.log(true);
@@ -197,6 +220,9 @@ export default {
             toolbar: {
               show: true
             }
+          },
+          tooltip: {
+            enabled: true
           }
         });
       }
@@ -209,27 +235,42 @@ export default {
     this.createNewDataset();
   },
   mounted() {
-    // this.renderDataset();
-    // this.resetOriginalState();
-    if (this.firstMount) {
-      this.renderDataset();
-      this.firstMount = !this.firstMount;
-    }
-    console.log("ts mounted");
+    // if (this.firstMount) {
+    //   this.renderDataset();
+    //   this.firstMount = !this.firstMount;
+    // }
+    // console.log("ts mounted");
   },
 
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset
     }),
-    ...mapGetters("initialData", ["indexNum"])
+    ...mapGetters("initialData", ["indexNum"]),
+
+    series() {
+      let series = [];
+
+      let seriesObj = { name: this.seriesName, data: this.dataArray };
+      series.push(seriesObj);
+      return series;
+    }
   },
   methods: {
+    // createNewDataset() {
+    //   this.newDataset = [];
+    //   this.dataset.forEach(element => {
+    //     this.newDataset.push(element[this.seriesName]);
+    //   });
+    // },
     createNewDataset() {
       this.newDataset = [];
+      this.dataArray = [];
       this.dataset.forEach(element => {
         this.newDataset.push(element[this.seriesName]);
       });
+      this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
+      randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
     },
     dataSelected(xaxis, yaxis) {
       this.testArray = [];
@@ -245,14 +286,16 @@ export default {
           this.testArray.push(i);
         }
       }
-      if (this.selectionTimer == null) {
-        this.selectionTimer = setTimeout(() => {
-          eventBus.$emit("dataSelected", this.testArray);
-        }, 1);
-      }
-      let timer = setTimeout(() => {
-        this.selectionTimer = null;
-      }, 2000);
+      eventBus.$emit("dataSelected", this.testArray);
+
+      // if (this.selectionTimer == null) {
+      //   this.selectionTimer = setTimeout(() => {
+      //     eventBus.$emit("dataSelected", this.testArray);
+      //   }, 1);
+      // }
+      // let timer = setTimeout(() => {
+      //   this.selectionTimer = null;
+      // }, 2000);
     },
     renderDataset() {
       this.resetSeries();
@@ -270,6 +313,10 @@ export default {
             toolbar: {
               show: true
             }
+          },
+          tooltip: {
+            enabled: true
+            // intersect: true
           }
         });
       }

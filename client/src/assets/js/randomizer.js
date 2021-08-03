@@ -1,5 +1,6 @@
 export function getCount(datasetLength) {
-  return Math.round(datasetLength * 0.1);
+  return Math.round(datasetLength * 0.05);
+  // data111.csv같은 경우 0.05
 }
 export function getRandom(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);

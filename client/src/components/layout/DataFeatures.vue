@@ -26,8 +26,8 @@
               <!-- 2nd Column -->
               <td class="secondColumn">
                 <tr>
-                  <span class="info_title">Col #: </span>
-                  <span> {{ columnIndex }} </span>
+                  <span v-once class="info_title">Col #: </span>
+                  <span v-once> {{ columnIndex }} </span>
                 </tr>
                 <tr>
                   <v-select
@@ -58,27 +58,27 @@
               <!-- numeric 일 경우: numeric summary 표시 -->
               <td v-else>
                 <tr>
-                  <span class="info_title">Mean </span>
+                  <span v-once class="info_title">Mean </span>
                   <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
                 </tr>
                 <tr>
-                  <span class="info_title">Mode </span>
+                  <span v-once class="info_title">Mode </span>
                   <span>: {{ summarizedInfo["numeric"][column]["mode"] }}</span>
                 </tr>
                 <tr>
-                  <span class="info_title">Median </span>
+                  <span v-once class="info_title">Median </span>
                   <span>: {{ summarizedInfo["numeric"][column]["median"] }}</span>
                 </tr>
                 <tr>
-                  <span class="info_title">Num of NA </span>
+                  <span v-once class="info_title">Num of NA </span>
                   <span>: {{ summarizedInfo["numeric"][column]["numOfNA"] }}</span>
                 </tr>
                 <tr>
-                  <span class="info_title">Standard Deviation </span>
+                  <span v-once class="info_title">Standard Deviation </span>
                   <span>: {{ summarizedInfo["numeric"][column]["standard deviation"] }}</span>
                 </tr>
                 <tr>
-                  <span class="info_title">Quantile </span>
+                  <span v-once class="info_title">Quantile </span>
                   <span>: {{ summarizedInfo["numeric"][column]["Q1"] }}, </span>
                   <span>{{ summarizedInfo["numeric"][column]["Q2"] }}, </span>
                   <span>{{ summarizedInfo["numeric"][column]["Q3"] }}, </span>
@@ -103,13 +103,14 @@
               </td>
               <!-- numeric 일 경우: distribution 표시 -->
               <td v-else>
-                <span class="tdTitle">Distribution</span>
+                <span v-once class="tdTitle">Distribution</span>
                 <Histogram
                   :distribution="summarizedInfo['distribution'][column]"
                   :interval="summarizedInfo['interval'][column]"
                   :indexNum="indexNum"
                 />
               </td>
+
               <!-- category 일 경우: -- 표시 -->
               <td v-if="distinguishDataType(column)"></td>
               <!-- numeric 일 경우: Graph 표시 -->
@@ -190,8 +191,9 @@ export default {
       editModal_darkenBackground: false,
       selectedColumnIndex: null,
       //etc (for dataset parsing)
-      show_timeSeriesGraph: false
-      // save flag
+      show_timeSeriesGraph: false,
+      // save flag,
+      newDataset: {}
     };
   },
   components: {
@@ -246,6 +248,15 @@ export default {
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
+    createNewDataset() {
+      let array = [];
+      for (const key in this.summarizedInfo["numeric"]) {
+        this.newDataset[key] = [];
+        this.dataset.forEach(element => {
+          this.newDataset[key].push(element[key]);
+        });
+      }
+    },
     getDataType(column) {
       return this.summarizedInfo["datatype"][column];
     },
@@ -341,6 +352,7 @@ export default {
     }
   },
   created() {
+    console.log("df created");
     this.loadDataSummary();
     this.columns.forEach(element => {
       this.columns_vue.push(element);
@@ -357,9 +369,11 @@ export default {
     });
   },
   mounted() {
-    console.log("df mounted");
+    // this.$nextTick(function() {
+    //   console.log("df mounted");
+    //   eventBus.$emit("dfMounted", true);
+    // });
   }
-  // s
 };
 </script>
 <style scoped>
