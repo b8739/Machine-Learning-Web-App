@@ -4,6 +4,7 @@ server/env37
 server/env39
 server/test.py
 server/config.py
+server/.gitignore
 testcode/
 # server/.ebextensions
 # server/.elasticbeanstalk
