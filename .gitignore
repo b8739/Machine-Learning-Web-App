@@ -1,15 +1,4 @@
-server/static/uploadsDB/
-server/env
-server/env37
-server/env39
-server/test.py
-server/config.py
-server/.gitignore
+server/
 testcode/
-server/.ebextensions
-server/.elasticbeanstalk
-server/dist
-server/boston_house.csv
-server/iotPlatformReq.py
 backend.sh
 frontend.sh
