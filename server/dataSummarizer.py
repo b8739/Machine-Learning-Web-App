@@ -1,11 +1,10 @@
-# from app import df
 import pandas as pd 
 import numpy as np 
 import os
 import json
 import matplotlib
 import json
-from app import jsonify, Response
+from application import jsonify, Response
 from collections import OrderedDict, defaultdict
 
 def summarizeData(df):

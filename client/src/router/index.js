@@ -15,6 +15,8 @@ import GraphBuilder from "../views/GraphBuilder";
 import Simulations from "../views/simulation/Simulations";
 import SimulationResult from "../views/simulation/SimulationResult";
 
+import LoginForm from "@/components/login/LoginForm";
+
 import "../assets/css/main.css";
 
 // import Login from "../views/Login";
@@ -27,6 +29,11 @@ const router = new VueRouter({
   routes: [
     {
       path: "/",
+      component: LoginForm,
+      props: true
+    },
+    {
+      path: "/projects",
       component: Projects,
       props: true
     },

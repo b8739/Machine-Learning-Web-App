@@ -45,7 +45,7 @@ export default {
       eventBus.$emit("saveRequest_canvasSide", true); // to Canvas.vue
 
       // axios
-      let path = "http://localhost:5000/xgboost_modeling";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/xgboost_modeling";
 
       this.$axios({
         method: "post",

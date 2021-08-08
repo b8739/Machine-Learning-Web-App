@@ -8,7 +8,7 @@ from IPython.display import display
 import math
 
 
-from app import jsonify, Response
+from application import jsonify, Response
 import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.model_selection import train_test_split
@@ -45,7 +45,10 @@ def getSimulationResult(observedVariable,rangeInfo):
         for nestedKey,nestedValue in value['interval'].items():
             intervalValue = value['interval'][nestedKey]
             if isinstance(intervalValue, str) == True:
-                intervals[nestedKey] = int(intervalValue)
+                if intervalValue.find('.') == -1:
+                    intervals[nestedKey] = int(intervalValue)
+                else:
+                    intervals[nestedKey] = float(intervalValue)
             else:
                 intervals[nestedKey] = intervalValue
         randomized = []

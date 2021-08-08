@@ -1,11 +1,10 @@
-# from app import df
 
 import pandas as pd 
 import numpy as np 
 import os
 import json
 import matplotlib
-from app import jsonify
+from application import jsonify
 
 def summarizeData(df):
   print(df.dtypes)

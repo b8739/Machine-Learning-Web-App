@@ -1,12 +1,13 @@
 
 # flask
 from flask import Flask, jsonify, request, render_template,request,url_for, Response
-from sqlalchemy.sql.sqltypes import VARCHAR
+
 from flask_cors import CORS
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
 
 
 # sqlalchemy
+from sqlalchemy.sql.sqltypes import VARCHAR
 from sqlalchemy import create_engine, MetaData, text, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,15 +15,13 @@ from flask_sqlalchemy import SQLAlchemy
 import mysql.connector
 from flask_mysqldb import MySQL
 
-
-
-from config import DB_URL
+from config import *
 
 from werkzeug.utils  import secure_filename
 import os
 import sys
-sys.path.append('/Users/jeongjaeho/attic_project/mlApp/server/modeling')
-sys.path.append('/Users/jeongjaeho/attic_project/mlApp/server/simulation')
+sys.path.append('./modeling')
+sys.path.append('./simulation')
 import datetime
 import time
 import json
@@ -33,15 +32,15 @@ import numpy as np
 
 # summarizer
 from dataSummarizer import summarizeData
-from normalDistribution import randGenerator_nd
+# from normalDistribution import randGenerator_nd
 
 # modeling
-from xgboost_modeling import *
-from svr_modeling import *
-from rf_modeling import *
+# from xgboost_modeling import *
+# from svr_modeling import *
+# from rf_modeling import *
 
 # simulation
-from simulation import getSimulationResult
+# from simulation import getSimulationResult
 
 
 # pyarrow
@@ -60,13 +59,16 @@ DEBUG = True
 # Base
 Base = declarative_base()
 
+ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
+STATIC_PATH = os.path.join(ROOT_PATH, 'dist')
+
 # instantiate the app
-app = Flask(__name__)
-app.config.from_object(__name__)
-app.config["TEMPLATES_AUTO_RELOAD"] = False
+application = Flask(__name__, static_folder=STATIC_PATH, static_url_path='')
+application.config.from_object(__name__)
+application.config["TEMPLATES_AUTO_RELOAD"] = False
 
 # enable CORS
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(application, resources={r'/*': {'origins': '*'}})
 
 # 임시 schema
 # class DataInfo(Base):
@@ -79,32 +81,32 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 #     quartile = Column(String(300))
 #     numofna = Column(String(300))
     
-# engine_dataset
-URI_dataset = 'mysql+mysqldb://root:0000@localhost/datasets'
-URI_modeling = 'mysql+mysqldb://root:0000@localhost/project_1'
-engine_dataset = create_engine(URI_dataset,echo = False)
-engine_modeling = create_engine(URI_modeling,echo = False)
+# engine_dataset (로컬용)
+# URI_dataset = 'mysql+mysqldb://root:0000@localhost/datasets'
+# URI_modeling = 'mysql+mysqldb://root:0000@localhost/project_1'
+# engine_dataset = create_engine(URI_dataset,echo = False)
+# engine_modeling = create_engine(URI_modeling,echo = False)
+# Session = sessionmaker(bind=engine_dataset,autocommit=False)
+# session = Session()
+
+# engine_dataset (개발용)
+engine_dataset = create_engine(datasets_URL,echo = False)
+engine_modeling = create_engine(modeling_URL,echo = False)
 Session = sessionmaker(bind=engine_dataset,autocommit=False)
 session = Session()
-
 
 # autocommit = 0 (false)
 # sql = "SET AUTOCOMMIT = 0;"
 # session.execute(sql)
 
-# john = DataInfo(columnName = '2')
-# session.add(john)
 
-# # Commit the new User John to the database
-# session.commit()
-
-
-@app.route('/', methods=['GET'])
-def testing():
-	return jsonify ("hello world")
+@application.route('/')
+def index():
+  # changed to send_static_file
+  return application.send_static_file('index.html')
 
 # Route for our Processing and Details Page
-@app.route('/dataupload',methods=['GET','POST'])
+@application.route('/dataupload',methods=['GET','POST'])
 def dataupload():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -152,7 +154,7 @@ def dataupload():
 addData: Dataset에 data를 'Add'할 때 라우팅
 """
 
-@app.route('/addData',methods=['GET','POST'])
+@application.route('/addData',methods=['GET','POST'])
 def addData():
 	response_object = {'status': 'success'}
 	post_data = request.json
@@ -179,7 +181,7 @@ def addData():
 loadData: Frontend에서 Dataset을 로드해오는 라우팅
 """
 
-@app.route('/loadData',methods=['GET','POST'])
+@application.route('/loadData',methods=['GET','POST'])
 def loadData():
     Session = sessionmaker(bind=engine_dataset,autocommit=False)
     session = Session()
@@ -201,7 +203,7 @@ def loadData():
 
 
 
-@app.route('/updateData', methods=['PUT', 'DELETE'])
+@application.route('/updateData', methods=['PUT', 'DELETE'])
 def updateData():
 	if request.method == 'PUT':
 		post_data = request.get_json() #json으로 하면 dict is not callable뜸
@@ -231,7 +233,7 @@ def updateData():
 """ 
 infinite-loading Test: 
 """
-@app.route('/infiniteLoading',methods=['GET','POST'])
+@application.route('/infiniteLoading',methods=['GET','POST'])
 def infiniteLoading():
 	limit = request.args.get('limit')
 	conn = engine_dataset.connect()
@@ -240,7 +242,7 @@ def infiniteLoading():
 	return Response(df.to_json( orient='records'), mimetype='application/json')
 
 
-@app.route('/deleteColumn',methods=['GET'])
+@application.route('/deleteColumn',methods=['GET'])
 def deleteColumn():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -251,7 +253,7 @@ def deleteColumn():
   session.close()
   return jsonify ("hello world")
 
-@app.route('/overwriteTable',methods=['GET'])
+@application.route('/overwriteTable',methods=['GET'])
 def overwriteTable():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -264,7 +266,7 @@ def overwriteTable():
   session.close()
   return jsonify ("overwrited")
 
-@app.route('/duplicateTable',methods=['GET'])
+@application.route('/duplicateTable',methods=['GET'])
 def duplicateTable():
   newTableName = request.args.get('newTableName')
   sql = "create table "+newTableName+" as select * from dataset;"
@@ -273,7 +275,7 @@ def duplicateTable():
   session.close()
   return jsonify ("duplicateTable")
 
-@app.route('/deleteRow',methods=['GET'])
+@application.route('/deleteRow',methods=['GET'])
 def deleteRow():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -294,7 +296,7 @@ def deleteRow():
   session.close()
   return jsonify (sql)
 
-@app.route('/deleteRowByPeriod',methods=['GET'])
+@application.route('/deleteRowByPeriod',methods=['GET'])
 def deleteRowByPeriod():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -320,7 +322,7 @@ def deleteRowByPeriod():
 
   return jsonify (getFullTimeSeries_from)
 
-@app.route('/showTables',methods=['GET'])
+@application.route('/showTables',methods=['GET'])
 def showTables():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -335,7 +337,7 @@ def showTables():
   session.close()
   return jsonify(tableList)
 
-@app.route('/changeColumnName',methods=['GET'])
+@application.route('/changeColumnName',methods=['GET'])
 def changeColumnName():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -356,7 +358,7 @@ def changeColumnName():
   session.close()
   return jsonify(newName)
 
-@app.route('/changeColumnOrder',methods=['GET'])
+@application.route('/changeColumnOrder',methods=['GET'])
 def changeColumnOrder():
   Session = sessionmaker(bind=engine_dataset,autocommit=False)
   session = Session()
@@ -380,17 +382,17 @@ def changeColumnOrder():
   session.close()
   return jsonify('hello')
 
-@app.route('/loadSummarizedData',methods=['GET'])
+@application.route('/loadSummarizedData',methods=['GET'])
 def loadSummarizedData():
   df = pd.read_sql_table('dataset', session.bind)
   return (summarizeData(df))
 
-@app.route('/loadRandomInfo',methods=['GET'])
+@application.route('/loadRandomInfo',methods=['GET'])
 def loadDistributionData():
   # df = pd.read_sql_table('dataset', session.bind)
   return (randGenerator_nd())
 
-@app.route('/xgboost_modeling',methods=['POST'])
+@application.route('/xgboost_modeling',methods=['POST'])
 def xgboost_modeling():
   modelingRequest = request.get_json()['modelingRequest']
   splitRatio = request.get_json()['splitRatio']
@@ -410,7 +412,7 @@ def xgboost_modeling():
   return (xgboost(splitRatio,modelingRequest))
   # return jsonify(modelingRequest)
 
-@app.route('/svr_modeling',methods=['GET'])
+@application.route('/svr_modeling',methods=['GET'])
 def svr_modeling():
   modelingOption_str = request.args.get('modelingOption')
 
@@ -430,7 +432,7 @@ def svr_modeling():
 
   return (svr(modelingOption_list))
 
-@app.route('/rf_modeling',methods=['GET'])
+@application.route('/rf_modeling',methods=['GET'])
 def rf_modeling():
   modelingOption_str = request.args.get('modelingOption')
 
@@ -446,7 +448,7 @@ def rf_modeling():
 
   return (rf(modelingOption_list))
 
-@app.route('/saveModel',methods=['POST'])
+@application.route('/saveModel',methods=['POST'])
 def saveModel():
   """ 
   Request로 받아서 저장해야 할 항목 (한번 저장 시 총 8개 테이블):
@@ -570,7 +572,7 @@ def saveModel():
   session.close
   return jsonify('hello')
 
-@app.route('/loadCases',methods=['GET'])
+@application.route('/loadCases',methods=['GET'])
 def loadCases():
   Session = sessionmaker(bind=engine_modeling,autocommit=False)
   session = Session()
@@ -590,7 +592,7 @@ def loadCases():
   session.close
   return jsonify(caseList)
 
-@app.route('/changeCase',methods=['GET'])
+@application.route('/changeCase',methods=['GET'])
 def changeCase():
   Session = sessionmaker(bind=engine_modeling,autocommit=False)
   session = Session()
@@ -642,7 +644,7 @@ def changeCase():
 
   return jsonify(modeling_dataset,modeling_summary)
 
-@app.route('/loadProjects',methods=['GET'])
+@application.route('/loadProjects',methods=['GET'])
 def loadProjects():
   Session = sessionmaker(bind=engine_modeling,autocommit=False)
   session = Session()
@@ -655,12 +657,13 @@ def loadProjects():
   session.close
   return jsonify(project_list)
 
-@app.route('/runSimulation',methods=['POST'])
+@application.route('/runSimulation',methods=['POST'])
 def runSimulation():
   observedVariable = request.get_json()['observedVariable']
   rangeInfo = request.get_json()['rangeInfo']
+  print (rangeInfo)
   return getSimulationResult(observedVariable,rangeInfo)
-  # print (rangeInfo)
-  return jsonify('hi')
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run()

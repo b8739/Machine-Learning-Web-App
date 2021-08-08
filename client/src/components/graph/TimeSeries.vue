@@ -3,7 +3,6 @@
     <!-- <v-btn @click="mount = true">rerender</v-btn> -->
 
     <apexchart
-      v-if="series"
       ref="realtimeChart"
       type="line"
       :width="graphWidth"
@@ -235,10 +234,10 @@ export default {
     this.createNewDataset();
   },
   mounted() {
-    // if (this.firstMount) {
-    //   this.renderDataset();
-    //   this.firstMount = !this.firstMount;
-    // }
+    if (this.firstMount) {
+      this.renderDataset();
+      this.firstMount = !this.firstMount;
+    }
     // console.log("ts mounted");
   },
 
@@ -251,27 +250,27 @@ export default {
     series() {
       let series = [];
 
-      let seriesObj = { name: this.seriesName, data: this.dataArray };
-      series.push(seriesObj);
+      // let seriesObj = { name: this.seriesName, data: this.dataArray };
+      // series.push(seriesObj);
       return series;
     }
   },
   methods: {
-    // createNewDataset() {
-    //   this.newDataset = [];
-    //   this.dataset.forEach(element => {
-    //     this.newDataset.push(element[this.seriesName]);
-    //   });
-    // },
     createNewDataset() {
       this.newDataset = [];
-      this.dataArray = [];
       this.dataset.forEach(element => {
         this.newDataset.push(element[this.seriesName]);
       });
-      this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
-      randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
     },
+    // createNewDataset() {
+    //   this.newDataset = [];
+    //   this.dataArray = [];
+    //   this.dataset.forEach(element => {
+    //     this.newDataset.push(element[this.seriesName]);
+    //   });
+    //   this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
+    //   randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+    // },
     dataSelected(xaxis, yaxis) {
       this.testArray = [];
       this.xaxisMin = Math.floor(xaxis.min);

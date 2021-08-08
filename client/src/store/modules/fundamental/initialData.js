@@ -98,7 +98,7 @@ const mutations = {
 
 const actions = {
   loadFundamentalData({ commit }, path) {
-    // const path = "http://localhost:5000/loadData";
+    // const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData";
     axios
       .get(path)
       .then(res => {
@@ -111,7 +111,7 @@ const actions = {
       });
   },
   loadSummarizedData({ commit }) {
-    const path = "http://localhost:5000/loadSummarizedData";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadSummarizedData";
     axios
       .get(path)
       .then(res => {
@@ -122,7 +122,7 @@ const actions = {
       });
   },
   loadRandomData({ commit }) {
-    const path = "http://localhost:5000/loadRandomInfo";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadRandomInfo";
     axios
       .get(path)
       .then(res => {

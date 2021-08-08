@@ -266,7 +266,7 @@ export default {
       this.top = obj.getBoundingClientRect().top;
     },
     loadCases() {
-      let path = "http://localhost:5000/loadCases";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
       axios
         .get(path)
         .then(res => {
@@ -276,7 +276,7 @@ export default {
     },
     saveModel() {
       let vm = this;
-      let path = "http://localhost:5000/saveModel";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/saveModel";
       axios({
         method: "post",
         url: path,
@@ -295,7 +295,7 @@ export default {
     },
     changeCase(case_name) {
       // changecase
-      let path = "http://localhost:5000/changeCase";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeCase";
       this.$axios
         .get(path, {
           params: {

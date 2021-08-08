@@ -7,7 +7,7 @@ import joblib
 from IPython.display import display
 
 
-from app import jsonify, Response
+from application import jsonify, Response
 import xgboost as xgb
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.model_selection import train_test_split

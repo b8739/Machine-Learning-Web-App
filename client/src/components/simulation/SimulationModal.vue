@@ -55,6 +55,13 @@
               <v-subheader>
                 Create Sample Values
               </v-subheader>
+              <v-row align="center">
+                <v-col cols="4">
+                  <v-subheader> If leave Fixed Value blank, regard it as </v-subheader></v-col
+                ><v-col cols="2">
+                  <v-select :items="numericStatistics" v-model="fixedValueDefault"></v-select
+                ></v-col>
+              </v-row>
               <v-row class="py-5" justify="center">
                 <v-col>
                   <v-card width="100%" min-height="300px" elevation="0">
@@ -384,6 +391,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      fixedValueDefault: null,
       // drawer
       drawer: false,
       // radio
@@ -553,14 +561,25 @@ export default {
         let featureName = this.columns[index];
         let rangeMin = this.rangeValues["start"][index];
         let rangeMax = this.rangeValues["end"][index];
+        //fixed value
         if (element == 0) {
-          //fixed value
-          rangeInfo[featureName] = {
-            method: "fixed",
-            interval: { fixedValue: this.fixedValues[index] }
-          };
-        } else {
-          //random value
+          //fixed value (null)
+          if (this.fixedValues[index] == null) {
+            rangeInfo[featureName] = {
+              method: "fixed",
+              interval: { fixedValue: this.summarizedInfo["numeric"][featureName]["median"] }
+            };
+          }
+          //fixed value (has value)
+          else {
+            rangeInfo[featureName] = {
+              method: "fixed",
+              interval: { fixedValue: this.fixedValues[index] }
+            };
+          }
+        }
+        //random value
+        else {
           rangeInfo[featureName] = { interval: { min: rangeMin, max: rangeMax } };
           if (this.distributionRadioModel[index] == 0) rangeInfo[featureName]["method"] = "uniform";
           else rangeInfo[featureName]["method"] = "normal";
@@ -569,7 +588,7 @@ export default {
       });
       console.log(rangeInfo);
       // axios
-      let path = "http://localhost:5000/runSimulation";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/runSimulation";
 
       this.$axios({
         method: "post",
