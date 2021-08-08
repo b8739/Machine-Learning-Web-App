@@ -5,8 +5,8 @@ server/env39
 server/test.py
 server/config.py
 testcode/
-server/.ebextensions
-server/.elasticbeanstalk
+server/'.ebextensions'
+server/'.elasticbeanstalk'
 server/dist
 server/boston_house.csv
 server/iotPlatformReq.py
