@@ -1,8 +1,8 @@
 import { NodeBuilder } from "@baklavajs/core";
 import FeatureOption from "@/components/baklava/feature/FeatureOption.vue";
-import store from "@/store/index";
+import store from "@/store/modules/fundamental/initialData";
 
-const columns = store.getters["initialData/columns"];
+const columns = store.state.columns;
 
 export default new NodeBuilder("TargetNode", {})
   .setName("Target")
@@ -27,7 +27,6 @@ export default new NodeBuilder("TargetNode", {})
       n.getInterface("Out").value = nodeResult;
       return nodeResult;
     }
-    console.log("ca");
 
     // n.setOptionValue("ValueText", result);
   })

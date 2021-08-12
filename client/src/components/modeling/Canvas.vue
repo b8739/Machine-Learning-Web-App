@@ -60,8 +60,8 @@ export default {
         "colsample_bytree",
         "max_depth"
       ],
-      svr_parameters: ["n_estimators", "min_samples_split"],
-      rf_parameters: ["kernel", "C", "epsilon", "gamma"],
+      svr_parameters: ["kernel", "C", "epsilon", "gamma"],
+      rf_parameters: ["n_estimators", "min_samples_split"],
       // barklava
       editor: new Editor(),
       viewPlugin: new ViewPlugin(),
@@ -76,44 +76,35 @@ export default {
   components: { NodeAlgorithm, CanvasSide },
   computed: {
     ...mapState({
-      inputs: state => state.modelingData.inputs,
-      targets: state => state.modelingData.targets,
       modelingRequest: state => state.modelingData.modelingRequest,
       splitRatio: state => state.modelingData.splitRatio,
       columns: state => state.initialData.columns
       // parameters: state => state.modelingData.parameters
-    }),
+    })
     // ...mapGetters("initialData", ["columns"]),
-    algorithmProps() {
-      if (this.algorithm == "XGBoost") {
-        return this.xgboost_props;
-      } else if (this.algorithm == "Random Forest") {
-        return this.randomForest_props;
-      } else if (this.algorithm == "SVR") {
-        return this.svr_props;
-      }
-    }
   },
 
   methods: {
+    ...mapActions("modelingData", ["requestModeling"]),
+    // mapmutations
+    ...mapMutations("modelingData", ["saveModelingRequest"]),
+
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveParameters"]),
     checkNodes() {
       this.calculate(this.engine);
     },
     async calculate(engine) {
       const result = await engine.calculate();
-      console.log(result.values());
       this.algorithmRequest = null;
       for (const v of result.values()) {
         this.algorithmRequest = v;
       }
       this.saveModelingRequest(this.algorithmRequest);
+      // vuex request api, save response, and routing
+      this.requestModeling();
     },
-    // mapmutations
-    ...mapMutations("modelingData", ["saveModelingRequest"]),
-
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
-    ...mapMutations("modelingResult", ["saveParameters"]),
 
     // build node types
     buildFeatureNodes(featureName) {

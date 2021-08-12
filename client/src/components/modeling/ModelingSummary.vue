@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     ...mapState({
-      modelingSummary: state => state.modelingResult.modelingSummary
+      modelingSummary: state => state.modelingData.modelingSummary
     }),
 
     test_result() {

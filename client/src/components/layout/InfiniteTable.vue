@@ -128,6 +128,7 @@
               </tr>
             </tbody>
             <infinite-loading
+              ref="infiniteLoading"
               @infinite="infiniteHandlerCustom"
               spinner="waveDots"
             ></infinite-loading>
@@ -451,8 +452,9 @@ export default {
       this.deleteDataFromGraph(this.payload);
       // infinite table 초기화
       this.checkedRows = [];
-      this.datasetItems.splice(45);
+      // this.datasetItems.splice(45);
       this.limit = 0;
+      this.$refs.infiniteLoading.stateChanger.reset();
     });
   },
   mounted() {},

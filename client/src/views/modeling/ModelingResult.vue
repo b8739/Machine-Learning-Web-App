@@ -234,8 +234,8 @@ export default {
   components: { ApexChart, ModelingSummary, SaveChange, ModelingResultSide },
   computed: {
     ...mapState({
-      graphSources: state => state.modelingResult.graphSources,
-      modelingSummary: state => state.modelingResult.modelingSummary
+      graphSources: state => state.modelingData.graphSources,
+      modelingSummary: state => state.modelingData.modelingSummary
     }),
 
     graphNames() {
@@ -250,9 +250,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveCaseList"]),
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
     modifyModeling() {
       let modelingParameter = [500, 0.08, 0.3, 0.04, 0.75, 0.5, 7];
       this.$router.push({ name: "modelingProcess" });

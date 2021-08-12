@@ -180,8 +180,8 @@ export default {
   components: { ApexChart, ModelingSummary },
   computed: {
     ...mapState({
-      graphSources: state => state.modelingResult.graphSources,
-      modelingSummary: state => state.modelingResult.modelingSummary
+      graphSources: state => state.modelingData.graphSources,
+      modelingSummary: state => state.modelingData.modelingSummary
     }),
 
     graphNames() {
@@ -196,16 +196,16 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveCaseList"]),
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
     getPos(e) {
       let obj = e.target;
       this.left = obj.getBoundingClientRect().left;
       this.top = obj.getBoundingClientRect().top;
     },
     loadCases() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
+      let path = "http://localhost:5000/loadCases";
       axios
         .get(path)
         .then(res => {

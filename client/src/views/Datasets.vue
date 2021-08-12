@@ -75,7 +75,7 @@ export default {
       this.$router.push({ name: "preprocess" });
     },
     showTables() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
+      let path = "http://localhost:5000/showTables";
       axios
         .get(path)
         .then(res => {

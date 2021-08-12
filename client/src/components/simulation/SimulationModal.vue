@@ -215,6 +215,7 @@
                       <v-navigation-drawer
                         :hide-overlay="true"
                         v-model="drawer"
+                        stateless
                         absolute
                         bottom
                         temporary
@@ -412,7 +413,7 @@ export default {
 
       distributionSelected: null,
       // tab
-      tab: 1,
+      tab: 0,
       tab_rangeMethod: 0,
 
       // page
@@ -433,7 +434,7 @@ export default {
 
       select: { method: "", explanation: "" },
 
-      dialog: true,
+      dialog: false,
       disabledProps: {
         disabled: true
       },

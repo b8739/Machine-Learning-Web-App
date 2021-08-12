@@ -200,22 +200,22 @@ export default {
     }
   },
   created() {
-    this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData");
+    this.loadFundamentalData("http://localhost:5000/loadData");
     this.loadSummarizedData();
     this.setNavStatus("preprocess");
-  },
+  }
   // beforeRouteEnter(to, from, next) {
   //   next(vm => {
   //     vm.dialog1 = true;
   //   });
   // s}
-  beforeRouteLeave(to, from, next) {
-    if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-      //
-    } else {
-      next();
-    }
-  }
+  // beforeRouteLeave(to, from, next) {
+  //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
+  //     //
+  //   } else {
+  //     next();
+  //   }
+  // }
 };
 </script>
 

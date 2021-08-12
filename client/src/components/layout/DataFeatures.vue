@@ -14,7 +14,7 @@
               <td>
                 <v-row>
                   <v-col cols="1"
-                    ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(columnIndex)"
+                    ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(column)"
                       >mdi-pencil</v-icon
                     ></v-col
                   >

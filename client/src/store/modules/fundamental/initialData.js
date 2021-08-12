@@ -83,8 +83,8 @@ const mutations = {
   },
   deleteDataFromGraph(state, payload) {
     payload.checkedRows.forEach(element => {
-      // Vue.delete(state.dataset[element], payload.featureName);
-      Vue.set(state.dataset[element], payload.featureName, null);
+      Vue.delete(state.dataset, element);
+      // Vue.set(state.dataset[element], payload.featureName, null);
     });
     // console.log(state.dataset);
   },
@@ -111,7 +111,7 @@ const actions = {
       });
   },
   loadSummarizedData({ commit }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadSummarizedData";
+    const path = "http://localhost:5000/loadSummarizedData";
     axios
       .get(path)
       .then(res => {
@@ -122,7 +122,7 @@ const actions = {
       });
   },
   loadRandomData({ commit }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadRandomInfo";
+    const path = "http://localhost:5000/loadRandomInfo";
     axios
       .get(path)
       .then(res => {

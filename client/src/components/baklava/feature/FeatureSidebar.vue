@@ -5,7 +5,7 @@
       <v-container>
         <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
         <v-checkbox
-          v-for="(feature, index) in inputFeatures"
+          v-for="(feature, index) in columns"
           :key="index"
           v-model="checkedFeatures[index]"
           dense
@@ -20,6 +20,7 @@
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
 import { CheckboxOption } from "@baklavajs/plugin-options-vue";
+import { mapState, mapGetters } from "vuex";
 export default {
   extends: InputOption,
   props: ["node"],
@@ -37,6 +38,7 @@ export default {
       selectAllFlag: false
     };
   },
+
   methods: {
     selectAll() {
       // flag가 true일 때 (이미 selectall이 된 상태) 체크 해제
@@ -44,8 +46,8 @@ export default {
       this.checkedFeatures = [];
       // flag가 false일 때 (select all이 해제된 상태) 전부 체크
       if (this.selectAllFlag == false) {
-        for (let i = 0; i < this.inputFeatures.length; i++) {
-          this.selectedFeatures.push(this.inputFeatures[i]);
+        for (let i = 0; i < this.columns.length; i++) {
+          this.selectedFeatures.push(this.columns[i]);
           this.checkedFeatures.push(true);
         }
       }
@@ -72,9 +74,14 @@ export default {
       this.$emit("input", this.selectedFeatures);
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      columns: state => state.initialData.columns
+    })
+  },
   created() {},
   mounted() {
+    console.log(this.value.features);
     this.inputFeatures = this.value.features;
   }
 };
