@@ -69,12 +69,12 @@
   </div>
 </template>
 <script>
-import ColumnList from "@/components/EDA/ColumnList.vue";
-import ApexChart from "@/components/EDA/ApexChart.vue";
-import DragBoxXaxis from "@/components/EDA/DragBoxXaxis.vue";
-import DragBoxYaxis from "@/components/EDA/DragBoxYaxis.vue";
-import Xgroup from "@/components/EDA/Xgroup.vue";
-import GraphTypeToolbar from "@/components/EDA/GraphTypeToolbar.vue";
+import ColumnList from "@/components/eda/ColumnList.vue";
+import ApexChart from "@/components/eda/ApexChart.vue";
+import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
+import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
+import Xgroup from "@/components/eda/Xgroup.vue";
+import GraphTypeToolbar from "@/components/eda/GraphTypeToolbar.vue";
 
 import { eventBus } from "@/main";
 // vuex
