@@ -55,7 +55,7 @@ export default {
     },
 
     addData(payload) {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/addData";
+      const path = "http://localhost:5000/addData";
       axios
         .post(path, payload)
         .then(() => {

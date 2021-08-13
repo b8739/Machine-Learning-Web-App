@@ -51,9 +51,8 @@ const actions = {
     }
     // define path
     let algorithmName = state.modelingRequest["algorithm"]["name"].toLowerCase(); // xgboost/rf/svr
-    let path =
-      "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + algorithmName + "_modeling";
-    // let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + algorithmPath;
+    let path = "http://localhost:5000/" + algorithmName + "_modeling";
+    // let path = "http://localhost:5000/" + algorithmPath;
     console.log(path);
     console.log(state.modelingRequest);
     console.log(state.splitRatio);

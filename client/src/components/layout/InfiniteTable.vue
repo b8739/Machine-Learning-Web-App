@@ -310,7 +310,7 @@ export default {
       this.showTableOption = false;
     },
     deleteColumn() {
-      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteColumn";
+      let api = "http://localhost:5000/deleteColumn";
       console.log(this.columnToDeleteInfo.name);
       axios
         .get(api, {
@@ -356,7 +356,7 @@ export default {
     },
     // infinteLoading
     infiniteLoadingCreated() {
-      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
+      let api = "http://localhost:5000/infiniteLoading";
       axios
         .get(api, {
           params: {
@@ -369,7 +369,7 @@ export default {
         });
     },
     infiniteHandler($state) {
-      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
+      let api = "http://localhost:5000/infiniteLoading";
       axios
         .get(api, {
           params: {

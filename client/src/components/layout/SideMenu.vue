@@ -70,7 +70,7 @@ export default {
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["loadTableList"]),
     clickTableNameEvent() {
-      this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData");
+      this.loadFundamentalData("http://localhost:5000/loadData");
     },
     callOption(title) {
       if (title == "Delete Row") {
@@ -82,7 +82,7 @@ export default {
       }
     },
     showTables() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
+      let path = "http://localhost:5000/showTables";
       axios
         .get(path)
         .then(res => {

@@ -108,7 +108,7 @@ export default {
     },
     deleteRow() {
       // date mode 일 때
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteRow";
+      const path = "http://localhost:5000/deleteRow";
       axios
         .get(path, {
           params: {

@@ -280,7 +280,7 @@ export default {
     clickDeleteEvent() {
       // date mode 일 때
       if (this.modeFlag == true) {
-        const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteRowByDate";
+        const path = "http://localhost:5000/deleteRowByDate";
         axios
           .get(path, {
             params: {
@@ -294,7 +294,7 @@ export default {
       }
       // period mode 일 때
       else {
-        const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteRowByPeriod";
+        const path = "http://localhost:5000/deleteRowByPeriod";
         axios
           .get(path, {
             params: {

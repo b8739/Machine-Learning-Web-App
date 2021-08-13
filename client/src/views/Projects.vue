@@ -53,7 +53,7 @@ export default {
   methods: {
     ...mapMutations("initialData", ["setNavStatus"]),
     loadProjects() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadProjects";
+      let path = "http://localhost:5000/loadProjects";
       console.log(path);
 
       axios

@@ -42,7 +42,7 @@ export default {
       }
     },
     saveTableAxios(saveOption) {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
+      const path = "http://localhost:5000/overwriteTable";
       axios
         .get(path, {
           params: {

@@ -122,7 +122,7 @@ export default {
       this.comp = componentName;
     },
     loadData() {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData";
+      const path = "http://localhost:5000/loadData";
       axios
         .get(path)
         .then(res => {
@@ -137,7 +137,7 @@ export default {
         });
     },
     duplicateTable() {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/duplicateTable";
+      const path = "http://localhost:5000/duplicateTable";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -174,7 +174,7 @@ export default {
     },
     updateData(payload) {
       console.log(payload);
-      const path = `http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/updateData`;
+      const path = `http://localhost:5000/updateData`;
       axios
         .put(path, payload)
         .then(() => {
@@ -200,7 +200,7 @@ export default {
     }
   },
   created() {
-    this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData");
+    this.loadFundamentalData("http://localhost:5000/loadData");
     this.loadSummarizedData();
     this.setNavStatus("preprocess");
   }
