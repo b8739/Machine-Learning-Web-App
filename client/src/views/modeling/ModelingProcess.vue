@@ -9,8 +9,19 @@
         </v-col> -->
         <v-col>
           <v-toolbar elevation="1" dense>
-            <v-spacer></v-spacer
-            ><v-btn @click="runModel"><v-icon left small>mdi-play-outline</v-icon> Run</v-btn>
+            <v-spacer></v-spacer>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="tellConnectAll" v-bind="attrs" v-on="on" class="mr-2">
+                  Connect All</v-btn
+                >
+              </template>
+              <span>Connect Order (Input -> Algorithm -> Target)</span>
+            </v-tooltip>
+
+            <v-btn @click="runModel" color="primary"
+              ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
+            >
           </v-toolbar>
           <Canvas></Canvas>
         </v-col>
@@ -40,7 +51,9 @@ export default {
   methods: {
     ...mapMutations("modelingData", ["saveGraphSources"]),
     ...mapMutations("modelingData", ["saveModelingSummary"]),
-
+    tellConnectAll() {
+      eventBus.$emit("tellConnectAll", true);
+    },
     runModel() {
       eventBus.$emit("saveRequest_canvas", true); // to Canvas.vue
       eventBus.$emit("saveRequest_canvasSide", true); // to Canvas.vue

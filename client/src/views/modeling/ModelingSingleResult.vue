@@ -205,7 +205,7 @@ export default {
       this.top = obj.getBoundingClientRect().top;
     },
     loadCases() {
-      let path = "http://localhost:5000/loadCases";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
       axios
         .get(path)
         .then(res => {

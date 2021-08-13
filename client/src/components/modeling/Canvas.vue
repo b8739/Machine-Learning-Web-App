@@ -169,6 +169,7 @@ export default {
           },
           "ParameterSidebar"
         )
+
         .addInputInterface("In")
         .addOutputInterface("Out")
         .onCalculate(n => {
@@ -195,6 +196,34 @@ export default {
     // eventbus
     eventBus.$on("saveRequest_canvas", status => {
       this.saveRequest();
+    });
+
+    eventBus.$on("closeSidebar", status => {
+      this.viewPlugin.sidebar.visible = false;
+    });
+    eventBus.$on("tellConnectAll", status => {
+      if (this.editor.nodes.length < 4) {
+        alert("Algorithm Node가 컨버스상에 있어야 합니다.");
+        return false;
+      }
+      let inputNode = null;
+      let algorithmNode = null;
+      let targetNode = null;
+      this.editor.nodes.forEach(element => {
+        if (element.name == "Input") {
+          inputNode = element;
+        } else if (element.name == "Target") {
+          targetNode = element;
+        } else if (element.name == "Debugger") {
+          return;
+        } else {
+          algorithmNode = element;
+        }
+      });
+      this.editor.addConnection(inputNode.getInterface("Out"), algorithmNode.getInterface("In"));
+      this.editor.addConnection(algorithmNode.getInterface("Out"), targetNode.getInterface("In"));
+
+      console.log(this.editor.nodes[0].name);
     });
     // baklava js setting
     this.editor.use(this.optionPlugin);

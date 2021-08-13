@@ -200,7 +200,7 @@ export default {
     }
   },
   created() {
-    this.loadFundamentalData("http://localhost:5000/loadData");
+    this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData");
     this.loadSummarizedData();
     this.setNavStatus("preprocess");
   }

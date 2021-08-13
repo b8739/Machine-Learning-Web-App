@@ -17,6 +17,7 @@
   </div>
 </template>
 <script>
+import Vue from "vue";
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
 import { CheckboxOption } from "@baklavajs/plugin-options-vue";
@@ -81,8 +82,16 @@ export default {
   },
   created() {},
   mounted() {
-    console.log(this.value.features);
-    this.inputFeatures = this.value.features;
+    //  다른 sidebar를 켰다가 다시 열면 값이 초기화되기 때문에, value값을 받아와서 다시 check 해줌
+    console.log(`${this.node.name} mounted`);
+    this.node.getOptionValue("Features").forEach(nodeValue => {
+      this.columns.forEach((column, index) => {
+        if (nodeValue == column) {
+          Vue.set(this.selectedFeatures, index, nodeValue);
+          Vue.set(this.checkedFeatures, index, true);
+        }
+      });
+    });
   }
 };
 </script>
