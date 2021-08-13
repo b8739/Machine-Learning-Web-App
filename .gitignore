@@ -1,5 +1,9 @@
 # server/
 testcode/
-dist
+server/.git
+server/dist
+server/env
+server/env37
+server/env39
 # backend.sh
 # frontend.sh
