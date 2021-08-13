@@ -1,9 +1,7 @@
 # server/
 testcode/
-server/.git
-server/dist
-server/env
-server/env37
-server/env39
+server-sub/.git
+server-sub/dist
+server-sub/config.py
 # backend.sh
 # frontend.sh
