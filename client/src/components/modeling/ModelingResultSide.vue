@@ -45,17 +45,17 @@ export default {
   },
   computed: {
     ...mapState({
-      caseList: state => state.modelingResult.caseList
+      caseList: state => state.modelingData.caseList
     })
   },
   methods: {
-    ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveCaseDataset"]),
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveCaseList"]),
+    ...mapMutations("modelingData", ["saveCaseDataset"]),
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
     loadCases() {
       console.log("loadCases");
-      let path = "http://localhost:5000/loadCases";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
       axios
         .get(path)
         .then(res => {
@@ -68,7 +68,7 @@ export default {
       let h = 500;
       let leftPosition = (screen.width - w) / 2;
       let topPosition = (screen.height - h) / 2;
-      let url = "http://localhost:8080/modelingSingleResult/" + case_name;
+      let url = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + case_name;
 
       window.open(
         url,

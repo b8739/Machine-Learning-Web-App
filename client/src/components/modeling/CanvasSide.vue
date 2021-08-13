@@ -110,6 +110,22 @@
                     </v-chip>
                   </v-chip-group>
                 </v-row>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      @click="
+                        (validationStartIndex = dataset.length - Math.round(dataset.length * 0.2)),
+                          (validationEndIndex = dataset.length)
+                      "
+                      v-bind="attrs"
+                      v-on="on"
+                      dense
+                      small
+                      >Default</v-btn
+                    >
+                  </template>
+                  <span>20% from the end of dataset</span>
+                </v-tooltip>
               </v-container>
             </v-list-item>
           </v-list-group>
@@ -120,26 +136,43 @@
               </v-list-item-content>
             </template>
             <v-list-item>
-              <v-col cols="5"> <v-subheader>Training:</v-subheader></v-col>
-              <v-text-field
-                suffix="%"
-                dense
-                outlined
-                clearable
-                hide-details
-                v-model="trainSet"
-              ></v-text-field>
+              <v-row>
+                <v-col cols=""> <v-subheader>Training:</v-subheader></v-col>
+                <v-col cols="7">
+                  <v-text-field
+                    :rules="[rules.required]"
+                    suffix="%"
+                    dense
+                    outlined
+                    clearable
+                    v-model="trainSet"
+                  ></v-text-field
+                ></v-col>
+              </v-row>
             </v-list-item>
             <v-list-item>
-              <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col>
-              <v-text-field
-                suffix="%"
-                outlined
-                dense
-                clearable
-                hide-details
-                v-model="testSet"
-              ></v-text-field>
+              <v-row>
+                <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col>
+                <v-col cols="7">
+                  <v-text-field
+                    :rules="[rules.required]"
+                    suffix="%"
+                    outlined
+                    dense
+                    clearable
+                    v-model="testSet"
+                  ></v-text-field
+                ></v-col>
+              </v-row>
+            </v-list-item>
+            <v-divider></v-divider>
+
+            <v-list-item>
+              <v-subheader>Example Ratios (Train:Test)</v-subheader>
+              <v-chip-group>
+                <v-chip @click="(trainSet = 60), (testSet = 40)" label>60:40</v-chip>
+                <v-chip @click="(trainSet = 80), (testSet = 20)" label>80:20</v-chip>
+              </v-chip-group>
             </v-list-item>
           </v-list-group>
         </v-list-group>
@@ -196,7 +229,11 @@ export default {
         { title: "My Account", icon: "mdi-account" },
         { title: "Users", icon: "mdi-account-group-outline" }
       ],
-      mini: true
+      mini: true,
+      // textfiled rules
+      rules: {
+        required: value => !!value || "Required."
+      }
     };
   },
   computed: {

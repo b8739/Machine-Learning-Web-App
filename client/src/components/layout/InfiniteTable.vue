@@ -128,6 +128,7 @@
               </tr>
             </tbody>
             <infinite-loading
+              ref="infiniteLoading"
               @infinite="infiniteHandlerCustom"
               spinner="waveDots"
             ></infinite-loading>
@@ -309,7 +310,7 @@ export default {
       this.showTableOption = false;
     },
     deleteColumn() {
-      let api = "http://localhost:5000/deleteColumn";
+      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteColumn";
       console.log(this.columnToDeleteInfo.name);
       axios
         .get(api, {
@@ -355,7 +356,7 @@ export default {
     },
     // infinteLoading
     infiniteLoadingCreated() {
-      let api = "http://localhost:5000/infiniteLoading";
+      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
       axios
         .get(api, {
           params: {
@@ -368,7 +369,7 @@ export default {
         });
     },
     infiniteHandler($state) {
-      let api = "http://localhost:5000/infiniteLoading";
+      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
       axios
         .get(api, {
           params: {
@@ -451,8 +452,9 @@ export default {
       this.deleteDataFromGraph(this.payload);
       // infinite table 초기화
       this.checkedRows = [];
-      this.datasetItems.splice(45);
+      // this.datasetItems.splice(45);
       this.limit = 0;
+      this.$refs.infiniteLoading.stateChanger.reset();
     });
   },
   mounted() {},

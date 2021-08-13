@@ -1,6 +1,7 @@
-server/static/uploadsDB/
-server/env
-server/env37
-server/env39
-NOx_201505_201606.txt
-solution_test.py
+# server/
+testcode/
+server-sub/.git
+server-sub/dist
+server-sub/config.py
+# backend.sh
+# frontend.sh

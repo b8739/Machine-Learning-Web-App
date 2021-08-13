@@ -19,7 +19,7 @@ export default new NodeBuilder("DisplayNode", {
       let inputList = "Inputs: " + JSON.stringify(nodeResult["inputs"]);
       let normalization = "Normalization: " + JSON.stringify(nodeResult["normalization"]);
       let algorithmName = "Algorithm Name: " + JSON.stringify(nodeResult["algorithm"]["name"]);
-      let parameters = "Algorithm Name: " + JSON.stringify(nodeResult["algorithm"]["parameters"]);
+      let parameters = "Parameters: " + JSON.stringify(nodeResult["algorithm"]["parameters"]);
       let targetList = "Targets: " + JSON.stringify(nodeResult["targets"]);
       n.setOptionValue("InputList", inputList);
       n.setOptionValue("Normalization", normalization);

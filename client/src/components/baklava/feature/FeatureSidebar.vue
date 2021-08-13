@@ -5,7 +5,7 @@
       <v-container>
         <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
         <v-checkbox
-          v-for="(feature, index) in inputFeatures"
+          v-for="(feature, index) in columns"
           :key="index"
           v-model="checkedFeatures[index]"
           dense
@@ -17,9 +17,11 @@
   </div>
 </template>
 <script>
+import Vue from "vue";
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
 import { CheckboxOption } from "@baklavajs/plugin-options-vue";
+import { mapState, mapGetters } from "vuex";
 export default {
   extends: InputOption,
   props: ["node"],
@@ -37,6 +39,7 @@ export default {
       selectAllFlag: false
     };
   },
+
   methods: {
     selectAll() {
       // flag가 true일 때 (이미 selectall이 된 상태) 체크 해제
@@ -44,8 +47,8 @@ export default {
       this.checkedFeatures = [];
       // flag가 false일 때 (select all이 해제된 상태) 전부 체크
       if (this.selectAllFlag == false) {
-        for (let i = 0; i < this.inputFeatures.length; i++) {
-          this.selectedFeatures.push(this.inputFeatures[i]);
+        for (let i = 0; i < this.columns.length; i++) {
+          this.selectedFeatures.push(this.columns[i]);
           this.checkedFeatures.push(true);
         }
       }
@@ -72,10 +75,23 @@ export default {
       this.$emit("input", this.selectedFeatures);
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      columns: state => state.initialData.columns
+    })
+  },
   created() {},
   mounted() {
-    this.inputFeatures = this.value.features;
+    //  다른 sidebar를 켰다가 다시 열면 값이 초기화되기 때문에, value값을 받아와서 다시 check 해줌
+    console.log(`${this.node.name} mounted`);
+    this.node.getOptionValue("Features").forEach(nodeValue => {
+      this.columns.forEach((column, index) => {
+        if (nodeValue == column) {
+          Vue.set(this.selectedFeatures, index, nodeValue);
+          Vue.set(this.checkedFeatures, index, true);
+        }
+      });
+    });
   }
 };
 </script>

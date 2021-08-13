@@ -60,8 +60,8 @@ export default {
         "colsample_bytree",
         "max_depth"
       ],
-      svr_parameters: ["n_estimators", "min_samples_split"],
-      rf_parameters: ["kernel", "C", "epsilon", "gamma"],
+      svr_parameters: ["kernel", "C", "epsilon", "gamma"],
+      rf_parameters: ["n_estimators", "min_samples_split"],
       // barklava
       editor: new Editor(),
       viewPlugin: new ViewPlugin(),
@@ -76,44 +76,35 @@ export default {
   components: { NodeAlgorithm, CanvasSide },
   computed: {
     ...mapState({
-      inputs: state => state.modelingData.inputs,
-      targets: state => state.modelingData.targets,
       modelingRequest: state => state.modelingData.modelingRequest,
       splitRatio: state => state.modelingData.splitRatio,
       columns: state => state.initialData.columns
       // parameters: state => state.modelingData.parameters
-    }),
+    })
     // ...mapGetters("initialData", ["columns"]),
-    algorithmProps() {
-      if (this.algorithm == "XGBoost") {
-        return this.xgboost_props;
-      } else if (this.algorithm == "Random Forest") {
-        return this.randomForest_props;
-      } else if (this.algorithm == "SVR") {
-        return this.svr_props;
-      }
-    }
   },
 
   methods: {
+    ...mapActions("modelingData", ["requestModeling"]),
+    // mapmutations
+    ...mapMutations("modelingData", ["saveModelingRequest"]),
+
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveParameters"]),
     checkNodes() {
       this.calculate(this.engine);
     },
     async calculate(engine) {
       const result = await engine.calculate();
-      console.log(result.values());
       this.algorithmRequest = null;
       for (const v of result.values()) {
         this.algorithmRequest = v;
       }
       this.saveModelingRequest(this.algorithmRequest);
+      // vuex request api, save response, and routing
+      this.requestModeling();
     },
-    // mapmutations
-    ...mapMutations("modelingData", ["saveModelingRequest"]),
-
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
-    ...mapMutations("modelingResult", ["saveParameters"]),
 
     // build node types
     buildFeatureNodes(featureName) {
@@ -178,6 +169,7 @@ export default {
           },
           "ParameterSidebar"
         )
+
         .addInputInterface("In")
         .addOutputInterface("Out")
         .onCalculate(n => {
@@ -204,6 +196,34 @@ export default {
     // eventbus
     eventBus.$on("saveRequest_canvas", status => {
       this.saveRequest();
+    });
+
+    eventBus.$on("closeSidebar", status => {
+      this.viewPlugin.sidebar.visible = false;
+    });
+    eventBus.$on("tellConnectAll", status => {
+      if (this.editor.nodes.length < 4) {
+        alert("Algorithm Node가 컨버스상에 있어야 합니다.");
+        return false;
+      }
+      let inputNode = null;
+      let algorithmNode = null;
+      let targetNode = null;
+      this.editor.nodes.forEach(element => {
+        if (element.name == "Input") {
+          inputNode = element;
+        } else if (element.name == "Target") {
+          targetNode = element;
+        } else if (element.name == "Debugger") {
+          return;
+        } else {
+          algorithmNode = element;
+        }
+      });
+      this.editor.addConnection(inputNode.getInterface("Out"), algorithmNode.getInterface("In"));
+      this.editor.addConnection(algorithmNode.getInterface("Out"), targetNode.getInterface("In"));
+
+      console.log(this.editor.nodes[0].name);
     });
     // baklava js setting
     this.editor.use(this.optionPlugin);

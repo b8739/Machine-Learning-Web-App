@@ -15,11 +15,13 @@ import GraphBuilder from "../views/GraphBuilder";
 import Simulations from "../views/simulation/Simulations";
 import SimulationResult from "../views/simulation/SimulationResult";
 
+import LoginForm from "@/components/login/LoginForm";
+
 import "../assets/css/main.css";
 
 // import Login from "../views/Login";
 
-Vue.use(VueRouter); //View Router를 사용했다고 선언
+Vue.use(VueRouter); //Vue Router를 사용했다고 선언
 
 const router = new VueRouter({
   mode: "history",
@@ -27,6 +29,11 @@ const router = new VueRouter({
   routes: [
     {
       path: "/",
+      component: LoginForm,
+      props: true
+    },
+    {
+      path: "/projects",
       component: Projects,
       props: true
     },

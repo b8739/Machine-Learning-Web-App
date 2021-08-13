@@ -78,7 +78,7 @@ export default {
 
   computed: {
     ...mapState({
-      caseList: state => state.modelingResult.caseList
+      caseList: state => state.modelingData.caseList
     })
   },
   /*
@@ -86,11 +86,11 @@ export default {
     */
   methods: {
     // 테이블 정보
-    ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveCaseDataset"]),
+    ...mapMutations("modelingData", ["saveCaseList"]),
+    ...mapMutations("modelingData", ["saveCaseDataset"]),
     // 시각화
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
     // nav 정보
     ...mapMutations("initialData", ["setNavStatus"]),
 
@@ -103,7 +103,7 @@ export default {
       this.$router.push({ name: "modelingProcess" });
     },
     loadCases() {
-      let path = "http://localhost:5000/loadCases";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
       axios
         .get(path)
         .then(res => {

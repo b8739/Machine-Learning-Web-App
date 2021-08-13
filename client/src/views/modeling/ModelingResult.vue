@@ -234,8 +234,8 @@ export default {
   components: { ApexChart, ModelingSummary, SaveChange, ModelingResultSide },
   computed: {
     ...mapState({
-      graphSources: state => state.modelingResult.graphSources,
-      modelingSummary: state => state.modelingResult.modelingSummary
+      graphSources: state => state.modelingData.graphSources,
+      modelingSummary: state => state.modelingData.modelingSummary
     }),
 
     graphNames() {
@@ -250,9 +250,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("modelingResult", ["saveCaseList"]),
-    ...mapMutations("modelingResult", ["saveGraphSources"]),
-    ...mapMutations("modelingResult", ["saveModelingSummary"]),
+    ...mapMutations("modelingData", ["saveCaseList"]),
+    ...mapMutations("modelingData", ["saveGraphSources"]),
+    ...mapMutations("modelingData", ["saveModelingSummary"]),
     modifyModeling() {
       let modelingParameter = [500, 0.08, 0.3, 0.04, 0.75, 0.5, 7];
       this.$router.push({ name: "modelingProcess" });
@@ -266,7 +266,7 @@ export default {
       this.top = obj.getBoundingClientRect().top;
     },
     loadCases() {
-      let path = "http://localhost:5000/loadCases";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
       axios
         .get(path)
         .then(res => {
@@ -276,7 +276,7 @@ export default {
     },
     saveModel() {
       let vm = this;
-      let path = "http://localhost:5000/saveModel";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/saveModel";
       axios({
         method: "post",
         url: path,
@@ -295,7 +295,7 @@ export default {
     },
     changeCase(case_name) {
       // changecase
-      let path = "http://localhost:5000/changeCase";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeCase";
       this.$axios
         .get(path, {
           params: {

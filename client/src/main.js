@@ -48,6 +48,11 @@ Vue.use(PortalVue);
 Vue.use(Vuetify);
 export default new Vuetify({});
 
+<<<<<<< HEAD
+=======
+Vue.use(Vuetify);
+
+>>>>>>> aws-eb
 Vue.use(BootstrapVue);
 Vue.component("apexchart", VueApexCharts);
 Vue.config.productionTip = false;

@@ -1,24 +1,6 @@
-const state = {
-  graphSources: null,
-  modelingSummary: null,
-  caseList: [],
-  caseDataset: null
-};
+const state = {};
 
-const mutations = {
-  saveGraphSources(state, payload) {
-    state.graphSources = payload;
-  },
-  saveModelingSummary(state, payload) {
-    state.modelingSummary = payload;
-  },
-  saveCaseList(state, payload) {
-    state.caseList = payload;
-  },
-  saveCaseDataset(state, payload) {
-    state.caseDataset = payload;
-  }
-};
+const mutations = {};
 
 const actions = {};
 

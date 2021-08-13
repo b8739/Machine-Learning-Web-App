@@ -14,6 +14,8 @@
   </div>
 </template>
 <script>
+import { eventBus } from "@/main";
+
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
 import { TextOption } from "@baklavajs/plugin-options-vue";
@@ -47,6 +49,7 @@ export default {
       this.node.editorInstance.removeNode(this.node);
       // 새로운 Node 위치 수정
       n.position = { x: currentNodePosition.x, y: currentNodePosition.y };
+      eventBus.$emit("closeSidebar", true);
     }
   }
 };
