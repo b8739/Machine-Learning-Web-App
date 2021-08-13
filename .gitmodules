@@ -1,0 +1,3 @@
+[submodule "server-sub"]
+	path = server-sub
+	url = https://git-codecommit.ap-northeast-2.amazonaws.com/v1/repos/attic-dev
