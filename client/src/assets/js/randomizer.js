@@ -1,5 +1,6 @@
 export function getCount(datasetLength) {
-  return Math.round(datasetLength * 0.5);
+  let percent = 100 / datasetLength;
+  return Math.round(datasetLength * percent);
   // data111.csv같은 경우 0.05
 }
 export function getRandom(min, max) {
@@ -9,7 +10,6 @@ export function getRandom(min, max) {
 export function getRandomArray(min, max) {
   var getCount = require("./randomizer.js").getCount;
   var getRandom = require("./randomizer.js").getRandom;
-  console.log(getCount);
   let count = getCount(max);
   if (max - min + 1 < count) return;
   // 배열 생성

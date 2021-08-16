@@ -115,7 +115,18 @@
               <td v-if="distinguishDataType(column)"></td>
               <!-- numeric 일 경우: Graph 표시 -->
               <td v-else @click="openEditModal(column)">
-                <span class="tdTitle" @click="showTimeSeriesGraph()">Graph</span>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-bind="attrs" v-on="on" right v-if="columnIndex == 0"
+                      >mdi-information-outline</v-icon
+                    >
+                  </template>
+                  <span>Only shows upto 500 rows of the dataset (randomized)</span>
+                </v-tooltip>
+
+                <v-row align="center">
+                  <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
+                </v-row>
 
                 <TimeSeries
                   :graphWidth="graphWidth"
@@ -245,7 +256,7 @@ export default {
   },
   methods: {
     ...mapActions("initialData", ["loadSummarizedData"]),
-    ...mapActions("initialData", ["loadFundamentalData"]),
+    // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
     createNewDataset() {
@@ -369,6 +380,10 @@ export default {
     });
   },
   mounted() {
+    console.log("df mounted");
+    // this.selectionTimer = setTimeout(() => {
+    //   eventBus.$emit("dfMounted", true);
+    // }, 1000);
     // this.$nextTick(function() {
     //   console.log("df mounted");
     //   eventBus.$emit("dfMounted", true);

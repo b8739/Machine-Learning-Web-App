@@ -114,7 +114,7 @@ export default {
   },
   //실험
   created() {
-    this.loadCases();
+    // this.loadCases();
     this.setNavStatus("models");
   },
   mounted() {

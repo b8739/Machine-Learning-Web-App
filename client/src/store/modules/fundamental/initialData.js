@@ -103,7 +103,7 @@ const actions = {
       .get(path)
       .then(res => {
         // console.log(res.data);
-        commit("loadDataset", res.data);
+        commit("loadDataset", Object.freeze(res.data));
         commit("setColumns");
       })
       .catch(error => {

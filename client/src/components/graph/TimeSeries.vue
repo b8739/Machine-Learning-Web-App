@@ -1,7 +1,5 @@
 <template>
-  <div id="chart">
-    <!-- <v-btn @click="mount = true">rerender</v-btn> -->
-
+  <div v-once id="chart">
     <apexchart
       ref="realtimeChart"
       type="line"
@@ -28,7 +26,7 @@ export default {
 
   data() {
     return {
-      mount: false,
+      title: 1,
       selectionTimer: null,
       xaxisMin: null,
       yaxisMin: null,
@@ -118,6 +116,13 @@ export default {
           },
 
           events: {
+            mounted: (chartContext, config) => {
+              this.selectionTimer = setTimeout(() => {
+                this.renderDataset();
+              }, 1000);
+
+              // console.log("mounted apex");
+            },
             legendClick: function(chartContext, seriesIndex, config) {
               // console.log(seriesIndex);
               // ...
@@ -232,15 +237,24 @@ export default {
 
   created() {
     this.createNewDataset();
+
+    eventBus.$on("renderDataset", status => {
+      // this.renderDataset();
+    });
   },
   mounted() {
-    if (this.firstMount) {
+    console.log("timeseries mounted");
+
+    if (!this.firstMount) {
+      //아직 false가 아니라서 작동 안함
       this.renderDataset();
-      this.firstMount = !this.firstMount;
     }
+    this.firstMount = !this.firstMount; // true -> false
     // console.log("ts mounted");
   },
-
+  destroyed() {
+    console.log("destroyed");
+  },
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset
@@ -256,6 +270,11 @@ export default {
     }
   },
   methods: {
+    sayHello: function() {
+      this.title++;
+      return this.title;
+    },
+
     createNewDataset() {
       this.newDataset = [];
       this.dataset.forEach(element => {
@@ -296,13 +315,15 @@ export default {
       //   this.selectionTimer = null;
       // }, 2000);
     },
+
     renderDataset() {
       this.resetSeries();
       if (this.newDataset != null) {
         this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
         randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
+        // console.time("updateSeriesLine");
         this.updateSeriesLine(this.dataArray, this.seriesName);
-        let payload = { featureName: this.seriesName, dataset: this.dataArray };
+        // console.timeEnd("updateSeriesLine");
         // vuex에 저장
       }
       // dialog(edit modal)일때만 toolbar 활성화

@@ -74,6 +74,7 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      chartMountCount: 0,
       // dataSet: {},
       dialog1: false,
       indexNum: "",
@@ -90,9 +91,9 @@ export default {
       comp: "DataFeatures"
     };
   },
+  watch: {},
   components: {
     DataTable,
-
     AddModal,
     DataFeatures,
     InfiniteTable,
@@ -107,7 +108,10 @@ export default {
   },
   // props: ["summarizedInfo"],
   computed: {
-    ...mapState("initialData", ["columns"])
+    ...mapState({
+      columns: state => state.initialData.columns
+      // summarizedInfo: state => state.initialData.summarizedInfo
+    })
   },
   methods: {
     ...mapMutations("initialData", ["setHadLoaded"]),
@@ -200,9 +204,13 @@ export default {
     }
   },
   created() {
+    this.setNavStatus("preprocess");
+
     this.loadFundamentalData("http://localhost:5000/loadData");
     this.loadSummarizedData();
-    this.setNavStatus("preprocess");
+  },
+  mounted() {
+    console.log("preprocess mounted");
   }
   // beforeRouteEnter(to, from, next) {
   //   next(vm => {

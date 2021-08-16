@@ -101,8 +101,18 @@ export default {
       for (const v of result.values()) {
         this.algorithmRequest = v;
       }
-      this.saveModelingRequest(this.algorithmRequest);
+      // Error Handling *Input - Target feature 중복 방지
+      let inputs = this.algorithmRequest.inputs;
+      let targets = this.algorithmRequest.targets;
+      for (let i = 0; i < inputs.length; i++) {
+        if (targets.includes(inputs[i])) {
+          alert("Input과 Target에 중복되는 feature가 있습니다: " + inputs[i]);
+          return false;
+        }
+      }
+      // 중복 없을 때만 vuex request
       // vuex request api, save response, and routing
+      this.saveModelingRequest(this.algorithmRequest);
       this.requestModeling();
     },
 
@@ -222,8 +232,6 @@ export default {
       });
       this.editor.addConnection(inputNode.getInterface("Out"), algorithmNode.getInterface("In"));
       this.editor.addConnection(algorithmNode.getInterface("Out"), targetNode.getInterface("In"));
-
-      console.log(this.editor.nodes[0].name);
     });
     // baklava js setting
     this.editor.use(this.optionPlugin);
