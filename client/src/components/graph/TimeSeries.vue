@@ -14,6 +14,7 @@
 <script>
 import Vue from "vue";
 // randomize function
+
 import * as randomizer from "@/assets/js/randomizer.js";
 
 //vuex
@@ -194,28 +195,6 @@ export default {
     };
   },
   watch: {
-    // seriesName: function(data) {
-    //   console.log("seriesname change");
-    //   this.$refs.realtimeChart.updateSeries({
-    //     name: seriesName
-    //   });
-    // },
-
-    // newDataset: {
-    //   handler(data) {
-    //     if (data.length == this.dataset.length) {
-    //       this.renderDataset();
-    //     }
-    //   },
-    //   deep: true,
-    //   immediate: false
-    // },
-    // case1: datafeature에서 createNewDataset하는 방식
-    // newDataset: function(data) {
-    //   if (data.length == this.dataset.length) {
-    //     this.renderDataset();
-    //   }
-    // },
     dialog: function(data) {
       if (data) {
         console.log(true);
@@ -237,10 +216,6 @@ export default {
 
   created() {
     this.createNewDataset();
-
-    eventBus.$on("renderDataset", status => {
-      // this.renderDataset();
-    });
   },
   mounted() {
     console.log("timeseries mounted");
@@ -318,14 +293,22 @@ export default {
 
     renderDataset() {
       this.resetSeries();
-      if (this.newDataset != null) {
-        this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
-        randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-        // console.time("updateSeriesLine");
-        this.updateSeriesLine(this.dataArray, this.seriesName);
-        // console.timeEnd("updateSeriesLine");
-        // vuex에 저장
-      }
+      let path = "http://localhost:5000/loadFeatureGraphData";
+      // axios
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          featureName: this.seriesName
+        }
+      })
+        .then(res => {
+          console.log(res.data);
+          this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
+        })
+        .catch(error => {
+          console.error(error);
+        });
       // dialog(edit modal)일때만 toolbar 활성화
       if (this.dialog) {
         this.$refs.realtimeChart.updateOptions({

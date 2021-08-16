@@ -80,9 +80,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      columns: state => state.initialData.columns
-    }),
     dynamicDeleteButtonProps() {
       if (this.tsCondition_from != null || this.featureConditions.length != 0) {
         this.deleteButtonProps.disabled = false;

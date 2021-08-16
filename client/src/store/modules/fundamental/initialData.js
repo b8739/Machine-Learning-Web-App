@@ -41,6 +41,7 @@ const mutations = {
       state.modifiedColumns.push(element);
     });
   },
+
   setColumns(state, payload) {
     state.columns = [];
     Object.keys(state.dataset[0]).forEach(element => {
@@ -70,7 +71,7 @@ const mutations = {
     // Vue.delete(state.summarizedInfo.datatype, oldName);
   },
   loadColumns(state, payload) {
-    state.columns = Object.keys(state.dataset);
+    state.columns = payload;
   },
   loadSelectedColumns(state, payload) {
     state.selectedColumns.push(payload);
@@ -105,6 +106,18 @@ const actions = {
         // console.log(res.data);
         commit("loadDataset", Object.freeze(res.data));
         commit("setColumns");
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  },
+  loadColumns({ commit }) {
+    let path = "http://localhost:5000/loadColumns";
+    axios
+      .get(path)
+      .then(res => {
+        console.log(res.data);
+        commit("loadColumns", res.data);
       })
       .catch(error => {
         console.error(error);

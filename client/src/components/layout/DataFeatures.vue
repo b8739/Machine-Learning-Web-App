@@ -107,7 +107,6 @@
                 <Histogram
                   :distribution="summarizedInfo['distribution'][column]"
                   :interval="summarizedInfo['interval'][column]"
-                  :indexNum="indexNum"
                 />
               </td>
 
@@ -172,7 +171,6 @@ export default {
         dense: true
       },
       clickedIconKey: null,
-      columns_vue: [],
       graphWidth: "260px",
       graphHeight: "200px",
       // numeric/categorical columns
@@ -217,16 +215,6 @@ export default {
   watch: {
     summarizedInfo: function(data) {
       deep: true, this.loadDataSummary();
-    },
-
-    columns_vue: {
-      handler(newValue, oldValue) {
-        // console.log(`old: ${oldValue}`);
-        // console.log(`new: ${newValue}`);
-        this.ChangeColumnNameFlag(true);
-      },
-      deep: true,
-      immediate: false
     }
   },
 
@@ -365,9 +353,7 @@ export default {
   created() {
     console.log("df created");
     this.loadDataSummary();
-    this.columns.forEach(element => {
-      this.columns_vue.push(element);
-    });
+
     // draggable
     this.columns.forEach(element => {
       this.duplicatedColumns.push(element);

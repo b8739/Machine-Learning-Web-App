@@ -15,7 +15,7 @@
 <script>
 export default {
   name: "Histogram",
-  props: ["indexNum", "interval", "distribution"],
+  props: ["interval", "distribution"],
   data() {
     return {
       intervalArray: [],
