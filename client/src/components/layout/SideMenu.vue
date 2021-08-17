@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-navigation-drawer v-model="drawer" absolute :mini-variant.sync="mini">
+    <v-navigation-drawer height="100vh" v-model="drawer" absolute :mini-variant.sync="mini">
       <v-list-item class="mt-10 px-2" v-once>
         <v-list-item-avatar>
           <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
@@ -17,7 +17,17 @@
           <template v-slot:activator>
             <v-list-item-title active>Options</v-list-item-title>
           </template>
-          <v-list-item v-for="item in items" :key="item.title" link @click="callOption(item.title)">
+          <v-list-item
+            :disabled="
+              item.title == 'Add Column' ||
+                item.title == 'Update Column' ||
+                item.title == 'Moving Average'
+            "
+            v-for="item in items"
+            :key="item.title"
+            link
+            @click="callOption(item.title)"
+          >
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>

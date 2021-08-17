@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="30vw">
+  <v-dialog @click:outside="removeFile" v-model="dialog" width="30vw">
     <v-card outlined class="py-10" @dragover.prevent @drop.stop.prevent="onDrop">
       <v-row justify="center" class="ma-0">
         <v-icon color="teal" class="mdi-48px"> mdi-briefcase-upload </v-icon>
@@ -15,6 +15,7 @@
           <input type="file" id="files" ref="files" multiple v-on:change="handleFilesUpload()" />
         </label>
       </v-row>
+
       <v-row justify="center" align="center" class="ma-0">
         <v-col cols="12" v-for="(file, index) in files" class="file-listing" :key="index">
           <p class="text-center">{{ file.name }}</p>
@@ -41,7 +42,6 @@ export default {
   data() {
     return {
       files: [],
-      datasets: [1, 2],
       dialog: false
     };
   },
@@ -49,12 +49,14 @@ export default {
   /*
       Defines the method used by the component
     */
+  computed() {},
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
 
     /*
         Submits files to the server
       */
+    //사실상 사용하지 않고, DefineDataset에서 데이터 업로드
     submitFiles() {
       /*
           Initialize the form data
@@ -66,6 +68,11 @@ export default {
         */
       for (var i = 0; i < this.files.length; i++) {
         let file = this.files[i];
+        let fileType = file.substring(file.length - 3);
+        if (fileType != "csv") {
+          this.errorMessage = `File type '${fileType}' is not supported, please upload 'csv' type file`;
+          return false;
+        }
         formData.append("csv_data", file);
       }
       /*
@@ -78,10 +85,13 @@ export default {
           }
         })
         .then(res => {
-          this.loadSummarizedInfo(res);
+          localStorage.clear();
+          console.log(res.data);
+          // this.loadSummarizedInfo(res);
         })
         .catch(ex => {
-          console.log("ERR!!!!! : ", ex);
+          this.errorMessage = ex;
+          console.log("ERROR : ", ex);
         });
     },
     /*
@@ -107,6 +117,13 @@ export default {
     onDrop(event) {
       const uploadedFiles = event.dataTransfer.files;
       // Do something with the dropped file
+      let fileName = uploadedFiles[0].name;
+      let fileType = fileName.substring(fileName.length - 3);
+      if (fileType != "csv") {
+        alert(`Only csv file type is supported (requested file type: ${fileType})`);
+        this.removeFile();
+        return;
+      }
       for (var i = 0; i < uploadedFiles.length; i++) {
         this.files.push(uploadedFiles[i]);
       }
@@ -122,7 +139,7 @@ export default {
       /*
   Make the request to the POST /select-files URL
 */
-      eventBus.$emit("dataUploadMode", true);
+      eventBus.$emit("dataUploadMode", true); //define dataset dialog 열기
       eventBus.$emit("formData", formData);
     }
     //실험
@@ -131,6 +148,12 @@ export default {
     eventBus.$on("openUploader", dialogStatus => {
       this.dialog = dialogStatus;
     });
+    eventBus.$on("removeFile", status => {
+      this.removeFile();
+    });
+  },
+  mounted() {
+    this.errorMessage = "";
   }
 };
 </script>

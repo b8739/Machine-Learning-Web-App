@@ -27,11 +27,14 @@
         </v-row>
         <v-tabs centered v-model="tab">
           <v-tab>1. Observed Variable</v-tab>
-          <v-tab>2. Create Samples </v-tab>
+          <v-tab :disabled="stepOneFlag != true">2. Create Samples </v-tab>
         </v-tabs>
         <v-tabs-items v-model="tab">
           <!-- 1. Input/target -->
           <v-tab-item>
+            <v-card-subtitle class="red--text"
+              >현재는 관찰변수로 CRIM만 지정 가능합니다.</v-card-subtitle
+            >
             <v-container>
               <v-row>
                 <!-- <v-card-text>Select the input(s) and target features you want to use.</v-card-text> -->
@@ -43,7 +46,7 @@
                   <v-card-actions>
                     <v-btn color="primary" @click="tab = 0">Previous</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="stepOneFinished">Next</v-btn>
+                    <v-btn color="primary" @click="stepOneFinished()">Next</v-btn>
                   </v-card-actions>
                 </v-col>
               </v-row>
@@ -59,7 +62,12 @@
                 <v-col cols="4">
                   <v-subheader> If leave Fixed Value blank, regard it as </v-subheader></v-col
                 ><v-col cols="2">
-                  <v-select :items="numericStatistics" v-model="fixedValueDefault"></v-select
+                  <v-select
+                    disabled
+                    :items="numericStatistics"
+                    label="Mode"
+                    v-model="fixedValueDefault"
+                  ></v-select
                 ></v-col>
               </v-row>
               <v-row class="py-5" justify="center">
@@ -229,7 +237,17 @@
                           class=""
                           :disabled="helperStatus"
                         >
-                          <v-container>
+                          <v-container
+                            ><v-row justify="end">
+                              <v-btn
+                                @click="drawer = !drawer"
+                                color="rgba(80, 79, 79, 0.817)"
+                                dark
+                                x-small
+                                light
+                                >X</v-btn
+                              ></v-row
+                            >
                             <v-row align="center" justify="center">
                               <v-card-text style="text-align:center"
                                 >Range Setting Helper</v-card-text
@@ -392,6 +410,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      stepOneFlag: null,
       fixedValueDefault: null,
       // drawer
       drawer: false,
@@ -515,14 +534,22 @@ export default {
       this.drawer = false;
     },
     getHelperValues(column) {
-      let min = this.summarizedInfo["interval"][column]["min"];
-      let max = this.summarizedInfo["interval"][column]["max"];
-      let mean = this.summarizedInfo["numeric"][column]["mean"];
-      let mode = this.summarizedInfo["numeric"][column]["mode"];
-      let median = this.summarizedInfo["numeric"][column]["median"];
-      // 배열에 삽입해서 반환
-      this.helperValues = { Min: min, Max: max, Mean: mean, Median: median, Mode: mode };
-      return this.helperValues;
+      // category
+      if (this.summarizedInfo["datatype"][column] == "category") {
+        this.helperValues = { Median: 0, Mode: 0 };
+        return this.helperValues;
+      }
+      // numeric
+      else {
+        let min = this.summarizedInfo["interval"][column]["min"];
+        let max = this.summarizedInfo["interval"][column]["max"];
+        let mean = this.summarizedInfo["numeric"][column]["mean"];
+        let mode = this.summarizedInfo["numeric"][column]["mode"];
+        let median = this.summarizedInfo["numeric"][column]["median"];
+        // 배열에 삽입해서 반환
+        this.helperValues = { Min: min, Max: max, Mean: mean, Median: median, Mode: mode };
+        return this.helperValues;
+      }
     },
     setTargetTextField(columnIndex, textFieldType) {
       // 대상 index 설정
@@ -552,6 +579,7 @@ export default {
     },
 
     stepOneFinished() {
+      this.stepOneFlag = true;
       this.tab = 1;
       eventBus.$emit("simulationColumnChecked", true);
     },
@@ -566,10 +594,17 @@ export default {
         if (element == 0) {
           //fixed value (null)
           if (this.fixedValues[index] == null) {
-            rangeInfo[featureName] = {
-              method: "fixed",
-              interval: { fixedValue: this.summarizedInfo["numeric"][featureName]["median"] }
-            };
+            if ("numeric" == this.summarizedInfo["datatype"][featureName]) {
+              rangeInfo[featureName] = {
+                method: "fixed",
+                interval: { fixedValue: this.summarizedInfo["numeric"][featureName]["mode"] }
+              };
+            } else {
+              rangeInfo[featureName] = {
+                method: "fixed",
+                interval: { fixedValue: 0 }
+              };
+            }
           }
           //fixed value (has value)
           else {

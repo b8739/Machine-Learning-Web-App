@@ -28,7 +28,7 @@ export default new Vuex.Store({
   plugins: [
     createPersistedState({
       // paths: ["initialData", "apexchartGraph", "modelingData", "simulationData", "simulationResult"]
-      paths: ["initialData"]
+      // paths: ["initialData"]
     })
   ]
 });

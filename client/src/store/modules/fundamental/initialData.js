@@ -1,53 +1,39 @@
 import axios from "axios";
 import Vue from "vue";
-
-const state = {
-  //data
-  dataset: {},
-  summarizedInfo: [],
-  tableList: [],
-  navStatus: null,
-  randomRange: null,
-  columns: []
+import router from "@/router";
+const getDefaultState = () => {
+  return {
+    summarizedInfo: null,
+    tableList: [],
+    navStatus: null,
+    randomRange: null,
+    columns: [],
+    datasetSize: null
+  };
 };
+const state = getDefaultState();
 
 const getters = {
-  // columns(state) {
-  //   let columnValues = Object.keys(state.dataset[0]);
-  //   return columnValues;
-  // },
   numericColumns(state) {
     let columnValues = Object.keys(state.summarizedInfo["numeric"]);
     return columnValues;
-  },
-
-  indexNum(state) {
-    let columnValues = Object.keys(state.dataset);
-    return Object.keys(state.dataset[columnValues[0]]).length - 1;
   }
 };
 
 const mutations = {
-  // saveColumnNames(state) {
-  //   state.columns = [];
-  //   let columnValues = Object.keys(state.dataset);
-  //   for (const columnValue of columnValues) {
-  //     state.columns.push(columnValue); //add했을 때 다시 loaddata되는데 push 때문에 중복된는 문제 해결 필요
-  //   }
-  // },
-  changedColumnOrder(state, payload) {
-    getters.columns;
-    payload.forEach(element => {
-      state.modifiedColumns.push(element);
-    });
+  resetState(state) {
+    Object.assign(state, getDefaultState());
   },
-
-  setColumns(state, payload) {
-    state.columns = [];
-    Object.keys(state.dataset[0]).forEach(element => {
+  loadColumns(state, payload) {
+    state.columns.splice(0, state.columns.length);
+    payload.forEach(element => {
       state.columns.push(element);
     });
   },
+  loadDatasetSize(state, payload) {
+    state.datasetSize = payload;
+  },
+
   loadDataset(state, payload) {
     state.dataset = payload;
   },
@@ -70,12 +56,7 @@ const mutations = {
     // Vue.set(state.summarizedInfo.datatype, newName, state.summarizedInfo.datatype[oldName]);
     // Vue.delete(state.summarizedInfo.datatype, oldName);
   },
-  loadColumns(state, payload) {
-    state.columns = payload;
-  },
-  loadSelectedColumns(state, payload) {
-    state.selectedColumns.push(payload);
-  },
+
   loadTableList(state, payload) {
     state.tableList = payload;
   },
@@ -98,14 +79,13 @@ const mutations = {
 };
 
 const actions = {
-  loadFundamentalData({ commit }, path) {
-    // const path = "http://localhost:5000/loadData";
+  loadDatasetSize({ commit }) {
+    const path = "http://localhost:5000/loadDatasetSize";
     axios
       .get(path)
       .then(res => {
         // console.log(res.data);
-        commit("loadDataset", Object.freeze(res.data));
-        commit("setColumns");
+        commit("loadDatasetSize", res.data);
       })
       .catch(error => {
         console.error(error);
@@ -116,7 +96,7 @@ const actions = {
     axios
       .get(path)
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         commit("loadColumns", res.data);
       })
       .catch(error => {
@@ -129,6 +109,7 @@ const actions = {
       .get(path)
       .then(res => {
         commit("loadSummarizedInfo", res.data);
+        router.push({ name: "preprocess" });
       })
       .catch(error => {
         console.error(error);

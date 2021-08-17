@@ -1,6 +1,8 @@
 <template>
   <div>
-    <a href="http://localhost:8080"><img class="logo" src="../../assets/attic_logo.png" alt=""/></a>
+    <a href="http://localhost:8080/"
+      ><img class="logo" src="../../assets/attic_logo.png" alt=""
+    /></a>
     <nav>
       <!-- Dataset -->
       <router-link id="routerLink" :class="{ underline: navStatus == 'datasets' }" to="/datasets"
@@ -42,7 +44,7 @@ export default {
       let h = screen.height * 0.8;
       let leftPosition = (screen.width - w) / 2;
       let topPosition = (screen.height - h) / 2;
-      let url = "http://localhost:8080/eda";
+      let url = "http://localhost:5000/eda";
       window.open(
         url,
         "modelingResult",
@@ -77,7 +79,7 @@ body {
 
 /* base.html */
 .logo {
-  width: 3%;
+  width: 4%;
   position: absolute;
   top: 18px;
   left: 20px;

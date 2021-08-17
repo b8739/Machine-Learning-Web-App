@@ -3,8 +3,12 @@
     <v-card>
       <v-container class="columnList">
         <v-row>
-          <v-card-title>Table 컬럼 순서 변경</v-card-title>
-
+          <div>
+            <v-card-title>Table 컬럼 순서 변경</v-card-title>
+            <v-card-subtitle class="red--text"
+              >Confirm 누르고 '새로고침'까지 해야 그래프 위치까지 정상적으로 변경되는 상태입니다.
+            </v-card-subtitle>
+          </div>
           <v-spacer></v-spacer>
           <v-btn x-small min-width="20" min-height="30" @click="closeStepper"
             ><v-icon small>mdi-close</v-icon>
@@ -97,9 +101,14 @@ export default {
     eventBus.$on("openChangeOrderModal", dialogStatus => {
       this.dialog = dialogStatus;
     });
-    this.columns.forEach(element => {
-      this.duplicatedColumns.push(element);
-    });
+    console.log("order created");
+
+    this.selectionTimer = setTimeout(() => {
+      this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
+      this.columns.forEach(element => {
+        this.duplicatedColumns.push(element);
+      });
+    }, 1000);
   }
 };
 </script>

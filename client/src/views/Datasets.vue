@@ -20,7 +20,7 @@
           v-for="(tableName, tableIndex) in tableList"
           :key="tableIndex"
           class="mr-5 mt-5 cursor-pointer"
-          @click="enterDataset"
+          @click="enterDataset(tableName)"
         >
           <v-card-text class="font-weight-bold body-1">{{ tableName }}</v-card-text>
           <v-card-text class="font-weight-light body-2 pt-0">Created Date:</v-card-text>
@@ -66,13 +66,14 @@ export default {
       Defines the method used by the component
     */
   methods: {
-    ...mapActions("initialData", ["loadSummarizedData"]),
-    ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["loadTableList"]),
     ...mapMutations("initialData", ["setNavStatus"]),
+    ...mapMutations("initialData", ["resetState"]),
+    ...mapActions("initialData", ["loadSummarizedData"]),
 
-    enterDataset() {
-      this.$router.push({ name: "preprocess" });
+    enterDataset(tableName) {
+      this.resetState();
+      this.loadSummarizedData();
     },
     showTables() {
       let path = "http://localhost:5000/showTables";

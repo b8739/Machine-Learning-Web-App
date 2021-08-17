@@ -26,6 +26,7 @@
               Confirm
             </v-btn>
           </v-card-actions>
+          <v-subheader class="red--text">{{ errorMessage }}</v-subheader>
         </v-container>
       </v-card>
     </v-dialog>
@@ -44,12 +45,15 @@ export default {
       formData: null,
       // flag
       dataUploadFlag: false,
-      saveNewFileFlag: false
+      saveNewFileFlag: false,
+      errorMessage: ""
     };
   },
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
-    ...mapActions("initialData", ["loadFundamentalData"]),
+    ...mapMutations("initialData", ["resetState"]),
+    ...mapActions("initialData", ["loadSummarizedData"]),
+
     eventHandler() {
       if (this.dataUploadFlag == true) {
         this.dataUpload();
@@ -57,12 +61,12 @@ export default {
       } else if (this.saveNewFileFlag == true) {
         this.saveNewFile(this.tableName);
         this.saveNewFileFlag = false;
+        this.dialog = false;
       }
-      this.dialog = false;
     },
-    dataUpload() {
+    async dataUpload() {
       axios
-        .post("http://localhost:5000/dataupload", this.formData, {
+        .post("http://localhost:5000/dataupload1", this.formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           },
@@ -71,12 +75,13 @@ export default {
           }
         })
         .then(response => {
-          this.result = response.data;
-          this.loadSummarizedInfo(this.result);
-
-          this.$router.push({ name: "preprocess" });
+          this.resetState();
+          this.loadSummarizedData();
+          this.dialog = false;
         })
         .catch(ex => {
+          this.errorMessage = ex;
+          eventBus.$emit("removeFile", true);
           console.log("ERR!!!!! : ", ex);
           // this.$router.push('/preprocess'); //delete later
         });

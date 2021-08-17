@@ -2,7 +2,6 @@
   <div>
     <div class="container">
       <!-- 테이블 -->
-
       <table class="dataTable">
         <tbody>
           <draggable tag="tbody" v-model="duplicatedColumns" @change="onDragEvent">
@@ -111,7 +110,16 @@
               </td>
 
               <!-- category 일 경우: -- 표시 -->
-              <td v-if="distinguishDataType(column)"></td>
+              <td v-if="distinguishDataType(column)">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon v-bind="attrs" v-on="on" right v-if="columnIndex == 0"
+                      >mdi-information-outline</v-icon
+                    >
+                  </template>
+                  <span>Only shows upto 500 rows of the dataset (randomized)</span>
+                </v-tooltip>
+              </td>
               <!-- numeric 일 경우: Graph 표시 -->
               <td v-else @click="openEditModal(column)">
                 <v-tooltip bottom>
@@ -225,7 +233,16 @@ export default {
       summarizedInfo: state => state.initialData.summarizedInfo,
       featureNameFlag: state => state.saveFlag.summarizedInfo
     }),
-    ...mapGetters("initialData", ["indexNum", "numericColumns"]),
+    ...mapGetters("initialData", ["numericColumns"]),
+    renderStatus() {
+      if (
+        this.summarizedInfo != null &&
+        this.columns.length != 0 &&
+        this.duplicatedColumns.length != 0
+      ) {
+        return true;
+      }
+    },
     categorySummary() {
       let categoricalColumn = Object.keys(this.summarizedInfo["categorical"]);
       let categorySummary = [];
@@ -247,15 +264,7 @@ export default {
     // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
-    createNewDataset() {
-      let array = [];
-      for (const key in this.summarizedInfo["numeric"]) {
-        this.newDataset[key] = [];
-        this.dataset.forEach(element => {
-          this.newDataset[key].push(element[key]);
-        });
-      }
-    },
+
     getDataType(column) {
       return this.summarizedInfo["datatype"][column];
     },
@@ -348,25 +357,29 @@ export default {
       //   this.category_info[key] = this.summarizedInfo["categorical"][key];
       // }
       // this.sampleForClass = this.summarizedInfo["sampleForClass"];
+    },
+    duplicateColumns() {
+      this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
+      this.columns.forEach(element => {
+        this.duplicatedColumns.push(element);
+      });
     }
   },
   created() {
-    console.log("df created");
     this.loadDataSummary();
-
+    this.selectionTimer = setTimeout(() => {
+      this.duplicateColumns();
+    }, 1000);
     // draggable
-    this.columns.forEach(element => {
-      this.duplicatedColumns.push(element);
-    });
+
     eventBus.$on("columnOrderUpdated", duplicatedColumns => {
-      this.duplicatedColumns = [];
+      this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
       duplicatedColumns.forEach(element => {
         this.duplicatedColumns.push(element);
       });
     });
   },
   mounted() {
-    console.log("df mounted");
     // this.selectionTimer = setTimeout(() => {
     //   eventBus.$emit("dfMounted", true);
     // }, 1000);

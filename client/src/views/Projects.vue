@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-app-bar>
-      <a href="http://localhost:8080"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
+      <a href="http://localhost:8080/"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
     </v-app-bar>
     <v-container fluid>
       <v-row>

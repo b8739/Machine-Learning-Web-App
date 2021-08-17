@@ -214,9 +214,7 @@ export default {
     immediate: true
   },
 
-  created() {
-    this.createNewDataset();
-  },
+  created() {},
   mounted() {
     console.log("timeseries mounted");
 
@@ -250,21 +248,6 @@ export default {
       return this.title;
     },
 
-    createNewDataset() {
-      this.newDataset = [];
-      this.dataset.forEach(element => {
-        this.newDataset.push(element[this.seriesName]);
-      });
-    },
-    // createNewDataset() {
-    //   this.newDataset = [];
-    //   this.dataArray = [];
-    //   this.dataset.forEach(element => {
-    //     this.newDataset.push(element[this.seriesName]);
-    //   });
-    //   this.randomIndexArray = randomizer.getRandomArray(0, this.dataset.length - 2);
-    //   randomizer.randomizeDataset(this.newDataset, this.dataArray, this.randomIndexArray);
-    // },
     dataSelected(xaxis, yaxis) {
       this.testArray = [];
       this.xaxisMin = Math.floor(xaxis.min);
@@ -303,7 +286,6 @@ export default {
         }
       })
         .then(res => {
-          console.log(res.data);
           this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
         })
         .catch(error => {
@@ -324,9 +306,7 @@ export default {
         });
       }
     },
-    rerender() {
-      this.updateSeriesLine(this.dataArray, this.seriesName);
-    },
+
     convertToArray(jsonObject, targetArray, randomIndex) {
       for (let i = 0; i < randomIndex.length; i++) {
         targetArray.push(jsonObject[randomIndex[i]]);

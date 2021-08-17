@@ -39,10 +39,18 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+
 export default {
   name: "Login",
   props: {
     source: String
+  },
+  methods: {
+    ...mapMutations("initialData", ["resetState"])
+  },
+  created() {
+    this.resetState();
   }
 };
 </script>

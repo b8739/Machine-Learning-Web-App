@@ -78,7 +78,7 @@
           <v-col cols="5">
             <v-row justify="end">
               <span class="caption py-2">
-                {{ datasetItems.length }} of {{ dataset.length }}
+                {{ datasetItems.length }} of {{ datasetSize }}
                 <v-icon small @click="scrollTable('top')" class="px-1"
                   >mdi-arrow-expand-up</v-icon
                 ></span
@@ -129,7 +129,7 @@
             </tbody>
             <infinite-loading
               ref="infiniteLoading"
-              @infinite="infiniteHandlerCustom"
+              @infinite="infiniteHandler"
               spinner="waveDots"
             ></infinite-loading>
           </template>
@@ -185,7 +185,7 @@ export default {
   computed: {
     // ...mapGetters("initialData", ["columns"]),
     ...mapState({
-      dataset: state => state.initialData.dataset,
+      datasetSize: state => state.initialData.datasetSize,
       columns: state => state.initialData.columns
     }),
     dataTableWidth() {

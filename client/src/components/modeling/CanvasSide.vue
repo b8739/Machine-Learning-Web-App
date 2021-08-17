@@ -62,7 +62,7 @@
                   <v-col cols="9">
                     <v-row>
                       <v-card-text class="body-2 font-weight-medium pa-0">
-                        Total Rows: {{ dataset.length }}</v-card-text
+                        Total Rows: {{ datasetSize }}</v-card-text
                       >
                     </v-row>
                     <v-row justify="center" align="center">
@@ -114,8 +114,8 @@
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       @click="
-                        (validationStartIndex = dataset.length - Math.round(dataset.length * 0.2)),
-                          (validationEndIndex = dataset.length)
+                        (validationStartIndex = datasetSize - Math.round(datasetSize * 0.2)),
+                          (validationEndIndex = datasetSize)
                       "
                       v-bind="attrs"
                       v-on="on"
@@ -239,7 +239,7 @@ export default {
   computed: {
     ...mapState({
       tableList: state => state.initialData.tableList,
-      dataset: state => state.initialData.dataset,
+      datasetSize: state => state.initialData.datasetSize,
       columns: state => state.initialData.columns
     }),
     ...mapGetters("initialData", ["indexNum"]),
