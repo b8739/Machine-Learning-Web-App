@@ -70,9 +70,11 @@ export default {
     ...mapMutations("initialData", ["setNavStatus"]),
     ...mapMutations("initialData", ["resetState"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
+    ...mapMutations("initialData", ["saveTableName"]),
 
     enterDataset(tableName) {
       this.resetState();
+      this.saveTableName(tableName);
       this.loadSummarizedData();
     },
     showTables() {

@@ -8,7 +8,8 @@ const getDefaultState = () => {
     navStatus: null,
     randomRange: null,
     columns: [],
-    datasetSize: null
+    datasetSize: null,
+    tableName: null
   };
 };
 const state = getDefaultState();
@@ -32,10 +33,6 @@ const mutations = {
   },
   loadDatasetSize(state, payload) {
     state.datasetSize = payload;
-  },
-
-  loadDataset(state, payload) {
-    state.dataset = payload;
   },
 
   setNavStatus(state, payload) {
@@ -75,14 +72,22 @@ const mutations = {
     payload.forEach(element => {
       state.columns.push(element);
     });
+  },
+  saveTableName(state, payload) {
+    state.tableName = payload;
   }
 };
 
 const actions = {
-  loadDatasetSize({ commit }) {
+  loadDatasetSize({ commit, state }) {
     const path = "http://localhost:5000/loadDatasetSize";
     axios
-      .get(path)
+      .get(path, {
+        params: {
+          //algorithmProp 전송
+          tableName: state.tableName
+        }
+      })
       .then(res => {
         // console.log(res.data);
         commit("loadDatasetSize", res.data);
@@ -91,10 +96,15 @@ const actions = {
         console.error(error);
       });
   },
-  loadColumns({ commit }) {
+  loadColumns({ commit, state }) {
     let path = "http://localhost:5000/loadColumns";
     axios
-      .get(path)
+      .get(path, {
+        params: {
+          //algorithmProp 전송
+          tableName: state.tableName
+        }
+      })
       .then(res => {
         // console.log(res.data);
         commit("loadColumns", res.data);
@@ -103,10 +113,15 @@ const actions = {
         console.error(error);
       });
   },
-  loadSummarizedData({ commit }) {
+  loadSummarizedData({ commit, state }) {
     const path = "http://localhost:5000/loadSummarizedData";
     axios
-      .get(path)
+      .get(path, {
+        params: {
+          //algorithmProp 전송
+          tableName: state.tableName
+        }
+      })
       .then(res => {
         commit("loadSummarizedInfo", res.data);
         router.push({ name: "preprocess" });
@@ -115,10 +130,15 @@ const actions = {
         console.error(error);
       });
   },
-  loadRandomData({ commit }) {
+  loadRandomData({ commit, state }) {
     const path = "http://localhost:5000/loadRandomInfo";
     axios
-      .get(path)
+      .get(path, {
+        params: {
+          //algorithmProp 전송
+          tableName: state.tableName
+        }
+      })
       .then(res => {
         commit("loadRandomInfo", res.data);
       })

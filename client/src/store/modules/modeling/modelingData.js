@@ -36,7 +36,7 @@ const mutations = {
 };
 
 const actions = {
-  requestModeling({ commit, state }) {
+  requestModeling({ commit, state, rootState }) {
     // Error Validation (Check if Validation empty)
     for (const key in state.splitRatio) {
       if (state.splitRatio[key] == null || state.splitRatio[key].length == 0) {
@@ -62,7 +62,8 @@ const actions = {
       url: path,
       data: {
         modelingRequest: state.modelingRequest,
-        splitRatio: state.splitRatio
+        splitRatio: state.splitRatio,
+        tableName: rootState.tableName
       }
     })
       .then(res => {

@@ -52,6 +52,7 @@ export default {
   computed() {},
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
+    ...mapMutations("initialData", ["saveTableName"]),
 
     /*
         Submits files to the server
@@ -87,6 +88,8 @@ export default {
         .then(res => {
           localStorage.clear();
           console.log(res.data);
+          this.saveTableName(this.tableName);
+          this.loadSummarizedData();
           // this.loadSummarizedInfo(res);
         })
         .catch(ex => {

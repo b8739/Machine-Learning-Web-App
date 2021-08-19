@@ -230,7 +230,8 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset
+      dataset: state => state.initialData.dataset,
+      tableName: state => state.initialData.tableName
     }),
     ...mapGetters("initialData", ["indexNum"]),
 
@@ -282,7 +283,8 @@ export default {
         method: "post",
         url: path,
         data: {
-          featureName: this.seriesName
+          featureName: this.seriesName,
+          tableName: this.tableName
         }
       })
         .then(res => {
