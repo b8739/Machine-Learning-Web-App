@@ -33,7 +33,7 @@
 
 <script>
 // randomize function
-import * as randomizer from "@/assets/js/randomizer.js";
+// import * as randomizer from "@/assets/js/randomizer.js";
 //vuex
 import { eventBus } from "@/main";
 import { mapActions } from "vuex";

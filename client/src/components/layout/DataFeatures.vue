@@ -3,157 +3,57 @@
     <div class="container">
       <!-- 테이블 -->
       <table class="dataTable">
-        <tbody>
-          <draggable tag="tbody" v-model="duplicatedColumns" @change="onDragEvent">
-            <!-- 행 -->
-            <tr v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
-              <!-- Columns -->
-
-              <!-- 1st Column -->
-              <td>
-                <v-row>
-                  <v-col cols="1"
-                    ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(column)"
-                      >mdi-pencil</v-icon
-                    ></v-col
-                  >
-                  <v-col
-                    ><v-text-field v-bind="activateName(column)" :value="column"></v-text-field>
-                  </v-col>
-                </v-row>
-              </td>
-              <!-- 2nd Column -->
-              <td class="secondColumn">
-                <tr>
-                  <span v-once class="info_title">Col #: </span>
-                  <span v-once> {{ columnIndex }} </span>
-                </tr>
-                <tr>
-                  <v-select
-                    :items="categoryTypes"
-                    dense
-                    single-line
-                    hide-details="true"
-                    height="20"
-                    :label="getDataType(column)"
-                  >
-                  </v-select>
-                </tr>
-              </td>
-
-              <!-- 3rd Column -->
-              <!-- category 일 경우: category summary 표시 -->
-              <td v-if="distinguishDataType(column)">
-                <tr
-                  v-for="(summary, categorySummaryIndex) in categorySummary"
-                  :key="categorySummaryIndex"
-                >
-                  <span class="info_title">{{ summary }} </span>
-                  <span>: {{ summarizedInfo["categorical"][column][summary] }}</span>
-                </tr>
-                <tr></tr>
-              </td>
-
-              <!-- numeric 일 경우: numeric summary 표시 -->
-              <td v-else>
-                <tr>
-                  <span v-once class="info_title">Mean </span>
-                  <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
-                </tr>
-                <tr>
-                  <span v-once class="info_title">Mode </span>
-                  <span>: {{ summarizedInfo["numeric"][column]["mode"] }}</span>
-                </tr>
-                <tr>
-                  <span v-once class="info_title">Median </span>
-                  <span>: {{ summarizedInfo["numeric"][column]["median"] }}</span>
-                </tr>
-                <tr>
-                  <span v-once class="info_title">Num of NA </span>
-                  <span>: {{ summarizedInfo["numeric"][column]["numOfNA"] }}</span>
-                </tr>
-                <tr>
-                  <span v-once class="info_title">Standard Deviation </span>
-                  <span>: {{ summarizedInfo["numeric"][column]["standard deviation"] }}</span>
-                </tr>
-                <tr>
-                  <span v-once class="info_title">Quantile </span>
-                  <span>: {{ summarizedInfo["numeric"][column]["Q1"] }}, </span>
-                  <span>{{ summarizedInfo["numeric"][column]["Q2"] }}, </span>
-                  <span>{{ summarizedInfo["numeric"][column]["Q3"] }}, </span>
-                  <span>{{ summarizedInfo["numeric"][column]["Q4"] }}, </span>
-                </tr>
-              </td>
-
-              <!-- 4th Column -->
-              <!-- category 일 경우: sample for class 표시 -->
-              <td v-if="distinguishDataType(column)">
-                <!-- <p class="info_title">Samples For Class:</p>
-              <v-row
-                no-gutters
-                v-for="(sample, sampleIndex) in summarizedInfo['sampleForClass'][column]"
-                :key="sampleIndex"
-              >
-                <v-col class="py-0"> {{ sampleIndex }}</v-col>
-                <v-spacer></v-spacer>
-                <v-col class="py-0">{{ sample }}% </v-col>
-                <v-col cols="12" class="pa-0"><v-divider></v-divider></v-col>
-              </v-row> -->
-              </td>
-              <!-- numeric 일 경우: distribution 표시 -->
-              <td v-else>
-                <span v-once class="tdTitle">Distribution</span>
-                <Histogram
-                  :distribution="summarizedInfo['distribution'][column]"
-                  :interval="summarizedInfo['interval'][column]"
-                />
-              </td>
-
-              <!-- category 일 경우: -- 표시 -->
-              <td v-if="distinguishDataType(column)">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" right v-if="columnIndex == 0"
-                      >mdi-information-outline</v-icon
+        <draggable tag="table" v-model="duplicatedColumns" @change="onDragEvent">
+          <!-- 행 -->
+          <tbody v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
+            <!-- Columns -->
+            <component :is="distinguishDataType(column)" :column="column">
+              <!-- slot -->
+              <!-- 1st column -->
+              <template>
+                <td>
+                  <v-row>
+                    <v-col cols="1"
+                      ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(column)"
+                        >mdi-pencil</v-icon
+                      ></v-col
                     >
-                  </template>
-                  <span>Only shows upto 500 rows of the dataset (randomized)</span>
-                </v-tooltip>
-              </td>
-              <!-- numeric 일 경우: Graph 표시 -->
-              <td v-else @click="openEditModal(column)">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon v-bind="attrs" v-on="on" right v-if="columnIndex == 0"
-                      >mdi-information-outline</v-icon
+                    <v-col
+                      ><v-text-field v-bind="activateName(column)" :value="column"></v-text-field>
+                    </v-col>
+                  </v-row>
+                </td>
+                <!-- 2nd Column -->
+                <td class="secondColumn">
+                  <tr>
+                    <span v-once class="info_title">Col #: </span>
+                    <span v-once> {{ columnIndex }} </span>
+                  </tr>
+                  <tr>
+                    <v-select
+                      :items="categoryTypes"
+                      dense
+                      single-line
+                      hide-details="true"
+                      height="20"
+                      :label="getDataType(column)"
                     >
-                  </template>
-                  <span>Only shows upto 500 rows of the dataset (randomized)</span>
-                </v-tooltip>
-
-                <v-row align="center">
-                  <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
-                </v-row>
-
-                <TimeSeries
-                  :graphWidth="graphWidth"
-                  :graphHeight="graphHeight"
-                  :seriesName="column"
-                />
-              </td>
-            </tr>
-          </draggable>
-        </tbody>
+                    </v-select>
+                  </tr>
+                </td>
+              </template>
+            </component>
+          </tbody>
+        </draggable>
       </table>
-      <EditModal />
     </div>
   </div>
 </template>
 
 <script>
-import TimeSeries from "@/components/graph/TimeSeries";
-import Histogram from "@/components/graph/Histogram";
-import EditModal from "@/components/modal/EditModal";
+import NumericRow from "@/components/tableRow/NumericRow";
+import CategoricalRow from "@/components/tableRow/CategoricalRow";
+import DateRow from "@/components/tableRow/DateRow";
 import draggable from "vuedraggable";
 import axios from "axios";
 //vuex
@@ -179,8 +79,7 @@ export default {
         dense: true
       },
       clickedIconKey: null,
-      graphWidth: "260px",
-      graphHeight: "200px",
+
       // numeric/categorical columns
       categoricalColumns: {},
       //summary contents
@@ -214,9 +113,10 @@ export default {
     };
   },
   components: {
-    TimeSeries,
-    EditModal,
-    Histogram,
+    DateRow,
+    NumericRow,
+    CategoricalRow,
+
     draggable
   },
 
@@ -264,15 +164,36 @@ export default {
     // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
+    saveClickedIconIndex(column) {
+      // v-icon click OFF
+      if (this.clickedIconKey == column) {
+        this.clickedIconKey = null;
+        // category 일 때
 
+        // this.changeColumnName_vue(this.columns[index], index);
+
+        // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
+        // this.loadSummarizedData();
+      } // v-icon click ON
+      else {
+        this.clickedIconKey = column;
+      }
+    },
+    activateName(column) {
+      if (this.clickedIconKey == column) {
+        return this.activatedName_props;
+      } else return this.inactivatedName_props;
+    },
     getDataType(column) {
       return this.summarizedInfo["datatype"][column];
     },
     distinguishDataType(column) {
-      let dataType = this.summarizedInfo["datatype"][column];
-      if (dataType == "category") {
-        return true;
-      } else if (dataType == "numeric") return false;
+      if (this.getDataType(column) == "category") {
+        return "CategoricalRow";
+      } else if (this.getDataType(column) == "numeric") return "NumericRow";
+      else {
+        return "DateRow";
+      }
     },
     onDragEvent(evt) {
       // let movedColumnName = evt.moved.element;
@@ -320,33 +241,7 @@ export default {
       //     console.error(error);
       //   });
     },
-    saveClickedIconIndex(column) {
-      // v-icon click OFF
-      if (this.clickedIconKey == column) {
-        this.clickedIconKey = null;
-        // category 일 때
 
-        // this.changeColumnName_vue(this.columns[index], index);
-
-        // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
-        // this.loadSummarizedData();
-      } // v-icon click ON
-      else {
-        this.clickedIconKey = column;
-      }
-    },
-    activateName(column) {
-      if (this.clickedIconKey == column) {
-        return this.activatedName_props;
-      } else return this.inactivatedName_props;
-    },
-    openEditModal(column) {
-      eventBus.$emit("openEditModal", column);
-    },
-    closeEditModal() {},
-    showTimeSeriesGraph() {
-      this.show_timeSeriesGraph = !this.show_timeSeriesGraph;
-    },
     loadDataSummary() {
       // // numeric
       // for (const key in this.numeric_info) {
@@ -395,52 +290,42 @@ export default {
   max-width: 1200px;
   max-height: 100vh;
   overflow: scroll;
-  /* margin: 0 auto; */
   margin-top: 50px;
 }
+.dataTable .info_title {
+  color: grey;
+}
+
 .dataTable {
   text-transform: capitalize;
   font-size: 14px;
-
   text-align: left;
   vertical-align: middle;
-  border-collapse: collapse;
   border-radius: 5px;
   border-style: hidden; /* hide standard table (collapsed) border */
   box-shadow: 0 0 0 1px rgba(104, 102, 102, 0.644);
   /* this draws the table border  */
   /* background-color: #234; */
 }
-.dataTable tr {
-  /* background-color: #ecf1f6; */
-}
-.dataTable .tdTitle {
-  display: inline-block;
-  text-align: center;
-  width: 95%;
-}
-.dataTable tr:hover {
-  /* background-color: #b1e6d2; */
-  cursor: pointer;
-}
-.dataTable tr:hover tr {
-  /* background-color: #b1e6d2; */
-}
 .dataTable td:first-child {
   font-weight: 600;
-}
-.dataTable td {
-  padding: 15px 10px;
-  border: 1px solid rgba(104, 102, 102, 0.644);
-  /* border-bottom: none; */
+  font-size: 10px;
 }
 .dataTable .info_title {
   color: grey;
 }
-.visibilityHidden {
-  display: none;
+.dataTable td {
+  padding: 15px 10px;
+  border: 1px solid rgba(104, 102, 102, 0.644);
+  border-bottom: none;
 }
 .secondColumn {
   max-width: 150px;
+}
+table,
+table td,
+table th {
+  border: 1px solid rgba(104, 102, 102, 0.644);
+  border-collapse: collapse;
 }
 </style>

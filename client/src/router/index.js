@@ -3,23 +3,25 @@ import VueRouter from "vue-router";
 
 import Projects from "../views/Projects";
 import Datasets from "../views/Datasets";
-import Preprocess from "../views/Preprocess";
-// modeling
-import ModelingProcess from "../views/modeling/ModelingProcess";
-import Models from "../views/modeling/Models";
+
 import ModelingResult from "../views/modeling/ModelingResult";
 import ModelingSingleResult from "../views/modeling/ModelingSingleResult";
 
 import GraphBuilder from "../views/GraphBuilder";
 
-import Simulations from "../views/simulation/Simulations";
 import SimulationResult from "../views/simulation/SimulationResult";
 
 import LoginForm from "@/components/login/LoginForm";
 
-import "../assets/css/main.css";
+import "@/assets/css/main.css";
 
-// import Login from "../views/Login";
+// lazyloading
+const Preprocess = () => import(/* webpackChunkName: "preprocess" */ "../views/Preprocess");
+const Models = () => import(/* webpackChunkName: "models" */ "../views/modeling/Models");
+const Simulations = () =>
+  import(/* webpackChunkName: "simulations" */ "../views/simulation/Simulations");
+const ModelingProcess = () =>
+  import(/* webpackChunkName: "modelingProcess" */ "../views/modeling/ModelingProcess");
 
 Vue.use(VueRouter); //Vue Router를 사용했다고 선언
 

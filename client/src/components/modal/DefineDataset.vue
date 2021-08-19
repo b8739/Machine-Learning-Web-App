@@ -22,7 +22,7 @@
             <v-btn color="gray darken-1" text @click="dialog = false">
               Close
             </v-btn>
-            <v-btn color="blue darken-1" @click.once="eventHandler" text>
+            <v-btn color="blue darken-1" @click="eventHandler" text>
               Confirm
             </v-btn>
           </v-card-actions>
@@ -66,7 +66,7 @@ export default {
     },
     async dataUpload() {
       axios
-        .post("http://localhost:5000/dataupload1", this.formData, {
+        .post("http://localhost:5000/dataupload", this.formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           },
@@ -81,7 +81,7 @@ export default {
         })
         .catch(ex => {
           this.errorMessage = ex;
-          eventBus.$emit("removeFile", true);
+          // eventBus.$emit("removeFile", true);
           console.log("ERR!!!!! : ", ex);
           // this.$router.push('/preprocess'); //delete later
         });

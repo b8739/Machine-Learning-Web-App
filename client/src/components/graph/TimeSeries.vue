@@ -15,7 +15,7 @@
 import Vue from "vue";
 // randomize function
 
-import * as randomizer from "@/assets/js/randomizer.js";
+// import * as randomizer from "@/assets/js/randomizer.js";
 
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
@@ -286,6 +286,7 @@ export default {
         }
       })
         .then(res => {
+          console.log(res.data);
           this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
         })
         .catch(error => {

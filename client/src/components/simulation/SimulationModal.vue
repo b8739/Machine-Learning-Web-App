@@ -400,8 +400,6 @@
 </template>
 <script>
 import Vue from "vue";
-import * as normalDistribution from "@/assets/js/normalDistribution.js";
-// import NormalDistribution from "normal-distribution";
 import { eventBus } from "@/main";
 import InputColumnList from "@/components/simulation/columnList/InputColumnList.vue";
 import TargetColumnList from "@/components/simulation/columnList/TargetColumnList.vue";

@@ -13,12 +13,14 @@
     </div>
     <v-main>
       <v-container id="mainWrapper" fluid>
-        <v-card height="100vh">
+       <div style=height:100vh>
           <v-row>
             <!-- 화면 좌측 -->
-            <v-col cols=""><SideMenu /></v-col>
+            <v-col cols="2">
+              <SideMenu />
+            </v-col>
             <!-- 화면 우측 -->
-            <v-col cols="10">
+          <v-col cols="10" class=px-8>
               <v-toolbar elevation="1">
                 <!-- Preprocess/Table 교체 버튼 -->
                 <v-row>
@@ -44,6 +46,7 @@
               </v-row>
             </v-col>
           </v-row>
+          </div>
         </v-card>
       </v-container>
     </v-main>

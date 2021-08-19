@@ -13,13 +13,14 @@ Vue.prototype.$axios = axios;
 import VueApexCharts from "vue-apexcharts";
 // portal
 import PortalVue from "portal-vue";
-// bootstrap
-import BootstrapVue from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+
 // vuetify
-import Vuetify from "vuetify";
-import "vuetify/dist/vuetify.min.css";
+// import Vuetify from "vuetify";
+import vuetify from "@/plugins/vuetify"; // path to vuetify export
+// export default new Vuetify({});
+// Vue.use(Vuetify);
+// import "vuetify/dist/vuetify.min.css";
+
 // BaklavaVuePlugin
 import { BaklavaVuePlugin } from "@baklavajs/plugin-renderer-vue";
 import "@baklavajs/plugin-renderer-vue/dist/styles.css";
@@ -45,12 +46,7 @@ Vue.component("font-awesome-icon", FontAwesomeIcon);
 Vue.config.productionTip = false;
 
 Vue.use(PortalVue);
-Vue.use(Vuetify);
-export default new Vuetify({});
 
-Vue.use(Vuetify);
-
-Vue.use(BootstrapVue);
 Vue.component("apexchart", VueApexCharts);
 Vue.config.productionTip = false;
 
@@ -59,6 +55,6 @@ export const eventBus = new Vue();
 new Vue({
   router,
   store,
-  vuetify: new Vuetify(),
+  vuetify,
   render: h => h(App)
 }).$mount("#app");
