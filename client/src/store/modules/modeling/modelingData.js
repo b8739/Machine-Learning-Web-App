@@ -63,13 +63,13 @@ const actions = {
       data: {
         modelingRequest: state.modelingRequest,
         splitRatio: state.splitRatio,
-        tableName: rootState.tableName
+        tableName: rootState.initialData.tableName
       }
     })
       .then(res => {
         commit("saveGraphSources", res.data[0]); // Test and Valid dataset
         commit("saveModelingSummary", res.data[1]); // Test and Valid dataset
-        router.push({ path: "modelingResult/" + algorithmName });
+        router.push({ path: "/modelingResult/" + algorithmName });
       })
       .catch(error => {
         console.error(error);

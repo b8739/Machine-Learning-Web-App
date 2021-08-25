@@ -5,9 +5,9 @@
         <v-row>
           <div>
             <v-card-title>Table 컬럼 순서 변경</v-card-title>
-            <v-card-subtitle class="red--text"
+            <!-- <v-card-subtitle class="red--text"
               >Confirm 누르고 '새로고침'까지 해야 그래프 위치까지 정상적으로 변경되는 상태입니다.
-            </v-card-subtitle>
+            </v-card-subtitle> -->
           </div>
           <v-spacer></v-spacer>
           <v-btn x-small min-width="20" min-height="30" @click="closeStepper"
@@ -17,7 +17,7 @@
         <v-divider></v-divider>
         <v-list outlined dense>
           <v-list-item-group active-class="border">
-            <draggable v-model="duplicatedColumns">
+            <draggable v-model="duplicatedColumns" @change="onDragEvent">
               <v-list-item v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
                 <v-list-item-content>
                   <v-list-item-title>{{ column }}</v-list-item-title>
@@ -52,24 +52,19 @@ export default {
     ...mapMutations("initialData", ["updateColumnOrder"]),
     confirmChanges() {
       this.ChangeColumnOrderFlag(true);
-      this.updateColumnOrder(this.duplicatedColumns);
+      // this.updateColumnOrder(this.duplicatedColumns);
       eventBus.$emit("columnOrderUpdated", this.duplicatedColumns);
     },
     closeStepper() {
       this.dialog = false;
     },
+
     onDragEvent(evt) {
-      let movedColumnName = evt.moved.element;
-      let oldIndex = evt.moved.oldIndex + 3;
-      let newIndex = evt.moved.newIndex + 3;
-      //컬럼 left 이동
-      if (oldIndex > newIndex) {
-        // this.changeColumnOrder("left", movedColumnName, newIndex);
-      }
-      //컬럼 right 이동
-      else {
-        // this.changeColumnOrder("right", movedColumnName, newIndex);
-      }
+      let columnName = evt.moved.element;
+      let oldIndex = evt.moved.oldIndex;
+      let newIndex = evt.moved.newIndex;
+      let movedInfo = { columnName: columnName, oldIndex: oldIndex, newIndex: newIndex };
+      console.log(movedInfo);
     },
     changeColumnOrder(position, movedColumnName, newIndex) {
       const api = "http://localhost:5000/changeColumnOrder";

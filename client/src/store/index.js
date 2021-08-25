@@ -13,6 +13,10 @@ import simulationData from "@/store/modules/simulation/simulationData.js";
 import simulationResult from "@/store/modules/simulation/simulationResult.js";
 // save
 import saveFlag from "@/store/modules/save/saveFlag.js";
+// infiniteTable
+import tableData from "@/store/modules/dataTable/tableData.js";
+// preprocess
+import preprocessHandler from "@/store/modules/preprocess/preprocessHandler.js";
 
 Vue.use(Vuex);
 
@@ -23,7 +27,9 @@ export default new Vuex.Store({
     modelingData,
     simulationData,
     simulationResult,
-    saveFlag
+    saveFlag,
+    tableData,
+    preprocessHandler
   },
   plugins: [
     createPersistedState({

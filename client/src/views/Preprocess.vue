@@ -1,6 +1,7 @@
 <template>
   <div id="wrap">
     <Header> </Header>
+    <!-- <v-btn @click=apiCheck></v-btn> -->
     <div class="text-center">
       <v-dialog v-model="dialog1" hide-overlay persistent width="300">
         <v-card color="primary" dark>
@@ -26,9 +27,9 @@
                 <v-row>
                   <v-btn class="mr-2" @click="changeComponent('DataFeatures')">Feature</v-btn>
                   <v-btn @click="changeComponent('InfiniteTable')">Table</v-btn>
-
+                
                   <v-spacer></v-spacer>
-
+                   <portal-target name="summary-change-name"> </portal-target>
                   <SaveMenu />
                 </v-row>
               </v-toolbar>
@@ -41,7 +42,7 @@
 
                 <!-- Table and Features (Dynamic Component) -->
                 <keep-alive>
-                  <component v-bind:is="comp"></component>
+                  <component :ref="comp" v-bind:is="comp"></component>
                 </keep-alive>
               </v-row>
             </v-col>
@@ -50,6 +51,12 @@
         </v-card>
       </v-container>
     </v-main>
+            <portal :to="confirmButtonSpot">
+          <v-btn color="error" @click="confirmEvent()">Confirm</v-btn>
+          <v-btn  @click="cancelEvent()">Cancel</v-btn>
+          
+          </portal
+        >
   </div>
 </template>
 <script>
@@ -61,7 +68,6 @@ import AverageModal from "@/components/average/AverageModal.vue";
 //components
 import DataTable from "@/components/DataTable";
 
-import AddModal from "@/components/modal/AddModal";
 import DataFeatures from "@/components/layout/DataFeatures";
 import InfiniteTable from "@/components/layout/InfiniteTable";
 import SideMenu from "@/components/layout/SideMenu.vue";
@@ -90,13 +96,13 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
+      // comp: "DataFeatures"
       comp: "DataFeatures"
     };
   },
   watch: {},
   components: {
     DataTable,
-    AddModal,
     DataFeatures,
     InfiniteTable,
     GraphBuilder,
@@ -109,17 +115,39 @@ export default {
   computed: {
     ...mapState({
       columns: state => state.initialData.columns,
-      datasetSize: state => state.initialData.datasetSize
-    })
+      datasetSize: state => state.initialData.datasetSize,
+      preprocessStatus: state => state.preprocessHandler.preprocessStatus,
+    }),
+        confirmButtonSpot() {
+          return this.preprocessStatus
+    },
   },
   methods: {
+        confirmEvent() {
+      this.activatedEvent();
+    },
+    cancelEvent(){
+this.setPreprocessStatus(null);
+ this.setEditMode(false);
+ this.setEditStatus(false);
+    },
+    apiCheck(){
+      const path = "http://localhost:5000/test1";
+      axios.get(path).catch(error => {
+        console.error(error);
+      });
+    },
     ...mapMutations("initialData", ["setNavStatus"]),
+    ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
+    ...mapMutations("preprocessHandler", ["setEditMode"]),
+    ...mapMutations("preprocessHandler", ["setEditStatus"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
     ...mapActions("initialData", ["loadDatasetSize"]),
 
     changeComponent(componentName) {
       this.comp = componentName;
+      eventBus.$emit('changeComponent',componentName);
     },
 
     duplicateTable() {
@@ -176,29 +204,52 @@ export default {
     },
     openSaveChangeDialog() {
       eventBus.$emit("openSaveChange", true);
+    },
+    rollback(){
+                    const path = "http://localhost:5000/rollback";
+      axios.get(path).catch(error => {
+        console.error(error);
+      });
     }
   },
   created() {
+      const path = "http://localhost:5000/startPreprocess";
+      axios.get(path).catch(error => {
+        console.error(error);
+      });
+    this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
     this.loadColumns();
     console.log(this.columns);
     this.loadDatasetSize();
   },
   mounted() {
+
     console.log("preprocess mounted");
   },
-  beforeDestroy() {
-    // window.localStorage.clear();
-    // console.log(window.localStorage);
-  }
+
   // beforeRouteEnter(to, from, next) {
   //   next(vm => {
   //     vm.dialog1 = true;
   //   });
   // s}
+  beforeDestroy() {
+    //     if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
+    //   const path = "http://localhost:5000/overwriteTable";
+    //   axios.get(path).catch(error => {
+    //     console.error(error);
+    //   });
+    // } else {
+    //   this.rollback();
+      
+    // }
+  },
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-  //     //
+  //     const path = "http://localhost:5000/overwriteTable";
+  //     axios.get(path).catch(error => {
+  //       console.error(error);
+  //     });
   //   } else {
   //     next();
   //   }

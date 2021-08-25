@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" absolute width="100%" height="100vh">
+  <v-navigation-drawer v-model="drawer" height="100vh">
     <!-- <v-btn @click="loadCases">hello</v-btn> -->
     <v-list>
       <!-- title -->

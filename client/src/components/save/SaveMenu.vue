@@ -2,14 +2,15 @@
   <div class="text-center">
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn color="secondary" dark v-bind="attrs" v-on="on">
-          Save Option
+        <v-btn color="" elevation="none" v-bind="attrs" v-on="on">
+          <v-icon>mdi-content-save-outline</v-icon>
         </v-btn>
       </template>
       <v-list>
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
+          :disabled="index == 1"
           link
           @click="clickSaveOptionEvent(index)"
         >

@@ -288,7 +288,7 @@ export default {
         }
       })
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
           this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
         })
         .catch(error => {

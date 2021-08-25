@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-navigation-drawer height="100vh" v-model="drawer" absolute :mini-variant.sync="mini">
-      <v-list-item class="mt-10 px-2" v-once>
+      <v-list-item class="mt-10 px-2">
         <v-list-item-avatar>
           <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
         </v-list-item-avatar>
@@ -12,29 +12,11 @@
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
       </v-list-item>
-      <v-list dense v-once>
-        <v-list-group v-model="activeState">
-          <template v-slot:activator>
-            <v-list-item-title active>Options</v-list-item-title>
-          </template>
-          <v-list-item
-            :disabled="
-              item.title == 'Add Column' ||
-                item.title == 'Update Column' ||
-                item.title == 'Moving Average'
-            "
-            v-for="item in items"
-            :key="item.title"
-            link
-            @click="callOption(item.title)"
-          >
-            <v-list-item-icon>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title draggable label>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list-group>
-      </v-list>
+
+      <keep-alive>
+        <component v-bind:is="dynamicSideMenu"></component>
+      </keep-alive>
+
       <!-- 구분선 -->
       <!-- <v-divider class=""></v-divider> -->
       <v-list dense>
@@ -52,6 +34,8 @@
 </template>
 
 <script>
+import TableSideMenu from "@/components/sideMenu/TableSideMenu";
+import SummarySideMenu from "@/components/sideMenu/SummarySideMenu";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 import axios from "axios";
@@ -60,37 +44,45 @@ export default {
     return {
       drawer: true,
       mini: false,
-      items: [
-        { title: "Add Column", icon: "mdi-plus-circle-outline" },
-        { title: "Update Column", icon: "mdi-select-drag" },
-        { title: "Delete Row", icon: "mdi-trash-can-outline" },
-        { title: "Change Order", icon: "mdi-swap-vertical" },
-        { title: "Moving Average", icon: "mdi-chart-timeline-variant" }
+
+      tableItems: [
+        { title: "Add Feature", icon: "mdi-plus" },
+        { title: "Update Feature", icon: "mdi-pencil" },
+        { title: "Delete Row", icon: "mdi-delete" }
       ],
-      activeState: true
+
+      activeState: true,
+      currentComponent: "DataFeatures"
     };
   },
-  components: {},
+  components: {
+    TableSideMenu,
+    SummarySideMenu
+  },
   computed: {
     ...mapState({
       tableList: state => state.initialData.tableList
-    })
+    }),
+    dataFeatures() {
+      return this.$root.$refs.dataFeatures;
+    },
+    infiniteTable() {
+      return this.$root.$refs.infiniteTable;
+    },
+
+    dynamicSideMenu() {
+      if (this.currentComponent == "DataFeatures") return "SummarySideMenu";
+      else return "TableSideMenu";
+    }
   },
   methods: {
     ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["loadTableList"]),
+
     clickTableNameEvent() {
       this.loadFundamentalData("http://localhost:5000/loadData");
     },
-    callOption(title) {
-      if (title == "Delete Row") {
-        eventBus.$emit("openDeleteRowModal", true);
-      } else if (title == "Moving Average") {
-        eventBus.$emit("openMovingAverageModal", true);
-      } else if (title == "Change Order") {
-        eventBus.$emit("openChangeOrderModal", true);
-      }
-    },
+
     showTables() {
       let path = "http://localhost:5000/showTables";
       axios
@@ -104,6 +96,9 @@ export default {
   },
   created() {
     this.showTables();
+    eventBus.$on("changeComponent", componentName => {
+      this.currentComponent = componentName;
+    });
   },
   mounted() {
     this.showTables();

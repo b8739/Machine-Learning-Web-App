@@ -1,7 +1,7 @@
 <template>
   <v-container fluid id="wrapper mt-4">
     <v-card elevation="0" height="100vh">
-      <v-row align="center">
+      <v-row class="mx-0" align="center">
         <v-subheader>
           Search Filter:
         </v-subheader>
@@ -37,55 +37,30 @@
             hide-details
           ></v-text-field
         ></v-col>
+        <v-spacer></v-spacer>
+        <portal-target v-if="editMode" name="table-delete-row"> </portal-target>
+
+        <!-- <v-btn color="error" v-show="editMode" @click="confirmEvent()">Cancel</v-btn> -->
       </v-row>
 
       <!-- toolbar -->
-      {{ checkedRows }}
+      <!-- {{ checkedRows }} -->
       <v-toolbar dense elevation="1">
-        <v-row align="center">
-          <v-col cols="5">
-            <v-btn small color="primary" outlined class="py-2 mr-2">
-              <v-icon left>
-                mdi-plus
-              </v-icon>
-              Add Row(s)
-            </v-btn>
+        <div></div>
+        <v-spacer></v-spacer>
+        <span class="caption">
+          <v-icon small @click="scrollTable('left')" class="px-1"> mdi-arrow-collapse-left</v-icon
+          >Horizontal Slide
+          <v-icon small @click="scrollTable('right')" class="px-1"
+            >mdi-arrow-collapse-right</v-icon
+          ></span
+        >
+        <v-spacer></v-spacer>
 
-            <v-btn small color="success" outlined class="py-2 mr-2">
-              <v-icon left>
-                mdi-pencil
-              </v-icon>
-              Update Row(s)
-            </v-btn>
-
-            <v-btn small color="error" outlined class="py-2 mr-2" @click="deleteRow()">
-              <v-icon left>
-                mdi-delete
-              </v-icon>
-              Delete Row(s)
-            </v-btn>
-          </v-col>
-          <v-col>
-            <span class="caption">
-              <v-icon small @click="scrollTable('left')" class="px-1">
-                mdi-arrow-collapse-left</v-icon
-              >Horizontal Slide
-              <v-icon small @click="scrollTable('right')" class="px-1"
-                >mdi-arrow-collapse-right</v-icon
-              ></span
-            >
-          </v-col>
-          <v-col cols="5">
-            <v-row justify="end">
-              <span class="caption py-2">
-                {{ datasetItems.length }} of {{ datasetSize }}
-                <v-icon small @click="scrollTable('top')" class="px-1"
-                  >mdi-arrow-expand-up</v-icon
-                ></span
-              >
-            </v-row>
-          </v-col>
-        </v-row>
+        <span class="caption py-2">
+          {{ datasetItems.length }} of {{ fakeDatasetSize }}
+          <v-icon small @click="scrollTable('top')" class="px-1">mdi-arrow-expand-up</v-icon></span
+        >
       </v-toolbar>
       <!-- datatable -->
       <v-sheet>
@@ -104,14 +79,26 @@
         >
           <!-- checkbox -->
           <template v-slot:header.data-table-select="{ on, props }">
-            <v-simple-checkbox @input="checkAll()" v-bind="props" v-on="on"></v-simple-checkbox>
+            <v-simple-checkbox
+              :ripple="false"
+              v-show="editMode"
+              @input="checkAll()"
+              v-bind="props"
+              v-on="on"
+            ></v-simple-checkbox>
           </template>
           <!-- Data Table items -->
           <template v-slot:body="{ items }">
             <tbody>
               <tr v-for="(item, itemIndex) in items" :key="itemIndex">
                 <td>
-                  <v-checkbox dense v-model="checkedRows" :value="itemIndex" hide-details />
+                  <v-checkbox
+                    v-show="editMode"
+                    dense
+                    v-model="checkedRows"
+                    :value="itemIndex"
+                    hide-details
+                  />
                 </td>
                 <td style="min-width:70px">
                   <!-- ID index -->
@@ -126,6 +113,25 @@
                   {{ item[column] }}
                 </td>
               </tr>
+              <!-- insertedItems -->
+              <tr
+                v-for="(insertedItem, insertedItemIndex) in insertedItems"
+                :key="insertedItemIndex"
+              >
+                <td></td>
+                <td style="min-width:70px">
+                  <!-- ID index -->
+                  {{ datasetSize + insertedItemIndex + 1 }}
+                </td>
+                <!-- Feature Value -->
+                <td
+                  v-for="(column, insertedColumnIndex) in columns"
+                  :key="insertedColumnIndex"
+                  style="min-width:150px"
+                >
+                  {{ insertedItem[column] }}
+                </td>
+              </tr>
             </tbody>
             <infinite-loading
               ref="infiniteLoading"
@@ -136,6 +142,21 @@
         </v-data-table>
       </v-sheet>
       <SaveChange />
+      <v-dialog v-model="editStatus[preprocessStatus]" max-width="500px">
+        <v-card light min-height="500px">
+          <v-container>
+            <v-row>
+              <v-col cols="5" v-for="(column, columnIndex) in columns" :key="columnIndex">
+                <v-text-field dense :label="column" value="1" v-model="columnField[column]">
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row justify="end">
+              <portal-target name="table-insert-row"> </portal-target>
+            </v-row>
+          </v-container>
+        </v-card>
+      </v-dialog>
     </v-card>
   </v-container>
 </template>
@@ -147,6 +168,7 @@ import InfiniteLoading from "vue-infinite-loading";
 import axios from "axios";
 import vClickOutside from "v-click-outside";
 import SaveChange from "@/components/save/SaveChange";
+
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   directives: {
@@ -154,6 +176,11 @@ export default {
   },
   data() {
     return {
+      insertedItems: [],
+      numOfInsertion: 0,
+      columnField: {},
+      dialog: false,
+      activatedEvent: null,
       checkedRows: [],
       filterLessThan: "",
       filterGreaterThan: "",
@@ -186,8 +213,16 @@ export default {
     // ...mapGetters("initialData", ["columns"]),
     ...mapState({
       datasetSize: state => state.initialData.datasetSize,
-      columns: state => state.initialData.columns
+      columns: state => state.initialData.columns,
+      tableName: state => state.initialData.tableName,
+      editMode: state => state.preprocessHandler.editMode,
+      editStatus: state => state.preprocessHandler.editStatus,
+      preprocessStatus: state => state.preprocessHandler.preprocessStatus
     }),
+    fakeDatasetSize() {
+      return this.datasetSize + this.numOfInsertion;
+    },
+
     dataTableWidth() {
       return this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper").offsetWidth;
     },
@@ -237,15 +272,7 @@ export default {
   },
   methods: {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
-    deleteRow() {
-      let numOfRows = this.checkedRows.length;
-      this.checkedRows.forEach(element => {
-        console.log(element);
-        Vue.delete(this.datasetItems, element);
-      });
-      this.checkedRows = []; //체크 초기화
-      alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
-    },
+
     scrollTable(direction) {
       let obj = this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper");
       if (direction == "top") {
@@ -369,13 +396,17 @@ export default {
         });
     },
     infiniteHandler($state) {
-      let api = "http://localhost:5000/infiniteLoading";
-      axios
-        .get(api, {
-          params: {
-            limit: this.limit
-          }
-        })
+      // new
+      let path = "http://localhost:5000/infiniteLoading";
+      // axios
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.tableName,
+          limit: this.limit
+        }
+      })
         .then(({ data }) => {
           // console.log(data);
           if (data.length) {
@@ -385,6 +416,9 @@ export default {
           } else {
             $state.complete();
           }
+        })
+        .catch(error => {
+          console.error(error);
         });
     },
     // infinteLoading
@@ -431,6 +465,7 @@ export default {
     }
   },
   created() {
+    this.$root.$refs.infiniteTable = this;
     // this.infiniteLoadingCreated();
     eventBus.$on("reloadInfiniteTable", reloadStatus => {
       this.resetTableData();

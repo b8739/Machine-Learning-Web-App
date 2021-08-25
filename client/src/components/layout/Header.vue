@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a href="http://localhost:5000/"
+    <a href="http://localhost:8080/"
       ><img class="logo" src="../../assets/attic_logo.png" alt=""
     /></a>
     <nav>
@@ -29,6 +29,7 @@
         >Simulation</router-link
       >
     </nav>
+    <v-spacer></v-spacer>
   </div>
 </template>
 <script>

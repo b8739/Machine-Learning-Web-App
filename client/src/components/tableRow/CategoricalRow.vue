@@ -13,17 +13,17 @@
 
     <!-- 4th Column -->
     <td>
-      <!-- <p class="info_title">Samples For Class:</p>
-              <v-row
-                no-gutters
-                v-for="(sample, sampleIndex) in summarizedInfo['sampleForClass'][column]"
-                :key="sampleIndex"
-              >
-                <v-col class="py-0"> {{ sampleIndex }}</v-col>
-                <v-spacer></v-spacer>
-                <v-col class="py-0">{{ sample }}% </v-col>
-                <v-col cols="12" class="pa-0"><v-divider></v-divider></v-col>
-              </v-row> -->
+      <p class="info_title">Samples For Class:</p>
+      <v-row
+        no-gutters
+        v-for="(sample, sampleIndex) in summarizedInfo['sampleForClass'][column]"
+        :key="sampleIndex"
+      >
+        <v-col class="py-0"> {{ sampleIndex }}</v-col>
+        <v-spacer></v-spacer>
+        <v-col class="py-0">{{ sample }}% </v-col>
+        <v-col cols="12" class="pa-0"><v-divider></v-divider></v-col>
+      </v-row>
     </td>
 
     <!-- category 일 경우: -- 표시 -->
@@ -43,11 +43,16 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
       columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo,
       featureNameFlag: state => state.saveFlag.summarizedInfo
-    })
+    }),
+    categorySummary() {
+      let categoricalColumn = Object.keys(this.summarizedInfo["categorical"]);
+      let categorySummary = [];
+      categorySummary = Object.keys(this.summarizedInfo["categorical"][categoricalColumn[0]]);
+      return categorySummary;
+    }
   },
   props: ["column", "columnIndex"]
 };
@@ -57,5 +62,8 @@ td {
   padding: 15px 10px;
   border: 1px solid rgba(104, 102, 102, 0.644);
   border-bottom: none;
+}
+.info_title {
+  color: grey;
 }
 </style>

@@ -49,7 +49,7 @@ export default {
   /*
       Defines the method used by the component
     */
-  computed() {},
+  computed: {},
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
     ...mapMutations("initialData", ["saveTableName"]),

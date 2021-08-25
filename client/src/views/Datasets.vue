@@ -3,16 +3,22 @@
     <Header />
 
     <v-container fluid class="pl-10 pt-10">
-      <v-row align="start" no-gutter dense>
-        <v-col cols="1">
-          <v-btn @click="openUploader" block color="success">
-            <v-icon left class="mdi-24">
-              mdi-plus
-            </v-icon>
-            Add Dataset
-          </v-btn>
-        </v-col>
-        <v-col cols="9"></v-col>
+      <v-row align="start">
+        <v-btn max-width="200px" class="mr-2" @click="openUploader" color="success">
+          <v-icon left class="mdi-24">
+            mdi-plus
+          </v-icon>
+          Add Dataset
+        </v-btn>
+
+        <v-btn max-width="200px" @click="deleteMode = !deleteMode" color="error">
+          <v-icon left class="mdi-24">
+            mdi-trash-can
+          </v-icon>
+          Delete Dataset
+        </v-btn>
+      </v-row>
+      <v-row>
         <v-sheet
           light
           outlined
@@ -21,8 +27,14 @@
           :key="tableIndex"
           class="mr-5 mt-5 cursor-pointer"
           @click="enterDataset(tableName)"
-        >
-          <v-card-text class="font-weight-bold body-1">{{ tableName }}</v-card-text>
+          ><v-container>
+            <v-row justify="end">
+              <v-btn v-show="deleteMode" @click="dropTable(tableName)" x-small light
+                >X</v-btn
+              ></v-row
+            ></v-container
+          >
+          <v-card-text class="font-weight-bold body-1 pt-0">{{ tableName }}</v-card-text>
           <v-card-text class="font-weight-light body-2 pt-0">Created Date:</v-card-text>
           <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
           <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text>
@@ -50,6 +62,7 @@ export default {
     */
   data() {
     return {
+      deleteMode: false,
       files: [],
       datasets: [1, 2]
     };
@@ -86,6 +99,27 @@ export default {
           this.loadTableList(res.data);
         })
         .catch(error => {});
+    },
+    dropTable(tableName) {
+      if (
+        confirm("선택한 Dataset을 Database에서 삭제하시겠습니까? (다시 복구할 수 없습니다)") == true
+      ) {
+        let path = "http://localhost:5000/dropTable";
+        axios
+          .get(path, {
+            params: {
+              tableName: tableName
+            }
+          })
+          .then(res => {
+            this.showTables();
+            this.deleteMode = false;
+            console.log("Table Successfully Deleted");
+          })
+          .catch(error => {
+            alert(error);
+          });
+      }
     },
     openUploader() {
       eventBus.$emit("openUploader", true);

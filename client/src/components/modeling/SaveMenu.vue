@@ -1,8 +1,8 @@
 <template>
   <div class="text-center">
-    <v-menu offset-y>
+    <!-- <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn color="secondary" dark v-bind="attrs" v-on="on">
+        <v-btn disabled color="secondary" dark v-bind="attrs" v-on="on">
           Save Option
         </v-btn>
       </template>
@@ -16,7 +16,10 @@
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item>
       </v-list>
-    </v-menu>
+    </v-menu> -->
+    <v-btn disabled>
+      Save Option
+    </v-btn>
   </div>
 </template>
 <script>
@@ -26,7 +29,7 @@ import DefineDataset from "@/components/modal/DefineDataset";
 export default {
   data() {
     return {
-      items: [{ title: "Overwrite" }, { title: "Save as New Dataset" }],
+      items: [{ title: "Overwrite" }, { title: "Save as New Dataset (Currently not supported)" }],
       dialog: false
     };
   },

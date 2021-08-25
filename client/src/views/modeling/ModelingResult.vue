@@ -12,7 +12,7 @@
           <v-toolbar elevation="1" dense>
             <v-spacer></v-spacer>
 
-            <v-btn @click="dialog = true" small color="info">
+            <v-btn disabled @click="dialog = true" small color="info">
               Save Model<v-icon right>mdi-content-save</v-icon>
             </v-btn>
 
@@ -313,15 +313,15 @@ export default {
     }
   },
   created() {
-    console.log("created");
-    let caseNameFromUrl = this.$route.params.case;
-    console.log(caseNameFromUrl);
-    if (caseNameFromUrl != "") {
-      this.changeCase(caseNameFromUrl);
-    }
-    eventBus.$on("changeCase", caseNameFromUrl => {
-      this.changeCase(caseNameFromUrl);
-    });
+    // console.log("created");
+    // let caseNameFromUrl = this.$route.params.case;
+    // console.log(caseNameFromUrl);
+    // if (caseNameFromUrl != "") {
+    //   this.changeCase(caseNameFromUrl);
+    // }
+    // eventBus.$on("changeCase", caseNameFromUrl => {
+    //   this.changeCase(caseNameFromUrl);
+    // });
   },
   mounted() {}
 };

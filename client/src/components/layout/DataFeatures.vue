@@ -2,6 +2,8 @@
   <div>
     <div class="container">
       <!-- 테이블 -->
+      <div>Duplicated{{ duplicatedColumns }}</div>
+      <div>Original{{ columns }}</div>
       <table class="dataTable">
         <draggable tag="table" v-model="duplicatedColumns" @change="onDragEvent">
           <!-- 행 -->
@@ -14,7 +16,11 @@
                 <td>
                   <v-row>
                     <v-col cols="1"
-                      ><v-icon x-small class="pt-3" @click="saveClickedIconIndex(column)"
+                      ><v-icon
+                        v-show="editStatus[preprocessStatus]"
+                        x-small
+                        class="pt-3"
+                        @click="saveClickedIconIndex(column)"
                         >mdi-pencil</v-icon
                       ></v-col
                     >
@@ -33,6 +39,7 @@
                     <v-select
                       :items="categoryTypes"
                       dense
+                      :disabled="changeTypeMode"
                       single-line
                       hide-details="true"
                       height="20"
@@ -62,6 +69,7 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
+      changeTypeMode: true,
       duplicatedColumns: [],
       editModalDialog: false,
       sampleForClass: null,
@@ -131,7 +139,9 @@ export default {
       dataset: state => state.initialData.dataset,
       columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo,
-      featureNameFlag: state => state.saveFlag.summarizedInfo
+      featureNameFlag: state => state.saveFlag.summarizedInfo,
+      editStatus: state => state.preprocessHandler.editStatus,
+      preprocessStatus: state => state.preprocessHandler.preprocessStatus
     }),
     ...mapGetters("initialData", ["numericColumns"]),
     renderStatus() {
@@ -143,12 +153,7 @@ export default {
         return true;
       }
     },
-    categorySummary() {
-      let categoricalColumn = Object.keys(this.summarizedInfo["categorical"]);
-      let categorySummary = [];
-      categorySummary = Object.keys(this.summarizedInfo["categorical"][categoricalColumn[0]]);
-      return categorySummary;
-    },
+
     numericSummary() {
       let numericColumn = Object.keys(this.summarizedInfo["numeric"]);
       let numericSummary = [];
@@ -261,6 +266,7 @@ export default {
     }
   },
   created() {
+    this.$root.$refs.dataFeatures = this;
     this.loadDataSummary();
     this.selectionTimer = setTimeout(() => {
       this.duplicateColumns();
@@ -272,6 +278,9 @@ export default {
       duplicatedColumns.forEach(element => {
         this.duplicatedColumns.push(element);
       });
+    });
+    eventBus.$on("changeNameMode", status => {
+      this.changeNameMode = status;
     });
   },
   mounted() {

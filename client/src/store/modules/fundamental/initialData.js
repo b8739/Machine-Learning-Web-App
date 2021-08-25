@@ -9,7 +9,9 @@ const getDefaultState = () => {
     randomRange: null,
     columns: [],
     datasetSize: null,
-    tableName: null
+    tableName: null,
+    preprocessStatus: null,
+    editMode: false
   };
 };
 const state = getDefaultState();
@@ -22,6 +24,12 @@ const getters = {
 };
 
 const mutations = {
+  setPreprocessStatus(state, payload) {
+    state.preprocessStatus = payload;
+  },
+  setEditMode(state, payload) {
+    state.editMode = payload;
+  },
   resetState(state) {
     Object.assign(state, getDefaultState());
   },
@@ -31,7 +39,8 @@ const mutations = {
       state.columns.push(element);
     });
   },
-  loadDatasetSize(state, payload) {
+
+  setDatasetSize(state, payload) {
     state.datasetSize = payload;
   },
 
@@ -90,7 +99,7 @@ const actions = {
       })
       .then(res => {
         // console.log(res.data);
-        commit("loadDatasetSize", res.data);
+        commit("setDatasetSize", res.data);
       })
       .catch(error => {
         console.error(error);

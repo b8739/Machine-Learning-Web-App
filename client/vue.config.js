@@ -7,9 +7,13 @@ module.exports = {
   publicPath: "/",
   // 용량 커서
   productionSourceMap: false,
-  configureWebpack: {
+  configureWebpack: config => {
     // mode: "development",
     // devtool: "eval"
+    config.output.filename = "js/[name].[hash].js";
+    config.output.chunkFilename = "js/[name].[hash].js";
+  },
+  configureWebpack: {
     plugins: [new VuefyLoaderPlugin()]
   }
 };
