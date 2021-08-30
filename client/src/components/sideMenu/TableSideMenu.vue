@@ -113,54 +113,6 @@ export default {
     ...mapActions("dataTableHandler", ["deleteRow"]),
     ...mapActions("dataTableHandler", ["insertRow"]),
 
-    // deleteRow() {
-    //   let path = "http://localhost:5000/deleteSingleRow";
-    //   this.$axios({
-    //     method: "post",
-    //     url: path,
-    //     data: {
-    //       tableName: this.tableName,
-    //       idNumbers: this.DataTable.checkedRows
-    //     }
-    //   })
-    //     .then(res => {
-    //       let numOfRows = this.DataTable.checkedRows.length;
-    //       this.DataTable.checkedRows.forEach(element => {
-    //         console.log(element);
-    //         Vue.delete(this.DataTable.datasetItems, element);
-    //       });
-    //       this.DataTable.checkedRows = []; //체크 초기화
-    //       alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
-    //       this.setDatasetSize(false);
-    //       this.setEditMode(false);
-    //       this.setPreprocessStatus(null);
-    //     })
-    //     .catch(error => {
-    //       console.error(error);
-    //     });
-    // },
-
-    // insertRow() {
-    //   let path = "http://localhost:5000/addData";
-    //   this.$axios({
-    //     method: "post",
-    //     url: path,
-    //     data: {
-    //       tableName: this.tableName,
-    //       newRow: this.DataTable.columnField
-    //     }
-    //   })
-    //     .then(res => {
-    //       this.DataTable.numOfInsertion = this.DataTable.numOfInsertion + 1;
-    //       this.DataTable.insertedItems.push(JSON.parse(JSON.stringify(this.DataTable.columnField)));
-    //       // this.setEditStatus(false);
-    //       this.setPreprocessStatus(null);
-    //       this.DataTable.dialog = false;
-    //     })
-    //     .catch(error => {
-    //       console.error(error);
-    //     });
-    // },
     // activation
     activateDeleteRow() {
       this.setPreprocessStatus("tableDeleteRow");

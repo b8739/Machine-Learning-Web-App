@@ -48,6 +48,7 @@ export default {
     ...mapActions("summaryTableHandler", ["calculateTransaction"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
+    ...mapActions("summaryTableHandler", ["cloneArray"]),
 
     clickSaveOptionEvent(index) {
       if (index == 0) {
@@ -75,7 +76,11 @@ export default {
         })
           .then(res => {
             this.loadColumns();
+
             this.loadSummarizedData();
+            this.selectionTimer = setTimeout(() => {
+              this.cloneArray();
+            }, 1000);
           })
           .catch(error => {
             console.error(error);
