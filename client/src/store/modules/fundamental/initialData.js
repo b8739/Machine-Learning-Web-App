@@ -127,7 +127,10 @@ const actions = {
       })
       .then(res => {
         commit("loadSummarizedInfo", res.data);
-        router.push({ name: "preprocess" });
+
+        if (router.currentRoute.path != "/preprocess") {
+          router.push({ name: "preprocess" });
+        }
       })
       .catch(error => {
         console.error(error);

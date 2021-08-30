@@ -4,6 +4,8 @@
     <!-- <v-btn @click=apiCheck></v-btn> -->
     <div>preprocessStatus:{{ preprocessStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
+    <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
+    <div>router:{{ $router.name }}</div>
     <div class="text-center">
       <v-dialog v-model="dialog1" hide-overlay persistent width="300">
         <v-card color="primary" dark>
@@ -111,7 +113,8 @@ export default {
       columns: state => state.initialData.columns,
       datasetSize: state => state.initialData.datasetSize,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
-      activatedEvent: state => state.preprocessHandler.activatedEvent
+      activatedEvent: state => state.preprocessHandler.activatedEvent,
+      additionalCancelEvent: state => state.preprocessHandler.additionalCancelEvent
     }),
     confirmButtonSpot() {
       return this.preprocessStatus;

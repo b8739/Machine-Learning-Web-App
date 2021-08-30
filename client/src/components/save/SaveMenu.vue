@@ -26,6 +26,8 @@
 import axios from "axios";
 import { eventBus } from "@/main";
 import DefineDataset from "@/components/modal/DefineDataset";
+import { mapActions, mapState, mapGetters, mapMutations } from "vuex";
+
 export default {
   data() {
     return {
@@ -34,7 +36,19 @@ export default {
     };
   },
   components: { DefineDataset },
+  computed: {
+    ...mapState({
+      columns: state => state.initialData.columns,
+      duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns,
+      tableName: state => state.initialData.tableName
+    }),
+    ...mapGetters("summaryTableHandler", ["changeFlag"])
+  },
   methods: {
+    ...mapActions("summaryTableHandler", ["calculateTransaction"]),
+    ...mapActions("initialData", ["loadSummarizedData"]),
+    ...mapActions("initialData", ["loadColumns"]),
+
     clickSaveOptionEvent(index) {
       if (index == 0) {
         this.saveTableAxios("overwrite");
@@ -44,20 +58,43 @@ export default {
         eventBus.$emit("saveNewFileMode", this.dialog);
       }
     },
+
     saveTableAxios(saveOption) {
-      const path = "http://localhost:5000/overwriteTable";
-      axios
-        .get(path, {
-          params: {
-            saveOption: saveOption
+      if (this.changeFlag) {
+        //summary 변경 있을 때
+        let path = "http://localhost:5000/changeColumnInfo";
+        // axios
+        this.$axios({
+          method: "post",
+          url: path,
+          data: {
+            duplicatedColumns: this.duplicatedColumns,
+            columns: this.columns,
+            tableName: this.tableName
           }
         })
-        .then(res => {
-          console.log(res);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+          .then(res => {
+            this.loadColumns();
+            this.loadSummarizedData();
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } else {
+        const path = "http://localhost:5000/overwriteTable";
+        axios
+          .get(path, {
+            params: {
+              saveOption: saveOption
+            }
+          })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
     }
   }
 };

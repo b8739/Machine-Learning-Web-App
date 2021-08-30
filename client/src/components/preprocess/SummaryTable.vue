@@ -23,7 +23,7 @@
                     <v-col
                       ><v-text-field
                         v-bind="activateName"
-                        :value="column"
+                        :value="column.columnName"
                         @change="renameColumns(columnIndex, $event)"
                       ></v-text-field>
                     </v-col>
@@ -73,11 +73,11 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
-      duplicatedColumns: [],
+      // duplicatedColumns: [],
       editModalDialog: false,
       sampleForClass: null,
-      categoryTypes: ["Category", "String", "Text", "Time-Series"],
-      numericTypes: ["Numeric", "Float", "Int"],
+      categoryTypes: ["Int64", "Float64", "Bool", "Datatime64", "Timedelta[ns]", "Category"],
+      numericTypes: ["Int64", "Float64", "Bool", "Datatime64", "Timedelta[ns]", "Category"],
 
       inactivatedName_props: {
         disabled: true,
@@ -147,9 +147,12 @@ export default {
       featureNameFlag: state => state.saveFlag.summarizedInfo,
       editStatus: state => state.preprocessHandler.editStatus,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
-      activatedEvent: state => state.preprocessHandler.activatedEvent
+      activatedEvent: state => state.preprocessHandler.activatedEvent,
+      duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns
     }),
     ...mapGetters("initialData", ["numericColumns"]),
+    ...mapGetters("summaryTableHandler", ["changeFlag"]),
+
     activateName() {
       if (this.editStatus["summaryChangeName"]) {
         return this.activatedName_props;
@@ -183,8 +186,10 @@ export default {
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
     ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
     ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
-    renameColumns(columnIndex, event) {
-      Vue.set(this.duplicatedColumns, columnIndex, event);
+    ...mapActions("summaryTableHandler", ["cloneArray"]),
+    ...mapMutations("summaryTableHandler", ["changeColumnOrder"]),
+    renameColumns(index, event) {
+      Vue.set(this.duplicatedColumns[index], "columnName", event);
     },
     saveClickedIconIndex(column) {
       // v-icon click OFF
@@ -214,21 +219,21 @@ export default {
       }
     },
 
-    changeColumnOrder(position, movedColumnName, newIndex) {
-      const api = "http://localhost:5000/changeColumnOrder";
-      axios
-        .get(api, {
-          params: {
-            position: position,
-            movedColumnName: movedColumnName,
-            newIndex: newIndex
-          }
-        })
-        .then(res => {})
-        .catch(error => {
-          console.error(error);
-        });
-    },
+    // changeColumnOrder(position, movedColumnName, newIndex) {
+    //   const api = "http://localhost:5000/changeColumnOrder";
+    //   axios
+    //     .get(api, {
+    //       params: {
+    //         position: position,
+    //         movedColumnName: movedColumnName,
+    //         newIndex: newIndex
+    //       }
+    //     })
+    //     .then(res => {})
+    //     .catch(error => {
+    //       console.error(error);
+    //     });
+    // },
     changeColumnName_vue(newName, columnIndex) {
       let payload = { newName: newName, columnIndex: columnIndex };
       console.log(payload);
@@ -258,14 +263,14 @@ export default {
       //   this.category_info[key] = this.summarizedInfo["categorical"][key];
       // }
       // this.sampleForClass = this.summarizedInfo["sampleForClass"];
-    },
-    duplicateColumns(cloneArray, originalArray) {
-      console.log("duplicate");
-      cloneArray.splice(0, cloneArray.length);
-      originalArray.forEach(element => {
-        cloneArray.push(element);
-      });
     }
+    // duplicateColumns(cloneArray, originalArray) {
+    //   console.log("duplicate");
+    //   cloneArray.splice(0, cloneArray.length);
+    //   originalArray.forEach(element => {
+    //     cloneArray.push(element);
+    //   });
+    // }
   },
   created() {
     this.resetDataTableVuex();
@@ -273,16 +278,16 @@ export default {
     this.$root.$refs.SummaryTable = this;
     this.loadDataSummary();
     this.selectionTimer = setTimeout(() => {
-      this.duplicateColumns(this.duplicatedColumns, this.columns);
+      this.cloneArray();
     }, 1000);
 
     // draggable
 
     eventBus.$on("columnOrderUpdated", duplicatedColumns => {
       duplicatedColumns.forEach((element, index) => {
-        console.log("eventbus columnorder");
         if (element != this.duplicatedColumns[index]) {
-          Vue.set(this.duplicatedColumns, index, element);
+          let payload = { index: index, element: element };
+          this.changeColumnOrder(payload);
         }
       });
     });

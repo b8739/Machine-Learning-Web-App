@@ -26,18 +26,25 @@
           v-for="(tableName, tableIndex) in tableList"
           :key="tableIndex"
           class="mr-5 mt-5 cursor-pointer"
-          @click="enterDataset(tableName)"
-          ><v-container>
+        >
+          <v-container>
             <v-row justify="end">
               <v-btn v-show="deleteMode" @click="dropTable(tableName)" x-small light
                 >X</v-btn
               ></v-row
-            ></v-container
-          >
-          <v-card-text class="font-weight-bold body-1 pt-0">{{ tableName }}</v-card-text>
-          <v-card-text class="font-weight-light body-2 pt-0">Created Date:</v-card-text>
-          <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
-          <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text>
+            >
+            <v-row>
+              <v-card-text class="font-weight-bold body-1 ">{{ tableName }}</v-card-text>
+              <v-card-text class="font-weight-light body-2 pt-0">Created Date:</v-card-text>
+              <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
+              <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text></v-row
+            >
+            <v-row justify="end">
+              <v-btn small dark color="secondary" @click="enterDataset(tableName)"
+                ><v-icon> mdi-subdirectory-arrow-right</v-icon>
+              </v-btn>
+            </v-row>
+          </v-container>
         </v-sheet>
       </v-row>
       <!-- modal -->

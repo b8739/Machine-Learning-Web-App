@@ -49,6 +49,7 @@ export default {
     ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapActions("preprocessHandler", ["activateEvent"]),
+    ...mapActions("summaryTableHandler", ["cloneArray"]),
 
     revertNameChange() {
       console.log("revert");
@@ -71,7 +72,11 @@ export default {
         this.activateEvent("summaryChangeType");
       } else if (title == "Change Order") {
         this.activateEvent("summaryChangeOrderModal");
-        this.setEvent(function() {});
+        this.setAdditionalCancelEvent(this.cloneArray);
+        this.setEvent(() => {
+          eventBus.$emit("openChangeOrderModal", false);
+          this.setAdditionalCancelEvent(null);
+        });
         eventBus.$emit("openChangeOrderModal", true);
       }
     }

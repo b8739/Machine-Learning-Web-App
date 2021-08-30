@@ -20,7 +20,7 @@
             <draggable v-model="duplicatedColumns" @change="onDragEvent">
               <v-list-item v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
                 <v-list-item-content>
-                  <v-list-item-title>{{ column }}</v-list-item-title>
+                  <v-list-item-title>{{ column.columnName }}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </draggable>
@@ -49,7 +49,7 @@ export default {
   props: ["duplicatedColumns"],
   methods: {
     ...mapMutations("saveFlag", ["ChangeColumnOrderFlag"]),
-    // ...mapMutations("saveFlag", ["updateChangedColumn"]),
+    ...mapMutations("summaryTableHandler", ["changeColumnOrder"]),
     ...mapMutations("initialData", ["updateColumnOrder"]),
     confirmChanges() {
       eventBus.$emit("columnOrderUpdated", this.duplicatedColumns);
@@ -63,31 +63,41 @@ export default {
       let oldIndex = evt.moved.oldIndex;
       let newIndex = evt.moved.newIndex;
       let movedInfo = { columnName: columnName, oldIndex: oldIndex, newIndex: newIndex };
-      console.log(movedInfo);
-    },
-    changeColumnOrder(position, movedColumnName, newIndex) {
-      const api = "http://localhost:5000/changeColumnOrder";
-      axios
-        .get(api, {
-          params: {
-            position: position,
-            movedColumnName: movedColumnName,
-            newIndex: newIndex
-          }
-        })
-        .then(res => {})
-        .catch(error => {
-          console.error(error);
-        });
+      this.changeColumnOrder(movedInfo);
     }
+    // changeColumnOrder(position, movedColumnName, newIndex) {
+    //   const api = "http://localhost:5000/changeColumnOrder";
+    //   axios
+    //     .get(api, {
+    //       params: {
+    //         position: position,
+    //         movedColumnName: movedColumnName,
+    //         newIndex: newIndex
+    //       }
+    //     })
+    //     .then(res => {})
+    //     .catch(error => {
+    //       console.error(error);
+    //     });
+    // }
   },
   components: {
     draggable
   },
   computed: {
     // ...mapGetters("initialData", ["columns"]),
+    duplicatedColumnsInstance: {
+      get() {
+        return this.duplicatedColumns;
+      }
+      // set(value) {
+      //   console.log(value);
+      //   this.changeColumnOrder(value);
+      // }
+    },
     ...mapState({
       columns: state => state.initialData.columns
+      // duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns
     })
   },
 
