@@ -38,7 +38,7 @@
           ></v-text-field
         ></v-col>
         <v-spacer></v-spacer>
-        <portal-target v-if="editMode" name="table-delete-row"> </portal-target>
+        <portal-target v-if="editMode" name="tableDeleteRow"> </portal-target>
 
         <!-- <v-btn color="error" v-show="editMode" @click="confirmEvent()">Cancel</v-btn> -->
       </v-row>
@@ -142,7 +142,7 @@
         </v-data-table>
       </v-sheet>
       <SaveChange />
-      <v-dialog v-model="editStatus[preprocessStatus]" max-width="500px">
+      <v-dialog v-model="dialog" max-width="500px">
         <v-card light min-height="500px">
           <v-container>
             <v-row>
@@ -152,7 +152,7 @@
               </v-col>
             </v-row>
             <v-row justify="end">
-              <portal-target name="table-insert-row"> </portal-target>
+              <portal-target name="tableInsertRow"> </portal-target>
             </v-row>
           </v-container>
         </v-card>
@@ -176,6 +176,7 @@ export default {
   },
   data() {
     return {
+      dialog: false,
       insertedItems: [],
       numOfInsertion: 0,
       columnField: {},

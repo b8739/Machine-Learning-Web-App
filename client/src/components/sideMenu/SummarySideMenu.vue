@@ -44,15 +44,24 @@ export default {
   methods: {
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
-
+    ...mapMutations("preprocessHandler", ["setEvent"]),
+    ...mapActions("preprocessHandler", ["cancelEvent"]),
+    ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
+    revertNameChange() {
+      if (!(JSON.stringify(this.columns) === JSON.stringify(this.dataFeatures.duplicatedColumns)))
+        //false, 동일하지 않을 때
+        this.dataFeatures.duplicateColumns();
+    },
     callOption(title) {
       if (title == "Change Name") {
-        this.dataFeatures.changeNameMode = !this.dataFeatures.changeNameMode;
-        this.setPreprocessStatus("summary-change-name");
-        this.setEditStatus(this.preprocessStatus);
+        this.cancelEvent();
+        this.setPreprocessStatus("summaryChangeName");
+        this.setEditStatus(true);
+        this.setAdditionalCancelEvent(this.revertNameChange);
       } else if (title == "Change Type") {
-        this.dataFeatures.changeTypeMode = !this.dataFeatures.changeTypeMode;
-        // this.setPreprocessStatus("summary-change-type");
+        this.cancelEvent();
+        this.setPreprocessStatus("summaryChangeType");
+        this.setEditStatus(true);
       } else if (title == "Change Order") {
         eventBus.$emit("openChangeOrderModal", true);
         // this.setPreprocessStatus("summary-change-order");

@@ -24,12 +24,6 @@ const getters = {
 };
 
 const mutations = {
-  setPreprocessStatus(state, payload) {
-    state.preprocessStatus = payload;
-  },
-  setEditMode(state, payload) {
-    state.editMode = payload;
-  },
   resetState(state) {
     Object.assign(state, getDefaultState());
   },

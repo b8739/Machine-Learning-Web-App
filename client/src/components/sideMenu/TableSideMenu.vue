@@ -81,7 +81,9 @@ export default {
     infiniteTable() {
       return this.$root.$refs.infiniteTable;
     },
-
+    preprocessComp() {
+      return this.$root.$refs.preprocessComp;
+    },
     ...mapState({
       tableName: state => state.initialData.tableName,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
@@ -93,67 +95,70 @@ export default {
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditMode"]),
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
-    activateDeleteRow() {
-      this.setPreprocessStatus("table-delete-row");
-      this.setEditMode(true);
-      // event assign
-      let path = "http://localhost:5000/addData";
-      this.infiniteTable.activatedEvent = () => {
-        this.$axios({
-          method: "post",
-          url: path,
-          data: {
-            tableName: this.tableName,
-            idNumbers: this.infiniteTable.checkedRows
-          }
-        })
-          .then(res => {
-            let numOfRows = this.infiniteTable.checkedRows.length;
-            this.infiniteTable.checkedRows.forEach(element => {
-              console.log(element);
-              Vue.delete(this.infiniteTable.datasetItems, element);
-            });
-            this.infiniteTable.checkedRows = []; //체크 초기화
-            alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
-            this.setDatasetSize(this.datasetSize - numOfRows);
-            this.setEditMode(false);
-          })
-          .catch(error => {
-            console.error(error);
+    ...mapMutations("preprocessHandler", ["setEvent"]),
+
+    deleteRow() {
+      let path = "http://localhost:5000/deleteSingleRow";
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.tableName,
+          idNumbers: this.infiniteTable.checkedRows
+        }
+      })
+        .then(res => {
+          let numOfRows = this.infiniteTable.checkedRows.length;
+          this.infiniteTable.checkedRows.forEach(element => {
+            console.log(element);
+            Vue.delete(this.infiniteTable.datasetItems, element);
           });
-      };
+          this.infiniteTable.checkedRows = []; //체크 초기화
+          alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
+          this.setDatasetSize(this.datasetSize - numOfRows);
+          this.setEditMode(false);
+          this.setPreprocessStatus(null);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    insertRow() {
+      let path = "http://localhost:5000/addData";
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.tableName,
+          newRow: this.infiniteTable.columnField
+        }
+      })
+        .then(res => {
+          this.infiniteTable.numOfInsertion = this.infiniteTable.numOfInsertion + 1;
+          this.infiniteTable.insertedItems.push(
+            JSON.parse(JSON.stringify(this.infiniteTable.columnField))
+          );
+          // this.setEditStatus(false);
+          this.setPreprocessStatus(null);
+          this.infiniteTable.dialog = false;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    // activation
+    activateDeleteRow() {
+      this.setPreprocessStatus("tableDeleteRow");
+      this.setEditMode(true);
+      let path = "http://localhost:5000/deleteSingleRow";
+
+      this.setEvent(this.deleteRow);
     },
     activateInsertRow() {
+      this.setPreprocessStatus("tableInsertRow");
+      // this.setEditStatus(true);
       this.infiniteTable.dialog = true;
-      this.setPreprocessStatus("table-insert-row");
-      this.setEditStatus(true);
-      let path = "http://localhost:5000/deleteSingleRow";
-      this.infiniteTable.activatedEvent = () => {
-        this.$axios({
-          method: "post",
-          url: path,
-          data: {
-            tableName: this.tableName,
-            newRow: this.infiniteTable.columnField
-          }
-        })
-          .then(res => {
-            // Vue.set(
-            //   this.infiniteTable.datasetItems,
-            //   this.datasetSize,
-            //   this.infiniteTable.columnField
-            // );
-            this.infiniteTable.numOfInsertion = this.infiniteTable.numOfInsertion + 1;
-            // this.infiniteTable.datasetItems.push(this.infiniteTable.columnField);
-            this.infiniteTable.insertedItems.push(this.infiniteTable.columnField);
-            this.infiniteTable.dialog = false;
-          })
-          .catch(error => {
-            console.error(error);
-          });
-
-        alert(`Data Added`); //삭제 알림
-      };
+      this.setEvent(this.insertRow);
     }
   }
 };

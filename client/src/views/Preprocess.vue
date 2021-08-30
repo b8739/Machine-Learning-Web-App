@@ -2,6 +2,8 @@
   <div id="wrap">
     <Header> </Header>
     <!-- <v-btn @click=apiCheck></v-btn> -->
+    <div>preprocessStatus:{{ preprocessStatus }}</div>
+    <div>activatedEvent:{{ activatedEvent }}</div>
     <div class="text-center">
       <v-dialog v-model="dialog1" hide-overlay persistent width="300">
         <v-card color="primary" dark>
@@ -14,22 +16,22 @@
     </div>
     <v-main>
       <v-container id="mainWrapper" fluid>
-       <div style=height:100vh>
+        <div style="height:100vh">
           <v-row>
             <!-- 화면 좌측 -->
             <v-col cols="2">
               <SideMenu />
             </v-col>
             <!-- 화면 우측 -->
-          <v-col cols="10" class=px-8>
+            <v-col cols="10" class="px-8">
               <v-toolbar elevation="1">
                 <!-- Preprocess/Table 교체 버튼 -->
                 <v-row>
                   <v-btn class="mr-2" @click="changeComponent('DataFeatures')">Feature</v-btn>
                   <v-btn @click="changeComponent('InfiniteTable')">Table</v-btn>
-                
+
                   <v-spacer></v-spacer>
-                   <portal-target name="summary-change-name"> </portal-target>
+                  <portal-target :name="summaryPortal"> </portal-target>
                   <SaveMenu />
                 </v-row>
               </v-toolbar>
@@ -47,16 +49,13 @@
               </v-row>
             </v-col>
           </v-row>
-          </div>
-        </v-card>
+        </div>
       </v-container>
     </v-main>
-            <portal :to="confirmButtonSpot">
-          <v-btn color="error" @click="confirmEvent()">Confirm</v-btn>
-          <v-btn  @click="cancelEvent()">Cancel</v-btn>
-          
-          </portal
-        >
+    <portal :to="confirmButtonSpot">
+      <v-btn color="error" @click="confirmEvent()">Confirm</v-btn>
+      <v-btn @click="cancelEvent()">Cancel</v-btn>
+    </portal>
   </div>
 </template>
 <script>
@@ -98,6 +97,7 @@ export default {
       featureFlag: true,
       // comp: "DataFeatures"
       comp: "DataFeatures"
+      // activatedEvent:null
     };
   },
   watch: {},
@@ -117,21 +117,26 @@ export default {
       columns: state => state.initialData.columns,
       datasetSize: state => state.initialData.datasetSize,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
+      activatedEvent: state => state.preprocessHandler.activatedEvent
     }),
-        confirmButtonSpot() {
-          return this.preprocessStatus
+    confirmButtonSpot() {
+      return this.preprocessStatus;
     },
+    summaryPortal() {
+      let substring = "summary";
+      if (this.preprocessStatus != null) {
+        if (this.preprocessStatus.includes(substring)) {
+          return this.preprocessStatus;
+        } else return "";
+      } else return "";
+    }
   },
   methods: {
-        confirmEvent() {
+    confirmEvent() {
       this.activatedEvent();
     },
-    cancelEvent(){
-this.setPreprocessStatus(null);
- this.setEditMode(false);
- this.setEditStatus(false);
-    },
-    apiCheck(){
+
+    apiCheck() {
       const path = "http://localhost:5000/test1";
       axios.get(path).catch(error => {
         console.error(error);
@@ -141,13 +146,14 @@ this.setPreprocessStatus(null);
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditMode"]),
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
+    ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
     ...mapActions("initialData", ["loadDatasetSize"]),
 
     changeComponent(componentName) {
       this.comp = componentName;
-      eventBus.$emit('changeComponent',componentName);
+      eventBus.$emit("changeComponent", componentName);
     },
 
     duplicateTable() {
@@ -205,18 +211,19 @@ this.setPreprocessStatus(null);
     openSaveChangeDialog() {
       eventBus.$emit("openSaveChange", true);
     },
-    rollback(){
-                    const path = "http://localhost:5000/rollback";
+    rollback() {
+      const path = "http://localhost:5000/rollback";
       axios.get(path).catch(error => {
         console.error(error);
       });
     }
   },
   created() {
-      const path = "http://localhost:5000/startPreprocess";
-      axios.get(path).catch(error => {
-        console.error(error);
-      });
+    this.$root.$refs.preprocessComp = this;
+    const path = "http://localhost:5000/startPreprocess";
+    axios.get(path).catch(error => {
+      console.error(error);
+    });
     this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
     this.loadColumns();
@@ -224,7 +231,6 @@ this.setPreprocessStatus(null);
     this.loadDatasetSize();
   },
   mounted() {
-
     console.log("preprocess mounted");
   },
 
@@ -241,9 +247,8 @@ this.setPreprocessStatus(null);
     //   });
     // } else {
     //   this.rollback();
-      
     // }
-  },
+  }
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
   //     const path = "http://localhost:5000/overwriteTable";

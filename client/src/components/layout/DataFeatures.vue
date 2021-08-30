@@ -4,28 +4,36 @@
       <!-- 테이블 -->
       <div>Duplicated{{ duplicatedColumns }}</div>
       <div>Original{{ columns }}</div>
+
       <table class="dataTable">
         <draggable tag="table" v-model="duplicatedColumns" @change="onDragEvent">
           <!-- 행 -->
           <tbody v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
             <!-- Columns -->
-            <component :is="distinguishDataType(column)" :column="column">
+            <component
+              :is="distinguishDataType(columns[columnIndex])"
+              :column="columns[columnIndex]"
+            >
               <!-- slot -->
               <!-- 1st column -->
               <template>
                 <td>
                   <v-row>
-                    <v-col cols="1"
+                    <!-- <v-col cols="1"
                       ><v-icon
                         v-show="editStatus[preprocessStatus]"
                         x-small
                         class="pt-3"
-                        @click="saveClickedIconIndex(column)"
+                        @click="saveClickedIconIndex(columns[columnIndex])"
                         >mdi-pencil</v-icon
                       ></v-col
-                    >
+                    > -->
                     <v-col
-                      ><v-text-field v-bind="activateName(column)" :value="column"></v-text-field>
+                      ><v-text-field
+                        v-bind="activateName"
+                        :value="column"
+                        @change="renameColumns(columnIndex, $event)"
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </td>
@@ -39,7 +47,7 @@
                     <v-select
                       :items="categoryTypes"
                       dense
-                      :disabled="changeTypeMode"
+                      :disabled="!editStatus['summaryChangeType']"
                       single-line
                       hide-details="true"
                       height="20"
@@ -58,6 +66,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import NumericRow from "@/components/tableRow/NumericRow";
 import CategoricalRow from "@/components/tableRow/CategoricalRow";
 import DateRow from "@/components/tableRow/DateRow";
@@ -69,7 +78,6 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
-      changeTypeMode: true,
       duplicatedColumns: [],
       editModalDialog: false,
       sampleForClass: null,
@@ -117,7 +125,8 @@ export default {
       //etc (for dataset parsing)
       show_timeSeriesGraph: false,
       // save flag,
-      newDataset: {}
+      newDataset: {},
+      confirmFlag: false
     };
   },
   components: {
@@ -141,9 +150,15 @@ export default {
       summarizedInfo: state => state.initialData.summarizedInfo,
       featureNameFlag: state => state.saveFlag.summarizedInfo,
       editStatus: state => state.preprocessHandler.editStatus,
-      preprocessStatus: state => state.preprocessHandler.preprocessStatus
+      preprocessStatus: state => state.preprocessHandler.preprocessStatus,
+      activatedEvent: state => state.preprocessHandler.activatedEvent
     }),
     ...mapGetters("initialData", ["numericColumns"]),
+    activateName() {
+      if (this.editStatus["summaryChangeName"]) {
+        return this.activatedName_props;
+      } else return this.inactivatedName_props;
+    },
     renderStatus() {
       if (
         this.summarizedInfo != null &&
@@ -169,6 +184,9 @@ export default {
     // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
+    renameColumns(columnIndex, event) {
+      Vue.set(this.duplicatedColumns, columnIndex, event);
+    },
     saveClickedIconIndex(column) {
       // v-icon click OFF
       if (this.clickedIconKey == column) {
@@ -184,11 +202,7 @@ export default {
         this.clickedIconKey = column;
       }
     },
-    activateName(column) {
-      if (this.clickedIconKey == column) {
-        return this.activatedName_props;
-      } else return this.inactivatedName_props;
-    },
+
     getDataType(column) {
       return this.summarizedInfo["datatype"][column];
     },
@@ -278,9 +292,6 @@ export default {
       duplicatedColumns.forEach(element => {
         this.duplicatedColumns.push(element);
       });
-    });
-    eventBus.$on("changeNameMode", status => {
-      this.changeNameMode = status;
     });
   },
   mounted() {
