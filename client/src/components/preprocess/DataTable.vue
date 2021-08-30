@@ -95,7 +95,7 @@
                   <v-checkbox
                     v-show="editMode"
                     dense
-                    v-model="checkedRows"
+                    v-model="checkedRowsInstance"
                     :value="itemIndex"
                     hide-details
                   />
@@ -147,7 +147,7 @@
           <v-container>
             <v-row>
               <v-col cols="5" v-for="(column, columnIndex) in columns" :key="columnIndex">
-                <v-text-field dense :label="column" value="1" v-model="columnField[column]">
+                <v-text-field dense :label="column" value="1" v-model="columnFieldInstance[column]">
                 </v-text-field>
               </v-col>
             </v-row>
@@ -177,21 +177,17 @@ export default {
   data() {
     return {
       dialog: false,
-      insertedItems: [],
-      numOfInsertion: 0,
-      columnField: {},
+      // insertedItems: [],
+      // numOfInsertion: 0,
+      // columnField: {},
       dialog: false,
       activatedEvent: null,
-      checkedRows: [],
       filterLessThan: "",
       filterGreaterThan: "",
       filterFeature: null,
 
-      // InfiniteLoading
       limit: 0,
-      // dataset
-      datasetItems: [],
-      // hovering & selection
+
       rowSelectedFlags: [],
       columnSelectedFlags: [],
       clickedColumnInfo: { rowIndex: null, columnIndex: null },
@@ -211,14 +207,37 @@ export default {
     };
   },
   computed: {
+    columnFieldInstance: {
+      get() {
+        return this.columnField;
+      },
+      set(value) {
+        this.setColumnField(value);
+      }
+    },
+    checkedRowsInstance: {
+      get() {
+        return this.checkedRows;
+      },
+      set(value) {
+        this.setCheckedRows(value);
+      }
+    },
     // ...mapGetters("initialData", ["columns"]),
     ...mapState({
       datasetSize: state => state.initialData.datasetSize,
       columns: state => state.initialData.columns,
       tableName: state => state.initialData.tableName,
+      // preprocessHandler
       editMode: state => state.preprocessHandler.editMode,
       editStatus: state => state.preprocessHandler.editStatus,
-      preprocessStatus: state => state.preprocessHandler.preprocessStatus
+      preprocessStatus: state => state.preprocessHandler.preprocessStatus,
+      // dataTableHandler
+      checkedRows: state => state.dataTableHandler.checkedRows,
+      datasetItems: state => state.dataTableHandler.datasetItems,
+      columnField: state => state.dataTableHandler.columnField,
+      numOfInsertion: state => state.dataTableHandler.numOfInsertion,
+      insertedItems: state => state.dataTableHandler.insertedItems
     }),
     fakeDatasetSize() {
       return this.datasetSize + this.numOfInsertion;
@@ -273,6 +292,13 @@ export default {
   },
   methods: {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
+    ...mapMutations("dataTableHandler", ["setCheckedRows"]),
+    ...mapMutations("dataTableHandler", ["addDatasetItems"]),
+    // ...mapMutations("dataTableHandler", ["resetDatasetItems"]),
+    ...mapMutations("dataTableHandler", ["setColumnField"]),
+    ...mapActions("preprocessHandler", ["cancelEvent"]),
+    ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
+    ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
 
     scrollTable(direction) {
       let obj = this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper");
@@ -393,7 +419,7 @@ export default {
         })
         .then(({ data }) => {
           this.limit += 45; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
-          this.datasetItems.push(...data);
+          this.addDatasetItems(data);
         });
     },
     infiniteHandler($state) {
@@ -409,10 +435,9 @@ export default {
         }
       })
         .then(({ data }) => {
-          // console.log(data);
           if (data.length) {
             this.limit += 45;
-            this.datasetItems.push(...data);
+            this.addDatasetItems(data);
             $state.loaded();
           } else {
             $state.complete();
@@ -424,27 +449,28 @@ export default {
     },
     // infinteLoading
 
-    infiniteHandlerCustom($state) {
-      // console.log(data);
-      if (this.dataset.length) {
-        for (let i = this.limit; i < this.limit + 50; i++) {
-          // 원본 데이터셋의 길이와 같아지는 순간 종료
-          if (i >= this.dataset.length) {
-            $state.complete();
-            break;
-          }
-          // 아니라면 계속 불러오기
-          this.datasetItems.push(this.dataset[i]);
-          if (this.checkAllFlag == true) {
-            this.checkedRows.push(i);
-          }
-        }
-        $state.loaded();
-        this.limit += 50;
-      } else {
-        $state.complete();
-      }
-    },
+    // infiniteHandlerCustom($state) {
+    //   // console.log(data);
+    //   if (this.dataset.length) {
+    //     for (let i = this.limit; i < this.limit + 50; i++) {
+    //       // 원본 데이터셋의 길이와 같아지는 순간 종료
+    //       if (i >= this.dataset.length) {
+    //         $state.complete();
+    //         break;
+    //       }
+    //       // 아니라면 계속 불러오기
+
+    //       this.datasetItems.push(this.dataset[i]);
+    //       if (this.checkAllFlag == true) {
+    //         this.checkedRows.push(i);
+    //       }
+    //     }
+    //     $state.loaded();
+    //     this.limit += 50;
+    //   } else {
+    //     $state.complete();
+    //   }
+    // },
     toggleRowFlags(xaxis) {
       let dateObjectLength = Object.keys(this.date).length;
       for (const key in this.date) {
@@ -466,7 +492,11 @@ export default {
     }
   },
   created() {
-    this.$root.$refs.infiniteTable = this;
+    this.cancelEvent();
+    // this.resetDatasetItems();
+    this.resetDataTableVuex();
+    this.resetPreprocessVuex();
+    this.$root.$refs.DataTable = this;
     // this.infiniteLoadingCreated();
     eventBus.$on("reloadInfiniteTable", reloadStatus => {
       this.resetTableData();

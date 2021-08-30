@@ -27,8 +27,8 @@
               <v-toolbar elevation="1">
                 <!-- Preprocess/Table 교체 버튼 -->
                 <v-row>
-                  <v-btn class="mr-2" @click="changeComponent('DataFeatures')">Feature</v-btn>
-                  <v-btn @click="changeComponent('InfiniteTable')">Table</v-btn>
+                  <v-btn class="mr-2" @click="changeComponent('SummaryTable')">Features</v-btn>
+                  <v-btn @click="changeComponent('DataTable')">Table</v-btn>
 
                   <v-spacer></v-spacer>
                   <portal-target :name="summaryPortal"> </portal-target>
@@ -39,8 +39,6 @@
                 <!-- <GraphBuilder :columns="columns" /> -->
                 <DeleteStepper />
                 <AverageModal />
-
-                <ChangeOrder />
 
                 <!-- Table and Features (Dynamic Component) -->
                 <keep-alive>
@@ -65,13 +63,11 @@ import GraphBuilder from "./GraphBuilder.vue";
 import DeleteStepper from "./DeleteStepper.vue";
 import AverageModal from "@/components/average/AverageModal.vue";
 //components
-import DataTable from "@/components/DataTable";
 
-import DataFeatures from "@/components/layout/DataFeatures";
-import InfiniteTable from "@/components/layout/InfiniteTable";
-import SideMenu from "@/components/layout/SideMenu.vue";
+import SummaryTable from "@/components/preprocess/SummaryTable";
+import DataTable from "@/components/preprocess/DataTable";
+import SideMenu from "@/components/preprocess/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
-import ChangeOrder from "@/components/changeOrder/ChangeOrder.vue";
 
 //vuex
 import { mapActions, mapState, mapMutations } from "vuex";
@@ -95,22 +91,20 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      // comp: "DataFeatures"
-      comp: "DataFeatures"
+      // comp: "SummaryTable"
+      comp: "SummaryTable"
       // activatedEvent:null
     };
   },
   watch: {},
   components: {
+    SummaryTable,
     DataTable,
-    DataFeatures,
-    InfiniteTable,
     GraphBuilder,
     SideMenu,
     SaveMenu,
     DeleteStepper,
-    AverageModal,
-    ChangeOrder
+    AverageModal
   },
   computed: {
     ...mapState({
@@ -123,9 +117,13 @@ export default {
       return this.preprocessStatus;
     },
     summaryPortal() {
-      let substring = "summary";
+      let includeSubstring = "summary";
+      let exclueSubstring = "Modal";
       if (this.preprocessStatus != null) {
-        if (this.preprocessStatus.includes(substring)) {
+        if (
+          this.preprocessStatus.includes(includeSubstring) &&
+          !this.preprocessStatus.includes(exclueSubstring)
+        ) {
           return this.preprocessStatus;
         } else return "";
       } else return "";
@@ -232,15 +230,18 @@ export default {
   },
   mounted() {
     console.log("preprocess mounted");
+    window.addEventListener("beforeunload", this.rollback); //새로고침 방지
   },
-
+  beforeUnmount() {
+    window.removeEventListener("beforeunload", this.rollback);
+  },
   // beforeRouteEnter(to, from, next) {
   //   next(vm => {
   //     vm.dialog1 = true;
   //   });
   // s}
   beforeDestroy() {
-    //     if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
+    // if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
     //   const path = "http://localhost:5000/overwriteTable";
     //   axios.get(path).catch(error => {
     //     console.error(error);

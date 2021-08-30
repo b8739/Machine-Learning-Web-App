@@ -17,6 +17,7 @@ import saveFlag from "@/store/modules/save/saveFlag.js";
 import tableData from "@/store/modules/dataTable/tableData.js";
 // preprocess
 import preprocessHandler from "@/store/modules/preprocess/preprocessHandler.js";
+import dataTableHandler from "@/store/modules/preprocess/dataTableHandler.js";
 
 Vue.use(Vuex);
 
@@ -29,7 +30,8 @@ export default new Vuex.Store({
     simulationResult,
     saveFlag,
     tableData,
-    preprocessHandler
+    preprocessHandler,
+    dataTableHandler
   },
   plugins: [
     createPersistedState({

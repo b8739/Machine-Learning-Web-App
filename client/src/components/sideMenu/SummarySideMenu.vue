@@ -30,45 +30,50 @@ export default {
     };
   },
   computed: {
-    dataFeatures() {
-      return this.$root.$refs.dataFeatures;
+    SummaryTable() {
+      return this.$root.$refs.SummaryTable;
     },
 
     ...mapState({
       tableName: state => state.initialData.tableName,
       datasetSize: state => state.initialData.datasetSize,
       editStatus: state => state.preprocessHandler.editStatus,
-      preprocessStatus: state => state.preprocessHandler.preprocessStatus
+      preprocessStatus: state => state.preprocessHandler.preprocessStatus,
+      columns: state => state.initialData.columns
     })
   },
   methods: {
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
     ...mapMutations("preprocessHandler", ["setEvent"]),
-    ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
+    ...mapActions("preprocessHandler", ["cancelEvent"]),
+    ...mapActions("preprocessHandler", ["activateEvent"]),
+
     revertNameChange() {
-      if (!(JSON.stringify(this.columns) === JSON.stringify(this.dataFeatures.duplicatedColumns)))
+      console.log("revert");
+      if (!(JSON.stringify(this.columns) === JSON.stringify(this.SummaryTable.duplicatedColumns)))
         //false, 동일하지 않을 때
-        this.dataFeatures.duplicateColumns();
+        this.SummaryTable.duplicateColumns(this.SummaryTable.duplicatedColumns, this.columns);
+    },
+    confirmNameChange() {
+      this.setEditStatus(false);
+      this.setPreprocessStatus(null);
+      this.setAdditionalCancelEvent(null);
     },
     callOption(title) {
+      this.cancelEvent();
       if (title == "Change Name") {
-        this.cancelEvent();
-        this.setPreprocessStatus("summaryChangeName");
-        this.setEditStatus(true);
+        this.activateEvent("summaryChangeName");
         this.setAdditionalCancelEvent(this.revertNameChange);
+        this.setEvent(this.confirmNameChange);
       } else if (title == "Change Type") {
-        this.cancelEvent();
-        this.setPreprocessStatus("summaryChangeType");
-        this.setEditStatus(true);
+        this.activateEvent("summaryChangeType");
       } else if (title == "Change Order") {
+        this.activateEvent("summaryChangeOrderModal");
+        this.setEvent(function() {});
         eventBus.$emit("openChangeOrderModal", true);
-        // this.setPreprocessStatus("summary-change-order");
       }
-      // if (title == "Moving Average") {
-      //   eventBus.$emit("openMovingAverageModal", true);
-      // }
     }
   }
 };

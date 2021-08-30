@@ -3,7 +3,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from "@/store/index";
 // global component
-import Header from "@/components/layout/Header.vue";
+import Header from "@/components/preprocess/Header.vue";
 Vue.component("Header", Header);
 // axios
 import axios from "axios";

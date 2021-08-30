@@ -5,7 +5,12 @@ const getDefaultState = () => {
   return {
     preprocessStatus: null,
     editMode: false,
-    editStatus: { tableInsertRow: false, summaryChangeName: false, summaryChangeType: false },
+    editStatus: {
+      tableInsertRow: false,
+      summaryChangeName: false,
+      summaryChangeType: false,
+      summaryChangeOrderModal: false
+    },
     activatedEvent: null,
     additionalCancelEvent: null
   };
@@ -35,6 +40,9 @@ const mutations = {
   },
   setAdditionalCancelEvent(state, payload) {
     state.additionalCancelEvent = payload;
+  },
+  resetPreprocessVuex(state) {
+    Object.assign(state, getDefaultState());
   }
 };
 
@@ -43,7 +51,13 @@ const actions = {
     commit("setAllEditStatus", false);
     commit("setPreprocessStatus", null);
     commit("setEditMode", false);
+    commit("setEvent", null);
+
     if (state.additionalCancelEvent != null) return state.additionalCancelEvent();
+  },
+  activateEvent({ commit, state }, payload) {
+    commit("setPreprocessStatus", payload);
+    commit("setEditStatus", true);
   }
 };
 

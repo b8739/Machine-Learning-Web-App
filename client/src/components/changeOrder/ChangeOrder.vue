@@ -28,7 +28,8 @@
         </v-list>
       </v-container>
       <v-card-actions>
-        <v-btn right @click="confirmChanges()">Confirm</v-btn>
+        <!-- <v-btn right @click="confirmChanges()">Confirm</v-btn> -->
+        <portal-target name="summaryChangeOrderModal"> </portal-target>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -42,17 +43,15 @@ import axios from "axios";
 export default {
   data() {
     return {
-      dialog: false,
-      duplicatedColumns: []
+      dialog: false
     };
   },
+  props: ["duplicatedColumns"],
   methods: {
     ...mapMutations("saveFlag", ["ChangeColumnOrderFlag"]),
     // ...mapMutations("saveFlag", ["updateChangedColumn"]),
     ...mapMutations("initialData", ["updateColumnOrder"]),
     confirmChanges() {
-      this.ChangeColumnOrderFlag(true);
-      // this.updateColumnOrder(this.duplicatedColumns);
       eventBus.$emit("columnOrderUpdated", this.duplicatedColumns);
     },
     closeStepper() {
@@ -96,14 +95,13 @@ export default {
     eventBus.$on("openChangeOrderModal", dialogStatus => {
       this.dialog = dialogStatus;
     });
-    console.log("order created");
 
-    this.selectionTimer = setTimeout(() => {
-      this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
-      this.columns.forEach(element => {
-        this.duplicatedColumns.push(element);
-      });
-    }, 1000);
+    // this.selectionTimer = setTimeout(() => {
+    //   this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
+    //   this.columns.forEach(element => {
+    //     this.duplicatedColumns.push(element);
+    //   });
+    // }, 1000);
   }
 };
 </script>

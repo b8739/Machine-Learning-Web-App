@@ -6,7 +6,7 @@
       <div>Original{{ columns }}</div>
 
       <table class="dataTable">
-        <draggable tag="table" v-model="duplicatedColumns" @change="onDragEvent">
+        <draggable tag="table" v-model="duplicatedColumns">
           <!-- 행 -->
           <tbody v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
             <!-- Columns -->
@@ -15,19 +15,11 @@
               :column="columns[columnIndex]"
             >
               <!-- slot -->
-              <!-- 1st column -->
+
               <template>
+                <!-- 1st column -->
                 <td>
                   <v-row>
-                    <!-- <v-col cols="1"
-                      ><v-icon
-                        v-show="editStatus[preprocessStatus]"
-                        x-small
-                        class="pt-3"
-                        @click="saveClickedIconIndex(columns[columnIndex])"
-                        >mdi-pencil</v-icon
-                      ></v-col
-                    > -->
                     <v-col
                       ><v-text-field
                         v-bind="activateName"
@@ -51,7 +43,7 @@
                       single-line
                       hide-details="true"
                       height="20"
-                      :label="getDataType(column)"
+                      :label="getDataType(columns[columnIndex])"
                     >
                     </v-select>
                   </tr>
@@ -62,6 +54,7 @@
         </draggable>
       </table>
     </div>
+    <ChangeOrder :duplicatedColumns="duplicatedColumns" />
   </div>
 </template>
 
@@ -72,6 +65,8 @@ import CategoricalRow from "@/components/tableRow/CategoricalRow";
 import DateRow from "@/components/tableRow/DateRow";
 import draggable from "vuedraggable";
 import axios from "axios";
+import ChangeOrder from "@/components/changeOrder/ChangeOrder.vue";
+
 //vuex
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
@@ -133,6 +128,7 @@ export default {
     DateRow,
     NumericRow,
     CategoricalRow,
+    ChangeOrder,
 
     draggable
   },
@@ -179,11 +175,14 @@ export default {
       return this.categoryIndex++;
     }
   },
+
   methods: {
     ...mapActions("initialData", ["loadSummarizedData"]),
     // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
+    ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
+    ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
     renameColumns(columnIndex, event) {
       Vue.set(this.duplicatedColumns, columnIndex, event);
     },
@@ -214,19 +213,7 @@ export default {
         return "DateRow";
       }
     },
-    onDragEvent(evt) {
-      // let movedColumnName = evt.moved.element;
-      // let oldIndex = evt.moved.oldIndex + 3;
-      // let newIndex = evt.moved.newIndex + 3;
-      // //컬럼 left 이동
-      // if (oldIndex > newIndex) {
-      //   this.changeColumnOrder("left", movedColumnName, newIndex);
-      // }
-      // //컬럼 right 이동
-      // else {
-      //   this.changeColumnOrder("right", movedColumnName, newIndex);
-      // }
-    },
+
     changeColumnOrder(position, movedColumnName, newIndex) {
       const api = "http://localhost:5000/changeColumnOrder";
       axios
@@ -272,29 +259,36 @@ export default {
       // }
       // this.sampleForClass = this.summarizedInfo["sampleForClass"];
     },
-    duplicateColumns() {
-      this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
-      this.columns.forEach(element => {
-        this.duplicatedColumns.push(element);
+    duplicateColumns(cloneArray, originalArray) {
+      console.log("duplicate");
+      cloneArray.splice(0, cloneArray.length);
+      originalArray.forEach(element => {
+        cloneArray.push(element);
       });
     }
   },
   created() {
-    this.$root.$refs.dataFeatures = this;
+    this.resetDataTableVuex();
+    this.resetPreprocessVuex();
+    this.$root.$refs.SummaryTable = this;
     this.loadDataSummary();
     this.selectionTimer = setTimeout(() => {
-      this.duplicateColumns();
+      this.duplicateColumns(this.duplicatedColumns, this.columns);
     }, 1000);
+
     // draggable
 
     eventBus.$on("columnOrderUpdated", duplicatedColumns => {
-      this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
-      duplicatedColumns.forEach(element => {
-        this.duplicatedColumns.push(element);
+      duplicatedColumns.forEach((element, index) => {
+        console.log("eventbus columnorder");
+        if (element != this.duplicatedColumns[index]) {
+          Vue.set(this.duplicatedColumns, index, element);
+        }
       });
     });
   },
   mounted() {
+    console.log("summarytable mounted");
     // this.selectionTimer = setTimeout(() => {
     //   eventBus.$emit("dfMounted", true);
     // }, 1000);

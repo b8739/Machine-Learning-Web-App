@@ -52,7 +52,7 @@ export default {
       ],
 
       activeState: true,
-      currentComponent: "DataFeatures"
+      currentComponent: "SummaryTable"
     };
   },
   components: {
@@ -71,7 +71,7 @@ export default {
     },
 
     dynamicSideMenu() {
-      if (this.currentComponent == "DataFeatures") return "SummarySideMenu";
+      if (this.currentComponent == "SummaryTable") return "SummarySideMenu";
       else return "TableSideMenu";
     }
   },

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Header from "./components/layout/Header.vue";
+import Header from "./components/preprocess/Header.vue";
 // import Sidebar from "./components/Sidebar.vue"
 import Preprocess from "./views/Preprocess.vue";
 // import { faTrash } from "@fortawesome/free-solid-svg-icons";

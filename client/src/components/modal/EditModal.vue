@@ -10,7 +10,7 @@
           <v-row justify="center" align="center">
             <portal-target name="destination"> </portal-target>
           </v-row>
-          <v-row> <InfiniteTable /></v-row>
+          <v-row> <DataTable /></v-row>
         </v-container>
       </v-card>
     </v-dialog>
@@ -27,7 +27,7 @@
 </template>
 <script>
 import TimeSeries from "@/components/graph/TimeSeries";
-import InfiniteTable from "@/components/layout/InfiniteTable";
+import DataTable from "@/components/preprocess/DataTable";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 
@@ -51,7 +51,7 @@ export default {
 
   components: {
     TimeSeries,
-    InfiniteTable
+    DataTable
   },
   computed: {
     ...mapState("initialData", ["columns"]),
