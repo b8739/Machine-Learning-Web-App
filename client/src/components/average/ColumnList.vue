@@ -73,9 +73,9 @@ export default {
       return selected;
     },
     ...mapState({
-      dataset: state => state.initialData.dataset
+      dataset: state => state.initialData.dataset,
 
-      // columns: state => state.columns
+      columns: state => state.initialData.columns
     })
     // ...mapGetters("initialData", ["columns", "indexNum"])
   }

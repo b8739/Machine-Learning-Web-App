@@ -2,12 +2,12 @@
   <div id="wrap">
     <Header> </Header>
     <!-- <v-btn @click=apiCheck></v-btn> -->
-    <div>preprocessStatus:{{ preprocessStatus }}</div>
+    <!-- <div>preprocessStatus:{{ preprocessStatus }}</div>
     <div>editStatus:{{ editStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
 
     <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
-    <div>router:{{ $router.name }}</div>
+    <div>router:{{ $router.name }}</div> -->
     <div class="text-center">
       <v-dialog v-model="dialog1" hide-overlay persistent width="300">
         <v-card color="primary" dark>
@@ -40,7 +40,7 @@
                 </v-row>
               </v-toolbar>
               <v-row>
-                <!-- <GraphBuilder :columns="columns" /> -->
+                <GraphBuilder :columns="columns" />
                 <DeleteStepper />
                 <AverageModal />
 
@@ -118,7 +118,8 @@ export default {
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
       activatedEvent: state => state.preprocessHandler.activatedEvent,
       additionalCancelEvent: state => state.preprocessHandler.additionalCancelEvent,
-      editStatus: state => state.preprocessHandler.editStatus
+      editStatus: state => state.preprocessHandler.editStatus,
+      datasetItems: state => state.dataTableHandler.datasetItems
     }),
     ...mapGetters("summaryTableHandler", ["summaryChangeFlag"]),
     ...mapGetters("dataTableHandler", ["tableChangeFlag"]),
@@ -164,9 +165,12 @@ export default {
 
     changeComponent(componentName) {
       this.askSave();
-      this.comp = componentName;
+      if (this.datasetItems.length == 0) {
+        eventBus.$emit("reloadDataTable", true);
+      }
       // this.setComponent(componentName);
-      // eventBus.$emit("changeComponent", componentName);
+      eventBus.$emit("changeComponent", componentName);
+      this.comp = componentName;
     },
 
     duplicateTable() {
@@ -231,6 +235,7 @@ export default {
       });
     },
     askSave() {
+      // 변경사항 있을 때
       if (
         (this.comp == "SummaryTable" && this.summaryChangeFlag == true) ||
         (this.comp == "DataTable" && this.tableChangeFlag == true)
@@ -242,6 +247,7 @@ export default {
         else {
           this.rollback();
           if (this.comp == "DataTable") {
+            this.resetDataTableVuex();
           } else if (this.comp == "SummaryTable") {
             this.resetSummaryTableVuex();
             this.selectionTimer = setTimeout(() => {
@@ -250,6 +256,7 @@ export default {
           }
         }
       }
+      // 변경사항 없을 때
     }
   },
   created() {

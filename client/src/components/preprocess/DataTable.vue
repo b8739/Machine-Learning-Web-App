@@ -142,7 +142,7 @@
         </v-data-table>
       </v-sheet>
       <SaveChange />
-      <v-dialog v-model="dialogInstance" @click:outside="setDialog(false)" max-width="500px">
+      <v-dialog v-model="dialogInstance" @click:outside="leaveDialog()" max-width="500px">
         <v-card light min-height="500px">
           <v-container>
             <v-row>
@@ -214,6 +214,7 @@ export default {
         this.setDialog(!this.dialog);
       }
     },
+
     columnFieldInstance: {
       get() {
         return this.columnField;
@@ -295,10 +296,10 @@ export default {
     SaveChange
   },
   watch: {
-    xaxis: function(data) {
-      this.toggleRowFlags(data);
-      this.toggleColumnFlags(this.selectedColumnIndex);
-    }
+    // xaxis: function(data) {
+    //   this.toggleRowFlags(data);
+    //   this.toggleColumnFlags(this.selectedColumnIndex);
+    // }
   },
   methods: {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
@@ -310,7 +311,11 @@ export default {
     ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
     ...mapMutations("dataTableHandler", ["addLimit"]),
     ...mapMutations("dataTableHandler", ["setDialog"]),
-
+    leaveDialog() {
+      this.cancelEvent();
+      this.resetDataTableVuex();
+      this.setDialog(false);
+    },
     scrollTable(direction) {
       let obj = this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper");
       if (direction == "top") {
@@ -451,8 +456,13 @@ export default {
           }
         })
         .catch(error => {
+          $state.error();
           console.error(error);
         });
+      // if (this.datasetItems.length == 0) {
+      // $state.reset();
+      //저장 안하고 들어왔을 때
+      // }
     },
     // infinteLoading
 
@@ -475,7 +485,6 @@ export default {
   created() {
     this.cancelEvent();
     this.resetDataTableVuex();
-    this.resetPreprocessVuex();
     this.$root.$refs.DataTable = this;
 
     eventBus.$on("reloadDataTable", reloadStatus => {

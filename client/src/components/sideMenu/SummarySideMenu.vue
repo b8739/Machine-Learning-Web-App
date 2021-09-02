@@ -52,6 +52,8 @@ export default {
   methods: {
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
+    ...mapMutations("summaryTableHandler", ["setDialog"]),
+
     ...mapMutations("preprocessHandler", ["setEvent"]),
     ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
     ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
@@ -80,11 +82,12 @@ export default {
         this.activateEvent("summaryChangeOrderModal");
         this.backupColumns();
         this.setAdditionalCancelEvent(this.revertToBackupArray);
+        this.setDialog(true);
+        // confirm시
         this.setEvent(() => {
-          eventBus.$emit("openChangeOrderModal", false);
+          this.setDialog(false);
           this.setAdditionalCancelEvent(null);
         });
-        eventBus.$emit("openChangeOrderModal", true);
       }
     }
   }

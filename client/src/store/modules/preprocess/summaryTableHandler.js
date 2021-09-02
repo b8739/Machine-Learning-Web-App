@@ -4,7 +4,8 @@ import Vue from "vue";
 const getDefaultState = () => {
   return {
     duplicatedColumns: [],
-    backedUpColumns: []
+    backedUpColumns: [],
+    dialog: false
   };
 };
 const state = getDefaultState();
@@ -25,6 +26,9 @@ const getters = {
 };
 
 const mutations = {
+  setDialog(state, payload) {
+    state.dialog = payload;
+  },
   changeColumnOrder(state, payload) {
     let temp = state.duplicatedColumns[payload.newIndex];
     Vue.set(state.duplicatedColumns, payload.newIndex, payload.columnName);
@@ -65,6 +69,7 @@ const actions = {
     state.backedUpColumns.forEach(element => {
       commit("addDuplicatedColumn", element);
     });
+    commit("setDialog", false);
   },
   revertNameChange({ commit, state, rootState, dispatch }) {
     console.log("revert");

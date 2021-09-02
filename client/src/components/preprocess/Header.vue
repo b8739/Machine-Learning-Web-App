@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a href="http://localhost:8080/"
+    <a href="http://localhost:5000/"
       ><img class="logo" src="../../assets/attic_logo.png" alt=""
     /></a>
     <nav>
@@ -16,7 +16,7 @@
         >Preprocess</router-link
       >
       <!-- EDA -->
-      <a id="routerLink" @click="openGraphBuilder()">EDA</a>
+      <a id="routerLink" @click="openDialog(true)">EDA</a>
       <!-- Modeling -->
       <router-link id="routerLink" :class="{ underline: navStatus == 'models' }" to="/models"
         >Modeling</router-link
@@ -40,28 +40,28 @@ export default {
     return {};
   },
   methods: {
-    openGraphBuilder() {
-      let w = screen.width * 0.8;
-      let h = screen.height * 0.8;
-      let leftPosition = (screen.width - w) / 2;
-      let topPosition = (screen.height - h) / 2;
-      let url = "http://localhost:5000/eda";
-      window.open(
-        url,
-        "modelingResult",
-        "width=" +
-          w +
-          ",height=" +
-          h +
-          ",top=" +
-          topPosition +
-          ",left=" +
-          leftPosition +
-          ", scrollbars=no"
-      );
-    },
-    openDialogue() {
-      eventBus.$emit("openDialogue", true);
+    // openGraphBuilder() {
+    //   let w = screen.width * 0.8;
+    //   let h = screen.height * 0.8;
+    //   let leftPosition = (screen.width - w) / 2;
+    //   let topPosition = (screen.height - h) / 2;
+    //   let url = "http://localhost:5000/eda";
+    //   window.open(
+    //     url,
+    //     "modelingResult",
+    //     "width=" +
+    //       w +
+    //       ",height=" +
+    //       h +
+    //       ",top=" +
+    //       topPosition +
+    //       ",left=" +
+    //       leftPosition +
+    //       ", scrollbars=no"
+    //   );
+    // },
+    openDialog() {
+      eventBus.$emit("openDialog", true);
     }
   },
   computed: {

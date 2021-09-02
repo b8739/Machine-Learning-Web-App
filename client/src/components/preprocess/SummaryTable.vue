@@ -257,7 +257,7 @@ export default {
   },
   created() {
     this.selectionTimer = setTimeout(() => {
-      // this.loadFeatureGraphData();
+      this.loadFeatureGraphData();
       this.cloneOriginalArray();
     }, 1000);
     this.resetDataTableVuex();

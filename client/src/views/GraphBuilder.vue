@@ -1,72 +1,74 @@
 <template>
-  <div data-app>
-    <v-card>
-      <v-toolbar color="light">
-        <v-btn icon dark @click="dialog = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-toolbar-title>EDA Graph Builder</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-toolbar-items>
-          <v-btn text @click="dialog = false">
-            Save
+  <v-dialog v-model="dialog">
+    <div data-app>
+      <v-card>
+        <v-toolbar color="light">
+          <v-btn icon dark @click="dialog = false">
+            <v-icon>mdi-close</v-icon>
           </v-btn>
-        </v-toolbar-items>
-      </v-toolbar>
+          <v-spacer></v-spacer>
+          <v-toolbar-title>EDA Graph Builder</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn text @click="dialog = false">
+              Save
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
 
-      <v-container fluid>
-        <!-- 좌측 -->
-        <v-row>
-          <v-col cols="2">
-            <ColumnList :style="style_columnList">
-              <v-subheader>{{ columns.length }} 개 열</v-subheader>
-            </ColumnList>
-          </v-col>
-          <v-divider vertical></v-divider>
+        <v-container fluid>
+          <!-- 좌측 -->
+          <v-row>
+            <v-col cols="2">
+              <ColumnList :style="style_columnList">
+                <v-subheader>{{ columns.length }} 개 열</v-subheader>
+              </ColumnList>
+            </v-col>
+            <v-divider vertical></v-divider>
+            <!-- 우측 -->
+            <v-col cols="10">
+              <!-- 우측 상단 -->
+              <v-row>
+                <v-col cols="12"><GraphTypeToolbar /></v-col>
+                <v-col cols="7" offset="1" class="axisTitle">
+                  <v-card class="ml-5" height="50px">
+                    <Xgroup :styleObject="style_DragBox_xaxis" />
+                  </v-card>
+                </v-col>
+              </v-row>
+              <!-- 우측 중앙 -->
+              <v-row dense>
+                <v-col cols="1" class=" ml-4 axisTitle" align-self="center">
+                  <v-card height="400px">
+                    <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
+                  </v-card>
+                </v-col>
+
+                <v-col cols="7" class="apexChartWrapper">
+                  <!-- <span class="yLabel">Y</span> -->
+
+                  <ApexChart v-show="apexChartRender" />
+                </v-col>
+
+                <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
+              </v-row>
+              <!-- 우측 하단 -->
+              <v-row dense>
+                <v-col cols="7" offset="1" class="axisTitle" :style="{ width: '500px' }">
+                  <v-card class="ml-5" height="50px">
+                    <!-- <span class="xLabel"> X</span> -->
+                    <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+
           <!-- 우측 -->
-          <v-col cols="10">
-            <!-- 우측 상단 -->
-            <v-row>
-              <v-col cols="12"><GraphTypeToolbar /></v-col>
-              <v-col cols="7" offset="1" class="axisTitle">
-                <v-card class="ml-5" height="50px">
-                  <Xgroup :styleObject="style_DragBox_xaxis" />
-                </v-card>
-              </v-col>
-            </v-row>
-            <!-- 우측 중앙 -->
-            <v-row dense>
-              <v-col cols="1" class=" ml-4 axisTitle" align-self="center">
-                <v-card height="400px">
-                  <DragBoxYaxis :styleObject="style_Dragbox_yaxis" />
-                </v-card>
-              </v-col>
-
-              <v-col cols="7" class="apexChartWrapper">
-                <!-- <span class="yLabel">Y</span> -->
-
-                <ApexChart v-show="apexChartRender" />
-              </v-col>
-
-              <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
-            </v-row>
-            <!-- 우측 하단 -->
-            <v-row dense>
-              <v-col cols="7" offset="1" class="axisTitle" :style="{ width: '500px' }">
-                <v-card class="ml-5" height="50px">
-                  <!-- <span class="xLabel"> X</span> -->
-                  <DragBoxXaxis :styleObject="style_DragBox_xaxis"> </DragBoxXaxis>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-
-        <!-- 우측 -->
-      </v-container>
-    </v-card>
-  </div>
+        </v-container>
+      </v-card>
+    </div>
+  </v-dialog>
 </template>
 <script>
 import ColumnList from "@/components/eda/ColumnList.vue";
@@ -119,7 +121,7 @@ export default {
     GraphTypeToolbar
   },
   created() {
-    eventBus.$on("openDialogue", dialogStatus => {
+    eventBus.$on("openDialog", dialogStatus => {
       this.dialog = dialogStatus;
     });
   }

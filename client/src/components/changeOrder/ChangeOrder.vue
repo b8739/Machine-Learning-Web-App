@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800">
+  <v-dialog v-model="dialogInstance" @click:outside="leaveDialog()" max-width="800">
     <v-card>
       <v-container class="columnList">
         <v-row>
@@ -42,15 +42,23 @@ import axios from "axios";
 
 export default {
   data() {
-    return {
-      dialog: false
-    };
+    return {};
   },
   props: ["duplicatedColumns"],
   methods: {
     ...mapMutations("saveFlag", ["ChangeColumnOrderFlag"]),
+    ...mapMutations("summaryTableHandler", ["setDialog"]),
     ...mapMutations("summaryTableHandler", ["changeColumnOrder"]),
+    ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
+
     ...mapMutations("initialData", ["updateColumnOrder"]),
+    ...mapActions("preprocessHandler", ["cancelEvent"]),
+
+    leaveDialog() {
+      this.cancelEvent();
+      this.resetDataTableVuex();
+      this.setDialog(false);
+    },
     confirmChanges() {
       eventBus.$emit("columnOrderUpdated", this.duplicatedColumns);
     },
@@ -85,6 +93,14 @@ export default {
     draggable
   },
   computed: {
+    dialogInstance: {
+      get() {
+        return this.dialog;
+      },
+      set() {
+        this.setDialog(!this.dialog);
+      }
+    },
     // ...mapGetters("initialData", ["columns"]),
     duplicatedColumnsInstance: {
       get() {
@@ -96,16 +112,12 @@ export default {
       // }
     },
     ...mapState({
-      columns: state => state.initialData.columns
-      // duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns
+      columns: state => state.initialData.columns,
+      dialog: state => state.summaryTableHandler.dialog
     })
   },
 
   created() {
-    eventBus.$on("openChangeOrderModal", dialogStatus => {
-      this.dialog = dialogStatus;
-    });
-
     // this.selectionTimer = setTimeout(() => {
     //   this.duplicatedColumns.splice(0, this.duplicatedColumns.length);
     //   this.columns.forEach(element => {

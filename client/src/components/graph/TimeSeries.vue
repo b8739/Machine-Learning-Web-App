@@ -276,24 +276,24 @@ export default {
 
     renderDataset() {
       this.resetSeries();
-      // this.updateSeriesLine(this.featureGraphData[this.seriesName], this.seriesName);
-      let path = "http://localhost:5000/loadFeatureGraphData";
-      // axios
-      this.$axios({
-        method: "post",
-        url: path,
-        data: {
-          featureName: this.seriesName,
-          tableName: this.tableName
-        }
-      })
-        .then(res => {
-          // console.log(res.data);
-          this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      this.updateSeriesLine(this.featureGraphData[this.seriesName], this.seriesName);
+      // let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadFeatureGraphData";
+      // // axios
+      // this.$axios({
+      //   method: "post",
+      //   url: path,
+      //   data: {
+      //     featureName: this.seriesName,
+      //     tableName: this.tableName
+      //   }
+      // })
+      //   .then(res => {
+      //     // console.log(res.data);
+      //     this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
+      //   })
+      //   .catch(error => {
+      //     console.error(error);
+      //   });
       // dialog(edit modal)일때만 toolbar 활성화
       if (this.dialog) {
         this.$refs.realtimeChart.updateOptions({

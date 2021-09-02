@@ -52,7 +52,7 @@
       <v-row align="center">
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
-      <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
+      <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" />
     </td>
     <EditModal />
   </tr>
