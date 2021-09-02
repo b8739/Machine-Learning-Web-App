@@ -3,13 +3,14 @@ import Vue from "vue";
 
 const getDefaultState = () => {
   return {
-    duplicatedColumns: []
+    duplicatedColumns: [],
+    backedUpColumns: []
   };
 };
 const state = getDefaultState();
 
 const getters = {
-  changeFlag(state, getters, rootState) {
+  summaryChangeFlag(state, getters, rootState) {
     let onlyDuplicatedColumnNames = [];
     state.duplicatedColumns.forEach(element => {
       onlyDuplicatedColumnNames.push(element.columnName);
@@ -36,26 +37,43 @@ const mutations = {
 
   addDuplicatedColumn(state, payload) {
     state.duplicatedColumns.push(payload);
+  },
+  addBackedUpColumn(state, payload) {
+    state.backedUpColumns.push(payload);
   }
 };
 
 const actions = {
-  cloneArray({ commit, state, rootState }) {
-    state.duplicatedColumns.splice(0, state.duplicatedColumns.length);
+  cloneOriginalArray({ commit, state, rootState }) {
+    // 배열 초기화
+    commit("resetSummaryTableVuex");
+    // 다시 집어넣기
     rootState.initialData.columns.forEach((element, index) => {
       let columnInfo = { columnName: element, columnIndex: index };
       commit("addDuplicatedColumn", columnInfo);
+      commit("addBackedUpColumn", columnInfo);
     });
+  },
+  backupColumns({ commit, state }) {
+    state.backedUpColumns.splice(0, state.duplicatedColumns.length);
+    state.duplicatedColumns.forEach(element => {
+      commit("addBackedUpColumn", element);
+    });
+  },
+  revertToBackupArray({ commit, state }) {
+    state.duplicatedColumns.splice(0, state.duplicatedColumns.length);
+    state.backedUpColumns.forEach(element => {
+      commit("addDuplicatedColumn", element);
+    });
+  },
+  revertNameChange({ commit, state, rootState, dispatch }) {
+    console.log("revert");
+    if (
+      !(JSON.stringify(rootState.initialData.columns) === JSON.stringify(state.duplicatedColumns))
+    )
+      //false, 동일하지 않을 때
+      dispatch("cloneBackupArray");
   }
-  //  calculateTransaction({ commit, state, rootState }){
-  //      let sql = "ALTER TABLE dataset MODIFY COLUMN "
-  //      +movedColumnName+ ' ' +originalType+ ' BEFORE '
-  //      this.duplicatedColumns.forEach((element,index) => {
-  //          if(index!=element.columnIndex){
-  //             sql = sql +element.columnName+' ';
-  //          }
-  //      });
-  //  }
 };
 
 export default {

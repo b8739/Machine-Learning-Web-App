@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr v-if="columns.length != 0">
     <slot></slot>
     <!-- 3rd Column -->
     <td>
@@ -41,7 +41,7 @@
       />
     </td>
 
-    <td @click="openEditModal(column)">
+    <td @click="openEditModal(column)" style="width:260px; height:250px">
       <!-- <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-icon v-bind="attrs" v-on="on" right>mdi-information-outline</v-icon>
@@ -65,7 +65,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      graphWidth: "260px",
+      graphWidth: "238px",
       graphHeight: "200px"
     };
   },
@@ -87,7 +87,8 @@ export default {
     openEditModal(column) {
       eventBus.$emit("openEditModal", column);
     }
-  }
+  },
+  created() {}
 };
 </script>
 <style scoped>

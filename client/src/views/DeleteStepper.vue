@@ -119,9 +119,6 @@ export default {
         .catch(error => {
           console.error(error);
         });
-
-      // eventBus.$emit("reloadInfiniteTable", true);
-      // this.resetValues();
     }
   },
 

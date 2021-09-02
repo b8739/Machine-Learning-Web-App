@@ -42,13 +42,14 @@ export default {
       duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns,
       tableName: state => state.initialData.tableName
     }),
-    ...mapGetters("summaryTableHandler", ["changeFlag"])
+    ...mapGetters("summaryTableHandler", ["summaryChangeFlag"]),
+    ...mapGetters("dataTableHandler", ["tableChangeFlag"])
   },
   methods: {
     ...mapActions("summaryTableHandler", ["calculateTransaction"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
-    ...mapActions("summaryTableHandler", ["cloneArray"]),
+    ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
 
     clickSaveOptionEvent(index) {
       if (index == 0) {
@@ -61,7 +62,7 @@ export default {
     },
 
     saveTableAxios(saveOption) {
-      if (this.changeFlag) {
+      if (this.summaryChangeFlag) {
         //summary 변경 있을 때
         let path = "http://localhost:5000/changeColumnInfo";
         // axios
@@ -79,13 +80,13 @@ export default {
 
             this.loadSummarizedData();
             this.selectionTimer = setTimeout(() => {
-              this.cloneArray();
+              this.cloneOriginalArray();
             }, 1000);
           })
           .catch(error => {
             console.error(error);
           });
-      } else {
+      } else if (this.tableChangeFlag) {
         const path = "http://localhost:5000/overwriteTable";
         axios
           .get(path, {
@@ -101,6 +102,11 @@ export default {
           });
       }
     }
+  },
+  created() {
+    eventBus.$on("saveChanges", status => {
+      this.saveTableAxios("overwrite");
+    });
   }
 };
 </script>

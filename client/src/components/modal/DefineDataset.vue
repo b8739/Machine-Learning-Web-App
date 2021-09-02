@@ -53,7 +53,7 @@ export default {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
     ...mapMutations("initialData", ["resetState"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
-    ...mapMutations("initialData", ["saveTableName"]),
+    ...mapMutations("initialData", ["setTableName"]),
 
     eventHandler() {
       if (this.dataUploadFlag == true) {
@@ -77,7 +77,7 @@ export default {
         })
         .then(response => {
           this.resetState();
-          this.saveTableName(this.tableName);
+          this.setTableName(this.tableName);
           this.loadSummarizedData();
           this.dialog = false;
         })

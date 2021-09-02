@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr v-if="columns.length != 0">
     <slot></slot>
     <!-- 3rd Column -->
     <td>

@@ -25,7 +25,9 @@
             <v-list-item-title>List of Datasets</v-list-item-title>
           </template>
           <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
-            <v-list-item-title @click="clickTableNameEvent">{{ tableName }}</v-list-item-title>
+            <v-list-item-title @click="clickTableNameEvent(tableName)">{{
+              tableName
+            }}</v-list-item-title>
           </v-list-item>
         </v-list-group>
       </v-list>
@@ -76,11 +78,30 @@ export default {
     }
   },
   methods: {
-    ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["loadTableList"]),
+    ...mapMutations("initialData", ["resetState"]),
+    ...mapActions("initialData", ["loadSummarizedData"]),
+    ...mapMutations("initialData", ["setTableName"]),
+    ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
+    ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
+    ...mapActions("initialData", ["loadColumns"]),
+    ...mapActions("initialData", ["loadDatasetSize"]),
+    ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
 
-    clickTableNameEvent() {
-      this.loadFundamentalData("http://localhost:5000/loadData");
+    clickTableNameEvent(tableName) {
+      this.resetState();
+      this.setTableName(tableName);
+      this.loadSummarizedData();
+      this.loadColumns();
+      this.loadDatasetSize();
+      this.showTables();
+      this.resetDataTableVuex();
+      this.resetPreprocessVuex();
+      eventBus.$emit("reloadDataTable", true);
+
+      this.selectionTimer = setTimeout(() => {
+        this.cloneOriginalArray();
+      }, 1000);
     },
 
     showTables() {

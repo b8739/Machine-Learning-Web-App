@@ -7,23 +7,33 @@ const getDefaultState = () => {
     datasetItems: [],
     //deleteData
     checkedRows: [],
-
+    limit: 0,
     //insertData
     columnField: {},
     numOfInsertion: 0,
+    numOfDeletion: 0,
     insertedItems: [],
     dialog: false
   };
 };
 const state = getDefaultState();
 
-const getters = {};
+const getters = {
+  tableChangeFlag(state, getters, rootState) {
+    if (
+      rootState.initialData.datasetSize ==
+      rootState.initialData.datasetSize + state.numOfInsertion - state.numOfDeletion
+    ) {
+      return false;
+    } else return true;
+  }
+};
 
 const mutations = {
-  resetDatasetItems(state, payload) {
-    state.datasetItems = [];
-    state.checkedRows = [];
+  addLimit(state, payload) {
+    state.limit += payload;
   },
+
   deleteDatasetItems(state, payload) {
     payload.forEach(element => {
       Vue.delete(state.datasetItems, element);
@@ -49,6 +59,9 @@ const mutations = {
   },
   resetDataTableVuex(state) {
     Object.assign(state, getDefaultState());
+  },
+  setNumOfDeletion(state, payload) {
+    state.numOfDeletion += payload;
   }
 };
 
@@ -73,10 +86,10 @@ const actions = {
         // 체크박스 초기화
         let emptyArray = [];
         commit("setCheckedRows", emptyArray);
-
-        commit("initialData/setDatasetSize", rootState.initialData.datasetSize - numOfRows, {
-          root: true
-        });
+        commit("setNumOfDeletion", numOfRows);
+        // commit("initialData/setDatasetSize", rootState.initialData.datasetSize - numOfRows, {
+        //   root: true
+        // });
         alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
         // 초기화
         commit("preprocessHandler/setEditMode", false, { root: true });
@@ -107,6 +120,21 @@ const actions = {
       })
       .catch(error => {
         console.error(error);
+      });
+  },
+  infiniteLoadingCreated({ commit, state, rootState }) {
+    let api = "http://localhost:5000/infiniteLoading";
+    axios
+      .get(api, {
+        params: {
+          limit: state.limit
+        }
+      })
+      .then(({ data }) => {
+        // this.limit += 45; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
+
+        commit("addLimit", 45);
+        commit("addDatasetItems", data);
       });
   }
 };

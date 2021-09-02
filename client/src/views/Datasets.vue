@@ -28,7 +28,7 @@
           class="mr-5 mt-5 cursor-pointer"
         >
           <v-container>
-            <v-row justify="end">
+            <v-row v-if="tableList" justify="end">
               <v-btn v-show="deleteMode" @click="dropTable(tableName)" x-small light
                 >X</v-btn
               ></v-row
@@ -90,11 +90,11 @@ export default {
     ...mapMutations("initialData", ["setNavStatus"]),
     ...mapMutations("initialData", ["resetState"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
-    ...mapMutations("initialData", ["saveTableName"]),
+    ...mapMutations("initialData", ["setTableName"]),
 
     enterDataset(tableName) {
       this.resetState();
-      this.saveTableName(tableName);
+      this.setTableName(tableName);
       this.loadSummarizedData();
     },
     showTables() {

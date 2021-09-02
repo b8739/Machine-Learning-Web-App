@@ -9,9 +9,7 @@ const getDefaultState = () => {
     randomRange: null,
     columns: [],
     datasetSize: null,
-    tableName: null,
-    preprocessStatus: null,
-    editMode: false
+    tableName: null
   };
 };
 const state = getDefaultState();
@@ -76,7 +74,7 @@ const mutations = {
       state.columns.push(element);
     });
   },
-  saveTableName(state, payload) {
+  setTableName(state, payload) {
     state.tableName = payload;
   }
 };

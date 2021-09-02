@@ -1,20 +1,43 @@
 import axios from "axios";
 import Vue from "vue";
 
-const state = {
-  apexChartDataset: {}
+const getDefaultState = () => {
+  return {
+    featureGraphData: null
+  };
 };
+const state = getDefaultState();
 
 const getters = {};
 
 const mutations = {
-  setApexChartDataset(state, payload) {
-    Vue.set(state.apexChartDataset, payload.featureName, payload.dataset);
-    // state.apexChartDataset[payload.featureName] = payload.dataset;
+  saveFeatureGraphData(state, payload) {
+    state.featureGraphData = payload;
   }
 };
 
-const actions = {};
+const actions = {
+  loadFeatureGraphData({ commit, state, rootState }) {
+    let path = "http://localhost:5000/loadFeatureGraphData";
+    // axios
+    axios({
+      method: "post",
+      url: path,
+      data: {
+        tableName: rootState.initialData.tableName
+      }
+    })
+      .then(res => {
+        // console.log(res.data);
+        // this.updateSeriesLine(res.data[this.seriesName], this.seriesName);
+        commit("saveFeatureGraphData", res.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    // dialog(edit modal)일때만 toolbar 활성화
+  }
+};
 
 export default {
   namespaced: true,

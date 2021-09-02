@@ -3,7 +3,9 @@
     <Header> </Header>
     <!-- <v-btn @click=apiCheck></v-btn> -->
     <div>preprocessStatus:{{ preprocessStatus }}</div>
+    <div>editStatus:{{ editStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
+
     <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
     <div>router:{{ $router.name }}</div>
     <div class="text-center">
@@ -72,7 +74,7 @@ import SideMenu from "@/components/preprocess/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 
 //vuex
-import { mapActions, mapState, mapMutations } from "vuex";
+import { mapActions, mapState, mapGetters, mapMutations } from "vuex";
 
 // eventbus
 import { eventBus } from "@/main";
@@ -93,8 +95,9 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      // comp: "SummaryTable"
       comp: "SummaryTable"
+      // comp: "SummaryTable"
+
       // activatedEvent:null
     };
   },
@@ -114,8 +117,12 @@ export default {
       datasetSize: state => state.initialData.datasetSize,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
       activatedEvent: state => state.preprocessHandler.activatedEvent,
-      additionalCancelEvent: state => state.preprocessHandler.additionalCancelEvent
+      additionalCancelEvent: state => state.preprocessHandler.additionalCancelEvent,
+      editStatus: state => state.preprocessHandler.editStatus
     }),
+    ...mapGetters("summaryTableHandler", ["summaryChangeFlag"]),
+    ...mapGetters("dataTableHandler", ["tableChangeFlag"]),
+
     confirmButtonSpot() {
       return this.preprocessStatus;
     },
@@ -147,14 +154,19 @@ export default {
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditMode"]),
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
+    ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
+    ...mapMutations("summaryTableHandler", ["resetSummaryTableVuex"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
     ...mapActions("initialData", ["loadDatasetSize"]),
+    ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
 
     changeComponent(componentName) {
+      this.askSave();
       this.comp = componentName;
-      eventBus.$emit("changeComponent", componentName);
+      // this.setComponent(componentName);
+      // eventBus.$emit("changeComponent", componentName);
     },
 
     duplicateTable() {
@@ -217,9 +229,31 @@ export default {
       axios.get(path).catch(error => {
         console.error(error);
       });
+    },
+    askSave() {
+      if (
+        (this.comp == "SummaryTable" && this.summaryChangeFlag == true) ||
+        (this.comp == "DataTable" && this.tableChangeFlag == true)
+      ) {
+        if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
+          eventBus.$emit("saveChanges", true);
+        }
+        // 취소했을때
+        else {
+          this.rollback();
+          if (this.comp == "DataTable") {
+          } else if (this.comp == "SummaryTable") {
+            this.resetSummaryTableVuex();
+            this.selectionTimer = setTimeout(() => {
+              this.cloneOriginalArray();
+            }, 1000);
+          }
+        }
+      }
     }
   },
   created() {
+    this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
     const path = "http://localhost:5000/startPreprocess";
     axios.get(path).catch(error => {
@@ -233,25 +267,19 @@ export default {
   },
   mounted() {
     console.log("preprocess mounted");
-    window.addEventListener("beforeunload", this.rollback); //새로고침 방지
+    window.addEventListener("beforeunload", this.askSave); //새로고침 방지
   },
   beforeUnmount() {
-    window.removeEventListener("beforeunload", this.rollback);
+    window.removeEventListener("beforeunload", this.askSave);
   },
   // beforeRouteEnter(to, from, next) {
   //   next(vm => {
   //     vm.dialog1 = true;
   //   });
   // s}
+
   beforeDestroy() {
-    // if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-    //   const path = "http://localhost:5000/overwriteTable";
-    //   axios.get(path).catch(error => {
-    //     console.error(error);
-    //   });
-    // } else {
-    //   this.rollback();
-    // }
+    this.askSave();
   }
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {

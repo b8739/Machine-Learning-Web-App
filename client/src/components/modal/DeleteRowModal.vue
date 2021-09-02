@@ -305,7 +305,7 @@ export default {
             console.error(error);
           });
       }
-      eventBus.$emit("reloadInfiniteTable", true);
+      eventBus.$emit("reloadDataTable", true);
       this.closeModalEvent();
     },
     closeModalEvent() {

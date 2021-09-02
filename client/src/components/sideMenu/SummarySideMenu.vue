@@ -4,7 +4,13 @@
       <template v-slot:activator>
         <v-list-item-title active>Edit Feature</v-list-item-title>
       </template>
-      <v-list-item v-for="item in items" :key="item.title" link @click="callOption(item.title)">
+      <v-list-item
+        :disabled="item.title == 'Moving Average' || item.title == 'Change Type'"
+        v-for="item in items"
+        :key="item.title"
+        link
+        @click="callOption(item.title)"
+      >
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -39,7 +45,8 @@ export default {
       datasetSize: state => state.initialData.datasetSize,
       editStatus: state => state.preprocessHandler.editStatus,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
-      columns: state => state.initialData.columns
+      columns: state => state.initialData.columns,
+      duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns
     })
   },
   methods: {
@@ -47,32 +54,32 @@ export default {
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
     ...mapMutations("preprocessHandler", ["setEvent"]),
     ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
+    ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapActions("preprocessHandler", ["activateEvent"]),
-    ...mapActions("summaryTableHandler", ["cloneArray"]),
+    ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
+    ...mapActions("summaryTableHandler", ["revertToBackupArray"]),
+    ...mapActions("summaryTableHandler", ["backupColumns"]),
 
-    revertNameChange() {
-      console.log("revert");
-      if (!(JSON.stringify(this.columns) === JSON.stringify(this.SummaryTable.duplicatedColumns)))
-        //false, 동일하지 않을 때
-        this.SummaryTable.duplicateColumns(this.SummaryTable.duplicatedColumns, this.columns);
-    },
     confirmNameChange() {
       this.setEditStatus(false);
       this.setPreprocessStatus(null);
       this.setAdditionalCancelEvent(null);
+      this.backupColumns();
     },
     callOption(title) {
       this.cancelEvent();
+      // this.resetPreprocessVuex();
       if (title == "Change Name") {
         this.activateEvent("summaryChangeName");
-        this.setAdditionalCancelEvent(this.revertNameChange);
         this.setEvent(this.confirmNameChange);
+        this.setAdditionalCancelEvent(this.revertToBackupArray);
       } else if (title == "Change Type") {
         this.activateEvent("summaryChangeType");
       } else if (title == "Change Order") {
         this.activateEvent("summaryChangeOrderModal");
-        this.setAdditionalCancelEvent(this.cloneArray);
+        this.backupColumns();
+        this.setAdditionalCancelEvent(this.revertToBackupArray);
         this.setEvent(() => {
           eventBus.$emit("openChangeOrderModal", false);
           this.setAdditionalCancelEvent(null);

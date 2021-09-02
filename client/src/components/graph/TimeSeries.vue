@@ -216,8 +216,6 @@ export default {
 
   created() {},
   mounted() {
-    console.log("timeseries mounted");
-
     if (!this.firstMount) {
       //아직 false가 아니라서 작동 안함
       this.renderDataset();
@@ -231,7 +229,8 @@ export default {
   computed: {
     ...mapState({
       dataset: state => state.initialData.dataset,
-      tableName: state => state.initialData.tableName
+      tableName: state => state.initialData.tableName,
+      featureGraphData: state => state.apexchartGraph.featureGraphData
     }),
     ...mapGetters("initialData", ["indexNum"]),
 
@@ -277,6 +276,7 @@ export default {
 
     renderDataset() {
       this.resetSeries();
+      // this.updateSeriesLine(this.featureGraphData[this.seriesName], this.seriesName);
       let path = "http://localhost:5000/loadFeatureGraphData";
       // axios
       this.$axios({

@@ -307,7 +307,7 @@ export default {
             console.error(error);
           });
       }
-      eventBus.$emit("reloadInfiniteTable", true);
+      eventBus.$emit("reloadDataTable", true);
       this.resetValues();
     },
     resetValues() {

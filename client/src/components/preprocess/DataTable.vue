@@ -102,7 +102,7 @@
                 </td>
                 <td style="min-width:70px">
                   <!-- ID index -->
-                  {{ itemIndex }}
+                  {{ item["ID"] }}
                 </td>
                 <!-- Feature Value -->
                 <td
@@ -142,7 +142,7 @@
         </v-data-table>
       </v-sheet>
       <SaveChange />
-      <v-dialog v-model="dialog" max-width="500px">
+      <v-dialog v-model="dialogInstance" @click:outside="setDialog(false)" max-width="500px">
         <v-card light min-height="500px">
           <v-container>
             <v-row>
@@ -176,17 +176,16 @@ export default {
   },
   data() {
     return {
-      dialog: false,
+      // dialog: false,
       // insertedItems: [],
       // numOfInsertion: 0,
       // columnField: {},
-      dialog: false,
       activatedEvent: null,
       filterLessThan: "",
       filterGreaterThan: "",
       filterFeature: null,
 
-      limit: 0,
+      // limit: 0,
 
       rowSelectedFlags: [],
       columnSelectedFlags: [],
@@ -207,6 +206,14 @@ export default {
     };
   },
   computed: {
+    dialogInstance: {
+      get() {
+        return this.dialog;
+      },
+      set() {
+        this.setDialog(!this.dialog);
+      }
+    },
     columnFieldInstance: {
       get() {
         return this.columnField;
@@ -237,10 +244,13 @@ export default {
       datasetItems: state => state.dataTableHandler.datasetItems,
       columnField: state => state.dataTableHandler.columnField,
       numOfInsertion: state => state.dataTableHandler.numOfInsertion,
-      insertedItems: state => state.dataTableHandler.insertedItems
+      numOfDeletion: state => state.dataTableHandler.numOfDeletion,
+      insertedItems: state => state.dataTableHandler.insertedItems,
+      limit: state => state.dataTableHandler.limit,
+      dialog: state => state.dataTableHandler.dialog
     }),
     fakeDatasetSize() {
-      return this.datasetSize + this.numOfInsertion;
+      return this.datasetSize + this.numOfInsertion - this.numOfDeletion;
     },
 
     dataTableWidth() {
@@ -294,11 +304,12 @@ export default {
     ...mapMutations("initialData", ["deleteDataFromGraph"]),
     ...mapMutations("dataTableHandler", ["setCheckedRows"]),
     ...mapMutations("dataTableHandler", ["addDatasetItems"]),
-    // ...mapMutations("dataTableHandler", ["resetDatasetItems"]),
     ...mapMutations("dataTableHandler", ["setColumnField"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
     ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
+    ...mapMutations("dataTableHandler", ["addLimit"]),
+    ...mapMutations("dataTableHandler", ["setDialog"]),
 
     scrollTable(direction) {
       let obj = this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper");
@@ -398,30 +409,25 @@ export default {
     assignClickColumn(thIndex) {
       this.clickedColumn = thIndex;
     },
-    // checkClickedColumn(tdIndex) {
-    //   if (tdIndex != this.clickedColumn) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // },
+
     resetHoverEffect() {
       this.clickedColumn = null;
     },
     // infinteLoading
-    infiniteLoadingCreated() {
-      let api = "http://localhost:5000/infiniteLoading";
-      axios
-        .get(api, {
-          params: {
-            limit: this.limit
-          }
-        })
-        .then(({ data }) => {
-          this.limit += 45; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
-          this.addDatasetItems(data);
-        });
-    },
+    // infiniteLoadingCreated() {
+    //   let api = "http://localhost:5000/infiniteLoading";
+    //   axios
+    //     .get(api, {
+    //       params: {
+    //         limit: this.limit
+    //       }
+    //     })
+    //     .then(({ data }) => {
+    //       // this.limit += 45; //이 값을 app.py의 192줄의 값과 똑같게 해준다.
+    //       this.addLimit(45);
+    //       this.addDatasetItems(data);
+    //     });
+    // },
     infiniteHandler($state) {
       // new
       let path = "http://localhost:5000/infiniteLoading";
@@ -436,7 +442,8 @@ export default {
       })
         .then(({ data }) => {
           if (data.length) {
-            this.limit += 45;
+            // this.limit += 45;
+            this.addLimit(45);
             this.addDatasetItems(data);
             $state.loaded();
           } else {
@@ -449,28 +456,6 @@ export default {
     },
     // infinteLoading
 
-    // infiniteHandlerCustom($state) {
-    //   // console.log(data);
-    //   if (this.dataset.length) {
-    //     for (let i = this.limit; i < this.limit + 50; i++) {
-    //       // 원본 데이터셋의 길이와 같아지는 순간 종료
-    //       if (i >= this.dataset.length) {
-    //         $state.complete();
-    //         break;
-    //       }
-    //       // 아니라면 계속 불러오기
-
-    //       this.datasetItems.push(this.dataset[i]);
-    //       if (this.checkAllFlag == true) {
-    //         this.checkedRows.push(i);
-    //       }
-    //     }
-    //     $state.loaded();
-    //     this.limit += 50;
-    //   } else {
-    //     $state.complete();
-    //   }
-    // },
     toggleRowFlags(xaxis) {
       let dateObjectLength = Object.keys(this.date).length;
       for (const key in this.date) {
@@ -485,22 +470,16 @@ export default {
     },
     openSaveChangeDialog: function(event) {
       eventBus.$emit("openSaveChange", true);
-    },
-    resetTableData() {
-      this.datasetItems = [];
-      this.limit = 0;
     }
   },
   created() {
     this.cancelEvent();
-    // this.resetDatasetItems();
     this.resetDataTableVuex();
     this.resetPreprocessVuex();
     this.$root.$refs.DataTable = this;
-    // this.infiniteLoadingCreated();
-    eventBus.$on("reloadInfiniteTable", reloadStatus => {
-      this.resetTableData();
-      this.infiniteLoadingCreated();
+
+    eventBus.$on("reloadDataTable", reloadStatus => {
+      this.$refs.infiniteLoading.stateChanger.reset();
     });
     // dataselected
     eventBus.$on("dataSelected", testArray => {

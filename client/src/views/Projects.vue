@@ -5,7 +5,7 @@
     </v-app-bar>
     <v-container fluid>
       <v-row>
-        <v-col cols="3" class="pl-0 pt-1">
+        <v-col v-if="project_list.length != 0" cols="3" class="pl-0 pt-1">
           <v-btn @click="loadProjects" block color="success">
             <v-icon left class="mdi-36">
               mdi-folder-plus-outline

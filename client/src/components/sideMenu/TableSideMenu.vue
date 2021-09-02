@@ -68,7 +68,7 @@
         <template v-slot:activator>
           <v-list-item-title active>Fill NA</v-list-item-title>
         </template>
-        <v-list-item link>
+        <v-list-item link disabled>
           <v-list-item-icon>
             <v-icon></v-icon>
           </v-list-item-icon>
@@ -112,6 +112,7 @@ export default {
     ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
     ...mapActions("dataTableHandler", ["deleteRow"]),
     ...mapActions("dataTableHandler", ["insertRow"]),
+    ...mapMutations("dataTableHandler", ["setDialog"]),
 
     // activation
     activateDeleteRow() {
@@ -121,10 +122,10 @@ export default {
     },
     activateInsertRow() {
       this.setPreprocessStatus("tableInsertRow");
-      this.DataTable.dialog = true;
+      this.setDialog(true);
       this.setEvent(this.insertRow);
       this.setAdditionalCancelEvent(() => {
-        this.DataTable.dialog = false;
+        this.setDialog(false);
       });
     }
   }

@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div v-if="summarizedInfo != null">
     <div class="container">
       <!-- 테이블 -->
+      <!-- <div>Original{{ columns }}</div>
       <div>Duplicated{{ duplicatedColumns }}</div>
-      <div>Original{{ columns }}</div>
+      <div>backedUpColumns{{ backedUpColumns }}</div> -->
 
       <table class="dataTable">
         <draggable tag="table" v-model="duplicatedColumns">
@@ -133,25 +134,21 @@ export default {
     draggable
   },
 
-  watch: {
-    summarizedInfo: function(data) {
-      deep: true, this.loadDataSummary();
-    }
-  },
+  watch: {},
 
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
+      tableName: state => state.initialData.tableName,
       columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo,
       featureNameFlag: state => state.saveFlag.summarizedInfo,
       editStatus: state => state.preprocessHandler.editStatus,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
       activatedEvent: state => state.preprocessHandler.activatedEvent,
-      duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns
+      duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns,
+      backedUpColumns: state => state.summaryTableHandler.backedUpColumns
     }),
     ...mapGetters("initialData", ["numericColumns"]),
-    ...mapGetters("summaryTableHandler", ["changeFlag"]),
 
     activateName() {
       if (this.editStatus["summaryChangeName"]) {
@@ -180,13 +177,18 @@ export default {
   },
 
   methods: {
+    ...mapActions("apexchartGraph", ["loadFeatureGraphData"]),
+
+    updateValues() {
+      this.addDuplicatedColumn;
+    },
     ...mapActions("initialData", ["loadSummarizedData"]),
     // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
     ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
     ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
-    ...mapActions("summaryTableHandler", ["cloneArray"]),
+    ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
     ...mapMutations("summaryTableHandler", ["changeColumnOrder"]),
     renameColumns(index, event) {
       Vue.set(this.duplicatedColumns[index], "columnName", event);
@@ -251,35 +253,16 @@ export default {
       //   .catch(error => {
       //     console.error(error);
       //   });
-    },
-
-    loadDataSummary() {
-      // // numeric
-      // for (const key in this.numeric_info) {
-      //   this.numeric_info[key] = this.summarizedInfo["numeric"][key];
-      // }
-      // // category
-      // for (const key in this.category_info) {
-      //   this.category_info[key] = this.summarizedInfo["categorical"][key];
-      // }
-      // this.sampleForClass = this.summarizedInfo["sampleForClass"];
     }
-    // duplicateColumns(cloneArray, originalArray) {
-    //   console.log("duplicate");
-    //   cloneArray.splice(0, cloneArray.length);
-    //   originalArray.forEach(element => {
-    //     cloneArray.push(element);
-    //   });
-    // }
   },
   created() {
+    this.selectionTimer = setTimeout(() => {
+      // this.loadFeatureGraphData();
+      this.cloneOriginalArray();
+    }, 1000);
     this.resetDataTableVuex();
     this.resetPreprocessVuex();
     this.$root.$refs.SummaryTable = this;
-    this.loadDataSummary();
-    this.selectionTimer = setTimeout(() => {
-      this.cloneArray();
-    }, 1000);
 
     // draggable
 

@@ -20,17 +20,16 @@ const state = getDefaultState();
 const getters = {};
 
 const mutations = {
+  resetPreprocessVuex(state) {
+    Object.assign(state, getDefaultState());
+  },
   setPreprocessStatus(state, payload) {
     state.preprocessStatus = payload;
   },
   setEditMode(state, payload) {
     state.editMode = payload;
   },
-  setAllEditStatus(state, payload) {
-    Object.keys(state.editStatus).forEach(element => {
-      Vue.set(state.editStatus, element, payload);
-    });
-  },
+
   setEditStatus(state, payload) {
     state.editStatus[state.preprocessStatus] = payload;
   },
@@ -48,12 +47,10 @@ const mutations = {
 
 const actions = {
   cancelEvent({ commit, state }) {
-    commit("setAllEditStatus", false);
-    commit("setPreprocessStatus", null);
-    commit("setEditMode", false);
-    commit("setEvent", null);
-
-    if (state.additionalCancelEvent != null) return state.additionalCancelEvent();
+    if (state.additionalCancelEvent != null) {
+      state.additionalCancelEvent();
+    }
+    commit("resetPreprocessVuex");
   },
   activateEvent({ commit, state }, payload) {
     commit("setPreprocessStatus", payload);
