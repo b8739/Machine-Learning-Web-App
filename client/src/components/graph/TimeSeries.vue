@@ -228,7 +228,6 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
       tableName: state => state.initialData.tableName,
       featureGraphData: state => state.apexchartGraph.featureGraphData
     }),
@@ -277,7 +276,7 @@ export default {
     renderDataset() {
       this.resetSeries();
       this.updateSeriesLine(this.featureGraphData[this.seriesName], this.seriesName);
-      // let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadFeatureGraphData";
+      // let path = "http://localhost:5000/loadFeatureGraphData";
       // // axios
       // this.$axios({
       //   method: "post",

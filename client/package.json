@@ -15,6 +15,8 @@
     "axios": "^0.21.1",
     "baklavajs": "^1.9.0",
     "core-js": "^3.6.5",
+    "ify-loader": "^1.1.0",
+    "plotly.js": "^2.5.0",
     "portal-vue": "^2.1.7",
     "sass": "~1.32.12",
     "v-click-outside": "^3.1.2",

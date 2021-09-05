@@ -41,7 +41,8 @@
       />
     </td>
 
-    <td @click="openEditModal(column)" style="width:260px; height:250px">
+    <td style="width:260px; height:250px">
+      <!-- @click="openEditModal(column)" -->
       <!-- <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-icon v-bind="attrs" v-on="on" right>mdi-information-outline</v-icon>
@@ -52,7 +53,8 @@
       <v-row align="center">
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
-      <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" />
+      <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
+      <PlotlyGraph :seriesName="column" />
     </td>
     <EditModal />
   </tr>
@@ -61,6 +63,7 @@
 import TimeSeries from "@/components/graph/TimeSeries";
 import Histogram from "@/components/graph/Histogram";
 import EditModal from "@/components/modal/EditModal";
+import PlotlyGraph from "@/components/graph/PlotlyGraph";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
@@ -81,7 +84,8 @@ export default {
   components: {
     TimeSeries,
     Histogram,
-    EditModal
+    EditModal,
+    PlotlyGraph
   },
   methods: {
     openEditModal(column) {

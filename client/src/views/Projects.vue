@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-app-bar>
-      <a href="http://localhost:5000/"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
+      <a href="http://localhost:8080/"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
     </v-app-bar>
     <v-container fluid>
       <v-row>
@@ -14,7 +14,6 @@
           </v-btn>
           <v-card height="900px">
             <v-navigation-drawer width="100%">
-              <!-- <v-btn @click="loadCases">hello</v-btn> -->
               <v-list>
                 <v-list-item>
                   <v-list-item-title class="font-weight-bold">Projects</v-list-item-title>
@@ -30,16 +29,17 @@
                     >
                   </v-sheet>
                 </v-list-item>
-                <!-- 여기 chip 들어감 -->
               </v-list>
             </v-navigation-drawer>
           </v-card>
         </v-col>
         <v-col cols=""> </v-col>
       </v-row>
+      <!-- <v-row> <div ref="tester"></div></v-row> -->
     </v-container>
   </div>
 </template>
+
 <script>
 import axios from "axios";
 //vuex
@@ -47,10 +47,58 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      project_list: []
+      project_list: [],
+      // plotly
+      data: [
+        {
+          x: [1, 2, 3, 4],
+          y: [10, 15, 13, 17],
+          type: "scatter",
+          marker: {
+            // marker is an object, valid marker keys: #scatter-marker
+            color: "rgb(16, 32, 77)" // more about "marker.color": #scatter-marker-color
+          }
+        },
+        {
+          type: "bar", // all "bar" chart attributes: #bar
+          x: [1, 2, 3], // more about "x": #bar-x
+          y: [3, 1, 6], // #bar-y
+          name: "bar chart example" // #bar-name
+        }
+      ],
+      layout: {
+        title: "My graph"
+      }
     };
   },
   methods: {
+    createPlot() {
+      let TESTER = this.$refs.tester;
+      Plotly.newPlot(
+        TESTER,
+        [
+          {
+            x: [1, 2, 3, 4, 5],
+            y: [1, 2, 4, 8, 16]
+          }
+        ],
+        {
+          width: 238,
+          height: 200,
+          margin: {
+            l: 20,
+            r: 20,
+            b: 20,
+            t: 20,
+            pad: 4
+          },
+          yaxis: {
+            automargin: true
+          }
+        },
+        { showSendToCloud: true }
+      );
+    },
     ...mapMutations("initialData", ["setNavStatus"]),
     loadProjects() {
       let path = "http://localhost:5000/loadProjects";
@@ -70,10 +118,13 @@ export default {
       this.$router.push({ name: "datasets" });
     }
   },
+  components: {},
   created() {
     this.loadProjects();
   },
-  mounted() {}
+  mounted() {
+    // this.createPlot();
+  }
 };
 </script>
 <style scoped>

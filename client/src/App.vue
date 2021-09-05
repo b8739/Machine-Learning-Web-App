@@ -22,12 +22,12 @@ import Preprocess from "./views/Preprocess.vue";
 
 export default {
   name: "App",
-
+  methods: {},
   components: {
     Header,
     Preprocess
   },
-  mounted() {}
+  created() {}
 };
 </script>
 
