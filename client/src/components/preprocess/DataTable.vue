@@ -491,10 +491,10 @@ export default {
       this.$refs.infiniteLoading.stateChanger.reset();
     });
     // dataselected
-    eventBus.$on("dataSelected", testArray => {
+    eventBus.$on("dataSelected", selectedData => {
       console.log("eventbus");
       this.checkedRows.splice(0, this.checkedRows.length);
-      testArray.forEach(element => {
+      selectedData.forEach(element => {
         this.checkedRows.push(element);
       });
     });

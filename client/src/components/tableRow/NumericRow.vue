@@ -4,6 +4,14 @@
     <!-- 3rd Column -->
     <td>
       <tr>
+        <span v-once class="info_title">Min </span>
+        <span>: {{ summarizedInfo["interval"][column]["min"] }}</span>
+      </tr>
+      <tr>
+        <span v-once class="info_title">Max </span>
+        <span>: {{ summarizedInfo["interval"][column]["max"] }}</span>
+      </tr>
+      <tr>
         <span v-once class="info_title">Mean </span>
         <span>: {{ summarizedInfo["numeric"][column]["mean"] }}</span>
       </tr>
@@ -35,7 +43,14 @@
     <!-- numeric 일 경우: distribution 표시 -->
     <td>
       <span v-once class="tdTitle">Distribution</span>
-      <Histogram
+      <!-- <Histogram
+        :distribution="summarizedInfo['distribution'][column]"
+        :interval="summarizedInfo['interval'][column]"
+      /> -->
+      <PlotlyHist
+        :seriesName="column"
+        :graphWidth="238"
+        :graphHeight="200"
         :distribution="summarizedInfo['distribution'][column]"
         :interval="summarizedInfo['interval'][column]"
       />
@@ -54,16 +69,15 @@
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
       <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
-      <PlotlyGraph :seriesName="column" />
+      <PlotlyLine :seriesName="column" :graphWidth="238" :graphHeight="200" :isEdit="false" />
     </td>
-    <EditModal />
   </tr>
 </template>
 <script>
 import TimeSeries from "@/components/graph/TimeSeries";
 import Histogram from "@/components/graph/Histogram";
-import EditModal from "@/components/modal/EditModal";
-import PlotlyGraph from "@/components/graph/PlotlyGraph";
+import PlotlyLine from "@/components/graph/PlotlyLine";
+import PlotlyHist from "@/components/graph/PlotlyHist";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
@@ -84,14 +98,10 @@ export default {
   components: {
     TimeSeries,
     Histogram,
-    EditModal,
-    PlotlyGraph
+    PlotlyLine,
+    PlotlyHist
   },
-  methods: {
-    openEditModal(column) {
-      eventBus.$emit("openEditModal", column);
-    }
-  },
+  methods: {},
   created() {}
 };
 </script>

@@ -55,12 +55,15 @@
         </draggable>
       </table>
     </div>
+    <EditModal />
     <ChangeOrder :duplicatedColumns="duplicatedColumns" />
   </div>
 </template>
 
 <script>
 import Vue from "vue";
+import EditModal from "@/components/modal/EditModal";
+
 import NumericRow from "@/components/tableRow/NumericRow";
 import CategoricalRow from "@/components/tableRow/CategoricalRow";
 import DateRow from "@/components/tableRow/DateRow";
@@ -130,6 +133,7 @@ export default {
     NumericRow,
     CategoricalRow,
     ChangeOrder,
+    EditModal,
 
     draggable
   },
@@ -178,7 +182,9 @@ export default {
 
   methods: {
     ...mapActions("apexchartGraph", ["loadFeatureGraphData"]),
-
+    openEditModal(column) {
+      eventBus.$emit("openEditModal", column);
+    },
     updateValues() {
       this.addDuplicatedColumn;
     },

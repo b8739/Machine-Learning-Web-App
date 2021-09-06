@@ -45,6 +45,9 @@ const mutations = {
   setCheckedRows(state, payload) {
     state.checkedRows = payload;
   },
+  pushCheckedRows(state, payload) {
+    state.checkedRows.push(payload);
+  },
   setColumnField(state, payload) {
     state.columnField = payload;
   },

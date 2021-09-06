@@ -6,15 +6,20 @@
           ><v-icon small>mdi-close</v-icon>
         </v-btn>
         <v-container>
-          <v-card-text style="text-align:center" class="title">Edit Data</v-card-text>
+          <v-card-text style="text-align:center" class="title">Graph Studio</v-card-text>
           <v-row justify="center" align="center">
-            <portal-target name="destination"> </portal-target>
+            <PlotlyLine
+              :seriesName="column"
+              :editMode="true"
+              :graphWidth="800"
+              :graphHeight="500"
+            />
           </v-row>
           <v-row> <DataTable /></v-row>
         </v-container>
       </v-card>
     </v-dialog>
-    <portal to="destination">
+    <!-- <portal to="destination">
       <TimeSeries
         v-if="dialog"
         :graphWidth="500"
@@ -22,10 +27,12 @@
         :seriesName="column"
         :dialog="dialog"
       />
-    </portal>
+    </portal> -->
   </div>
 </template>
 <script>
+import PlotlyLine from "@/components/graph/PlotlyLine";
+
 import TimeSeries from "@/components/graph/TimeSeries";
 import DataTable from "@/components/preprocess/DataTable";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
@@ -51,10 +58,12 @@ export default {
 
   components: {
     TimeSeries,
-    DataTable
+    DataTable,
+    PlotlyLine
   },
   computed: {
     ...mapState("initialData", ["columns"]),
+
     ...mapGetters("initialData", ["indexNum"])
   },
   methods: {
@@ -67,6 +76,9 @@ export default {
       this.dialog = true;
       this.column = column;
     });
+  },
+  mounted() {
+    console.log("editmodal mounted");
   }
 };
 </script>
