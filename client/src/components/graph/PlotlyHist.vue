@@ -18,7 +18,7 @@ export default {
           // dx: 0,
           // nbinsy: 20,
           type: "bar",
-          // opacity: 0.8,
+          opacity: 0.8,
           // ybins: {
           //   start: 0,
           //   end: 0

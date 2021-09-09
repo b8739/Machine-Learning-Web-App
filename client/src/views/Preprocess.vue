@@ -8,16 +8,7 @@
 
     <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
     <div>router:{{ $router.name }}</div> -->
-    <div class="text-center">
-      <v-dialog v-model="dialog1" hide-overlay persistent width="300">
-        <v-card color="primary" dark>
-          <v-card-text>
-            Please stand by
-            <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </div>
+
     <v-main>
       <v-container id="mainWrapper" fluid>
         <div style="height:100vh">
@@ -41,6 +32,7 @@
               </v-toolbar>
               <v-row>
                 <GraphBuilder :columns="columns" />
+                <NewGraphBuilder />
                 <DeleteStepper />
                 <AverageModal />
 
@@ -64,6 +56,7 @@
 import axios from "axios";
 //views
 import GraphBuilder from "./GraphBuilder.vue";
+import NewGraphBuilder from "./NewGraphBuilder.vue";
 import DeleteStepper from "./DeleteStepper.vue";
 import AverageModal from "@/components/average/AverageModal.vue";
 //components
@@ -106,6 +99,7 @@ export default {
     SummaryTable,
     DataTable,
     GraphBuilder,
+    NewGraphBuilder,
     SideMenu,
     SaveMenu,
     DeleteStepper,
@@ -157,6 +151,7 @@ export default {
     ...mapMutations("preprocessHandler", ["setEditStatus"]),
     ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
     ...mapMutations("summaryTableHandler", ["resetSummaryTableVuex"]),
+    ...mapMutations("edaHandler", ["resetEda"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
@@ -260,6 +255,7 @@ export default {
     }
   },
   created() {
+    this.resetEda();
     this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
     const path = "http://localhost:5000/startPreprocess";
@@ -269,7 +265,6 @@ export default {
     this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
     this.loadColumns();
-    console.log(this.columns);
     this.loadDatasetSize();
   },
   mounted() {

@@ -1,57 +1,29 @@
 <template>
   <div class="dragXaxisBox">
-    <v-row class="dragXaxisBox" no-gutters>
-      <v-col cols="4" :class="{ hoverEffectOn: hoverStatus }">
-        <draggable
-          class="draggable"
-          :options="{ group: 'dragGroup' }"
-          @start="drag = true"
-          @end="drag = false"
-          :list="leftColumns"
-        >
-          <v-chip v-for="(column, columnIndex) in leftColumns" :key="columnIndex" small outlined>{{
-            column
-          }}</v-chip>
-        </draggable>
-      </v-col>
-      <v-col cols="4" :class="{ hoverEffectOn: hoverStatus }">
-        <span class="xLabel">X</span>
-        <draggable
-          class="draggable"
-          :options="{ group: 'dragGroup' }"
-          @start="drag = true"
-          @end="drag = false"
-          :list="centerColumns"
-          @change="onDragEvent"
-        >
-          <v-chip
-            v-for="(column, columnIndex) in centerColumns"
-            :key="columnIndex"
-            small
-            outlined
-            >{{ column }}</v-chip
-          >
-        </draggable>
-      </v-col>
-      <v-col cols="4" :class="{ hoverEffectOn: hoverStatus }">
-        <draggable
-          class="draggable"
-          :options="{ group: 'dragGroup' }"
-          @start="drag = true"
-          @end="drag = false"
-          :list="rightColumns"
-        >
-          <v-chip v-for="(column, columnIndex) in rightColumns" :key="columnIndex" small outlined>{{
-            column
-          }}</v-chip>
-        </draggable>
-      </v-col>
-    </v-row>
+    <draggable
+      class="draggable d-flex  justify-center align-center"
+      :class="{ hoverEffectOn: hoverStatus }"
+      :options="{ group: 'dragGroup' }"
+      @start="drag = true"
+      @end="drag = false"
+      :list="centerColumns"
+      @change="onDragEvent"
+    >
+      <v-chip
+        class="mx-12"
+        v-for="(column, columnIndex) in centerColumns"
+        :key="columnIndex"
+        small
+        outlined
+        >{{ column }}</v-chip
+      >
+    </draggable>
   </div>
 </template>
 <script>
 import { eventBus } from "@/main";
-import { mapState, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+
 import draggable from "vuedraggable";
 
 export default {
@@ -59,9 +31,10 @@ export default {
     return {
       // columns: { leftColumns: [], centerColumns: [], rightColumns: [] },
       hoverStatus: false,
-      leftColumns: [],
+
       centerColumns: [],
-      rightColumns: []
+
+      numOfDragElement: 0
     };
   },
   props: ["styleObject", "axisPosition"],
@@ -70,18 +43,29 @@ export default {
     draggable
   },
   methods: {
+    ...mapMutations("edaHandler", ["setXaxisColumn"]),
+    ...mapMutations("edaHandler", ["removeXaxisColumn"]),
+    ...mapMutations("edaHandler", ["setXaxisEvent"]),
+
     onDragEvent(evt) {
       let eventName = Object.keys(evt)[0];
-      console.log(eventName);
+      // console.log(eventName);
       switch (eventName) {
         case "added":
-          let axisInfo = { evt: evt, type: "axis" };
-          eventBus.$emit("xaxisBeingDragged", axisInfo);
-          //드래그 박스에 chip 하나만 유지하도록 초기화
-          this.centerColumns = [evt.added.element];
+          this.setXaxisColumn(this.centerColumns);
+          this.setXaxisEvent(evt);
+          this.numOfDragElement++;
+          // eventBus.$emit("xaxisBeingDragged", axisInfo);
+          break;
+        case "moved":
+          this.setXaxisEvent(evt);
+          this.setXaxisColumn(this.centerColumns);
           break;
         case "removed":
           eventBus.$emit("xaxisBeingRemoved", false);
+          this.setXaxisEvent(evt);
+          this.removeXaxisColumn(evt.removed.element);
+          this.numOfDragElement--;
           break;
       }
     }
@@ -93,8 +77,7 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset
-      // leftColumns: state => state.leftColumns
+      xaxisColumns: state => state.edaHandler.xaxisColumns
     }),
     ...mapGetters("initialData", ["indexNum"])
   }

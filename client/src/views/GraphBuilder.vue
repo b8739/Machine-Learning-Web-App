@@ -7,7 +7,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-spacer></v-spacer>
-          <v-toolbar-title>EDA Graph Builder</v-toolbar-title>
+          <v-toolbar-title>EDA Graph Builder (기능 미완성)</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
             <v-btn text @click="dialog = false">
@@ -47,7 +47,8 @@
                 <v-col cols="7" class="apexChartWrapper">
                   <!-- <span class="yLabel">Y</span> -->
 
-                  <ApexChart v-show="apexChartRender" />
+                  <!-- <ApexChart v-show="apexChartRender" /> -->
+                  <PlotlyEdaGraph :graphWidth="800" :graphHeight="400" :isEdit="false" />
                 </v-col>
 
                 <!-- 원래 500, grouping 개발하느라 임시로 작게 변경 -->
@@ -73,6 +74,7 @@
 <script>
 import ColumnList from "@/components/eda/ColumnList.vue";
 import ApexChart from "@/components/eda/ApexChart.vue";
+import PlotlyEdaGraph from "@/components/graph/PlotlyEdaGraph.vue";
 import DragBoxXaxis from "@/components/eda/DragBoxXaxis.vue";
 import DragBoxYaxis from "@/components/eda/DragBoxYaxis.vue";
 import Xgroup from "@/components/eda/Xgroup.vue";
@@ -118,12 +120,13 @@ export default {
     DragBoxYaxis,
     Xgroup,
     ApexChart,
-    GraphTypeToolbar
+    GraphTypeToolbar,
+    PlotlyEdaGraph
   },
   created() {
-    eventBus.$on("openDialog", dialogStatus => {
-      this.dialog = dialogStatus;
-    });
+    // eventBus.$on("openDialog", dialogStatus => {
+    //   this.dialog = dialogStatus;
+    // });
   }
 };
 </script>

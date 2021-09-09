@@ -17,6 +17,11 @@ export default {
   watch: {
     seriesName: function(newValue, oldValue) {
       this.createEditPlot();
+    },
+    featureGraphData: function(val, oldValue) {
+      if (val != null) {
+        this.createPlot(this.featureGraphData[this.seriesName], false);
+      }
     }
   },
   data() {
@@ -34,7 +39,8 @@ export default {
           line: {
             // color: "rgb(219, 64, 82)",
             width: 1
-          }
+          },
+          opacity: 0.9
           // showlegend: true
           // name: this.seriesName
         }
@@ -167,7 +173,6 @@ export default {
     }
   },
   mounted() {
-    console.log("plotly line mounted");
     if (this.isEdit == false) {
       (this.config["modeBarButtonsToAdd"] = [
         {
@@ -189,8 +194,6 @@ export default {
           "zoomOut2d",
           "Delete Selected Data"
         ]);
-
-      this.createPlot(this.featureGraphData[this.seriesName], false);
     } else {
       this.config["displayModeBar"] = true;
       this.createEditPlot();

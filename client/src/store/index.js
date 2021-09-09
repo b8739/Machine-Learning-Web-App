@@ -19,7 +19,8 @@ import tableData from "@/store/modules/dataTable/tableData.js";
 import preprocessHandler from "@/store/modules/preprocess/preprocessHandler.js";
 import dataTableHandler from "@/store/modules/preprocess/dataTableHandler.js";
 import summaryTableHandler from "@/store/modules/preprocess/summaryTableHandler.js";
-
+//eda
+import edaHandler from "@/store/modules/eda/edaHandler.js";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -33,7 +34,8 @@ export default new Vuex.Store({
     tableData,
     preprocessHandler,
     dataTableHandler,
-    summaryTableHandler
+    summaryTableHandler,
+    edaHandler
   },
   plugins: [
     createPersistedState({

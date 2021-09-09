@@ -69,7 +69,7 @@
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
       <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
-      <PlotlyLine :seriesName="column" :graphWidth="238" :graphHeight="200" :isEdit="false" />
+      <!-- <PlotlyLine :seriesName="column" :graphWidth="238" :graphHeight="200" :isEdit="false" /> -->
     </td>
   </tr>
 </template>
@@ -88,10 +88,9 @@ export default {
   },
   computed: {
     ...mapState({
-      dataset: state => state.initialData.dataset,
       columns: state => state.initialData.columns,
       summarizedInfo: state => state.initialData.summarizedInfo,
-      featureNameFlag: state => state.saveFlag.summarizedInfo
+      featureNameFlag: state => state.saveFlag.summarizedInfoh
     })
   },
   props: ["column", "columnIndex"],
