@@ -7,13 +7,13 @@
             <template v-slot:activator>
               <v-list-item-title active>Structure</v-list-item-title>
             </template>
-            <v-list-item link>
+            <v-list-item link @click="setMenuState('traces')">
               <v-list-item-icon>
                 <v-icon></v-icon>
               </v-list-item-icon>
               <v-list-item-title draggable label>Traces</v-list-item-title>
             </v-list-item>
-            <v-list-item link>
+            <v-list-item link @click="setMenuState('subplots')">
               <v-list-item-icon>
                 <v-icon></v-icon>
               </v-list-item-icon>
@@ -28,10 +28,10 @@
             <!-- 2nd -->
             <v-col cols="3" class="pa-0 ma-0">
               <v-card class="pa-0 ma-0" height="100vh">
-                <v-container fluid>
+                <v-container fluid v-show="menuState == 'traces'">
                   <v-row justify="end">
                     <v-col class="pa-0 ma-0" cols="5"
-                      ><v-btn @click="numTracePanel++">+ Trace</v-btn></v-col
+                      ><v-btn @click="addEmptyTrace()">+ Trace</v-btn></v-col
                     ></v-row
                   >
                   <v-row>
@@ -41,7 +41,23 @@
                           v-for="(tracePanel, tpIndex) in numTracePanel"
                           :key="tpIndex"
                         >
-                          <v-expansion-panel-header> Trace {{ tpIndex }} </v-expansion-panel-header>
+                          <v-expansion-panel-header class="flexContainer">
+                            <template v-slot:actions>
+                              <v-icon class="expandIcon">$expand</v-icon>
+                            </template>
+                            <span class="header"> Trace {{ tpIndex }}</span>
+                            <v-btn
+                              @click="deleteTrace(tpIndex)"
+                              class="closeIcon pa-0"
+                              elevation="0"
+                              color="white"
+                            >
+                              <svg width="20px" height="20px">
+                                <path
+                                  d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                ></path></svg
+                            ></v-btn>
+                          </v-expansion-panel-header>
                           <v-expansion-panel-content>
                             <v-container fluid>
                               <v-row>
@@ -90,6 +106,7 @@
   </v-dialog>
 </template>
 <script>
+import Vue from "vue";
 import { eventBus } from "@/main";
 import PlotlyEdaGraph from "@/components/graph/PlotlyEdaGraph.vue";
 
@@ -99,7 +116,7 @@ export default {
   data() {
     return {
       axisTypes: ["x", "y"],
-      numTracePanel: 1,
+      numTracePanel: [0],
       dialog: true,
       drawer: true,
       depthStatus: true,
@@ -107,9 +124,19 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("edaMenuHandler", ["setMenuState"]),
+
+    deleteTrace(tpIndex) {
+      Vue.delete(this.numTracePanel, tpIndex);
+      eventBus.$emit("deleteTrace", tpIndex);
+    },
+    addEmptyTrace() {
+      this.numTracePanel.push(0);
+      eventBus.$emit("addEmptyTrace", true);
+    },
     loadAxis(featureName, axisType, tpIndex) {
       let payload = { featureName: featureName, axisType: axisType, tpIndex: tpIndex };
-      eventBus.$emit("load_xAxis", payload);
+      eventBus.$emit("loadAxis", payload);
       // let path = "http://localhost:5000/loadEditGraphData";
       // // axios
       // this.$axios({
@@ -130,7 +157,8 @@ export default {
   },
   computed: {
     ...mapState({
-      columns: state => state.initialData.columns
+      columns: state => state.initialData.columns,
+      menuState: state => state.edaMenuHandler.menuState
     })
   },
   components: {
@@ -143,3 +171,18 @@ export default {
   }
 };
 </script>
+<style scoped>
+.expandIcon {
+  order: 1;
+}
+
+.header {
+  order: 2;
+  flex-grow: 10 !important;
+  padding-left: 10px;
+}
+.closeIcon {
+  order: 3;
+  flex-grow: 1 !important;
+}
+</style>

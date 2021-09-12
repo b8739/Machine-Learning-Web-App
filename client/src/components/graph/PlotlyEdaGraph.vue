@@ -6,11 +6,21 @@ import { eventBus } from "@/main";
 import Vue from "vue";
 
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
-
+let cloneDeep = require("lodash/cloneDeep");
 export default {
   watch: {},
   data() {
     return {
+      dataFormat: {
+        type: "scatter",
+        mode: "lines+markers",
+        marker: {
+          size: 2
+        },
+        line: {
+          width: 1
+        }
+      },
       data: [
         {
           type: "scatter",
@@ -68,7 +78,7 @@ export default {
       yaxisColumns: state => state.edaHandler.yaxisColumns,
       yaxisEvent: state => state.edaHandler.yaxisEvent
     }),
-    refName() {
+    plotContainer() {
       return this.$refs["edaGraph"];
     }
   },
@@ -101,8 +111,8 @@ export default {
           let layout_update = {
             grid: { rows: 1, columns: 2, pattern: "independent" }
           };
-          Plotly.newPlot(this.refName, this.data, this.layout, this.config);
-          Plotly.relayout(this.refName, layout_update);
+          Plotly.newPlot(this.plotContainer, this.data, this.layout, this.config);
+          Plotly.relayout(this.plotContainer, layout_update);
         })
         .catch(error => {
           console.error(error);
@@ -114,28 +124,30 @@ export default {
       if (axisName == "x") return "y";
       else return "x";
     },
-    createPlot(data) {
+    createPlot() {
       //   this.data[0].x.splice(0, this.data[0].x.length);
       //   this.data[0].x = data;
-      let TESTER = this.$refs["edaGraph"];
-      Plotly.newPlot(TESTER, this.data, this.layout, this.config);
+
+      Plotly.newPlot(this.plotContainer, this.data, this.layout, this.config);
     },
-    addNewTrace(data, axisType, tpIndex) {
-      let newTrace = {};
-      newTrace[axisType] = data;
-      Plotly.addTraces(this.refName, newTrace, tpIndex);
+    addNewTrace() {
+      let newTrace = cloneDeep(this.dataFormat);
+      newTrace["x"] = [[]];
+      newTrace["y"] = [[]];
+      Plotly.addTraces(this.plotContainer, newTrace);
+    },
+    deleteTrace(tpIndex) {
+      Plotly.deleteTraces(this.plotContainer, tpIndex);
     },
     updatePlot(data, axisType, tpIndex) {
-      if (tpIndex > 0) {
-        this.addNewTrace(data, axisType, tpIndex);
-      } else {
-        this.data[0][axisType] = [data];
-        let oppositeAxis = this.getOppositeAxis(axisType);
-        if (this.data[tpIndex][oppositeAxis] != undefined) {
-          this.data[tpIndex][oppositeAxis] = [this.data[tpIndex][oppositeAxis]];
-        }
-        Plotly.restyle(this.refName, this.data[0]);
-      }
+      // let newTrace = {};
+      // newTrace[axisType] = [[data]];
+      this.data[tpIndex][axisType] = [data];
+      // let oppositeAxis = this.getOppositeAxis(axisType);
+      // if (this.data[tpIndex][oppositeAxis] != undefined) {
+      //   this.data[tpIndex][oppositeAxis] = [this.data[tpIndex][oppositeAxis]];
+      // }
+      Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
     },
     loadFullData(featureName, axisType, tpIndex) {
       let path = "http://localhost:5000/loadEditGraphData";
@@ -158,8 +170,14 @@ export default {
     }
   },
   created() {
-    eventBus.$on("load_xAxis", payload => {
+    eventBus.$on("loadAxis", payload => {
       this.loadFullData(payload.featureName, payload.axisType, payload.tpIndex);
+    });
+    eventBus.$on("addEmptyTrace", status => {
+      this.addNewTrace();
+    });
+    eventBus.$on("deleteTrace", tpIndex => {
+      this.deleteTrace(tpIndex);
     });
   },
   mounted() {
@@ -176,7 +194,7 @@ export default {
     ]),
       (this.config["modeBarButtonsToRemove"] = ["Delete Selected Data"]);
 
-    this.createPlot([], false);
+    this.createPlot();
   }
 };
 </script>

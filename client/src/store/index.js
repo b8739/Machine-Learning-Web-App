@@ -21,6 +21,7 @@ import dataTableHandler from "@/store/modules/preprocess/dataTableHandler.js";
 import summaryTableHandler from "@/store/modules/preprocess/summaryTableHandler.js";
 //eda
 import edaHandler from "@/store/modules/eda/edaHandler.js";
+import edaMenuHandler from "@/store/modules/eda/edaMenuHandler.js";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -35,7 +36,8 @@ export default new Vuex.Store({
     preprocessHandler,
     dataTableHandler,
     summaryTableHandler,
-    edaHandler
+    edaHandler,
+    edaMenuHandler
   },
   plugins: [
     createPersistedState({
