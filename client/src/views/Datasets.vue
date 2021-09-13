@@ -98,7 +98,7 @@ export default {
       this.loadSummarizedData();
     },
     showTables() {
-      let path = "http://localhost:5000/showTables";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
       axios
         .get(path)
         .then(res => {
@@ -111,7 +111,7 @@ export default {
       if (
         confirm("선택한 Dataset을 Database에서 삭제하시겠습니까? (다시 복구할 수 없습니다)") == true
       ) {
-        let path = "http://localhost:5000/dropTable";
+        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dropTable";
         axios
           .get(path, {
             params: {

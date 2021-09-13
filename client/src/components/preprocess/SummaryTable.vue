@@ -207,7 +207,7 @@ export default {
 
         // this.changeColumnName_vue(this.columns[index], index);
 
-        // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
+        // this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData"); //vuex column, dataset, indexnum 변경
         // this.loadSummarizedData();
       } // v-icon click ON
       else {
@@ -228,7 +228,7 @@ export default {
     },
 
     // changeColumnOrder(position, movedColumnName, newIndex) {
-    //   const api = "http://localhost:5000/changeColumnOrder";
+    //   const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnOrder";
     //   axios
     //     .get(api, {
     //       params: {
@@ -247,7 +247,7 @@ export default {
       console.log(payload);
       // this.changeColumnName_vuex(payload); //summarizedInfo의 이름까지 변경해야하는 문제 때문에 일단 보류
 
-      // const api = "http://localhost:5000/changeColumnName_vue";
+      // const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnName_vue";
       // axios
       //   .get(api, {
       //     params: {

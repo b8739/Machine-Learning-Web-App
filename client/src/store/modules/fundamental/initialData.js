@@ -81,7 +81,7 @@ const mutations = {
 
 const actions = {
   loadDatasetSize({ commit, state }) {
-    const path = "http://localhost:5000/loadDatasetSize";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDatasetSize";
     axios
       .get(path, {
         params: {
@@ -98,7 +98,7 @@ const actions = {
       });
   },
   loadColumns({ commit, state }) {
-    let path = "http://localhost:5000/loadColumns";
+    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
     axios
       .get(path, {
         params: {
@@ -115,7 +115,7 @@ const actions = {
       });
   },
   loadSummarizedData({ commit, state }) {
-    const path = "http://localhost:5000/loadSummarizedData";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadSummarizedData";
     axios
       .get(path, {
         params: {
@@ -135,7 +135,7 @@ const actions = {
       });
   },
   loadRandomData({ commit, state }) {
-    const path = "http://localhost:5000/loadRandomInfo";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadRandomInfo";
     axios
       .get(path, {
         params: {

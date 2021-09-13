@@ -73,7 +73,7 @@ const actions = {
 
   //   },
   deleteRow({ commit, state, rootState }) {
-    let path = "http://localhost:5000/deleteSingleRow";
+    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteSingleRow";
     axios({
       method: "post",
       url: path,
@@ -104,7 +104,7 @@ const actions = {
   },
 
   insertRow({ commit, state, rootState }) {
-    let path = "http://localhost:5000/insertRow";
+    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/insertRow";
     axios({
       method: "post",
       url: path,
@@ -126,7 +126,7 @@ const actions = {
       });
   },
   infiniteLoadingCreated({ commit, state, rootState }) {
-    let api = "http://localhost:5000/infiniteLoading";
+    let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
     axios
       .get(api, {
         params: {

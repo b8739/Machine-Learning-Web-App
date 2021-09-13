@@ -33,12 +33,12 @@ export default {
           type: "scatter",
           mode: "lines+markers",
           marker: {
-            size: 2
+            size: 1
             // marker is an object, valid marker keys: #scatter-marker
           },
           line: {
             // color: "rgb(219, 64, 82)",
-            width: 1
+            width: 0.6
           },
           opacity: 0.9
           // showlegend: true
@@ -56,7 +56,9 @@ export default {
           pad: 4
         },
         colorway: ["#2E93fA", "#66DA26", "#546E7A", "#E91E63", "#FF9800"],
-
+        // xaxis: {
+        //   type: "date"
+        // },
         yaxis: {
           automargin: true
         }
@@ -113,7 +115,7 @@ export default {
     },
     createEditPlot() {
       let vm = this;
-      let path = "http://localhost:5000/loadEditGraphData";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadEditGraphData";
       // axios
       this.$axios({
         method: "post",

@@ -64,7 +64,7 @@ export default {
     saveTableAxios(saveOption) {
       if (this.summaryChangeFlag) {
         //summary 변경 있을 때
-        let path = "http://localhost:5000/changeColumnInfo";
+        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnInfo";
         // axios
         this.$axios({
           method: "post",
@@ -87,7 +87,7 @@ export default {
             console.error(error);
           });
       } else if (this.tableChangeFlag) {
-        const path = "http://localhost:5000/overwriteTable";
+        const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
         axios
           .get(path, {
             params: {

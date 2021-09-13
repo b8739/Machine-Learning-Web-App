@@ -31,7 +31,7 @@
                 </v-row>
               </v-toolbar>
               <v-row>
-                <GraphBuilder :columns="columns" />
+                <!-- <GraphBuilder :columns="columns" /> -->
                 <NewGraphBuilder />
                 <DeleteStepper />
                 <AverageModal />
@@ -140,7 +140,7 @@ export default {
     },
 
     apiCheck() {
-      const path = "http://localhost:5000/test1";
+      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/test1";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -169,7 +169,7 @@ export default {
     },
 
     duplicateTable() {
-      const path = "http://localhost:5000/duplicateTable";
+      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/duplicateTable";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -199,7 +199,7 @@ export default {
     },
     updateData(payload) {
       console.log(payload);
-      const path = `http://localhost:5000/updateData`;
+      const path = `http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/updateData`;
       axios
         .put(path, payload)
         .then(() => {
@@ -224,7 +224,7 @@ export default {
       eventBus.$emit("openSaveChange", true);
     },
     rollback() {
-      const path = "http://localhost:5000/rollback";
+      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/rollback";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -258,7 +258,7 @@ export default {
     this.resetEda();
     this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
-    const path = "http://localhost:5000/startPreprocess";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/startPreprocess";
     axios.get(path).catch(error => {
       console.error(error);
     });
@@ -285,7 +285,7 @@ export default {
   }
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-  //     const path = "http://localhost:5000/overwriteTable";
+  //     const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
   //     axios.get(path).catch(error => {
   //       console.error(error);
   //     });
