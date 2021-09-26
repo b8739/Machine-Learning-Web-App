@@ -56,7 +56,7 @@ export default {
     },
     runModel() {
       eventBus.$emit("saveRequest_canvas", true); // to Canvas.vue
-      eventBus.$emit("saveRequest_canvasSide", true); // to Canvas.vue
+      eventBus.$emit("saveRequest_canvasSide", true); // to CanvasSide.vue
     },
 
     getPos(e) {

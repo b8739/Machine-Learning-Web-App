@@ -112,7 +112,7 @@ export default {
       // Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
     },
     loadFullData(featureName, axisType, tpIndex) {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadEditGraphData";
+      let path = "http://localhost:5000/loadEditGraphData";
       // axios
       this.$axios({
         method: "post",
@@ -128,6 +128,34 @@ export default {
         .catch(error => {
           console.error(error);
         });
+    },
+    renderGroupingGraph(groupingData) {
+      Object.keys(groupingData).forEach((element, index) => {
+        console.log(index);
+        // Data 1이 있는 상태에서 시작하므로, 1은 존재하는 것 재활용하고 없을 때 새로 만듦
+        if (this.data[index] == undefined) {
+          this.addNewTrace();
+        }
+        // Data Setting
+        this.data[index]["x"] = groupingData[element][0];
+        this.data[index]["y"] = groupingData[element][1];
+        this.data[index]["name"] = element;
+        // Layout Setting (Axis 분리)
+        if (index != 0) {
+          ["x", "y"].forEach(element => {
+            //layout
+            let axisNum = element + "axis" + parseInt(index + 1);
+            this.layout[axisNum] = {};
+            // this.layout[axisNum]["overlaying"] = axisType;
+            this.layout[axisNum]["automargin"] = true;
+            this.layout[axisNum]["title"] = {};
+            Vue.set(this.data[index], element + "axis", element + parseInt(index + 1));
+          });
+        }
+      });
+      // let fullAxis = this.getAxisName(axisType) + this.getAxisNumber(tpIndex);
+      // this.layout[fullAxis] = this.getFontFormat(featureName, axisType, tpIndex);
+      Plotly.update(this.plotContainer, this.data, this.layout);
     },
     getOppositeAxis(axisName) {
       if (axisName == "x") return "y";
@@ -147,9 +175,11 @@ export default {
     },
     getFontFormat(featureName, axisType, tpIndex) {
       let axisInfo = {
+        automargin: true,
         title: {
-          automargin: true,
+          //
           text: featureName,
+          // standoff: 20,
           font: {
             size: 14,
             color: "#7f7f7f"
@@ -190,8 +220,8 @@ export default {
     changeOverlay(value, tpIndex) {
       let xaxis = "xaxis" + (parseInt(tpIndex) + 1);
       let yaxis = "yaxis" + (parseInt(tpIndex) + 1);
-      // this.layout[xaxis] = {};
-      // this.layout[yaxis] = {};
+      this.layout[xaxis] = {};
+      this.layout[yaxis] = {};
       if (value) {
         this.layout[xaxis]["overlaying"] = "x";
         this.layout[yaxis]["overlaying"] = "y";
@@ -231,6 +261,12 @@ export default {
     });
     eventBus.$on("deleteTrace", tpIndex => {
       this.deleteTrace(tpIndex);
+    });
+    eventBus.$on("applyGroupBy", groupingData => {
+      let groupLength = Object.keys(groupingData).length;
+      this.changeGridInfo(1, groupLength);
+      this.renderGroupingGraph(groupingData);
+      console.log(groupingData);
     });
   },
   mounted() {

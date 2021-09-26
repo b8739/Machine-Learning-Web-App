@@ -10,7 +10,7 @@
             </v-card-subtitle> -->
           </div>
           <v-spacer></v-spacer>
-          <v-btn x-small min-width="20" min-height="30" @click="closeStepper"
+          <v-btn x-small min-width="20" min-height="30" @click="leaveDialog()"
             ><v-icon small>mdi-close</v-icon>
           </v-btn>
         </v-row>
@@ -62,9 +62,6 @@ export default {
     confirmChanges() {
       eventBus.$emit("columnOrderUpdated", this.duplicatedColumns);
     },
-    closeStepper() {
-      this.dialog = false;
-    },
 
     onDragEvent(evt) {
       let columnName = evt.moved.element;
@@ -74,7 +71,7 @@ export default {
       this.changeColumnOrder(movedInfo);
     }
     // changeColumnOrder(position, movedColumnName, newIndex) {
-    //   const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnOrder";
+    //   const api = "http://localhost:5000/changeColumnOrder";
     //   axios
     //     .get(api, {
     //       params: {

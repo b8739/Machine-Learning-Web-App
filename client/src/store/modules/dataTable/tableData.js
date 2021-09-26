@@ -2,24 +2,14 @@ import Vue from "vue";
 
 const getDefaultState = () => {
   return {
-    editMode: false,
-    activatedEvent: null,
-    datasetItems: []
+    activatedEvent: null
   };
 };
 const state = getDefaultState();
 
 const getters = {};
 
-const mutations = {
-  setDatasetItems(state, payload) {
-    state.datasetItems.push(payload);
-  },
-
-  activateEditMode(state, payload) {
-    state.editMode = payload;
-  }
-};
+const mutations = {};
 const actions = {
   activateDeleteRow({ commit, state, rootState }, payload) {
     commit("activateEditMode", true);

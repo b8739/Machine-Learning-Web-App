@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a href="http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/"
+    <a href="http://localhost:8080/"
       ><img class="logo" src="../../assets/attic_logo.png" alt=""
     /></a>
     <nav>
@@ -45,7 +45,7 @@ export default {
     //   let h = screen.height * 0.8;
     //   let leftPosition = (screen.width - w) / 2;
     //   let topPosition = (screen.height - h) / 2;
-    //   let url = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/eda";
+    //   let url = "http://localhost:5000/eda";
     //   window.open(
     //     url,
     //     "modelingResult",

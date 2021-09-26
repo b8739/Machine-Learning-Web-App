@@ -11,7 +11,7 @@
           Add Dataset
         </v-btn>
 
-        <v-btn max-width="200px" @click="deleteMode = !deleteMode" color="error">
+        <v-btn max-width="200px" @click="editMode = !editMode" color="error">
           <v-icon left class="mdi-24">
             mdi-trash-can
           </v-icon>
@@ -29,9 +29,7 @@
         >
           <v-container>
             <v-row v-if="tableList" justify="end">
-              <v-btn v-show="deleteMode" @click="dropTable(tableName)" x-small light
-                >X</v-btn
-              ></v-row
+              <v-btn v-show="editMode" @click="dropTable(tableName)" x-small light>X</v-btn></v-row
             >
             <v-row>
               <v-card-text class="font-weight-bold body-1 ">{{ tableName }}</v-card-text>
@@ -69,7 +67,7 @@ export default {
     */
   data() {
     return {
-      deleteMode: false,
+      editMode: false,
       files: [],
       datasets: [1, 2]
     };
@@ -98,7 +96,7 @@ export default {
       this.loadSummarizedData();
     },
     showTables() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
+      let path = "http://localhost:5000/showTables";
       axios
         .get(path)
         .then(res => {
@@ -111,7 +109,7 @@ export default {
       if (
         confirm("선택한 Dataset을 Database에서 삭제하시겠습니까? (다시 복구할 수 없습니다)") == true
       ) {
-        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dropTable";
+        let path = "http://localhost:5000/dropTable";
         axios
           .get(path, {
             params: {
@@ -120,7 +118,7 @@ export default {
           })
           .then(res => {
             this.showTables();
-            this.deleteMode = false;
+            this.editMode = false;
             console.log("Table Successfully Deleted");
           })
           .catch(error => {

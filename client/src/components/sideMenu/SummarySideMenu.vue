@@ -5,7 +5,7 @@
         <v-list-item-title active>Edit Feature</v-list-item-title>
       </template>
       <v-list-item
-        :disabled="item.title == 'Moving Average' || item.title == 'Change Type'"
+        :disabled="item.title == 'Moving Average'"
         v-for="item in items"
         :key="item.title"
         link
@@ -63,7 +63,7 @@ export default {
     ...mapActions("summaryTableHandler", ["revertToBackupArray"]),
     ...mapActions("summaryTableHandler", ["backupColumns"]),
 
-    confirmNameChange() {
+    confirmChange() {
       this.setEditStatus(false);
       this.setPreprocessStatus(null);
       this.setAdditionalCancelEvent(null);
@@ -74,10 +74,8 @@ export default {
       // this.resetPreprocessVuex();
       if (title == "Change Name") {
         this.activateEvent("summaryChangeName");
-        this.setEvent(this.confirmNameChange);
+        this.setEvent(this.confirmChange);
         this.setAdditionalCancelEvent(this.revertToBackupArray);
-      } else if (title == "Change Type") {
-        this.activateEvent("summaryChangeType");
       } else if (title == "Change Order") {
         this.activateEvent("summaryChangeOrderModal");
         this.backupColumns();
@@ -88,6 +86,9 @@ export default {
           this.setDialog(false);
           this.setAdditionalCancelEvent(null);
         });
+      } else if (title == "Change Type") {
+        this.activateEvent("summaryChangeType");
+        this.setEvent(this.confirmChange);
       }
     }
   }

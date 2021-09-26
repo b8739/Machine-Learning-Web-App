@@ -56,7 +56,7 @@
       />
     </td>
 
-    <td style="width:340px; height:250px">
+    <td style="width:300px; height:250px">
       <!-- @click="openEditModal(column)" -->
       <!-- <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
@@ -69,7 +69,7 @@
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
       <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
-      <PlotlyLine :seriesName="column" :graphWidth="330" :graphHeight="200" :isEdit="false" />
+      <!-- <PlotlyLine :seriesName="column" :graphWidth="270" :graphHeight="200" :isEdit="false" /> -->
     </td>
   </tr>
 </template>

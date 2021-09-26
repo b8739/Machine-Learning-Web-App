@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-navigation-drawer v-model="drawer" absolute height="1000px" permanent>
+    <v-navigation-drawer v-model="drawer" absolute height="100vh" permanent>
       <!-- :mini-variant.sync="mini" -->
       <v-list-item class="px-2">
         <v-list-item-title>Modeling Setting</v-list-item-title>
@@ -30,7 +30,8 @@
                 hide-details
                 dense
                 :label="dataInfoLabels[indexOfDataInfo]"
-                :items="getItems(indexOfDataInfo)"
+                :items="tableList"
+                @change="saveDatasetName"
               ></v-autocomplete>
             </v-list-item-content>
           </v-list-item>
@@ -167,7 +168,7 @@
             </v-list-item>
             <v-divider></v-divider>
 
-            <v-list-item>
+            <v-list-item class="pt-2">
               <v-subheader>Example Ratios (Train:Test)</v-subheader>
               <v-chip-group>
                 <v-chip @click="(trainSet = 60), (testSet = 40)" label>60:40</v-chip>
@@ -249,6 +250,7 @@ export default {
   },
   methods: {
     ...mapMutations("modelingData", ["saveSplitRatio"]),
+    ...mapMutations("modelingData", ["saveDatasetName"]),
     addValidationIndex() {
       this.validationIndexArray.push({
         start: this.validationStartIndex,
@@ -260,21 +262,7 @@ export default {
     algorithmClicked(algorithm) {
       this.chosenAlgorithm = algorithm;
     },
-    getItems(index) {
-      if (index == 0) {
-        return this.tableList;
-      }
 
-      // else if (indexOfFormFields == 1) {
-      //   return ;
-      // } else if (indexOfFormFields == 2) {
-      //   return ;
-      // } else if (indexOfFormFields == 3) {
-      //   return ;
-      // } else {
-      //   return ;
-      // }
-    },
     saveRequest() {
       this.saveSplitRatio(this.splitRatio);
     },

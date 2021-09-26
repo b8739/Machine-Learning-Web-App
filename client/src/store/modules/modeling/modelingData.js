@@ -4,6 +4,7 @@ import router from "@/router";
 const state = {
   // request
   modelingRequest: null,
+  modelingDataset: null,
   splitRatio: null,
   // response from API
   graphSources: null,
@@ -16,6 +17,9 @@ const mutations = {
   // request
   saveModelingRequest(state, payload) {
     state.modelingRequest = payload;
+  },
+  saveDatasetName(state, payload) {
+    state.modelingDataset = payload;
   },
   saveSplitRatio(state, payload) {
     state.splitRatio = payload;
@@ -51,9 +55,8 @@ const actions = {
     }
     // define path
     let algorithmName = state.modelingRequest["algorithm"]["name"].toLowerCase(); // xgboost/rf/svr
-    let path =
-      "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + algorithmName + "_modeling";
-    // let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + algorithmPath;
+    let path = "http://localhost:5000/" + algorithmName + "_modeling";
+    // let path = "http://localhost:5000/" + algorithmPath;
     console.log(path);
     console.log(state.modelingRequest);
     console.log(state.splitRatio);
@@ -63,8 +66,8 @@ const actions = {
       url: path,
       data: {
         modelingRequest: state.modelingRequest,
-        splitRatio: state.splitRatio,
-        tableName: rootState.initialData.tableName
+        modelingDataset: state.modelingDataset,
+        splitRatio: state.splitRatio
       }
     })
       .then(res => {

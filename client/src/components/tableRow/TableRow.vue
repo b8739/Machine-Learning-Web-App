@@ -78,7 +78,7 @@ export default {
 
         // this.changeColumnName_vue(this.columns[index], index);
 
-        // this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData"); //vuex column, dataset, indexnum 변경
+        // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
         // this.loadSummarizedData();
       } // v-icon click ON
       else {

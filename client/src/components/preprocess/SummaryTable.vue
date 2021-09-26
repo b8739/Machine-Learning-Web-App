@@ -1,9 +1,11 @@
 <template>
-  <div v-if="summarizedInfo != null">
+  <div v-if="summarizedInfo != null || summarizedInfo != undefined">
     <div class="container">
       <!-- 테이블 -->
       <!-- <div>Original{{ columns }}</div>
+      <br />
       <div>Duplicated{{ duplicatedColumns }}</div>
+      <br />
       <div>backedUpColumns{{ backedUpColumns }}</div> -->
 
       <table class="dataTable">
@@ -38,8 +40,9 @@
                   </tr>
                   <tr>
                     <v-select
-                      :items="categoryTypes"
+                      :items="dataTypes"
                       dense
+                      @change="changeColumnType(columnIndex, $event)"
                       :disabled="!editStatus['summaryChangeType']"
                       single-line
                       hide-details="true"
@@ -80,8 +83,7 @@ export default {
       // duplicatedColumns: [],
       editModalDialog: false,
       sampleForClass: null,
-      categoryTypes: ["Int64", "Float64", "Bool", "Datatime64", "Timedelta[ns]", "Category"],
-      numericTypes: ["Int64", "Float64", "Bool", "Datatime64", "Timedelta[ns]", "Category"],
+      dataTypes: ["int16", "int32", "int64", "float32", "float64", "string", "datatime64"],
 
       inactivatedName_props: {
         disabled: true,
@@ -182,6 +184,9 @@ export default {
 
   methods: {
     ...mapActions("apexchartGraph", ["loadFeatureGraphData"]),
+    changeColumnType(index, event) {
+      Vue.set(this.duplicatedColumns[index], "datatype", event);
+    },
     openEditModal(column) {
       eventBus.$emit("openEditModal", column);
     },
@@ -207,7 +212,7 @@ export default {
 
         // this.changeColumnName_vue(this.columns[index], index);
 
-        // this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData"); //vuex column, dataset, indexnum 변경
+        // this.loadFundamentalData("http://localhost:5000/loadData"); //vuex column, dataset, indexnum 변경
         // this.loadSummarizedData();
       } // v-icon click ON
       else {
@@ -219,16 +224,20 @@ export default {
       return this.summarizedInfo["datatype"][column];
     },
     distinguishDataType(column) {
-      if (this.getDataType(column) == "category") {
+      if (this.getDataType(column) == "category" || this.getDataType(column) == "string") {
         return "CategoricalRow";
-      } else if (this.getDataType(column) == "numeric") return "NumericRow";
+      } else if (
+        this.getDataType(column).indexOf("int") != 1 ||
+        this.getDataType(column).indexOf("float") != 1
+      )
+        return "NumericRow";
       else {
         return "DateRow";
       }
     },
 
     // changeColumnOrder(position, movedColumnName, newIndex) {
-    //   const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnOrder";
+    //   const api = "http://localhost:5000/changeColumnOrder";
     //   axios
     //     .get(api, {
     //       params: {
@@ -247,7 +256,7 @@ export default {
       console.log(payload);
       // this.changeColumnName_vuex(payload); //summarizedInfo의 이름까지 변경해야하는 문제 때문에 일단 보류
 
-      // const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnName_vue";
+      // const api = "http://localhost:5000/changeColumnName_vue";
       // axios
       //   .get(api, {
       //     params: {

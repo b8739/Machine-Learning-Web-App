@@ -29,7 +29,7 @@
               <v-card class="pa-0 ma-0" height="100vh">
                 <v-container fluid v-show="menuState == 'data'">
                   <v-row justify="end">
-                    <v-col class="px-0 mx-0" cols="3"
+                    <v-col class="px-0 mx-0" cols="4"
                       ><v-btn @click="addEmptyTrace()">+ Data</v-btn></v-col
                     ></v-row
                   >
@@ -180,12 +180,31 @@
                     </table>
                   </v-row>
                 </v-container>
+                <v-container fluid v-show="menuState == 'transform'">
+                  <v-card-subtitle>Transform Setting</v-card-subtitle>
+                  {{ groupColumn }}
+                  <v-row v-for="(axisType, atIndex) in axisTypes" :key="atIndex">
+                    <!-- x -->
+                    <v-col class="pa-0 ma-0" cols="3">
+                      <v-subheader>{{ axisType }}</v-subheader></v-col
+                    >
+                    <v-col class="pa-0 ma-0" cols="9">
+                      <v-select
+                        @change="loadGroupingData(axisType)"
+                        clearable
+                        :items="columns"
+                        dense
+                        v-model="groupColumn[axisType]"
+                      ></v-select
+                    ></v-col>
+                  </v-row>
+                </v-container>
               </v-card>
             </v-col>
 
             <v-col class="pa-0 ma-0">
               <v-card height="100%">
-                <PlotlyEdaGraph :graphWidth="1000" :graphHeight="600" :isEdit="false" /> </v-card
+                <PlotlyEdaGraph :graphWidth="700" :graphHeight="600" :isEdit="false" /> </v-card
             ></v-col>
           </v-row>
         </v-container>
@@ -215,14 +234,24 @@ export default {
       blurHandler: false,
       axisTypes: ["x", "y"],
       numTracePanel: [0],
-      dialog: false,
-      drawer: false,
+      dialog: true,
+      drawer: true,
       depthStatus: true,
       mini: false,
       axisList: {
         x: [{ id: "Data 1", value: "x" }],
         y: [{ id: "Data 1", value: "y" }]
-      }
+      },
+      groupColumn: {
+        x: "",
+        y: ""
+      },
+      loadedFeatures: [
+        {
+          x: null,
+          y: null
+        }
+      ]
     };
   },
   watch: {
@@ -235,7 +264,30 @@ export default {
   },
   methods: {
     ...mapMutations("edaMenuHandler", ["setMenuState"]),
+    loadGroupingData(axisType) {
+      // 현재는 단일 groupingfeature만 되는 상태
+      let path = "http://localhost:5000/loadGroupingData";
+      // axios
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.tableName,
+          groupingFeature: this.groupColumn[axisType],
+          otherFeatures: [this.selectedData["x"][0], this.selectedData["y"][0]]
+        }
+      })
+        .then(res => {
+          // this.groupingData = res.data;
 
+          eventBus.$emit("applyGroupBy", res.data);
+          //subplot 나누기 (this.groupDataLength)
+          // eventbus보내기 (로직은 for문 돌면서 하나씩 update)
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     removeAxis(axisType, tpIndex) {
       let payload = { axisType: axisType, tpIndex: tpIndex };
 
@@ -287,9 +339,14 @@ export default {
   },
   computed: {
     ...mapState({
+      tableName: state => state.initialData.tableName,
+
       columns: state => state.initialData.columns,
       menuState: state => state.edaMenuHandler.menuState
-    })
+    }),
+    groupDataLength() {
+      return this.groupingData.length;
+    }
   },
   components: {
     PlotlyEdaGraph

@@ -41,6 +41,7 @@ const mutations = {
   },
 
   loadSummarizedInfo(state, payload) {
+    state.summarizedInfo = null;
     state.summarizedInfo = payload;
   },
   changeColumnName_vuex(state, payload) {
@@ -81,7 +82,7 @@ const mutations = {
 
 const actions = {
   loadDatasetSize({ commit, state }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDatasetSize";
+    const path = "http://localhost:5000/loadDatasetSize";
     axios
       .get(path, {
         params: {
@@ -98,7 +99,7 @@ const actions = {
       });
   },
   loadColumns({ commit, state }) {
-    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
+    let path = "http://localhost:5000/loadColumns";
     axios
       .get(path, {
         params: {
@@ -115,7 +116,7 @@ const actions = {
       });
   },
   loadSummarizedData({ commit, state }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadSummarizedData";
+    const path = "http://localhost:5000/loadSummarizedData";
     axios
       .get(path, {
         params: {
@@ -135,7 +136,7 @@ const actions = {
       });
   },
   loadRandomData({ commit, state }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadRandomInfo";
+    const path = "http://localhost:5000/loadRandomInfo";
     axios
       .get(path, {
         params: {

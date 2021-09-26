@@ -4,6 +4,7 @@ import Vue from "vue";
 const getDefaultState = () => {
   return {
     duplicatedColumns: [],
+
     backedUpColumns: [],
     dialog: false
   };
@@ -11,17 +12,40 @@ const getDefaultState = () => {
 const state = getDefaultState();
 
 const getters = {
-  summaryChangeFlag(state, getters, rootState) {
+  summaryChangeNameFlag(state, getters, rootState) {
     let onlyDuplicatedColumnNames = [];
     state.duplicatedColumns.forEach(element => {
       onlyDuplicatedColumnNames.push(element.columnName);
     });
+
     let convertedString = JSON.stringify(onlyDuplicatedColumnNames);
     if (convertedString === JSON.stringify(rootState.initialData.columns)) {
       return false;
     } else {
       return true;
     }
+  },
+  summaryChangeTypeFlag(state, getters, rootState) {
+    let onlyDuplicaedColumnTypes = [];
+    state.duplicatedColumns.forEach(element => {
+      onlyDuplicaedColumnTypes.push(element.datatype);
+    });
+    let convertedString = JSON.stringify(onlyDuplicaedColumnTypes);
+    let datatypes = [];
+    Object.keys(rootState.initialData.summarizedInfo.datatype).forEach(element => {
+      datatypes.push(rootState.initialData.summarizedInfo.datatype[element]);
+    });
+    datatypes = JSON.stringify(datatypes);
+    if (convertedString === datatypes) {
+      return false;
+    } else {
+      return true;
+    }
+  },
+  summaryChangeFlag(state, getters) {
+    if (getters.summaryChangeNameFlag || getters.summaryChangeTypeFlag) {
+      return true;
+    } else return false;
   }
 };
 
@@ -52,8 +76,9 @@ const actions = {
     // 배열 초기화
     commit("resetSummaryTableVuex");
     // 다시 집어넣기
+    let datatypes = rootState.initialData.summarizedInfo.datatype;
     rootState.initialData.columns.forEach((element, index) => {
-      let columnInfo = { columnName: element, columnIndex: index };
+      let columnInfo = { columnName: element, columnIndex: index, datatype: datatypes[element] };
       commit("addDuplicatedColumn", columnInfo);
       commit("addBackedUpColumn", columnInfo);
     });

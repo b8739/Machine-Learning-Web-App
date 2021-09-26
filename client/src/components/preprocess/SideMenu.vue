@@ -12,25 +12,33 @@
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
       </v-list-item>
-
+      <v-list dense>
+        <v-list-group v-model="activeState">
+          <template v-slot:activator>
+            <v-list-item-title>Current Dataset</v-list-item-title>
+          </template>
+          <!-- <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
+            <v-list-item-title @click="clickTableNameEvent(tableName)">{{
+              tableName
+            }}</v-list-item-title>
+          </v-list-item> -->
+          <v-select
+            class="px-3"
+            outlined
+            clearable
+            hide-details
+            dense
+            :label="tableName"
+            :items="tableList"
+          ></v-select>
+        </v-list-group>
+      </v-list>
       <keep-alive>
         <component v-bind:is="dynamicSideMenu"></component>
       </keep-alive>
 
       <!-- 구분선 -->
       <!-- <v-divider class=""></v-divider> -->
-      <v-list dense>
-        <v-list-group v-model="activeState">
-          <template v-slot:activator>
-            <v-list-item-title>List of Datasets</v-list-item-title>
-          </template>
-          <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
-            <v-list-item-title @click="clickTableNameEvent(tableName)">{{
-              tableName
-            }}</v-list-item-title>
-          </v-list-item>
-        </v-list-group>
-      </v-list>
     </v-navigation-drawer>
   </v-container>
 </template>
@@ -54,7 +62,8 @@ export default {
       ],
 
       activeState: true,
-      currentComponent: "SummaryTable"
+      // currentComponent: "SummaryTable",
+      currentComponent: "DataTable"
     };
   },
   components: {
@@ -63,6 +72,8 @@ export default {
   },
   computed: {
     ...mapState({
+      tableName: state => state.initialData.tableName,
+
       tableList: state => state.initialData.tableList
     }),
     dataFeatures() {
@@ -87,6 +98,7 @@ export default {
     ...mapActions("initialData", ["loadColumns"]),
     ...mapActions("initialData", ["loadDatasetSize"]),
     ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
+    ...mapActions("apexchartGraph", ["loadFeatureGraphData"]),
 
     clickTableNameEvent(tableName) {
       this.resetState();
@@ -100,12 +112,14 @@ export default {
       eventBus.$emit("reloadDataTable", true);
 
       this.selectionTimer = setTimeout(() => {
+        this.loadFeatureGraphData();
+
         this.cloneOriginalArray();
       }, 1000);
     },
 
     showTables() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
+      let path = "http://localhost:5000/showTables";
       axios
         .get(path)
         .then(res => {

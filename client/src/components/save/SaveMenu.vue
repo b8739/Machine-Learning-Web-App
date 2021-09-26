@@ -40,13 +40,15 @@ export default {
     ...mapState({
       columns: state => state.initialData.columns,
       duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns,
-      tableName: state => state.initialData.tableName
+      tableName: state => state.initialData.tableName,
+      summarizedInfo: state => state.initialData.summarizedInfo
     }),
-    ...mapGetters("summaryTableHandler", ["summaryChangeFlag"]),
+    ...mapGetters("summaryTableHandler", ["summaryChangeNameFlag"]),
     ...mapGetters("dataTableHandler", ["tableChangeFlag"])
   },
   methods: {
     ...mapActions("summaryTableHandler", ["calculateTransaction"]),
+    ...mapActions("summaryTableHandler", ["summaryChangeTypeFlag"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
     ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
@@ -62,45 +64,71 @@ export default {
     },
 
     saveTableAxios(saveOption) {
-      if (this.summaryChangeFlag) {
-        //summary 변경 있을 때
-        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnInfo";
-        // axios
-        this.$axios({
-          method: "post",
-          url: path,
-          data: {
-            duplicatedColumns: this.duplicatedColumns,
-            columns: this.columns,
-            tableName: this.tableName
+      // if (this.summaryChangeNameFlag) {
+      //   //summary 변경 있을 때
+      //   let path = "http://localhost:5000/changeColumnName";
+      //   // axios
+      //   this.$axios({
+      //     method: "post",
+      //     url: path,
+      //     data: {
+      //       duplicatedColumns: this.duplicatedColumns,
+      //       columns: this.columns,
+      //       tableName: this.tableName
+      //     }
+      //   })
+      //     .then(res => {
+      //       this.loadColumns();
+      //       this.loadSummarizedData();
+      //       this.selectionTimer = setTimeout(() => {
+      //         this.cloneOriginalArray();
+      //       }, 1000);
+      //     })
+      //     .catch(error => {
+      //       console.error(error);
+      //     });
+      // }
+      // if (this.summaryChangeTypeFlag) {
+      //   //summary 변경 있을 때
+      //   let path = "http://localhost:5000/changeColumnType";
+      //   // axios
+      //   this.$axios({
+      //     method: "post",
+      //     url: path,
+      //     data: {
+      //       duplicatedColumns: this.duplicatedColumns,
+      //       originalDataType: this.summarizedInfo.datatype,
+      //       tableName: this.tableName
+      //     }
+      //   })
+      //     .then(res => {
+      //       this.loadColumns();
+
+      //       this.loadSummarizedData();
+      //       this.selectionTimer = setTimeout(() => {
+      //         this.cloneOriginalArray();
+      //       }, 1000);
+      //     })
+      //     .catch(error => {
+      //       console.error(error);
+      //     });
+      // }
+
+      // if (this.tableChangeFlag) {
+      const path = "http://localhost:5000/overwriteTable";
+      axios
+        .get(path, {
+          params: {
+            saveOption: saveOption
           }
         })
-          .then(res => {
-            this.loadColumns();
-
-            this.loadSummarizedData();
-            this.selectionTimer = setTimeout(() => {
-              this.cloneOriginalArray();
-            }, 1000);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      } else if (this.tableChangeFlag) {
-        const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
-        axios
-          .get(path, {
-            params: {
-              saveOption: saveOption
-            }
-          })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      }
+        .then(res => {
+          console.log(res);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      // }
     }
   },
   created() {

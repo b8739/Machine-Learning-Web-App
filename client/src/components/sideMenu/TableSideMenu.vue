@@ -11,12 +11,11 @@
           </v-list-item-icon>
           <v-list-item-title draggable label>Insert Row</v-list-item-title>
         </v-list-item>
-        <v-list-item link disabled>
+        <!-- <v-list-item link disabled>
           <v-list-item-icon>
-            <!-- <v-icon>mdi-plus</v-icon> -->
           </v-list-item-icon>
           <v-list-item-title draggable label>Conditional Insert</v-list-item-title>
-        </v-list-item>
+        </v-list-item> -->
       </v-list-group>
     </v-list>
     <v-list dense>
@@ -24,18 +23,18 @@
         <template v-slot:activator>
           <v-list-item-title active>Update</v-list-item-title>
         </template>
-        <v-list-item link disabled>
+        <v-list-item link @click="activateUpdateRow()">
           <v-list-item-icon>
             <v-icon></v-icon>
           </v-list-item-icon>
-          <v-list-item-title draggable label>Update a Row</v-list-item-title>
+          <v-list-item-title draggable label>Update Row</v-list-item-title>
         </v-list-item>
-        <v-list-item link disabled>
+        <!-- <v-list-item link disabled>
           <v-list-item-icon>
             <v-icon></v-icon>
           </v-list-item-icon>
           <v-list-item-title draggable label>Conditional Update</v-list-item-title>
-        </v-list-item>
+        </v-list-item> -->
       </v-list-group>
     </v-list>
     <v-list dense>
@@ -49,7 +48,7 @@
           </v-list-item-icon>
           <v-list-item-title draggable label>Delete Row</v-list-item-title>
         </v-list-item>
-        <v-list-item link disabled>
+        <!-- <v-list-item link disabled>
           <v-list-item-icon>
             <v-icon></v-icon>
           </v-list-item-icon>
@@ -60,19 +59,19 @@
             <v-icon></v-icon>
           </v-list-item-icon>
           <v-list-item-title draggable label>Conditional Delete</v-list-item-title>
-        </v-list-item>
+        </v-list-item> -->
       </v-list-group>
     </v-list>
     <v-list dense>
       <v-list-group v-model="deleteState">
         <template v-slot:activator>
-          <v-list-item-title active>Fill NA</v-list-item-title>
+          <v-list-item-title active>Search NA</v-list-item-title>
         </template>
         <v-list-item link disabled>
           <v-list-item-icon>
             <v-icon></v-icon>
           </v-list-item-icon>
-          <v-list-item-title draggable label>Fill NA</v-list-item-title>
+          <v-list-item-title draggable label>Search NA</v-list-item-title>
         </v-list-item>
       </v-list-group>
     </v-list>
@@ -112,18 +111,28 @@ export default {
     ...mapMutations("preprocessHandler", ["setAdditionalCancelEvent"]),
     ...mapActions("dataTableHandler", ["deleteRow"]),
     ...mapActions("dataTableHandler", ["insertRow"]),
+    ...mapActions("dataTableHandler", ["updateRow"]),
     ...mapMutations("dataTableHandler", ["setDialog"]),
 
     // activation
     activateDeleteRow() {
       this.setPreprocessStatus("tableDeleteRow");
-      this.setEditMode(true);
+      this.setEditMode("delete");
       this.setEvent(this.deleteRow);
     },
     activateInsertRow() {
-      this.setPreprocessStatus("tableInsertRow");
+      this.setPreprocessStatus("tableInsertUpdateRow");
       this.setDialog(true);
       this.setEvent(this.insertRow);
+      this.setAdditionalCancelEvent(() => {
+        this.setDialog(false);
+      });
+    },
+    activateUpdateRow() {
+      this.setPreprocessStatus("tableInsertUpdateRow");
+      this.setEditMode("update");
+      this.setEvent(this.updateRow);
+
       this.setAdditionalCancelEvent(() => {
         this.setDialog(false);
       });

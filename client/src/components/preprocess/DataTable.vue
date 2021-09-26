@@ -1,8 +1,11 @@
 <template>
   <v-container fluid id="wrapper mt-4">
     <v-card elevation="0" height="100vh">
+      {{ columnFieldChangeFlag }}
+      {{ columnField }}
       <v-row class="mx-0" align="center">
         <v-subheader>
+          <v-icon>mdi-magnify</v-icon>
           Search Filter:
         </v-subheader>
 
@@ -38,7 +41,7 @@
           ></v-text-field
         ></v-col>
         <v-spacer></v-spacer>
-        <portal-target v-if="editMode" name="tableDeleteRow"> </portal-target>
+        <portal-target v-if="editMode == 'delete'" name="tableDeleteRow"> </portal-target>
 
         <!-- <v-btn color="error" v-show="editMode" @click="confirmEvent()">Cancel</v-btn> -->
       </v-row>
@@ -81,7 +84,7 @@
           <template v-slot:header.data-table-select="{ on, props }">
             <v-simple-checkbox
               :ripple="false"
-              v-show="editMode"
+              v-show="editMode == 'delete'"
               @input="checkAll()"
               v-bind="props"
               v-on="on"
@@ -93,12 +96,20 @@
               <tr v-for="(item, itemIndex) in items" :key="itemIndex">
                 <td>
                   <v-checkbox
-                    v-show="editMode"
+                    v-show="editMode == 'delete'"
                     dense
                     v-model="checkedRowsInstance"
                     :value="itemIndex"
                     hide-details
                   />
+                  <v-icon
+                    v-show="editMode == 'update'"
+                    @click="updateSetting(itemIndex)"
+                    small
+                    class="mr-2"
+                  >
+                    mdi-pencil
+                  </v-icon>
                 </td>
                 <td style="min-width:70px">
                   <!-- ID index -->
@@ -152,7 +163,7 @@
               </v-col>
             </v-row>
             <v-row justify="end">
-              <portal-target name="tableInsertRow"> </portal-target>
+              <portal-target name="tableInsertUpdateRow"> </portal-target>
             </v-row>
           </v-container>
         </v-card>
@@ -176,10 +187,7 @@ export default {
   },
   data() {
     return {
-      // dialog: false,
-      // insertedItems: [],
-      // numOfInsertion: 0,
-      // columnField: {},
+      updateDialog: false,
       activatedEvent: null,
       filterLessThan: "",
       filterGreaterThan: "",
@@ -250,9 +258,8 @@ export default {
       limit: state => state.dataTableHandler.limit,
       dialog: state => state.dataTableHandler.dialog
     }),
-    fakeDatasetSize() {
-      return this.datasetSize + this.numOfInsertion - this.numOfDeletion;
-    },
+    ...mapGetters("dataTableHandler", ["columnFieldChangeFlag"]),
+    ...mapGetters("dataTableHandler", ["fakeDatasetSize"]),
 
     dataTableWidth() {
       return this.$refs.dataTable.$el.querySelector(".v-data-table__wrapper").offsetWidth;
@@ -306,14 +313,26 @@ export default {
     ...mapMutations("dataTableHandler", ["setCheckedRows"]),
     ...mapMutations("dataTableHandler", ["addDatasetItems"]),
     ...mapMutations("dataTableHandler", ["setColumnField"]),
+    ...mapMutations("dataTableHandler", ["setColumnFieldByKey"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
     ...mapMutations("dataTableHandler", ["resetDataTableVuex"]),
     ...mapMutations("preprocessHandler", ["resetPreprocessVuex"]),
     ...mapMutations("dataTableHandler", ["addLimit"]),
     ...mapMutations("dataTableHandler", ["setDialog"]),
+    ...mapMutations("dataTableHandler", ["setOriginalColumnField"]),
+    ...mapMutations("dataTableHandler", ["setEditingRowIndex"]),
+    updateSetting(index) {
+      Object.keys(this.datasetItems[index]).forEach(element => {
+        let payload = { columnName: element, value: this.datasetItems[index][element] };
+        this.setColumnFieldByKey(payload);
+      });
+      this.setEditingRowIndex(index);
+      this.setOriginalColumnField(this.datasetItems[index]);
+      this.setDialog(!this.dialog);
+    },
     leaveDialog() {
       this.cancelEvent();
-      this.resetDataTableVuex();
+      this.setColumnField({});
       this.setDialog(false);
     },
     scrollTable(direction) {
@@ -380,7 +399,7 @@ export default {
       this.showTableOption = false;
     },
     deleteColumn() {
-      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteColumn";
+      let api = "http://localhost:5000/deleteColumn";
       console.log(this.columnToDeleteInfo.name);
       axios
         .get(api, {
@@ -420,7 +439,7 @@ export default {
     },
     // infinteLoading
     // infiniteLoadingCreated() {
-    //   let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
+    //   let api = "http://localhost:5000/infiniteLoading";
     //   axios
     //     .get(api, {
     //       params: {
@@ -435,7 +454,7 @@ export default {
     // },
     infiniteHandler($state) {
       // new
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
+      let path = "http://localhost:5000/infiniteLoading";
       // axios
       this.$axios({
         method: "post",

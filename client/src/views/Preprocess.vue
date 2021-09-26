@@ -1,13 +1,13 @@
 <template>
   <div id="wrap">
     <Header> </Header>
-    <!-- <v-btn @click=apiCheck></v-btn> -->
-    <!-- <div>preprocessStatus:{{ preprocessStatus }}</div>
+    <!-- <v-btn @click="apiCheck"></v-btn> -->
+    <div>preprocessStatus:{{ preprocessStatus }}</div>
     <div>editStatus:{{ editStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
 
     <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
-    <div>router:{{ $router.name }}</div> -->
+    <div>router:{{ $router.name }}</div>
 
     <v-main>
       <v-container id="mainWrapper" fluid>
@@ -88,8 +88,8 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      comp: "SummaryTable"
       // comp: "SummaryTable"
+      comp: "DataTable"
 
       // activatedEvent:null
     };
@@ -140,7 +140,7 @@ export default {
     },
 
     apiCheck() {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/test1";
+      const path = "http://localhost:5000/test1";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -169,7 +169,7 @@ export default {
     },
 
     duplicateTable() {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/duplicateTable";
+      const path = "http://localhost:5000/duplicateTable";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -199,7 +199,7 @@ export default {
     },
     updateData(payload) {
       console.log(payload);
-      const path = `http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/updateData`;
+      const path = `http://localhost:5000/updateData`;
       axios
         .put(path, payload)
         .then(() => {
@@ -224,7 +224,7 @@ export default {
       eventBus.$emit("openSaveChange", true);
     },
     rollback() {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/rollback";
+      const path = "http://localhost:5000/rollback";
       axios.get(path).catch(error => {
         console.error(error);
       });
@@ -258,7 +258,7 @@ export default {
     this.resetEda();
     this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/startPreprocess";
+    const path = "http://localhost:5000/startPreprocess";
     axios.get(path).catch(error => {
       console.error(error);
     });
@@ -285,7 +285,7 @@ export default {
   }
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-  //     const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
+  //     const path = "http://localhost:5000/overwriteTable";
   //     axios.get(path).catch(error => {
   //       console.error(error);
   //     });

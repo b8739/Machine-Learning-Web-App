@@ -622,7 +622,7 @@ export default {
       });
       console.log(rangeInfo);
       // axios
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/runSimulation";
+      let path = "http://localhost:5000/runSimulation";
 
       this.$axios({
         method: "post",

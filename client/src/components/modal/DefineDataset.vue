@@ -67,7 +67,7 @@ export default {
     },
     async dataUpload() {
       axios
-        .post("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dataupload", this.formData, {
+        .post("http://localhost:5000/dataupload", this.formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           },
@@ -89,7 +89,7 @@ export default {
         });
     },
     saveNewFile(tableName) {
-      let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/duplicateTable";
+      let api = "http://localhost:5000/duplicateTable";
       axios
         .get(api, {
           params: {
