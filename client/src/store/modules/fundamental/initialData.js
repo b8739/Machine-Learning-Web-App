@@ -81,6 +81,11 @@ const mutations = {
 };
 
 const actions = {
+  resetAllState({ commit, state, rootState }) {
+    commit("resetState");
+    commit("modelingData/resetModelingData", null, { root: true });
+    commit("preprocessHandler/setPreprocessStatus", null, { root: true });
+  },
   loadDatasetSize({ commit, state }) {
     const path = "http://localhost:5000/loadDatasetSize";
     axios

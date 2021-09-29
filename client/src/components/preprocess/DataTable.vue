@@ -1,8 +1,8 @@
 <template>
   <v-container fluid id="wrapper mt-4">
     <v-card elevation="0" height="100vh">
-      {{ columnFieldChangeFlag }}
-      {{ columnField }}
+      <!-- {{ columnFieldChangeFlag }}
+      {{ columnField }} -->
       <v-row class="mx-0" align="center">
         <v-subheader>
           <v-icon>mdi-magnify</v-icon>

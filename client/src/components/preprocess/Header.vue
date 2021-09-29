@@ -22,12 +22,12 @@
         >Modeling</router-link
       >
       <!-- Simulation -->
-      <router-link
+      <!-- <router-link
         id="routerLink"
         :class="{ underline: navStatus == 'simulation' }"
         to="/Simulations"
         >Simulation</router-link
-      >
+      > -->
     </nav>
     <v-spacer></v-spacer>
   </div>

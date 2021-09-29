@@ -32,9 +32,9 @@
         <v-tabs-items v-model="tab">
           <!-- 1. Input/target -->
           <v-tab-item>
-            <v-card-subtitle class="red--text"
+            <!-- <v-card-subtitle class="red--text"
               >현재는 관찰변수로 CRIM만 지정 가능합니다.</v-card-subtitle
-            >
+            > -->
             <v-container>
               <v-row>
                 <!-- <v-card-text>Select the input(s) and target features you want to use.</v-card-text> -->
@@ -88,7 +88,7 @@
                           </thead>
                           <tbody>
                             <tr
-                              v-for="(column, columnIndex) in columns"
+                              v-for="(column, columnIndex) in inputs"
                               v-show="previousPage - 1 < columnIndex && columnIndex < currentPage"
                               :key="columnIndex"
                             >
@@ -408,6 +408,8 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      inputs: null,
+      targets: null,
       stepOneFlag: null,
       fixedValueDefault: null,
       // drawer
@@ -629,7 +631,8 @@ export default {
         url: path,
         data: {
           observedVariable: this.observedVariable,
-          rangeInfo: rangeInfo
+          rangeInfo: rangeInfo,
+          target: this.targets[0]
         }
       })
         .then(res => {
@@ -644,7 +647,26 @@ export default {
       // customzied
       this.$router.push({ name: "simulationResult" });
     },
+    getCaseFeatures(caseID) {
+      // axios
+      let path = "http://localhost:5000/getCaseFeatures";
 
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          caseID: caseID
+        }
+      })
+        .then(res => {
+          // console.log(res.data);
+          this.inputs = res.data.inputs;
+          this.targets = res.data.targets;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     getItems(index) {
       if (index == 0) {
         return this.tableList;
@@ -668,8 +690,9 @@ export default {
     TargetColumnList
   },
   created() {
-    eventBus.$on("openSimulation", dialogStatus => {
-      this.dialog = dialogStatus;
+    eventBus.$on("openSimulation", caseID => {
+      this.getCaseFeatures(caseID);
+      this.dialog = true;
     });
     // radio button default 를 0으로
     this.columns.forEach(element => {

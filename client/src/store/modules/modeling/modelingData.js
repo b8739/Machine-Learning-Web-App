@@ -1,17 +1,20 @@
 import axios from "axios";
 import router from "@/router";
 
-const state = {
-  // request
-  modelingRequest: null,
-  modelingDataset: null,
-  splitRatio: null,
-  // response from API
-  graphSources: null,
-  modelingSummary: null,
-  caseList: [],
-  caseDataset: null
+const getDefaultState = () => {
+  return {
+    // request
+    modelingRequest: null,
+    modelingDataset: null,
+    splitRatio: null,
+    // response from API
+    graphSources: null,
+    modelingSummary: null,
+    caseList: [],
+    caseDataset: null
+  };
 };
+const state = getDefaultState();
 
 const mutations = {
   // request
@@ -36,6 +39,9 @@ const mutations = {
   },
   saveCaseDataset(state, payload) {
     state.caseDataset = payload;
+  },
+  resetModelingData(state) {
+    Object.assign(state, getDefaultState());
   }
 };
 

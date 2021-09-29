@@ -62,8 +62,8 @@ export default {
       ],
 
       activeState: true,
-      // currentComponent: "SummaryTable",
-      currentComponent: "DataTable"
+      currentComponent: "SummaryTable"
+      // currentComponent: "DataTable"
     };
   },
   components: {

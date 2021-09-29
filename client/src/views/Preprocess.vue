@@ -2,12 +2,12 @@
   <div id="wrap">
     <Header> </Header>
     <!-- <v-btn @click="apiCheck"></v-btn> -->
-    <div>preprocessStatus:{{ preprocessStatus }}</div>
+    <!-- <div>preprocessStatus:{{ preprocessStatus }}</div>
     <div>editStatus:{{ editStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
 
     <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
-    <div>router:{{ $router.name }}</div>
+    <div>router:{{ $router.name }}</div> -->
 
     <v-main>
       <v-container id="mainWrapper" fluid>
@@ -88,8 +88,8 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      // comp: "SummaryTable"
-      comp: "DataTable"
+      comp: "SummaryTable"
+      // comp: "DataTable"
 
       // activatedEvent:null
     };

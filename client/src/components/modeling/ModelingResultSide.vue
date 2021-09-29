@@ -13,15 +13,17 @@
             class="cursor-pointer"
             light
             outlined
-            height="100"
             width="100%"
             @click="newWindow(case_[case_name])"
           >
             <v-card-text class="font-weight-bold subheading pt-2 pb-0">
-              {{ case_["case_name"] }}</v-card-text
+              {{ case_["name"] }}</v-card-text
+            >
+            <v-card-text class="font-weight-light caption pt-2 pb-0">
+              Algorithm: {{ case_["algorithm"] }}</v-card-text
             >
             <v-card-text class="font-weight-light caption pt-2 pb-1">
-              {{ case_["algorithm"] }}</v-card-text
+              Dataset: {{ case_["used_dataset"] }}</v-card-text
             >
             <v-card-text class="font-weight-thin caption pt-1"> Created __ days ago</v-card-text>
           </v-sheet>

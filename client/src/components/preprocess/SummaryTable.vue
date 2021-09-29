@@ -186,6 +186,20 @@ export default {
     ...mapActions("apexchartGraph", ["loadFeatureGraphData"]),
     changeColumnType(index, event) {
       Vue.set(this.duplicatedColumns[index], "datatype", event);
+
+      //       let path = "http://localhost:5000/changeColumnType";
+      // this.$axios({
+      //   method: "post",
+      //   url: path,
+      //   data: {
+      //     case_name: this.case_name,
+      //     duplicatedColumns: this.duplicatedColumns,
+      //     tableName: this.tableName,
+
+      //   }
+      // }).then(function(res) {
+      //   vm.loadCases();
+      // });
     },
     openEditModal(column) {
       eventBus.$emit("openEditModal", column);

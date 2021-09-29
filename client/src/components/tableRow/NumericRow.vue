@@ -69,7 +69,7 @@
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
       <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
-      <!-- <PlotlyLine :seriesName="column" :graphWidth="270" :graphHeight="200" :isEdit="false" /> -->
+      <PlotlyLine :seriesName="column" :graphWidth="270" :graphHeight="200" :isEdit="false" />
     </td>
   </tr>
 </template>

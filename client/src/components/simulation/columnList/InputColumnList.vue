@@ -52,8 +52,13 @@ export default {
     ...mapMutations("simulationData", ["saveObservedVariable"]),
 
     selectAll() {
-      for (let i = 0; i < this.columns.length; i++) {
-        this.inputs.push(this.columns[i]);
+      //체크 되어 있으면 초기화
+      if (this.inputs.length == this.columns.length) {
+        this.inputs = [];
+      } else {
+        for (let i = 0; i < this.columns.length; i++) {
+          this.inputs.push(this.columns[i]);
+        }
       }
     },
     dynamicProps(columnIndex) {

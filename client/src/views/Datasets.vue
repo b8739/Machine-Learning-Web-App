@@ -20,6 +20,7 @@
       </v-row>
       <v-row>
         <v-sheet
+          @click="enterDataset(tableName)"
           light
           outlined
           width="350px"
@@ -37,11 +38,11 @@
               <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
               <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text></v-row
             >
-            <v-row justify="end">
-              <v-btn small dark color="secondary" @click="enterDataset(tableName)"
+            <!-- <v-row justify="end">
+              <v-btn small outlined color="secondary" @click="enterDataset(tableName)"
                 ><v-icon> mdi-subdirectory-arrow-right</v-icon>
               </v-btn>
-            </v-row>
+            </v-row> -->
           </v-container>
         </v-sheet>
       </v-row>
@@ -67,6 +68,7 @@ export default {
     */
   data() {
     return {
+      // enterBlocked:false,
       editMode: false,
       files: [],
       datasets: [1, 2]
@@ -91,9 +93,11 @@ export default {
     ...mapMutations("initialData", ["setTableName"]),
 
     enterDataset(tableName) {
-      this.resetState();
-      this.setTableName(tableName);
-      this.loadSummarizedData();
+      if (!this.editMode) {
+        this.resetState();
+        this.setTableName(tableName);
+        this.loadSummarizedData();
+      }
     },
     showTables() {
       let path = "http://localhost:5000/showTables";

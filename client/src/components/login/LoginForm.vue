@@ -47,10 +47,13 @@ export default {
     source: String
   },
   methods: {
-    ...mapMutations("initialData", ["resetState"])
+    // ...mapMutations("initialData", ["resetState"])
+    ...mapActions("initialData", ["resetAllState"])
   },
   created() {
-    this.resetState();
+    console.log("hi");
+    // this.resetState();
+    this.resetAllState();
   }
 };
 </script>

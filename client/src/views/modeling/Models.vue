@@ -23,11 +23,13 @@
           class="mr-5 mt-5 cursor-pointer"
         >
           <!-- @click="routeModelingResult(case_[case_name])" v-sheet-->
-          <v-card-text class="font-weight-bold body-1">{{ case_["case_name"] }}</v-card-text>
+          <v-card-text class="font-weight-bold body-1">{{ case_["name"] }}</v-card-text>
           <v-card-text class="font-weight-light caption pt-0">
             {{ case_["algorithm"] }}</v-card-text
           >
-          <v-card-text class="font-weight-thin caption pt-0"> {{ case_["dataset"] }}</v-card-text>
+          <v-card-text class="font-weight-thin caption pt-0">
+            {{ case_["used_dataset"] }}</v-card-text
+          >
           <v-chip-group column>
             <v-chip
               class="ma-2"
@@ -41,7 +43,7 @@
               </v-icon>
               Modeling
             </v-chip>
-            <v-chip class="ma-2" color="primary" outlined small to="/simulations">
+            <v-chip class="ma-2" color="orange" outlined small @click="newSimulation(case_['id'])">
               <v-icon left x-small>
                 mdi-chart-bell-curve-cumulative
               </v-icon>
@@ -52,6 +54,7 @@
       </v-row>
     </v-container>
     <ModelingModal />
+    <SimulationModal />
   </div>
 </template>
 
@@ -63,6 +66,8 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 
 import ModelingModal from "@/components/modeling/ModelingModal.vue";
+import SimulationModal from "@/components/simulation/SimulationModal.vue";
+
 export default {
   /*
       Defines the data used by the component
@@ -74,7 +79,7 @@ export default {
     };
   },
 
-  components: { ModelingModal },
+  components: { ModelingModal, SimulationModal },
 
   computed: {
     ...mapState({
@@ -93,7 +98,10 @@ export default {
     ...mapMutations("modelingData", ["saveModelingSummary"]),
     // nav 정보
     ...mapMutations("initialData", ["setNavStatus"]),
-
+    newSimulation(caseID) {
+      console.log(caseID);
+      eventBus.$emit("openSimulation", caseID);
+    },
     routeModelingResult(case_name) {
       //   console.log(case_name);
       this.$router.push({ name: "modelingResult", params: { case: case_name } });
@@ -114,7 +122,7 @@ export default {
   },
   //실험
   created() {
-    // this.loadCases();
+    this.loadCases();
     this.setNavStatus("models");
   },
   mounted() {

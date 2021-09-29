@@ -34,7 +34,7 @@
                     ></v-row
                   >
                   <v-row>
-                    <v-expansion-panels multiple>
+                    <v-expansion-panels multiple v-model="openedPanel">
                       <v-col>
                         <v-expansion-panel
                           v-for="(tracePanel, tpIndex) in numTracePanel"
@@ -59,14 +59,18 @@
                           </v-expansion-panel-header>
                           <v-expansion-panel-content>
                             <v-container fluid>
-                              <v-row>
-                                <v-switch
-                                  @change="value => changeOverlay(value, tpIndex)"
-                                  v-if="tpIndex != 0"
-                                  v-model="overlayModel[tpIndex]"
-                                  label="Overlay"
-                                ></v-switch>
-                              </v-row>
+                              <v-row v-if="tpIndex != 0">
+                                <v-col class="pa-0 ma-0" cols="4">
+                                  <v-subheader>Overlay</v-subheader></v-col
+                                >
+                                <v-col class="pa-0 ma-0" cols="8">
+                                  <v-select
+                                    dense
+                                    @change="value => changeOverlay(value, tpIndex)"
+                                    v-model="overlayModel[tpIndex]"
+                                    :items="overlayTargets"
+                                  ></v-select></v-col
+                              ></v-row>
                               <v-row>
                                 <v-col class="pa-0 ma-0" cols="3">
                                   <v-subheader>Type</v-subheader></v-col
@@ -114,7 +118,9 @@
                                           )
                                       "
                                       dense
-                                    ></v-select
+                                      v-model="axisToUse[axisType][tpIndex]"
+                                    >
+                                    </v-select
                                   ></v-col>
                                   <v-col class="pa-0 ma-0" cols="1">
                                     <v-btn
@@ -225,7 +231,9 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      openedPanel: [null],
       selectedData: { x: [], y: [] },
+      axisToUse: { x: [0], y: [0] },
       overlayModel: [0],
       grid: {
         rows: 1,
@@ -233,8 +241,8 @@ export default {
       },
       blurHandler: false,
       axisTypes: ["x", "y"],
-      numTracePanel: [0],
-      dialog: true,
+      numTracePanel: [null],
+      dialog: false,
       drawer: true,
       depthStatus: true,
       mini: false,
@@ -264,6 +272,7 @@ export default {
   },
   methods: {
     ...mapMutations("edaMenuHandler", ["setMenuState"]),
+    ...mapMutations("edaMenuHandler", ["resetEda"]),
     loadGroupingData(axisType) {
       // 현재는 단일 groupingfeature만 되는 상태
       let path = "http://localhost:5000/loadGroupingData";
@@ -279,8 +288,8 @@ export default {
       })
         .then(res => {
           // this.groupingData = res.data;
-
-          eventBus.$emit("applyGroupBy", res.data);
+          let payload = { groupby: axisType, data: res.data };
+          eventBus.$emit("applyGroupBy", payload);
           //subplot 나누기 (this.groupDataLength)
           // eventbus보내기 (로직은 for문 돌면서 하나씩 update)
         })
@@ -315,8 +324,14 @@ export default {
       eventBus.$emit("deleteTrace", tpIndex);
     },
     addEmptyTrace() {
-      this.numTracePanel.push(0);
-      this.overlayModel.push(true);
+      this.openedPanel = [];
+      this.openedPanel.push(this.numTracePanel.length);
+      this.numTracePanel.push(true);
+      this.addAxis();
+      // this.axisToUse["x"].push("Data 1");
+      // this.axisToUse["y"].push("Data 1");
+      this.overlayModel.push("Data 1");
+
       eventBus.$emit("addEmptyTrace", true);
     },
     loadAxis(featureName, axisType, tpIndex) {
@@ -344,6 +359,14 @@ export default {
       columns: state => state.initialData.columns,
       menuState: state => state.edaMenuHandler.menuState
     }),
+    overlayTargets() {
+      let array = ["None"];
+
+      for (let i = 1; i < this.numTracePanel.length; i++) {
+        array.push("Data " + i);
+      }
+      return array;
+    },
     groupDataLength() {
       return this.groupingData.length;
     }
@@ -352,6 +375,7 @@ export default {
     PlotlyEdaGraph
   },
   created() {
+    this.resetEda();
     eventBus.$on("openDialog", dialogStatus => {
       this.dialog = dialogStatus;
       this.drawer = true;

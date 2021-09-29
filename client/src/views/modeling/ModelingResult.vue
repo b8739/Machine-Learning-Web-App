@@ -12,7 +12,7 @@
           <v-toolbar elevation="1" dense>
             <v-spacer></v-spacer>
 
-            <v-btn disabled @click="dialog = true" small color="info">
+            <v-btn @click="dialog = true" small color="info">
               Save Model<v-icon right>mdi-content-save</v-icon>
             </v-btn>
 
@@ -53,7 +53,7 @@
               <v-btn @click="dialog = !dialog" color="gray darken-1" text>
                 Close
               </v-btn>
-              <v-btn @click="saveModel" color="blue darken-1" @click.once="eventHandler" text>
+              <v-btn @click="saveModel" color="blue darken-1" text>
                 Confirm
               </v-btn>
             </v-card-actions>
@@ -234,8 +234,11 @@ export default {
   components: { ApexChart, ModelingSummary, SaveChange, ModelingResultSide },
   computed: {
     ...mapState({
+      modelingRequest: state => state.modelingData.modelingRequest,
       graphSources: state => state.modelingData.graphSources,
-      modelingSummary: state => state.modelingData.modelingSummary
+      modelingSummary: state => state.modelingData.modelingSummary,
+
+      tableName: state => state.initialData.tableName
     }),
 
     graphNames() {
@@ -267,7 +270,7 @@ export default {
     },
     loadCases() {
       let path = "http://localhost:5000/loadCases";
-      axios
+      this.$axios
         .get(path)
         .then(res => {
           this.saveCaseList(res.data);
@@ -277,15 +280,18 @@ export default {
     saveModel() {
       let vm = this;
       let path = "http://localhost:5000/saveModel";
-      axios({
+      this.$axios({
         method: "post",
         url: path,
         data: {
           case_name: this.case_name,
-          modelingOption: this.modelingOption,
-          algorithm: this.algorithm,
+          tableName: this.tableName,
+          inputs: this.modelingRequest.inputs,
+          targets: this.modelingRequest.targets,
+          parameters: this.modelingRequest.algorithm.parameters,
+          algorithm: this.modelingRequest.algorithm.name,
           graphSources: JSON.stringify(this.graphSources),
-          modelingSummary: JSON.stringify(this.modelingSummary)
+          modelingSummary: this.modelingSummary
         }
       }).then(function(res) {
         vm.loadCases();

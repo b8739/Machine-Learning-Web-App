@@ -1,4 +1,5 @@
 <template>
+  <!-- <div style="width:700px">layout:{{ layout }}</div> -->
   <div ref="edaGraph"></div>
 </template>
 <script>
@@ -196,15 +197,20 @@ export default {
       this.data[tpIndex]["y"] = [this.data[tpIndex]["y"]];
 
       let axisNum = axis + (parseInt(tpIndex) + 1);
-      this.layout[axisNum] = {};
+      this.layout[axisNum] = this.getFontFormat(featureName, axisType, tpIndex);
+      // changeoverlay
       this.layout[axisNum]["overlaying"] = axisType;
-      this.layout[axisNum]["automargin"] = true;
-      this.layout[axisNum]["title"] = {};
-      this.layout[axisNum]["title"]["text"] = featureName;
-      this.layout[axisNum]["title"]["font"] = {
-        size: 14,
-        color: "#7f7f7f"
-      };
+      // this.changeOverlay("Data 1", tpIndex);
+
+      // this.layout[axisNum] = {};
+      // this.layout[axisNum]["overlaying"] = axisType;
+      // this.layout[axisNum]["automargin"] = true;
+      // this.layout[axisNum]["title"] = {};
+      // this.layout[axisNum]["title"]["text"] = featureName;
+      // this.layout[axisNum]["title"]["font"] = {
+      //   size: 14,
+      //   color: "#7f7f7f"
+      // };
 
       Plotly.update(this.plotContainer, this.data[tpIndex], this.layout, tpIndex);
     },
@@ -218,16 +224,25 @@ export default {
       Plotly.relayout(this.plotContainer, this.layout);
     },
     changeOverlay(value, tpIndex) {
+      console.log(value);
       let xaxis = "xaxis" + (parseInt(tpIndex) + 1);
       let yaxis = "yaxis" + (parseInt(tpIndex) + 1);
-      this.layout[xaxis] = {};
-      this.layout[yaxis] = {};
-      if (value) {
+      // undefined일 때만 initialize (안그러면 getfontformat에서 세팅한 layout를 초기화해버리게됨)
+      if (this.layout[xaxis] == undefined && this.layout[yaxis] == undefined) {
+        this.layout[xaxis] = {};
+        this.layout[yaxis] = {};
+      }
+
+      if (value == "Data 1") {
         this.layout[xaxis]["overlaying"] = "x";
         this.layout[yaxis]["overlaying"] = "y";
-      } else {
+      } else if (value == "None") {
         Vue.delete(this.layout[xaxis], "overlaying");
         Vue.delete(this.layout[yaxis], "overlaying");
+      } else {
+        let axisIndex = value.substring(5);
+        this.layout[xaxis]["overlaying"] = "x" + axisIndex;
+        this.layout[yaxis]["overlaying"] = "y" + axisIndex;
       }
       Plotly.relayout(this.plotContainer, this.layout);
     },
@@ -262,11 +277,15 @@ export default {
     eventBus.$on("deleteTrace", tpIndex => {
       this.deleteTrace(tpIndex);
     });
-    eventBus.$on("applyGroupBy", groupingData => {
-      let groupLength = Object.keys(groupingData).length;
-      this.changeGridInfo(1, groupLength);
-      this.renderGroupingGraph(groupingData);
-      console.log(groupingData);
+    eventBus.$on("applyGroupBy", payload => {
+      let groupLength = Object.keys(payload.data).length;
+      if (payload.groupby == "x") {
+        this.changeGridInfo(1, groupLength);
+      } else {
+        this.changeGridInfo(groupLength, 1);
+      }
+      this.renderGroupingGraph(payload.data);
+      console.log(payload.data);
     });
   },
   mounted() {
