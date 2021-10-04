@@ -21,7 +21,8 @@ const getDefaultState = () => {
     columnField: {},
     // <Insert, Update 시 사용> Insert하거나 Update할 데이터 한 줄의 값들을 저장해서 이후에 Request를 보낼 때 사용 (v-textfield와 v-model되어 있음)
     originalColumnField: {},
-    dialog: false
+    dialog: false,
+    tableChangeFlag: false
     // <Insert, Update 시 사용>
   };
 };
@@ -32,14 +33,14 @@ const getters = {
     return rootState.initialData.datasetSize + state.numOfInsertion - state.numOfDeletion;
   },
   // save flag
-  tableChangeFlag(state, getters, rootState) {
-    if (
-      rootState.initialData.datasetSize ==
-      rootState.initialData.datasetSize + state.numOfInsertion - state.numOfDeletion
-    ) {
-      return false;
-    } else return true;
-  },
+  // tableChangeFlag(state, getters, rootState) {
+  //   if (
+  //     rootState.initialData.datasetSize ==
+  //     rootState.initialData.datasetSize + state.numOfInsertion - state.numOfDeletion
+  //   ) {
+  //     return false;
+  //   } else return true;
+  // },
 
   columnFieldChangeFlag(state, getters) {
     if (JSON.stringify(state.columnField) == JSON.stringify(state.originalColumnField)) {
@@ -56,6 +57,9 @@ const getters = {
 };
 
 const mutations = {
+  setTableChangeFlag(state, payload) {
+    state.tableChangeFlag = true;
+  },
   setEditingRowIndex(state, payload) {
     state.editingRowIndex = payload;
   },
@@ -127,7 +131,10 @@ const actions = {
       .then(res => {
         alert("Data Added");
         commit("setNumOfInsertion", state.numOfInsertion + 1);
+
         commit("addInsertItems", JSON.parse(JSON.stringify(state.columnField)));
+        commit("setTableChangeFlag");
+
         //   초기화
         commit("preprocessHandler/setPreprocessStatus", null, { root: true });
         commit("setDialog", false);
@@ -157,6 +164,7 @@ const actions = {
         commit("setNumOfDeletion", numOfRows);
 
         alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
+        commit("setTableChangeFlag");
         // 초기화
         commit("preprocessHandler/setEditMode", false, { root: true });
         commit("preprocessHandler/setPreprocessStatus", null, { root: true });
@@ -185,6 +193,8 @@ const actions = {
         // 업데이트 알림
         alert(`Successfully Updated!`);
         commit("updateDatasetItem");
+        commit("setTableChangeFlag");
+
         // 초기화
         commit("preprocessHandler/setEditMode", false, { root: true });
         commit("preprocessHandler/setPreprocessStatus", null, { root: true });

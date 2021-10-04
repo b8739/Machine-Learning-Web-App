@@ -41,10 +41,10 @@ export default {
       columns: state => state.initialData.columns,
       duplicatedColumns: state => state.summaryTableHandler.duplicatedColumns,
       tableName: state => state.initialData.tableName,
-      summarizedInfo: state => state.initialData.summarizedInfo
+      summarizedInfo: state => state.initialData.summarizedInfo,
+      tableChangeFlag: state => state.dataTableHandler.tableChangeFlag
     }),
-    ...mapGetters("summaryTableHandler", ["summaryChangeNameFlag"]),
-    ...mapGetters("dataTableHandler", ["tableChangeFlag"])
+    ...mapGetters("summaryTableHandler", ["summaryChangeNameFlag"])
   },
   methods: {
     ...mapActions("summaryTableHandler", ["calculateTransaction"]),
@@ -64,30 +64,30 @@ export default {
     },
 
     saveTableAxios(saveOption) {
-      if (this.summaryChangeNameFlag) {
-        //summary 변경 있을 때
-        let path = "http://localhost:5000/changeColumnName";
-        // axios
-        this.$axios({
-          method: "post",
-          url: path,
-          data: {
-            duplicatedColumns: this.duplicatedColumns,
-            columns: this.columns,
-            tableName: this.tableName
-          }
-        })
-          .then(res => {
-            this.loadColumns();
-            this.loadSummarizedData();
-            this.selectionTimer = setTimeout(() => {
-              this.cloneOriginalArray();
-            }, 1000);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      }
+      // if (this.summaryChangeNameFlag) {
+      //   //summary 변경 있을 때
+      //   let path = "http://localhost:5000/changeColumnName";
+      //   // axios
+      //   this.$axios({
+      //     method: "post",
+      //     url: path,
+      //     data: {
+      //       duplicatedColumns: this.duplicatedColumns,
+      //       columns: this.columns,
+      //       tableName: this.tableName
+      //     }
+      //   })
+      //     .then(res => {
+      //       this.loadColumns();
+      //       this.loadSummarizedData();
+      //       this.selectionTimer = setTimeout(() => {
+      //         this.cloneOriginalArray();
+      //       }, 1000);
+      //     })
+      //     .catch(error => {
+      //       console.error(error);
+      //     });
+      // }
       // if (this.summaryChangeTypeFlag) {
       //   //summary 변경 있을 때
       //   let path = "http://localhost:5000/changeColumnType";
@@ -114,8 +114,9 @@ export default {
       //     });
       // }
 
-      if (this.tableChangeFlag) {
-        const path = "http://localhost:5000/overwriteTable";
+      // if (this.tableChangeFlag)
+      {
+        const path = "http://localhost:5000/saveChanges";
         axios
           .get(path, {
             params: {

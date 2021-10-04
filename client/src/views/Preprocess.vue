@@ -113,10 +113,10 @@ export default {
       activatedEvent: state => state.preprocessHandler.activatedEvent,
       additionalCancelEvent: state => state.preprocessHandler.additionalCancelEvent,
       editStatus: state => state.preprocessHandler.editStatus,
-      datasetItems: state => state.dataTableHandler.datasetItems
+      datasetItems: state => state.dataTableHandler.datasetItems,
+      tableChangeFlag: state => state.dataTableHandler.tableChangeFlag
     }),
     ...mapGetters("summaryTableHandler", ["summaryChangeFlag"]),
-    ...mapGetters("dataTableHandler", ["tableChangeFlag"]),
 
     confirmButtonSpot() {
       return this.preprocessStatus;
