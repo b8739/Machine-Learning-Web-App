@@ -88,8 +88,8 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      comp: "SummaryTable"
-      // comp: "DataTable"
+      // comp: "SummaryTable"
+      comp: "DataTable"
 
       // activatedEvent:null
     };
@@ -139,12 +139,6 @@ export default {
       this.activatedEvent();
     },
 
-    apiCheck() {
-      const path = "http://localhost:5000/test1";
-      axios.get(path).catch(error => {
-        console.error(error);
-      });
-    },
     ...mapMutations("initialData", ["setNavStatus"]),
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
     ...mapMutations("preprocessHandler", ["setEditMode"]),
@@ -168,12 +162,6 @@ export default {
       this.comp = componentName;
     },
 
-    duplicateTable() {
-      const path = "http://localhost:5000/duplicateTable";
-      axios.get(path).catch(error => {
-        console.error(error);
-      });
-    },
     displaySwitch() {
       this.showFeatures = !this.showFeatures;
       this.showTable = !this.showTable;
@@ -223,12 +211,12 @@ export default {
     openSaveChangeDialog() {
       eventBus.$emit("openSaveChange", true);
     },
-    rollback() {
-      const path = "http://localhost:5000/rollback";
-      axios.get(path).catch(error => {
-        console.error(error);
-      });
-    },
+    // rollback() {
+    //   const path = "http://localhost:5000/rollback";
+    //   axios.get(path).catch(error => {
+    //     console.error(error);
+    //   });
+    // },
     askSave() {
       // 변경사항 있을 때
       if (
@@ -240,7 +228,8 @@ export default {
         }
         // 취소했을때
         else {
-          this.rollback();
+          // this.rollback();
+          // rollback 대신에 뭐가 들어가야 함
           if (this.comp == "DataTable") {
             this.resetDataTableVuex();
           } else if (this.comp == "SummaryTable") {
@@ -258,10 +247,10 @@ export default {
     this.resetEda();
     this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
-    const path = "http://localhost:5000/startPreprocess";
-    axios.get(path).catch(error => {
-      console.error(error);
-    });
+    // const path = "http://localhost:5000/startPreprocess"; //gsession -> trigger
+    // axios.get(path).catch(error => {
+    //   console.error(error);
+    // });
     this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
     this.loadColumns();

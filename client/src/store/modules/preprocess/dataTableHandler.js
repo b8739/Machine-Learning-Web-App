@@ -45,6 +45,13 @@ const getters = {
     if (JSON.stringify(state.columnField) == JSON.stringify(state.originalColumnField)) {
       return false;
     } else return true;
+  },
+  checkedRowIdList(state) {
+    let array = [];
+    state.checkedRows.forEach(element => {
+      array.push(state.datasetItems[element]["ID"]);
+    });
+    return array;
   }
 };
 
@@ -62,7 +69,13 @@ const mutations = {
     state.originalColumnField = payload;
   },
   deleteDatasetItems(state, payload) {
-    payload.forEach(element => {
+    // checkedRows 순서를 내림차순으로 해야 datasetItems를 삭제할 때 index가 영향받지 않음
+    let array = payload;
+    array.sort(function(a, b) {
+      return b - a;
+    });
+    // 배열을 돌면서 삭제
+    array.forEach(element => {
       Vue.delete(state.datasetItems, element);
     });
   },
@@ -108,7 +121,7 @@ const actions = {
       data: {
         tableName: rootState.initialData.tableName,
         rowToInsert: state.columnField,
-        ID: getters.fakeDatasetSize
+        ID: getters.fakeDatasetSize + 1
       }
     })
       .then(res => {
@@ -123,27 +136,26 @@ const actions = {
         console.error(error);
       });
   },
-  deleteRow({ commit, state, rootState }) {
+  deleteRow({ commit, state, getters, rootState }) {
     let path = "http://localhost:5000/deleteRow";
     axios({
       method: "post",
       url: path,
       data: {
         tableName: rootState.initialData.tableName,
-        idNumbers: state.checkedRows
+        idNumbers: getters.checkedRowIdList
       }
     })
       .then(res => {
         // 데이터 삭제 (updating frontend)
+
         commit("deleteDatasetItems", state.checkedRows);
         let numOfRows = state.checkedRows.length;
         // 체크박스 초기화
         let emptyArray = [];
         commit("setCheckedRows", emptyArray);
         commit("setNumOfDeletion", numOfRows);
-        // commit("initialData/setDatasetSize", rootState.initialData.datasetSize - numOfRows, {
-        //   root: true
-        // });
+
         alert(`Total ${numOfRows} row(s) Successfully Deleted!`); //삭제 알림
         // 초기화
         commit("preprocessHandler/setEditMode", false, { root: true });
