@@ -1,7 +1,7 @@
 <template>
   <div id="wrap">
     <Header> </Header>
-    <!-- <v-btn @click="apiCheck"></v-btn> -->
+    <v-btn @click="revertChanges"></v-btn>
     <!-- <div>preprocessStatus:{{ preprocessStatus }}</div>
     <div>editStatus:{{ editStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
@@ -108,6 +108,7 @@ export default {
   computed: {
     ...mapState({
       columns: state => state.initialData.columns,
+      tableName: state => state.initialData.tableName,
       datasetSize: state => state.initialData.datasetSize,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
       activatedEvent: state => state.preprocessHandler.activatedEvent,
@@ -135,6 +136,21 @@ export default {
     }
   },
   methods: {
+    revertChanges() {
+      const path = "http://localhost:5000/revertChanges";
+      axios
+        .get(path, {
+          params: {
+            tableName: this.tableName
+          }
+        })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     confirmEvent() {
       this.activatedEvent();
     },
