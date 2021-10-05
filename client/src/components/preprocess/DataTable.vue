@@ -132,7 +132,7 @@
                 <td></td>
                 <td style="min-width:70px">
                   <!-- ID index -->
-                  {{ datasetSize + insertedItemIndex + 1 }}
+                  {{ datasetItems[datasetItems.length - 1]["ID"] + 1 }}
                 </td>
                 <!-- Feature Value -->
                 <td

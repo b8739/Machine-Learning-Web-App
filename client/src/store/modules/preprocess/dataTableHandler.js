@@ -125,7 +125,7 @@ const actions = {
       data: {
         tableName: rootState.initialData.tableName,
         rowToInsert: state.columnField,
-        ID: getters.fakeDatasetSize + 1
+        ID: state.datasetItems[state.datasetItems.length - 1]["ID"] + 1
       }
     })
       .then(res => {

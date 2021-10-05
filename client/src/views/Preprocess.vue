@@ -1,7 +1,6 @@
 <template>
   <div id="wrap">
     <Header> </Header>
-    <v-btn @click="revertChanges"></v-btn>
     <!-- <div>preprocessStatus:{{ preprocessStatus }}</div>
     <div>editStatus:{{ editStatus }}</div>
     <div>activatedEvent:{{ activatedEvent }}</div>
@@ -227,12 +226,12 @@ export default {
     openSaveChangeDialog() {
       eventBus.$emit("openSaveChange", true);
     },
-    // rollback() {
-    //   const path = "http://localhost:5000/rollback";
-    //   axios.get(path).catch(error => {
-    //     console.error(error);
-    //   });
-    // },
+    rollback() {
+      const path = "http://localhost:5000/rollback";
+      axios.get(path).catch(error => {
+        console.error(error);
+      });
+    },
     askSave() {
       // 변경사항 있을 때
       if (
@@ -244,7 +243,7 @@ export default {
         }
         // 취소했을때
         else {
-          // this.rollback();
+          this.rollback();
           // rollback 대신에 뭐가 들어가야 함
           if (this.comp == "DataTable") {
             this.resetDataTableVuex();
@@ -263,10 +262,10 @@ export default {
     this.resetEda();
     this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
-    // const path = "http://localhost:5000/startPreprocess"; //gsession -> trigger
-    // axios.get(path).catch(error => {
-    //   console.error(error);
-    // });
+    const path = "http://localhost:5000/startPreprocess"; //gsession -> trigger
+    axios.get(path).catch(error => {
+      console.error(error);
+    });
     this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
     this.loadColumns();

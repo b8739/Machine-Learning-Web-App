@@ -116,7 +116,7 @@ export default {
 
       // if (this.tableChangeFlag)
       {
-        const path = "http://localhost:5000/saveChanges";
+        const path = "http://localhost:5000/overwriteTable";
         axios
           .get(path, {
             params: {
