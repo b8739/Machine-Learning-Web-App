@@ -12,7 +12,7 @@
           <!-- 최상단 메뉴 탭 -->
 
           <v-text-field
-            v-model="tableName"
+            v-model="newTableName"
             :counter="10"
             label="Name of Dataset"
             required
@@ -41,13 +41,18 @@ export default {
   data() {
     return {
       dialog: false,
-      tableName: "",
+      newTableName: "",
       formData: null,
       // flag
       dataUploadFlag: false,
       saveNewFileFlag: false,
       errorMessage: ""
     };
+  },
+  computed: {
+    ...mapState({
+      tableName: state => state.initialData.tableName
+    })
   },
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
@@ -60,7 +65,7 @@ export default {
         this.dataUpload();
         this.dataUploadFlag = false;
       } else if (this.saveNewFileFlag == true) {
-        this.saveNewFile(this.tableName);
+        this.saveNewFile();
         this.saveNewFileFlag = false;
         this.dialog = false;
       }
@@ -72,12 +77,12 @@ export default {
             "Content-Type": "multipart/form-data"
           },
           params: {
-            tableName: this.tableName
+            tableName: this.newTableName
           }
         })
         .then(response => {
           this.resetState();
-          this.setTableName(this.tableName);
+          this.setTableName(this.newTableName);
           this.loadSummarizedData();
           this.dialog = false;
         })
@@ -88,17 +93,24 @@ export default {
           // this.$router.push('/preprocess'); //delete later
         });
     },
-    saveNewFile(tableName) {
-      let api = "http://localhost:5000/duplicateTable";
-      axios
-        .get(api, {
-          params: {
-            newTableName: tableName
-          }
+    saveNewFile() {
+      let path = "http://localhost:5000/saveAsNewTable";
+      console.log(this.tableName);
+      console.log(this.newTableName);
+      axios;
+      this.$axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.tableName,
+          newTableName: this.newTableName
+        }
+      })
+        .then(res => {
+          this.updatePlot(featureName, res.data[featureName], axisType, tpIndex);
         })
-        .then(response => {})
-        .catch(ex => {
-          console.log("ERR!!!!! : ", ex);
+        .catch(error => {
+          console.error(error);
         });
     }
   },

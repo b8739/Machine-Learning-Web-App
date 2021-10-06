@@ -10,7 +10,6 @@
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
-          :disabled="index == 1"
           link
           @click="clickSaveOptionEvent(index)"
         >

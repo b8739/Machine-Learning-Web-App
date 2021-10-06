@@ -22,7 +22,8 @@
                 <!-- Preprocess/Table 교체 버튼 -->
                 <v-row>
                   <v-btn class="mr-2" @click="changeComponent('SummaryTable')">Features</v-btn>
-                  <v-btn @click="changeComponent('DataTable')">Table</v-btn>
+                  <v-btn @click="changeComponent('AgGrid')">Table</v-btn>
+                  <!-- <v-btn @click="changeComponent('DataTable')">Table</v-btn> -->
 
                   <v-spacer></v-spacer>
                   <portal-target :name="summaryPortal"> </portal-target>
@@ -62,6 +63,7 @@ import AverageModal from "@/components/average/AverageModal.vue";
 
 import SummaryTable from "@/components/preprocess/SummaryTable";
 import DataTable from "@/components/preprocess/DataTable";
+import AgGrid from "@/components/preprocess/AgGrid";
 import SideMenu from "@/components/preprocess/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 
@@ -88,7 +90,7 @@ export default {
       // flag
       featureFlag: true,
       // comp: "SummaryTable"
-      comp: "DataTable"
+      comp: "AgGrid"
 
       // activatedEvent:null
     };
@@ -102,7 +104,8 @@ export default {
     SideMenu,
     SaveMenu,
     DeleteStepper,
-    AverageModal
+    AverageModal,
+    AgGrid
   },
   computed: {
     ...mapState({

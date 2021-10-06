@@ -279,7 +279,7 @@ export default {
             // 두 조건 모두 입력된 경우,
             if (this.filterLessThan && this.filterGreaterThan) {
               return (
-                parseFloat(this.filterGreaterThan) < value &&
+                parseFloat(this.filterGreaterThan) <= value &&
                 value < parseFloat(this.filterLessThan)
               );
             }
@@ -287,7 +287,7 @@ export default {
             else if (this.filterLessThan && !this.filterGreaterThan) {
               return value < parseFloat(this.filterLessThan);
             } else {
-              return parseFloat(this.filterGreaterThan) < value;
+              return parseFloat(this.filterGreaterThan) <= value;
             }
           };
         }
