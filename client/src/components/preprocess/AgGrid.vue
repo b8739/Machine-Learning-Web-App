@@ -1,22 +1,25 @@
 <template>
-  <ag-grid-vue
-    style="width: 1400px; height:800px"
-    class="ag-theme-alpine"
-    :columnDefs="columnDefs"
-    :rowModelType="rowModelType"
-    @grid-ready="onGridReady"
-    :defaultColDef="defaultColDef"
-    :components="components"
-    :rowBuffer="rowBuffer"
-    :rowSelection="rowSelection"
-    :paginationPageSize="paginationPageSize"
-    :cacheOverflowSize="cacheOverflowSize"
-    :maxConcurrentDatasourceRequests="maxConcurrentDatasourceRequests"
-    :infiniteInitialRowCount="infiniteInitialRowCount"
-    :maxBlocksInCache="maxBlocksInCache"
-    :modules="modules"
-  >
-  </ag-grid-vue>
+  <div>
+    <v-btn @click="test">d</v-btn>
+    <ag-grid-vue
+      style="width: 1400px; height:800px"
+      class="ag-theme-alpine"
+      :columnDefs="columnDefs"
+      :rowModelType="rowModelType"
+      @grid-ready="onGridReady"
+      :defaultColDef="defaultColDef"
+      :components="components"
+      :rowBuffer="rowBuffer"
+      :rowSelection="rowSelection"
+      :paginationPageSize="paginationPageSize"
+      :cacheOverflowSize="cacheOverflowSize"
+      :maxConcurrentDatasourceRequests="maxConcurrentDatasourceRequests"
+      :infiniteInitialRowCount="infiniteInitialRowCount"
+      :maxBlocksInCache="maxBlocksInCache"
+      :modules="modules"
+    >
+    </ag-grid-vue>
+  </div>
 </template>
 
 <script>
@@ -63,9 +66,23 @@ export default {
     columnDefs() {
       let array = [{ field: "ID" }];
       this.columns.forEach(element => {
-        array.push({ field: element });
-      });
+        let lowered = element.toString().toLowerCase();
+        console.log(element);
+        let filterObj = {
+          field: element,
+          filter: "agNumberColumnFilter"
+        };
+        if (
+          lowered == "ts" ||
+          lowered == "timeseries" ||
+          lowered == "date" ||
+          lowered == "datetime"
+        ) {
+          filterObj["filter"] = "agDateColumnFilter";
+        }
 
+        array.push(filterObj);
+      });
       return array;
     }
   },
@@ -73,34 +90,172 @@ export default {
     AgGridVue
   },
   methods: {
-    // onGridReady(params) {
-    //       this.gridApi = params.api;
-    //       this.gridColumnApi = params.columnApi;
+    test(event) {
+      console.log(this.gridApi.getFilterInstance());
+    },
+    filterData(data, filterModel) {
+      // Filter 존재 여부 검사
+      // [If Filter exists] fitler 안하고 그대로 반환
+      let filterList = Object.keys(filterModel);
 
-    //       const updateData = (data) => {
-    //         var dataSource = {
-    //           rowCount: null,
-    //           getRows: function (params) {
-    //             console.log(
-    //               'asking for ' + params.startRow + ' to ' + params.endRow
-    //             );
-    //             setTimeout(function () {
-    //               var rowsThisPage = data.slice(params.startRow, params.endRow);
-    //               var lastRow = -1;
-    //               if (data.length <= params.endRow) {
-    //                 lastRow = data.length;
-    //               }
-    //               params.successCallback(rowsThisPage, lastRow);
-    //             }, 500);
-    //           },
-    //         };
-    //         gridApi.setDatasource(dataSource);
-    //       };
+      let isFilterPresent = filterModel && Object.keys(filterModel).length > 0;
+      if (!isFilterPresent) {
+        return data;
+      }
 
-    //       fetch('https://www.ag-grid.com/example-assets/olympic-winners.json')
-    //         .then((resp) => resp.json())
-    //         .then((data) => updateData(data));
-    //     },
+      // [If Not]
+      let resultOfFilter = [];
+      // loop
+      itemLoop: for (let i = 0; i < data.length; i++) {
+        let item = data[i];
+        filterLoop: for (let j = 0; j < filterList.length; j++) {
+          let filterColumn = filterList[j];
+          let filterType = filterModel[filterColumn].filterType;
+          let filterCalculation = filterModel[filterColumn].type;
+
+          //switch
+          if (filterType == "text") {
+            let filterValue = filterModel[filterColumn].filter;
+            switch (filterCalculation) {
+              case "contains":
+                if (item[filterColumn].includes(filterValue.toString()) == false) {
+                  continue itemLoop;
+                }
+                break;
+              case "notContains":
+                if (item[filterColumn].includes(filterValue.toString())) {
+                  continue itemLoop;
+                }
+                break;
+              case "startsWith":
+                if (item[filterColumn].toString()[0] != filterValue) {
+                  continue itemLoop;
+                }
+                break;
+              case "endsWith":
+                if (
+                  item[filterColumn].toString()[item[filterColumn].toString().length - 1] ==
+                  filterValue
+                ) {
+                  continue itemLoop;
+                }
+            }
+          } else if (filterType == "number") {
+            let filterValue = filterModel[filterColumn].filter;
+            switch (filterCalculation) {
+              case "equals":
+                if (item[filterColumn] != filterValue) {
+                  continue itemLoop;
+                }
+                break;
+              case "notEqual":
+                if (item[filterColumn] == filterValue) {
+                  continue itemLoop;
+                }
+                break;
+
+              case "lessThan":
+                if (item[filterColumn] >= filterValue) {
+                  continue itemLoop;
+                }
+                break;
+              case "lessThanOrEqual":
+                if (item[filterColumn] > filterValue || item[filterColumn] != filterValue) {
+                  continue itemLoop;
+                }
+                break;
+              case "greaterThan":
+                if (item[filterColumn] <= filterValue) {
+                  continue itemLoop;
+                }
+                break;
+              case "greaterThanOrEqual":
+                if (item[filterColumn] < filterValue || item[filterColumn] != filterValue) {
+                  continue itemLoop;
+                }
+                break;
+              case "inRange":
+                if (
+                  filterValue <= item[filterColumn] &&
+                  item[filterColumn] < filterModel[filterColumn]["filterTo"] == false
+                ) {
+                  continue itemLoop;
+                }
+                break;
+              case "dateFrom":
+                if (
+                  filterValue <= item[filterColumn] &&
+                  item[filterColumn] < filterModel[filterColumn]["filterTo"] == false
+                ) {
+                  continue itemLoop;
+                }
+                break;
+
+                break;
+              default:
+                break;
+            }
+          } else if (filterType == "date") {
+            let dateFrom = filterModel[filterColumn].dateFrom;
+
+            switch (filterCalculation) {
+              case "equals":
+                if (item[filterColumn] != dateFrom) {
+                  continue itemLoop;
+                }
+                break;
+              case "notEqual":
+                if (item[filterColumn] == dateFrom) {
+                  continue itemLoop;
+                }
+                break;
+
+              case "lessThan":
+                if (new Date(item[filterColumn]) > new Date(dateFrom)) {
+                  continue itemLoop;
+                }
+                break;
+              case "lessThanOrEqual":
+                if (
+                  new Date(item[filterColumn]) > dateFrom ||
+                  new Date(item[filterColumn] != dateFrom)
+                ) {
+                  continue itemLoop;
+                }
+                break;
+              case "greaterThan":
+                if (new Date(item[filterColumn]) < new Date(dateFrom)) {
+                  continue itemLoop;
+                }
+                break;
+              case "greaterThanOrEqual":
+                if (
+                  new Date(item[filterColumn] < dateFrom) ||
+                  new Date(item[filterColumn] != dateFrom)
+                ) {
+                  continue itemLoop;
+                }
+                break;
+              case "inRange":
+                let dateTo = filterModel[filterColumn].dateTo;
+
+                if (
+                  new Date(dateFrom >= item[filterColumn]) &&
+                  new Date(item[filterColumn] > dateTo) == false
+                ) {
+                  continue itemLoop;
+                }
+                break;
+
+              default:
+                break;
+            }
+          }
+        }
+        resultOfFilter.push(item);
+      }
+      return resultOfFilter;
+    },
     onGridReady(params) {
       this.gridApi = params.api;
       this.gridColumnApi = params.columnApi;
@@ -109,9 +264,11 @@ export default {
 
       // function
       function updateData(vm) {
-        var dataSource = {
+        let dataSource = {
           rowCount: null,
+
           getRows: function(params) {
+            console.log(params);
             console.log("asking for " + params.startRow + " to " + params.endRow);
             let path = "http://localhost:5000/infiniteRowModel";
 
@@ -126,18 +283,17 @@ export default {
               }
             })
               .then(res => {
-                var lastRow = -1;
-                if (vm.datasetSize <= params.endRow) {
-                  lastRow = vm.datasetSize;
-                }
-                params.successCallback(res.data, lastRow);
+                let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
+
+                params.successCallback(dataAfterFiltering, vm.datasetSize);
               })
+
               .catch(error => {
                 console.error(error);
               });
           }
         };
-        console.log(dataSource);
+
         params.api.setDatasource(dataSource);
       }
     }
