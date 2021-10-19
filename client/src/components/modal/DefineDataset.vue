@@ -51,7 +51,8 @@ export default {
   },
   computed: {
     ...mapState({
-      tableName: state => state.initialData.tableName
+      tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName
     })
   },
   methods: {
@@ -77,11 +78,12 @@ export default {
             "Content-Type": "multipart/form-data"
           },
           params: {
-            tableName: this.newTableName
+            tableName: this.newTableName,
+            projectName: this.projectName
           }
         })
         .then(response => {
-          this.resetState();
+          // this.resetState();
           this.setTableName(this.newTableName);
           this.loadSummarizedData();
           this.dialog = false;

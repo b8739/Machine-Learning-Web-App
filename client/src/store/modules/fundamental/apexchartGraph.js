@@ -24,7 +24,9 @@ const actions = {
       method: "post",
       url: path,
       data: {
-        tableName: rootState.initialData.tableName
+        tableName: rootState.initialData.tableName,
+        projectName: rootState.initialData.projectName,
+        datasetSize: rootState.initialData.datasetSize
       }
     })
       .then(res => {

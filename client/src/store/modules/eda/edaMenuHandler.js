@@ -19,10 +19,7 @@ const mutations = {
   }
 };
 
-const actions = {
-  //   loadFeatureGraphData({ commit, state, rootState }) {
-  //   }
-};
+const actions = {};
 
 export default {
   namespaced: true,

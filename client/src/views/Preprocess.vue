@@ -89,8 +89,8 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      // comp: "SummaryTable"
-      comp: "AgGrid"
+      comp: "SummaryTable"
+      // comp: "AgGrid"
 
       // activatedEvent:null
     };
@@ -265,10 +265,6 @@ export default {
     this.resetEda();
     this.resetSummaryTableVuex();
     this.$root.$refs.preprocessComp = this;
-    const path = "http://localhost:5000/startPreprocess"; //gsession -> trigger
-    axios.get(path).catch(error => {
-      console.error(error);
-    });
     this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
     this.loadColumns();

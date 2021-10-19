@@ -1,6 +1,29 @@
 <template>
   <div>
-    <v-btn @click="test">d</v-btn>
+    <div class="mt-5">
+      <span class="button-group">
+        <label>Available Undo's</label>
+        <input id="undoInput" readonly class="undo-redo-input" />
+        <label>Available Redo's</label>
+        <input id="redoInput" readonly class="undo-redo-input" />
+        <v-btn small id="undoBtn" v-on:click="undo()">Undo</v-btn>
+        <v-btn small id="redoBtn" v-on:click="redo()">Redo</v-btn>
+      </span>
+    </div>
+    <div style="display: flex;">
+      <div class="row">
+        <label>columnSeparator = </label>
+        <select id="columnSeparator">
+          <option value="none">(default)</option>
+          <option value="tab">tab</option>
+          <option value="|">bar (|)</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin: 10px 0;">
+      <v-btn small v-on:click="onBtnUpdate()">Show CSV export content text</v-btn>
+      <v-btn small v-on:click="onBtnExport()">Download CSV export file</v-btn>
+    </div>
     <ag-grid-vue
       style="width: 1400px; height:800px"
       class="ag-theme-alpine"
@@ -17,8 +40,17 @@
       :infiniteInitialRowCount="infiniteInitialRowCount"
       :maxBlocksInCache="maxBlocksInCache"
       :modules="modules"
+      :undoRedoCellEditing="true"
+      :undoRedoCellEditingLimit="undoRedoCellEditingLimit"
+      @first-data-rendered="onFirstDataRendered"
+      @cell-value-changed="onCellValueChanged"
     >
     </ag-grid-vue>
+    <v-card>
+      <textarea id="csvResult">
+Click the Show CSV export content button to view exported CSV here</textarea
+      >
+    </v-card>
   </div>
 </template>
 
@@ -28,6 +60,7 @@ import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 
 import { AgGridVue } from "@ag-grid-community/vue";
 import { InfiniteRowModelModule } from "@ag-grid-community/infinite-row-model";
+import { CsvExportModule } from "@ag-grid-community/csv-export";
 import "@ag-grid-community/core/dist/styles/ag-grid.css";
 import "@ag-grid-community/core/dist/styles/ag-theme-alpine.css";
 import axios from "axios";
@@ -36,15 +69,11 @@ export default {
   name: "App",
   data() {
     return {
-      modules: [InfiniteRowModelModule],
+      modules: [InfiniteRowModelModule, CsvExportModule],
 
       gridApi: null,
       columnApi: null,
-      defaultColDef: {
-        flex: 1,
-        resizable: true,
-        minWidth: 100
-      },
+
       components: null,
       rowBuffer: null,
       rowSelection: null,
@@ -53,21 +82,29 @@ export default {
       cacheOverflowSize: null,
       maxConcurrentDatasourceRequests: null,
       infiniteInitialRowCount: null,
-      maxBlocksInCache: null
+      maxBlocksInCache: null,
+      defaultColDef: {
+        flex: 1,
+        minWidth: 150,
+        editable: true,
+        resizable: true,
+        // undo
+        undoRedoCellEditingLimit: null
+      }
     };
   },
   computed: {
     ...mapState({
       columns: state => state.initialData.columns,
       datasetSize: state => state.initialData.datasetSize,
-      tableName: state => state.initialData.tableName
+      tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName
     }),
 
     columnDefs() {
-      let array = [{ field: "ID" }];
+      let array = [{ field: "ID", minWidth: 60, resizable: true }];
       this.columns.forEach(element => {
         let lowered = element.toString().toLowerCase();
-        console.log(element);
         let filterObj = {
           field: element,
           filter: "agNumberColumnFilter"
@@ -90,9 +127,22 @@ export default {
     AgGridVue
   },
   methods: {
+    onBtnExport() {
+      let params = this.getParams();
+      if (params.columnSeparator) {
+        alert(
+          "NOTE: you are downloading a file with non-standard separators - it may not render correctly in Excel."
+        );
+      }
+      this.gridApi.exportDataAsCsv(params);
+    },
+    onBtnUpdate() {
+      document.querySelector("#csvResult").value = this.gridApi.getDataAsCsv(this.getParams());
+    },
     test(event) {
       console.log(this.gridApi.getFilterInstance());
     },
+
     filterData(data, filterModel) {
       // Filter 존재 여부 검사
       // [If Filter exists] fitler 안하고 그대로 반환
@@ -160,7 +210,7 @@ export default {
                 }
                 break;
               case "lessThanOrEqual":
-                if (item[filterColumn] > filterValue || item[filterColumn] != filterValue) {
+                if (item[filterColumn] > filterValue && item[filterColumn] != filterValue) {
                   continue itemLoop;
                 }
                 break;
@@ -170,7 +220,7 @@ export default {
                 }
                 break;
               case "greaterThanOrEqual":
-                if (item[filterColumn] < filterValue || item[filterColumn] != filterValue) {
+                if (item[filterColumn] < filterValue && item[filterColumn] != filterValue) {
                   continue itemLoop;
                 }
                 break;
@@ -217,7 +267,7 @@ export default {
                 break;
               case "lessThanOrEqual":
                 if (
-                  new Date(item[filterColumn]) > dateFrom ||
+                  new Date(item[filterColumn]) > dateFrom &&
                   new Date(item[filterColumn] != dateFrom)
                 ) {
                   continue itemLoop;
@@ -230,7 +280,7 @@ export default {
                 break;
               case "greaterThanOrEqual":
                 if (
-                  new Date(item[filterColumn] < dateFrom) ||
+                  new Date(item[filterColumn] < dateFrom) &&
                   new Date(item[filterColumn] != dateFrom)
                 ) {
                   continue itemLoop;
@@ -278,13 +328,14 @@ export default {
               url: path,
               data: {
                 tableName: vm.tableName,
+                projectName: vm.projectName,
                 startRow: params.startRow.toString(),
                 endRow: params.endRow.toString()
               }
             })
               .then(res => {
+                console.log(res.data);
                 let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
-
                 params.successCallback(dataAfterFiltering, vm.datasetSize);
               })
 
@@ -295,6 +346,84 @@ export default {
         };
 
         params.api.setDatasource(dataSource);
+      }
+    },
+    onFirstDataRendered() {
+      setValue("#undoInput", 0);
+      disable("#undoInput", true);
+      disable("#undoBtn", true);
+      setValue("#redoInput", 0);
+      disable("#redoInput", true);
+      disable("#redoBtn", true);
+    },
+    onCellValueChanged(params) {
+      var undoSize = params.api.getCurrentUndoSize();
+      setValue("#undoInput", undoSize);
+      disable("#undoBtn", undoSize < 1);
+      var redoSize = params.api.getCurrentRedoSize();
+      setValue("#redoInput", redoSize);
+      disable("#redoBtn", redoSize < 1);
+    },
+    undo() {
+      this.gridApi.undoCellEditing();
+    },
+    redo() {
+      this.gridApi.redoCellEditing();
+    },
+    getParams() {
+      return { columnSeparator: this.getValue("#columnSeparator") };
+    },
+    getValue(inputSelector) {
+      var text = document.querySelector(inputSelector).value;
+      switch (text) {
+        case "string":
+          return (
+            'Here is a comma, and a some "quotes". You can see them using the\n' +
+            "api.getDataAsCsv() button but they will not be visible when the downloaded\n" +
+            "CSV file is opened in Excel because string content passed to\n" +
+            "prependContent and appendContent is not escaped."
+          );
+        case "array":
+          return [
+            [],
+            [
+              {
+                data: {
+                  value: 'Here is a comma, and a some "quotes".',
+                  type: "String"
+                }
+              }
+            ],
+            [
+              {
+                data: {
+                  value:
+                    "They are visible when the downloaded CSV file is opened in Excel because custom content is properly escaped (provided that suppressQuotes is not set to true)",
+                  type: "String"
+                }
+              }
+            ],
+            [
+              {
+                data: {
+                  value: "this cell:",
+                  type: "String"
+                },
+                mergeAcross: 1
+              },
+              {
+                data: {
+                  value: "is empty because the first cell has mergeAcross=1",
+                  type: "String"
+                }
+              }
+            ],
+            []
+          ];
+        case "none":
+          return;
+        default:
+          return text;
       }
     }
   },
@@ -316,6 +445,32 @@ export default {
     this.maxConcurrentDatasourceRequests = 1;
     this.infiniteInitialRowCount = 1000;
     this.maxBlocksInCache = 10;
+    this.undoRedoCellEditingLimit = 5;
   }
 };
 </script>
+<style scoped>
+.button-group {
+  padding-bottom: 4px;
+  display: inline-block;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 13px;
+}
+#undoInput {
+  color: grey;
+}
+#redoInput {
+  color: grey;
+}
+.undo-redo-input {
+  width: 20px;
+}
+
+.undo-btn {
+  margin-left: 20px;
+}
+
+.redo-btn {
+  margin-left: 5px;
+}
+</style>

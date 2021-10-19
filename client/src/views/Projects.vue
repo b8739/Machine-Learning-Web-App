@@ -100,6 +100,9 @@ export default {
       );
     },
     ...mapMutations("initialData", ["setNavStatus"]),
+    ...mapMutations("initialData", ["setProjectName"]),
+    ...mapMutations("initialData", ["resetState"]),
+
     loadProjects() {
       let path = "http://localhost:5000/loadProjects";
       console.log(path);
@@ -114,7 +117,9 @@ export default {
         });
     },
     enterProject() {
+      this.resetState();
       this.setNavStatus("datasets");
+      this.setProjectName("project 1");
       this.$router.push({ name: "datasets" });
     }
   },

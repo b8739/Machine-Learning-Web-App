@@ -1,5 +1,6 @@
 <template>
   <v-app id="inspire">
+    <v-btn @click="mongoTest">mongoTest</v-btn>
     <v-main>
       <v-container fluid fill-height>
         <v-row align="center" justify="center">
@@ -48,7 +49,21 @@ export default {
   },
   methods: {
     // ...mapMutations("initialData", ["resetState"])
-    ...mapActions("initialData", ["resetAllState"])
+    ...mapActions("initialData", ["resetAllState"]),
+    mongoTest() {
+      let path = "http://localhost:5000/test";
+      // axios
+      this.$axios({
+        method: "get",
+        url: path
+      })
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
   },
   created() {
     console.log("hi");

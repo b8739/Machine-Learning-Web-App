@@ -9,7 +9,8 @@ const getDefaultState = () => {
     randomRange: null,
     columns: [],
     datasetSize: null,
-    tableName: null
+    tableName: null,
+    projectName: null
   };
 };
 const state = getDefaultState();
@@ -77,6 +78,9 @@ const mutations = {
   },
   setTableName(state, payload) {
     state.tableName = payload;
+  },
+  setProjectName(state, payload) {
+    state.projectName = payload;
   }
 };
 
@@ -88,15 +92,13 @@ const actions = {
   },
   loadDatasetSize({ commit, state }) {
     const path = "http://localhost:5000/loadDatasetSize";
-    axios
-      .get(path, {
-        params: {
-          //algorithmProp 전송
-          tableName: state.tableName
-        }
-      })
+    // 수정
+    axios({
+      method: "post",
+      url: path,
+      data: { tableName: state.tableName, projectName: state.projectName }
+    })
       .then(res => {
-        // console.log(res.data);
         commit("setDatasetSize", res.data);
       })
       .catch(error => {
@@ -105,30 +107,30 @@ const actions = {
   },
   loadColumns({ commit, state }) {
     let path = "http://localhost:5000/loadColumns";
-    axios
-      .get(path, {
-        params: {
-          //algorithmProp 전송
-          tableName: state.tableName
-        }
-      })
+    axios({
+      method: "post",
+      url: path,
+      data: { tableName: state.tableName, projectName: state.projectName }
+    })
       .then(res => {
-        // console.log(res.data);
         commit("loadColumns", res.data);
       })
       .catch(error => {
         console.error(error);
       });
+
+    // 원본
   },
   loadSummarizedData({ commit, state }) {
     const path = "http://localhost:5000/loadSummarizedData";
-    axios
-      .get(path, {
-        params: {
-          //algorithmProp 전송
-          tableName: state.tableName
-        }
-      })
+    axios({
+      method: "post",
+      url: path,
+      data: {
+        tableName: state.tableName,
+        projectName: state.projectName
+      }
+    })
       .then(res => {
         commit("loadSummarizedInfo", res.data);
 

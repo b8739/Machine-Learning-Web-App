@@ -73,6 +73,7 @@ export default {
   computed: {
     ...mapState({
       tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName,
 
       tableList: state => state.initialData.tableList
     }),
@@ -106,7 +107,7 @@ export default {
       this.loadSummarizedData();
       this.loadColumns();
       this.loadDatasetSize();
-      this.showTables();
+      this.showTables(projectName);
       this.resetDataTableVuex();
       this.resetPreprocessVuex();
       eventBus.$emit("reloadDataTable", true);
@@ -120,13 +121,17 @@ export default {
 
     showTables() {
       let path = "http://localhost:5000/showTables";
-      axios
-        .get(path)
+      axios({
+        method: "post",
+        url: path,
+        data: { projectName: this.projectName }
+      })
         .then(res => {
-          // this.tableList = res.data;
           this.loadTableList(res.data);
         })
-        .catch(error => {});
+        .catch(error => {
+          console.error(error);
+        });
     }
   },
   created() {

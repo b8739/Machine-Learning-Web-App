@@ -79,7 +79,8 @@ export default {
 
   computed: {
     ...mapState({
-      tableList: state => state.initialData.tableList
+      tableList: state => state.initialData.tableList,
+      projectName: state => state.initialData.projectName
     })
   },
   /*
@@ -88,26 +89,28 @@ export default {
   methods: {
     ...mapMutations("initialData", ["loadTableList"]),
     ...mapMutations("initialData", ["setNavStatus"]),
-    ...mapMutations("initialData", ["resetState"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("initialData", ["setTableName"]),
 
     enterDataset(tableName) {
       if (!this.editMode) {
-        this.resetState();
         this.setTableName(tableName);
         this.loadSummarizedData();
       }
     },
     showTables() {
       let path = "http://localhost:5000/showTables";
-      axios
-        .get(path)
+      axios({
+        method: "post",
+        url: path,
+        data: { projectName: this.projectName }
+      })
         .then(res => {
-          // this.tableList = res.data;
           this.loadTableList(res.data);
         })
-        .catch(error => {});
+        .catch(error => {
+          console.error(error);
+        });
     },
     dropTable(tableName) {
       if (
