@@ -139,13 +139,13 @@ export default {
   },
   //실험
   created() {
-    console.log("created");
+    // console.log("created");
     this.showTables();
     this.setNavStatus("datasets");
-    console.log("Datatable created");
+    // console.log("Datatable created");
   },
   mounted() {
-    console.log("mounted");
+    // console.log("mounted");
     this.showTables();
     this.setNavStatus("datasets");
   }

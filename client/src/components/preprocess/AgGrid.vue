@@ -1,13 +1,17 @@
 <template>
   <div>
     <div class="mt-5">
+      cache{{ cacheBlockSize }}
       <span class="button-group">
         <label>Available Undo's</label>
         <input id="undoInput" readonly class="undo-redo-input" />
         <label>Available Redo's</label>
         <input id="redoInput" readonly class="undo-redo-input" />
+
         <v-btn small id="undoBtn" v-on:click="undo()">Undo</v-btn>
         <v-btn small id="redoBtn" v-on:click="redo()">Redo</v-btn>
+        <v-btn @click="test">test</v-btn>
+        <v-btn @click="filtercheck">filtercheck</v-btn>
       </span>
     </div>
     <div style="display: flex;">
@@ -36,14 +40,15 @@
       :rowSelection="rowSelection"
       :paginationPageSize="paginationPageSize"
       :cacheOverflowSize="cacheOverflowSize"
+      :cacheBlockSize="cacheBlockSize"
       :maxConcurrentDatasourceRequests="maxConcurrentDatasourceRequests"
       :infiniteInitialRowCount="infiniteInitialRowCount"
-      :maxBlocksInCache="maxBlocksInCache"
       :modules="modules"
       :undoRedoCellEditing="true"
       :undoRedoCellEditingLimit="undoRedoCellEditingLimit"
       @first-data-rendered="onFirstDataRendered"
       @cell-value-changed="onCellValueChanged"
+      :getRowStyle="getRowStyle"
     >
     </ag-grid-vue>
     <v-card>
@@ -83,14 +88,16 @@ export default {
       maxConcurrentDatasourceRequests: null,
       infiniteInitialRowCount: null,
       maxBlocksInCache: null,
+      cacheBlockSize: 100,
       defaultColDef: {
         flex: 1,
-        minWidth: 150,
+        minWidth: 100,
         editable: true,
         resizable: true,
         // undo
         undoRedoCellEditingLimit: null
-      }
+      },
+      getRowStyle: null
     };
   },
   computed: {
@@ -127,6 +134,32 @@ export default {
     AgGridVue
   },
   methods: {
+    filtercheck() {
+      let dd = this.gridApi.getFilterModel();
+      console.log(dd);
+    },
+
+    getDisplayedRowCount() {
+      var count = this.gridApi.getDisplayedRowCount();
+      console.log("getDisplayedRowCount() => " + count);
+    },
+    printAllDisplayedRows() {
+      var count = this.gridApi.getDisplayedRowCount();
+      console.log("## printAllDisplayedRows");
+      for (var i = 0; i < count; i++) {
+        var rowNode = this.gridApi.getDisplayedRowAtIndex(i);
+        console.log("row " + i + " is " + rowNode.data);
+      }
+    },
+    getRowData() {
+      var rowData = [];
+      this.gridApi.forEachNode(function(node) {
+        rowData.push(node.data);
+      });
+      console.log("Row Data:");
+      console.log(rowData);
+    },
+
     onBtnExport() {
       let params = this.getParams();
       if (params.columnSeparator) {
@@ -134,13 +167,14 @@ export default {
           "NOTE: you are downloading a file with non-standard separators - it may not render correctly in Excel."
         );
       }
+
       this.gridApi.exportDataAsCsv(params);
     },
     onBtnUpdate() {
       document.querySelector("#csvResult").value = this.gridApi.getDataAsCsv(this.getParams());
     },
-    test(event) {
-      console.log(this.gridApi.getFilterInstance());
+    test() {
+      this.gridApi.onFilterChanged();
     },
 
     filterData(data, filterModel) {
@@ -318,8 +352,13 @@ export default {
           rowCount: null,
 
           getRows: function(params) {
-            console.log(params);
             console.log("asking for " + params.startRow + " to " + params.endRow);
+            let filterModel = vm.gridApi.getFilterModel();
+            console.log(filterModel);
+            console.log(vm.parseFilterModel(filterModel));
+            filterModel = vm.parseFilterModel(filterModel);
+            console.log(filterModel);
+
             let path = "http://localhost:5000/infiniteRowModel";
 
             // axios
@@ -330,13 +369,15 @@ export default {
                 tableName: vm.tableName,
                 projectName: vm.projectName,
                 startRow: params.startRow.toString(),
-                endRow: params.endRow.toString()
+                endRow: params.endRow.toString(),
+                filterModel: filterModel
               }
             })
               .then(res => {
-                console.log(res.data);
-                let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
-                params.successCallback(dataAfterFiltering, vm.datasetSize);
+                // let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
+                // console.log(res.data);
+
+                params.successCallback(res.data, vm.datasetSize);
               })
 
               .catch(error => {
@@ -347,6 +388,74 @@ export default {
 
         params.api.setDatasource(dataSource);
       }
+    },
+    parseFilterModel(filterModel) {
+      if (Object.keys(filterModel).length == 0) {
+        return "none";
+      } else {
+        let filterKeys = Object.keys(filterModel);
+        let conditionList = [];
+        filterKeys.forEach(element => {
+          // YES operator
+          let condition = {};
+
+          if ("operator" in filterModel[element]) {
+            let operator;
+            if (filterModel[element]["operator"] == "AND") {
+              operator = "$and";
+            } else {
+              operator = "$or";
+            }
+            condition[operator] = [];
+            for (let i = 1; i < 3; i++) {
+              let newCondition = this.filterSwitch(element, filterModel[element]["condition" + i]);
+              condition[operator].push(newCondition);
+            }
+          }
+          // NO operator
+          else {
+            // no operator
+            condition = this.filterSwitch(element, filterModel[element]);
+          }
+          conditionList.push(condition);
+        });
+        return conditionList;
+      }
+    },
+    filterSwitch(elementName, filterModel) {
+      console.log(filterModel);
+      let filter = filterModel["filter"];
+      let condition = {};
+      switch (filterModel["type"]) {
+        case "equals":
+          condition[elementName] = filter;
+          break;
+        case "notEqual":
+          condition[elementName] = { $ne: filter };
+          break;
+        case "lessThan":
+          condition[elementName] = { $lt: filter };
+
+          break;
+        case "lessThanOrEqual":
+          condition[elementName] = { $lte: filter };
+          break;
+        case "greaterThan":
+          condition[elementName] = { $gt: filter };
+
+          break;
+        case "greaterThanOrEqual":
+          condition[elementName] = { $gte: filter };
+
+          break;
+        case "inRange":
+          condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
+
+          break;
+        default:
+          break;
+      }
+      return condition;
     },
     onFirstDataRendered() {
       setValue("#undoInput", 0);
@@ -428,6 +537,11 @@ export default {
     }
   },
   beforeMount() {
+    // this.getRowStyle = params => {
+    //   if (params.data == undefined) {
+    //     return { display: "none" };
+    //   }
+    // };
     this.components = {
       loadingRenderer: params => {
         if (params.value !== undefined) {
@@ -443,8 +557,8 @@ export default {
     this.paginationPageSize = 100;
     this.cacheOverflowSize = 2;
     this.maxConcurrentDatasourceRequests = 1;
-    this.infiniteInitialRowCount = 1000;
-    this.maxBlocksInCache = 10;
+    this.infiniteInitialRowCount = 1;
+
     this.undoRedoCellEditingLimit = 5;
   }
 };

@@ -89,8 +89,8 @@ export default {
       showTable: true,
       // flag
       featureFlag: true,
-      comp: "SummaryTable"
-      // comp: "AgGrid"
+      // comp: "SummaryTable"
+      comp: "AgGrid"
 
       // activatedEvent:null
     };
@@ -271,7 +271,7 @@ export default {
     this.loadDatasetSize();
   },
   mounted() {
-    console.log("preprocess mounted");
+    // console.log("preprocess mounted");
     window.addEventListener("beforeunload", this.askSave); //새로고침 방지
   },
   beforeUnmount() {
