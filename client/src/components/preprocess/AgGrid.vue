@@ -1,20 +1,20 @@
 <template>
   <div>
-    <div class="mt-5">
-      cache{{ cacheBlockSize }}
-      <span class="button-group">
-        <label>Available Undo's</label>
-        <input id="undoInput" readonly class="undo-redo-input" />
-        <label>Available Redo's</label>
-        <input id="redoInput" readonly class="undo-redo-input" />
+    <!-- Toolbars -->
+    <v-toolbar> {{ updateTransaction }}</v-toolbar>
+    <v-toolbar>
+      <v-toolbar-title class="mr-2">Undo/Redo:</v-toolbar-title>
+      <label>Available Undo's:</label>
+      <input id="undoInput" readonly class="undo-redo-input" />
+      <label>Available Redo's:</label>
+      <input id="redoInput" readonly class="undo-redo-input" />
 
-        <v-btn small id="undoBtn" v-on:click="undo()">Undo</v-btn>
-        <v-btn small id="redoBtn" v-on:click="redo()">Redo</v-btn>
-        <v-btn @click="test">test</v-btn>
-        <v-btn @click="filtercheck">filtercheck</v-btn>
-      </span>
-    </div>
-    <div style="display: flex;">
+      <v-btn small id="undoBtn" v-on:click="undo()">Undo</v-btn>
+      <v-btn small id="redoBtn" v-on:click="redo()">Redo</v-btn>
+      <v-btn small @click="test">test</v-btn>
+      <v-btn small @click="filtercheck">filtercheck</v-btn>
+    </v-toolbar>
+    <v-toolbar v-show="false">
       <div class="row">
         <label>columnSeparator = </label>
         <select id="columnSeparator">
@@ -23,11 +23,29 @@
           <option value="|">bar (|)</option>
         </select>
       </div>
-    </div>
-    <div style="margin: 10px 0;">
-      <v-btn small v-on:click="onBtnUpdate()">Show CSV export content text</v-btn>
-      <v-btn small v-on:click="onBtnExport()">Download CSV export file</v-btn>
-    </div>
+    </v-toolbar>
+    <v-toolbar>
+      <v-toolbar-title class="mr-2"> Export CSV FIle:</v-toolbar-title>
+      <v-btn small v-on:click="exportLoadedData()"
+        >Download CSV file <label style="color:red">(Only currently loaded data)</label></v-btn
+      >
+      <v-btn small v-on:click="exportAllData()"
+        >Download CSV file <label style="color:red">(All Data)</label></v-btn
+      >
+    </v-toolbar>
+    <v-toolbar>
+      <v-toolbar-title class="mr-2"> CRUD Action (Server Side):</v-toolbar-title>
+      <v-btn small>Insert</v-btn>
+      <v-btn small @click="updateRows()">Update</v-btn>
+      <v-btn small @click="deleteRows()">Delete</v-btn>
+
+      <!-- AG Grid -->
+    </v-toolbar>
+    <v-dialog v-model="dialog">
+      <v-card>
+        <input id="csvResult" />
+      </v-card>
+    </v-dialog>
     <ag-grid-vue
       style="width: 1400px; height:800px"
       class="ag-theme-alpine"
@@ -51,11 +69,6 @@
       :getRowStyle="getRowStyle"
     >
     </ag-grid-vue>
-    <v-card>
-      <textarea id="csvResult">
-Click the Show CSV export content button to view exported CSV here</textarea
-      >
-    </v-card>
   </div>
 </template>
 
@@ -74,6 +87,7 @@ export default {
   name: "App",
   data() {
     return {
+      dialog: false,
       modules: [InfiniteRowModelModule, CsvExportModule],
 
       gridApi: null,
@@ -97,7 +111,8 @@ export default {
         // undo
         undoRedoCellEditingLimit: null
       },
-      getRowStyle: null
+      getRowStyle: null,
+      updateTransaction: []
     };
   },
   computed: {
@@ -109,13 +124,21 @@ export default {
     }),
 
     columnDefs() {
-      let array = [{ field: "ID", minWidth: 60, resizable: true }];
+      let array = [];
       this.columns.forEach(element => {
         let lowered = element.toString().toLowerCase();
         let filterObj = {
           field: element,
           filter: "agNumberColumnFilter"
+          //     equals: (oldVal, newVal) => {
+          //       console.log(oldVal);
+          //       console.log(newVal);
+          //       return true;
+          // }
         };
+        if (lowered == "id") {
+          filterObj["editable"] = false;
+        }
         if (
           lowered == "ts" ||
           lowered == "timeseries" ||
@@ -134,6 +157,58 @@ export default {
     AgGridVue
   },
   methods: {
+    updateRows() {
+      let availableUndo = document.getElementById("undoInput").value;
+      if (availableUndo != 0) {
+        let path = "http://localhost:5000/updateRows";
+        // axios
+        axios({
+          method: "post",
+          url: path,
+          data: {
+            projectName: this.projectName,
+            tableName: this.tableName,
+            updateTransaction: this.updateTransaction
+          }
+        })
+          .then(res => {
+            console.log(res.data);
+          })
+
+          .catch(error => {
+            console.error(error);
+          });
+      }
+    },
+    deleteRows() {
+      let selectedRows = this.gridApi.getSelectedRows();
+      let selectedIDs = [];
+      selectedRows.forEach(element => {
+        selectedIDs.push(element["ID"]);
+      });
+      let path = "http://localhost:5000/deleteRows";
+
+      // axios
+      axios({
+        method: "post",
+        url: path,
+        data: {
+          projectName: this.projectName,
+          tableName: this.tableName,
+          selectedIDs: selectedIDs
+        }
+      })
+        .then(res => {
+          // let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
+          // console.log(res.data);
+          this.gridApi.refreshInfiniteCache();
+          console.log(res.data);
+        })
+
+        .catch(error => {
+          console.error(error);
+        });
+    },
     filtercheck() {
       let dd = this.gridApi.getFilterModel();
       console.log(dd);
@@ -159,8 +234,36 @@ export default {
       console.log("Row Data:");
       console.log(rowData);
     },
+    exportAllData() {
+      let filterModel = this.gridApi.getFilterModel();
+      filterModel = this.parseFilterModel(filterModel);
 
-    onBtnExport() {
+      let path = "http://localhost:5000/exportAllData";
+      // axios
+      axios({
+        method: "post",
+        url: path,
+        data: {
+          projectName: this.projectName,
+          tableName: this.tableName,
+          filterModel: filterModel
+        }
+      })
+        .then(res => {
+          console.log(res);
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "file.csv"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    exportLoadedData() {
       let params = this.getParams();
       if (params.columnSeparator) {
         alert(
@@ -171,10 +274,15 @@ export default {
       this.gridApi.exportDataAsCsv(params);
     },
     onBtnUpdate() {
+      this.dialog = true;
+
       document.querySelector("#csvResult").value = this.gridApi.getDataAsCsv(this.getParams());
     },
     test() {
-      this.gridApi.onFilterChanged();
+      let getSelectedNodes = this.gridApi.getSelectedNodes();
+      let getSelectedRows = this.gridApi.getSelectedRows();
+      console.log(getSelectedNodes);
+      console.log(getSelectedRows);
     },
 
     filterData(data, filterModel) {
@@ -352,12 +460,11 @@ export default {
           rowCount: null,
 
           getRows: function(params) {
-            console.log("asking for " + params.startRow + " to " + params.endRow);
+            // console.log("asking for " + params.startRow + " to " + params.endRow);
             let filterModel = vm.gridApi.getFilterModel();
-            console.log(filterModel);
-            console.log(vm.parseFilterModel(filterModel));
+            // console.log(filterModel);
+            // console.log(vm.parseFilterModel(filterModel));
             filterModel = vm.parseFilterModel(filterModel);
-            console.log(filterModel);
 
             let path = "http://localhost:5000/infiniteRowModel";
 
@@ -465,13 +572,41 @@ export default {
       disable("#redoInput", true);
       disable("#redoBtn", true);
     },
-    onCellValueChanged(params) {
+    undoCalculate(params) {
       var undoSize = params.api.getCurrentUndoSize();
       setValue("#undoInput", undoSize);
       disable("#undoBtn", undoSize < 1);
       var redoSize = params.api.getCurrentRedoSize();
       setValue("#redoInput", redoSize);
       disable("#redoBtn", redoSize < 1);
+    },
+    onCellValueChanged(params) {
+      this.undoCalculate(params);
+      //transaction
+      // 출력
+      // console.log(`Field Name: ${params.colDef.field}`);
+      // console.log(`ID: ${params.data.ID}`);
+      // console.log(`New Value: ${params.newValue}`);
+      // update object
+      let update = {
+        field: params.colDef.field,
+        ID: params.data.ID,
+        newValue: params.newValue
+      };
+      // 중복 요소 삭제
+      let substringIndex = JSON.stringify(update).indexOf("newValue");
+      this.updateTransaction.forEach((element, index) => {
+        if (
+          JSON.stringify(element).substring(0, substringIndex) ==
+          JSON.stringify(update).substring(0, substringIndex)
+        ) {
+          Vue.delete(this.updateTransaction, index);
+        }
+      });
+
+      // 배열에 입력
+
+      this.updateTransaction.push(update);
     },
     undo() {
       this.gridApi.undoCellEditing();

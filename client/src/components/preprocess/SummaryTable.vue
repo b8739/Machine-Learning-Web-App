@@ -1,5 +1,6 @@
 <template>
   <div v-if="summarizedInfo != null || summarizedInfo != undefined">
+    {{ columnsWithoutID }}
     <div class="container">
       <!-- 테이블 -->
       <!-- <div>Original{{ columns }}</div>
@@ -11,11 +12,11 @@
       <table class="dataTable">
         <draggable tag="table" v-model="duplicatedColumns">
           <!-- 행 -->
-          <tbody v-for="(column, columnIndex) in duplicatedColumns" :key="columnIndex">
+          <tbody v-for="(column, columnIndex) in columnsWithoutID" :key="columnIndex">
             <!-- Columns -->
             <component
-              :is="distinguishDataType(columns[columnIndex])"
-              :column="columns[columnIndex]"
+              :is="distinguishDataType(columnsWithoutID[columnIndex])"
+              :column="columnsWithoutID[columnIndex]"
             >
               <!-- slot -->
 
@@ -26,7 +27,7 @@
                     <v-col
                       ><v-text-field
                         v-bind="activateName"
-                        :value="column.columnName"
+                        :value="column"
                         @change="renameColumns(columnIndex, $event)"
                       ></v-text-field>
                     </v-col>
@@ -47,7 +48,7 @@
                       single-line
                       hide-details="true"
                       height="20"
-                      :label="getDataType(columns[columnIndex])"
+                      :label="getDataType(columnsWithoutID[columnIndex])"
                     >
                     </v-select>
                   </tr>
@@ -155,7 +156,15 @@ export default {
       backedUpColumns: state => state.summaryTableHandler.backedUpColumns
     }),
     ...mapGetters("initialData", ["numericColumns"]),
-
+    columnsWithoutID() {
+      let columnsWithoutID = [];
+      this.columns.forEach(element => {
+        if (element != "ID") {
+          columnsWithoutID.push(element);
+        }
+      });
+      return columnsWithoutID;
+    },
     activateName() {
       if (this.editStatus["summaryChangeName"]) {
         return this.activatedName_props;
@@ -238,6 +247,7 @@ export default {
       return this.summarizedInfo["datatype"][column];
     },
     distinguishDataType(column) {
+      console.log(column);
       if (this.getDataType(column) == "category" || this.getDataType(column) == "string") {
         return "CategoricalRow";
       } else if (
