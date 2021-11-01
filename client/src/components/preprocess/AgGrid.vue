@@ -4,6 +4,7 @@
     <!-- <v-toolbar> {{ updateTransaction }}</v-toolbar> -->
 
     <v-toolbar>
+      {{ hiddenCols }}
       <v-toolbar-title class="mr-2">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
       <input id="undoInput" readonly class="undo-redo-input" />
@@ -34,16 +35,30 @@
     </v-toolbar>
     <v-toolbar>
       <v-toolbar-title class="mr-2"> CRUD Action (Server Side):</v-toolbar-title>
-      <v-btn small disabled>Insert</v-btn>
-      <v-btn small @click="updateRows()">Update</v-btn>
-      <v-btn small @click="deleteRows()">Delete</v-btn>
-
+      <v-btn small @click="updateRows()">Update Row</v-btn>
+      <v-btn small @click="deleteRows()">Delete Row</v-btn>
+      <v-btn small>Delete Column</v-btn>
+      <v-btn small @click="dialog_colDisplay = true">Drop Column (Hide)</v-btn>
+      <v-dialog v-model="dialog_colDisplay">
+        <v-card>
+          <v-container>
+            <v-chip-group v-model="hiddenCols" multiple active-class="error--text" class="ml-10">
+              <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" label>
+                {{ column }}
+              </v-chip>
+            </v-chip-group>
+          </v-container>
+          <v-card-actions>
+            <v-btn @click="hideColumn">Confirm</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <!-- AG Grid -->
     </v-toolbar>
     <v-toolbar>
-      <v-btn @click="dialog = !dialog">Change Column Name</v-btn>
+      <v-btn @click="dialog_colName = !dialog_colName">Change Column Name</v-btn>
 
-      <v-dialog v-model="dialog">
+      <v-dialog v-model="dialog_colName">
         <v-card>
           <v-container>
             <v-row>
@@ -72,13 +87,14 @@
         <v-chip
           v-for="(dataGrid, gridIndex) in gridList"
           :key="gridIndex"
+          v-bind="dynamicVchipProp(gridIndex)"
           @click="currentGrid = gridIndex"
           class="ml-1"
           close
           @click:close="removeGrid(gridIndex)"
           label
         >
-          {{ gridIndex }}
+          Grid {{ gridIndex }}
         </v-chip>
       </v-chip-group>
       <v-btn @click="createNewGrid"><v-icon>mdi-plus</v-icon> Add Dataframe</v-btn></v-toolbar
@@ -129,10 +145,15 @@ export default {
   name: "App",
   data() {
     return {
+      hiddenCols: [],
+      vchipClickedProp: {
+        color: "primary"
+      },
       currentGrid: 0,
       gridList: [0],
       gridColumns: [],
-      dialog: false,
+      dialog_colDisplay: false,
+      dialog_colName: false,
       modules: [InfiniteRowModelModule, CsvExportModule],
 
       gridApi: {},
@@ -150,7 +171,7 @@ export default {
       cacheBlockSize: 100,
       defaultColDef: {
         flex: 1,
-        minWidth: 100,
+        minWidth: 140,
         editable: true,
         resizable: true,
         // undo
@@ -158,7 +179,7 @@ export default {
       },
       getRowStyle: null,
       updateTransaction: [],
-      deleteTransaction: {}
+      deleteTransaction: { 0: { row: [], column: [] } }
     };
   },
   computed: {
@@ -183,6 +204,7 @@ export default {
           // }
         };
         if (lowered == "id") {
+          filterObj["maxWidth"] = 70;
           filterObj["editable"] = false;
         }
         if (
@@ -204,6 +226,29 @@ export default {
   },
 
   methods: {
+    hideColumn() {
+      let finalState = [];
+      let state = {};
+      this.columns.forEach((element, index) => {
+        if (this.hiddenCols.includes(index)) {
+          state = { colId: element, hide: true };
+        } else {
+          state = { colId: element, hide: false };
+        }
+        finalState.push(state);
+        console.log(finalState);
+      });
+
+      this.gridColumnApi.applyColumnState({
+        state: finalState
+      });
+    },
+
+    dynamicVchipProp(gridIndex) {
+      if (gridIndex == this.currentGrid) {
+        return this.vchipClickedProp;
+      }
+    },
     removeGrid(gridIndex) {
       this.gridList.splice(gridIndex, 1);
       Vue.delete(this.deleteTransaction, gridIndex);
@@ -211,8 +256,8 @@ export default {
     },
     getColumnDefs() {},
     createNewGrid() {
-      this.deleteTransaction[this.currentGrid] = [];
       this.currentGrid = this.gridList.length;
+      this.deleteTransaction[this.currentGrid] = { row: [], column: [] };
 
       this.gridList.push(0);
     },
@@ -230,7 +275,7 @@ export default {
       });
       this.gridApi[this.currentGrid].setColumnDefs(columnDefs);
       //닫기
-      this.dialog = false;
+      this.dialog_colName = false;
     },
     updateRows() {
       let availableUndo = document.getElementById("undoInput").value;
@@ -258,7 +303,7 @@ export default {
     deleteRows() {
       let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
       selectedRows.forEach(element => {
-        this.deleteTransaction[this.currentGrid].push(element["ID"]);
+        this.deleteTransaction[this.currentGrid]["row"].push(element["ID"]);
       });
       this.gridApi[this.currentGrid].refreshInfiniteCache();
       // let path = "http://localhost:5000/deleteRows";
@@ -373,7 +418,7 @@ export default {
             // console.log(vm.parseFilterModel(filterModel));
             filterModel = vm.parseFilterModel(filterModel);
             if (vm.deleteTransaction[vm.currentGrid] != undefined) {
-              let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.currentGrid] } };
+              let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.currentGrid]["row"] } };
               console.log(filterModel);
               filterModel.push(ninFilter);
             }
