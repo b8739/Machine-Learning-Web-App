@@ -15,7 +15,7 @@
               :graphHeight="500"
             />
           </v-row>
-          <v-row> <DataTable /></v-row>
+          <!-- <v-row> <DataTable /></v-row> -->
         </v-container>
       </v-card>
     </v-dialog>

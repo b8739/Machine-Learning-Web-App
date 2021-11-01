@@ -246,7 +246,8 @@ export default {
       graphSources: state => state.modelingData.graphSources,
       modelingSummary: state => state.modelingData.modelingSummary,
 
-      tableName: state => state.initialData.tableName
+      tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName
     }),
 
     graphNames() {
@@ -292,14 +293,19 @@ export default {
         method: "post",
         url: path,
         data: {
-          case_name: this.case_name,
+          projectName: this.projectName,
           tableName: this.tableName,
+
+          case_name: this.case_name,
           inputs: this.modelingRequest.inputs,
+
           targets: this.modelingRequest.targets,
           parameters: this.modelingRequest.algorithm.parameters,
+
           algorithm: this.modelingRequest.algorithm.name,
-          graphSources: JSON.stringify(this.graphSources),
           modelingSummary: this.modelingSummary
+
+          // graphSources: JSON.stringify(this.graphSources),
         }
       }).then(function(res) {
         vm.loadCases();

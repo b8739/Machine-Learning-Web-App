@@ -31,9 +31,10 @@ export default {
         {
           y: [],
           type: "scatter",
-          mode: "lines+markers",
+          mode: "markers",
+          // mode: "markers",
           marker: {
-            size: 1
+            size: 2
             // marker is an object, valid marker keys: #scatter-marker
           },
           line: {
@@ -122,7 +123,8 @@ export default {
         url: path,
         data: {
           featureName: this.seriesName,
-          tableName: this.tableName
+          tableName: this.tableName,
+          projectName: this.projectName
         }
       })
         .then(res => {
@@ -151,6 +153,7 @@ export default {
   computed: {
     ...mapState({
       tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName,
       featureGraphData: state => state.apexchartGraph.featureGraphData
     }),
     refName() {
@@ -196,6 +199,8 @@ export default {
           "zoomOut2d",
           "Delete Selected Data"
         ]);
+      console.log("plotly mounted");
+      // this.createPlot(this.featureGraphData[this.seriesName], false);
     } else {
       this.config["displayModeBar"] = true;
       this.createEditPlot();

@@ -1,17 +1,16 @@
 <template>
   <div>
     <!-- Toolbars -->
-    <v-toolbar> {{ updateTransaction }}</v-toolbar>
+    <!-- <v-toolbar> {{ updateTransaction }}</v-toolbar> -->
+
     <v-toolbar>
       <v-toolbar-title class="mr-2">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
       <input id="undoInput" readonly class="undo-redo-input" />
       <label>Available Redo's:</label>
       <input id="redoInput" readonly class="undo-redo-input" />
-
       <v-btn small id="undoBtn" v-on:click="undo()">Undo</v-btn>
       <v-btn small id="redoBtn" v-on:click="redo()">Redo</v-btn>
-      <v-btn small @click="test">test</v-btn>
       <v-btn small @click="filtercheck">filtercheck</v-btn>
     </v-toolbar>
     <v-toolbar v-show="false">
@@ -35,18 +34,60 @@
     </v-toolbar>
     <v-toolbar>
       <v-toolbar-title class="mr-2"> CRUD Action (Server Side):</v-toolbar-title>
-      <v-btn small>Insert</v-btn>
+      <v-btn small disabled>Insert</v-btn>
       <v-btn small @click="updateRows()">Update</v-btn>
       <v-btn small @click="deleteRows()">Delete</v-btn>
 
       <!-- AG Grid -->
     </v-toolbar>
-    <v-dialog v-model="dialog">
-      <v-card>
-        <input id="csvResult" />
-      </v-card>
-    </v-dialog>
+    <v-toolbar>
+      <v-btn @click="dialog = !dialog">Change Column Name</v-btn>
+
+      <v-dialog v-model="dialog">
+        <v-card>
+          <v-container>
+            <v-row>
+              <v-col>From</v-col>
+              <v-col>To</v-col>
+            </v-row>
+            <v-row v-for="(column, columnIndex) in columns" :key="columnIndex">
+              <v-col><v-text-field disabled :label="column"></v-text-field></v-col>
+              <v-icon>mdi-arrow-right</v-icon>
+              <v-col
+                ><v-text-field
+                  v-model="gridColumns[columnIndex]"
+                  :placeholder="column"
+                ></v-text-field
+              ></v-col>
+            </v-row>
+          </v-container>
+          <v-card-actions>
+            <v-btn @click="updateColumnName">Confirm</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-toolbar>
+    <v-toolbar>
+      <v-chip-group class="ml-10">
+        <v-chip
+          v-for="(dataGrid, gridIndex) in gridList"
+          :key="gridIndex"
+          @click="currentGrid = gridIndex"
+          class="ml-1"
+          close
+          @click:close="removeGrid(gridIndex)"
+          label
+        >
+          {{ gridIndex }}
+        </v-chip>
+      </v-chip-group>
+      <v-btn @click="createNewGrid"><v-icon>mdi-plus</v-icon> Add Dataframe</v-btn></v-toolbar
+    >
+
     <ag-grid-vue
+      v-for="(dataGrid, gridIndex) in gridList"
+      :key="gridIndex"
+      v-show="currentGrid == gridIndex"
       style="width: 1400px; height:800px"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
@@ -67,6 +108,7 @@
       @first-data-rendered="onFirstDataRendered"
       @cell-value-changed="onCellValueChanged"
       :getRowStyle="getRowStyle"
+      :maintainColumnOrder="true"
     >
     </ag-grid-vue>
   </div>
@@ -87,10 +129,13 @@ export default {
   name: "App",
   data() {
     return {
+      currentGrid: 0,
+      gridList: [0],
+      gridColumns: [],
       dialog: false,
       modules: [InfiniteRowModelModule, CsvExportModule],
 
-      gridApi: null,
+      gridApi: {},
       columnApi: null,
 
       components: null,
@@ -112,7 +157,8 @@ export default {
         undoRedoCellEditingLimit: null
       },
       getRowStyle: null,
-      updateTransaction: []
+      updateTransaction: [],
+      deleteTransaction: {}
     };
   },
   computed: {
@@ -156,7 +202,36 @@ export default {
   components: {
     AgGridVue
   },
+
   methods: {
+    removeGrid(gridIndex) {
+      this.gridList.splice(gridIndex, 1);
+      Vue.delete(this.deleteTransaction, gridIndex);
+      this.currentGrid = this.gridList.length - 1;
+    },
+    getColumnDefs() {},
+    createNewGrid() {
+      this.deleteTransaction[this.currentGrid] = [];
+      this.currentGrid = this.gridList.length;
+
+      this.gridList.push(0);
+    },
+    updateColumnName() {
+      let changedElementIndex = [];
+      this.gridColumns.forEach((element, index) => {
+        if (element != this.columns[index]) {
+          changedElementIndex.push(index);
+        }
+      });
+      //headername 변경
+      const columnDefs = this.columnDefs;
+      changedElementIndex.forEach((element, index) => {
+        columnDefs[element].headerName = this.gridColumns[element];
+      });
+      this.gridApi[this.currentGrid].setColumnDefs(columnDefs);
+      //닫기
+      this.dialog = false;
+    },
     updateRows() {
       let availableUndo = document.getElementById("undoInput").value;
       if (availableUndo != 0) {
@@ -181,61 +256,60 @@ export default {
       }
     },
     deleteRows() {
-      let selectedRows = this.gridApi.getSelectedRows();
-      let selectedIDs = [];
+      let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
       selectedRows.forEach(element => {
-        selectedIDs.push(element["ID"]);
+        this.deleteTransaction[this.currentGrid].push(element["ID"]);
       });
-      let path = "http://localhost:5000/deleteRows";
+      this.gridApi[this.currentGrid].refreshInfiniteCache();
+      // let path = "http://localhost:5000/deleteRows";
 
-      // axios
-      axios({
-        method: "post",
-        url: path,
-        data: {
-          projectName: this.projectName,
-          tableName: this.tableName,
-          selectedIDs: selectedIDs
-        }
-      })
-        .then(res => {
-          // let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
-          // console.log(res.data);
-          this.gridApi.refreshInfiniteCache();
-          console.log(res.data);
-        })
+      // // axios
+      // axios({
+      //   method: "post",
+      //   url: path,
+      //   data: {
+      //     projectName: this.projectName,
+      //     tableName: this.tableName,
+      //     selectedIDs: selectedIDs
+      //   }
+      // })
+      //   .then(res => {
 
-        .catch(error => {
-          console.error(error);
-        });
+      //     this.gridApi[this.currentGrid].refreshInfiniteCache();
+      //     console.log(res.data);
+      //   })
+
+      //   .catch(error => {
+      //     console.error(error);
+      //   });
     },
     filtercheck() {
-      let dd = this.gridApi.getFilterModel();
+      let dd = this.gridApi[this.currentGrid].getFilterModel();
       console.log(dd);
     },
 
     getDisplayedRowCount() {
-      var count = this.gridApi.getDisplayedRowCount();
+      var count = this.gridApi[this.currentGrid].getDisplayedRowCount();
       console.log("getDisplayedRowCount() => " + count);
     },
     printAllDisplayedRows() {
-      var count = this.gridApi.getDisplayedRowCount();
+      var count = this.gridApi[this.currentGrid].getDisplayedRowCount();
       console.log("## printAllDisplayedRows");
       for (var i = 0; i < count; i++) {
-        var rowNode = this.gridApi.getDisplayedRowAtIndex(i);
+        var rowNode = this.gridApi[this.currentGrid].getDisplayedRowAtIndex(i);
         console.log("row " + i + " is " + rowNode.data);
       }
     },
     getRowData() {
       var rowData = [];
-      this.gridApi.forEachNode(function(node) {
+      this.gridApi[this.currentGrid].forEachNode(function(node) {
         rowData.push(node.data);
       });
       console.log("Row Data:");
       console.log(rowData);
     },
     exportAllData() {
-      let filterModel = this.gridApi.getFilterModel();
+      let filterModel = this.gridApi[this.currentGrid].getFilterModel();
       filterModel = this.parseFilterModel(filterModel);
 
       let path = "http://localhost:5000/exportAllData";
@@ -271,185 +345,19 @@ export default {
         );
       }
 
-      this.gridApi.exportDataAsCsv(params);
+      this.gridApi[this.currentGrid].exportDataAsCsv(params);
     },
     onBtnUpdate() {
       this.dialog = true;
 
-      document.querySelector("#csvResult").value = this.gridApi.getDataAsCsv(this.getParams());
-    },
-    test() {
-      let getSelectedNodes = this.gridApi.getSelectedNodes();
-      let getSelectedRows = this.gridApi.getSelectedRows();
-      console.log(getSelectedNodes);
-      console.log(getSelectedRows);
+      document.querySelector("#csvResult").value = this.gridApi[this.currentGrid].getDataAsCsv(
+        this.getParams()
+      );
     },
 
-    filterData(data, filterModel) {
-      // Filter 존재 여부 검사
-      // [If Filter exists] fitler 안하고 그대로 반환
-      let filterList = Object.keys(filterModel);
-
-      let isFilterPresent = filterModel && Object.keys(filterModel).length > 0;
-      if (!isFilterPresent) {
-        return data;
-      }
-
-      // [If Not]
-      let resultOfFilter = [];
-      // loop
-      itemLoop: for (let i = 0; i < data.length; i++) {
-        let item = data[i];
-        filterLoop: for (let j = 0; j < filterList.length; j++) {
-          let filterColumn = filterList[j];
-          let filterType = filterModel[filterColumn].filterType;
-          let filterCalculation = filterModel[filterColumn].type;
-
-          //switch
-          if (filterType == "text") {
-            let filterValue = filterModel[filterColumn].filter;
-            switch (filterCalculation) {
-              case "contains":
-                if (item[filterColumn].includes(filterValue.toString()) == false) {
-                  continue itemLoop;
-                }
-                break;
-              case "notContains":
-                if (item[filterColumn].includes(filterValue.toString())) {
-                  continue itemLoop;
-                }
-                break;
-              case "startsWith":
-                if (item[filterColumn].toString()[0] != filterValue) {
-                  continue itemLoop;
-                }
-                break;
-              case "endsWith":
-                if (
-                  item[filterColumn].toString()[item[filterColumn].toString().length - 1] ==
-                  filterValue
-                ) {
-                  continue itemLoop;
-                }
-            }
-          } else if (filterType == "number") {
-            let filterValue = filterModel[filterColumn].filter;
-            switch (filterCalculation) {
-              case "equals":
-                if (item[filterColumn] != filterValue) {
-                  continue itemLoop;
-                }
-                break;
-              case "notEqual":
-                if (item[filterColumn] == filterValue) {
-                  continue itemLoop;
-                }
-                break;
-
-              case "lessThan":
-                if (item[filterColumn] >= filterValue) {
-                  continue itemLoop;
-                }
-                break;
-              case "lessThanOrEqual":
-                if (item[filterColumn] > filterValue && item[filterColumn] != filterValue) {
-                  continue itemLoop;
-                }
-                break;
-              case "greaterThan":
-                if (item[filterColumn] <= filterValue) {
-                  continue itemLoop;
-                }
-                break;
-              case "greaterThanOrEqual":
-                if (item[filterColumn] < filterValue && item[filterColumn] != filterValue) {
-                  continue itemLoop;
-                }
-                break;
-              case "inRange":
-                if (
-                  filterValue <= item[filterColumn] &&
-                  item[filterColumn] < filterModel[filterColumn]["filterTo"] == false
-                ) {
-                  continue itemLoop;
-                }
-                break;
-              case "dateFrom":
-                if (
-                  filterValue <= item[filterColumn] &&
-                  item[filterColumn] < filterModel[filterColumn]["filterTo"] == false
-                ) {
-                  continue itemLoop;
-                }
-                break;
-
-                break;
-              default:
-                break;
-            }
-          } else if (filterType == "date") {
-            let dateFrom = filterModel[filterColumn].dateFrom;
-
-            switch (filterCalculation) {
-              case "equals":
-                if (item[filterColumn] != dateFrom) {
-                  continue itemLoop;
-                }
-                break;
-              case "notEqual":
-                if (item[filterColumn] == dateFrom) {
-                  continue itemLoop;
-                }
-                break;
-
-              case "lessThan":
-                if (new Date(item[filterColumn]) > new Date(dateFrom)) {
-                  continue itemLoop;
-                }
-                break;
-              case "lessThanOrEqual":
-                if (
-                  new Date(item[filterColumn]) > dateFrom &&
-                  new Date(item[filterColumn] != dateFrom)
-                ) {
-                  continue itemLoop;
-                }
-                break;
-              case "greaterThan":
-                if (new Date(item[filterColumn]) < new Date(dateFrom)) {
-                  continue itemLoop;
-                }
-                break;
-              case "greaterThanOrEqual":
-                if (
-                  new Date(item[filterColumn] < dateFrom) &&
-                  new Date(item[filterColumn] != dateFrom)
-                ) {
-                  continue itemLoop;
-                }
-                break;
-              case "inRange":
-                let dateTo = filterModel[filterColumn].dateTo;
-
-                if (
-                  new Date(dateFrom >= item[filterColumn]) &&
-                  new Date(item[filterColumn] > dateTo) == false
-                ) {
-                  continue itemLoop;
-                }
-                break;
-
-              default:
-                break;
-            }
-          }
-        }
-        resultOfFilter.push(item);
-      }
-      return resultOfFilter;
-    },
     onGridReady(params) {
-      this.gridApi = params.api;
+      console.log("on grid readty");
+      this.gridApi[this.gridList.length - 1] = params.api;
       this.gridColumnApi = params.columnApi;
       let vm = this;
       updateData(vm);
@@ -461,10 +369,16 @@ export default {
 
           getRows: function(params) {
             // console.log("asking for " + params.startRow + " to " + params.endRow);
-            let filterModel = vm.gridApi.getFilterModel();
-            // console.log(filterModel);
+            let filterModel = vm.gridApi[vm.currentGrid].getFilterModel();
             // console.log(vm.parseFilterModel(filterModel));
             filterModel = vm.parseFilterModel(filterModel);
+            if (vm.deleteTransaction[vm.currentGrid] != undefined) {
+              let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.currentGrid] } };
+              console.log(filterModel);
+              filterModel.push(ninFilter);
+            }
+
+            console.log(filterModel);
 
             let path = "http://localhost:5000/infiniteRowModel";
 
@@ -481,7 +395,6 @@ export default {
               }
             })
               .then(res => {
-                // let dataAfterFiltering = vm.filterData(res.data, params.filterModel);
                 // console.log(res.data);
 
                 params.successCallback(res.data, vm.datasetSize);
@@ -498,7 +411,7 @@ export default {
     },
     parseFilterModel(filterModel) {
       if (Object.keys(filterModel).length == 0) {
-        return "none";
+        return [];
       } else {
         let filterKeys = Object.keys(filterModel);
         let conditionList = [];
@@ -515,53 +428,104 @@ export default {
             }
             condition[operator] = [];
             for (let i = 1; i < 3; i++) {
-              let newCondition = this.filterSwitch(element, filterModel[element]["condition" + i]);
+              let newCondition = this.serverSideFilter(
+                element,
+                filterModel[element]["condition" + i]
+              );
               condition[operator].push(newCondition);
             }
           }
           // NO operator
           else {
             // no operator
-            condition = this.filterSwitch(element, filterModel[element]);
+            condition = this.serverSideFilter(element, filterModel[element]);
           }
           conditionList.push(condition);
         });
         return conditionList;
       }
     },
-    filterSwitch(elementName, filterModel) {
-      console.log(filterModel);
-      let filter = filterModel["filter"];
+    serverSideFilter(elementName, filterModel) {
       let condition = {};
-      switch (filterModel["type"]) {
-        case "equals":
-          condition[elementName] = filter;
-          break;
-        case "notEqual":
-          condition[elementName] = { $ne: filter };
-          break;
-        case "lessThan":
-          condition[elementName] = { $lt: filter };
+      let filterType = filterModel.filterType;
+      if (filterType == "number") {
+        let filter = filterModel["filter"];
 
-          break;
-        case "lessThanOrEqual":
-          condition[elementName] = { $lte: filter };
-          break;
-        case "greaterThan":
-          condition[elementName] = { $gt: filter };
+        switch (filterModel["type"]) {
+          case "equals":
+            condition[elementName] = filter;
+            break;
+          case "notEqual":
+            condition[elementName] = { $ne: filter };
+            break;
+          case "lessThan":
+            condition[elementName] = { $lt: filter };
 
-          break;
-        case "greaterThanOrEqual":
-          condition[elementName] = { $gte: filter };
+            break;
+          case "lessThanOrEqual":
+            condition[elementName] = { $lte: filter };
+            break;
+          case "greaterThan":
+            condition[elementName] = { $gt: filter };
 
-          break;
-        case "inRange":
-          condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
+            break;
+          case "greaterThanOrEqual":
+            condition[elementName] = { $gte: filter };
 
-          break;
-        default:
-          break;
+            break;
+          case "inRange":
+            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
+
+            break;
+          default:
+            break;
+        }
+      } else if (filterType == "date") {
+        let filter = filterModel["dateFrom"];
+
+        switch (filterModel["type"]) {
+          case "equals":
+            condition[elementName] = filter;
+            break;
+          case "notEqual":
+            condition[elementName] = { $ne: filter };
+            break;
+
+          case "lessThan":
+            condition[elementName] = { $lt: filter };
+            break;
+
+          case "greaterThan":
+            condition[elementName] = { $gt: filter };
+
+            break;
+
+          case "inRange":
+            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
+
+            break;
+          case "dateFrom":
+            break;
+          default:
+            break;
+        }
+      } else if (filterType == "text") {
+        let filter = filterModel["filter"];
+
+        switch (filterModel["type"]) {
+          case "contains":
+            break;
+          case "notContains":
+            break;
+          case "startsWith":
+            break;
+          case "endsWith":
+            break;
+          default:
+            break;
+        }
       }
+
       return condition;
     },
     onFirstDataRendered() {
@@ -609,10 +573,10 @@ export default {
       this.updateTransaction.push(update);
     },
     undo() {
-      this.gridApi.undoCellEditing();
+      this.gridApi[this.currentGrid].undoCellEditing();
     },
     redo() {
-      this.gridApi.redoCellEditing();
+      this.gridApi[this.currentGrid].redoCellEditing();
     },
     getParams() {
       return { columnSeparator: this.getValue("#columnSeparator") };
@@ -670,6 +634,11 @@ export default {
           return text;
       }
     }
+  },
+  mounted() {
+    this.columns.forEach(element => {
+      this.gridColumns.push(element);
+    });
   },
   beforeMount() {
     // this.getRowStyle = params => {

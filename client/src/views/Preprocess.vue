@@ -171,7 +171,6 @@ export default {
     ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
 
     changeComponent(componentName) {
-      this.askSave();
       if (this.datasetItems.length == 0) {
         eventBus.$emit("reloadDataTable", true);
       }
@@ -235,31 +234,7 @@ export default {
         console.error(error);
       });
     },
-    askSave() {
-      // 변경사항 있을 때
-      if (
-        (this.comp == "SummaryTable" && this.summaryChangeFlag == true) ||
-        (this.comp == "DataTable" && this.tableChangeFlag == true)
-      ) {
-        if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-          eventBus.$emit("saveChanges", true);
-        }
-        // 취소했을때
-        else {
-          this.rollback();
-          // rollback 대신에 뭐가 들어가야 함
-          if (this.comp == "DataTable") {
-            this.resetDataTableVuex();
-          } else if (this.comp == "SummaryTable") {
-            this.resetSummaryTableVuex();
-            this.selectionTimer = setTimeout(() => {
-              this.cloneOriginalArray();
-            }, 1000);
-          }
-        }
-      }
-      // 변경사항 없을 때
-    }
+    askSave() {}
   },
   created() {
     this.resetEda();

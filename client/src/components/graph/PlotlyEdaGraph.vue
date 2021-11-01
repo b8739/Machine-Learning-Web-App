@@ -13,7 +13,7 @@ export default {
     return {
       dataFormat: {
         type: "scatter",
-        mode: "lines+markers",
+        mode: "markers",
         marker: {
           size: 2
         },
@@ -25,7 +25,7 @@ export default {
       data: [
         {
           type: "scatter",
-          mode: "lines+markers",
+          mode: "markers",
           marker: {
             size: 2
             // marker is an object, valid marker keys: #scatter-marker
@@ -73,6 +73,7 @@ export default {
   computed: {
     ...mapState({
       tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName,
       featureGraphData: state => state.apexchartGraph.featureGraphData,
       xaxisColumns: state => state.edaHandler.xaxisColumns,
       xaxisEvent: state => state.edaHandler.xaxisEvent,
@@ -120,7 +121,8 @@ export default {
         url: path,
         data: {
           featureName: featureName,
-          tableName: this.tableName
+          tableName: this.tableName,
+          projectName: this.projectName
         }
       })
         .then(res => {

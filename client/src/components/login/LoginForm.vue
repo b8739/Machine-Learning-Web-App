@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-btn @click="mongoTest">mongoTest</v-btn>
+    <!-- <v-btn @click="mongoTest">mongoTest</v-btn> -->
     <v-main>
       <v-container fluid fill-height>
         <v-row align="center" justify="center">

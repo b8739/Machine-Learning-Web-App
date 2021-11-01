@@ -23,13 +23,13 @@
           class="mr-5 mt-5 cursor-pointer"
         >
           <!-- @click="routeModelingResult(case_[case_name])" v-sheet-->
-          <v-card-text class="font-weight-bold body-1">{{ case_["name"] }}</v-card-text>
+          <v-card-text class="font-weight-bold body-1">{{ case_["case_name"] }}</v-card-text>
           <v-card-text class="font-weight-light caption pt-0">
             {{ case_["algorithm"] }}</v-card-text
           >
-          <v-card-text class="font-weight-thin caption pt-0">
+          <!-- <v-card-text class="font-weight-thin caption pt-0">
             {{ case_["used_dataset"] }}</v-card-text
-          >
+          > -->
           <v-chip-group column>
             <v-chip
               class="ma-2"

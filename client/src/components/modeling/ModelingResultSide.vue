@@ -17,14 +17,14 @@
             @click="newWindow(case_[case_name])"
           >
             <v-card-text class="font-weight-bold subheading pt-2 pb-0">
-              {{ case_["name"] }}</v-card-text
+              {{ case_["case_name"] }}</v-card-text
             >
             <v-card-text class="font-weight-light caption pt-2 pb-0">
               Algorithm: {{ case_["algorithm"] }}</v-card-text
             >
-            <v-card-text class="font-weight-light caption pt-2 pb-1">
+            <!-- <v-card-text class="font-weight-light caption pt-2 pb-1">
               Dataset: {{ case_["used_dataset"] }}</v-card-text
-            >
+            > -->
             <v-card-text class="font-weight-thin caption pt-1"> Created __ days ago</v-card-text>
           </v-sheet>
         </v-list-item>
@@ -61,6 +61,7 @@ export default {
       axios
         .get(path)
         .then(res => {
+          console.log(res.data);
           this.saveCaseList(res.data);
         })
         .catch(error => {});

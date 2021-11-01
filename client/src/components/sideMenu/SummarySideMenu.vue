@@ -5,7 +5,7 @@
         <v-list-item-title active>Edit Feature</v-list-item-title>
       </template>
       <v-list-item
-        :disabled="item.title == 'Moving Average'"
+        disabled
         v-for="item in items"
         :key="item.title"
         link

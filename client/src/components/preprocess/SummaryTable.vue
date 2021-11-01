@@ -1,6 +1,6 @@
 <template>
-  <div v-if="summarizedInfo != null || summarizedInfo != undefined">
-    {{ columnsWithoutID }}
+  <div v-if="columns.length != 0">
+    <!-- {{ columnsWithoutID }} -->
     <div class="container">
       <!-- 테이블 -->
       <!-- <div>Original{{ columns }}</div>
@@ -247,15 +247,14 @@ export default {
       return this.summarizedInfo["datatype"][column];
     },
     distinguishDataType(column) {
-      console.log(column);
       if (this.getDataType(column) == "category" || this.getDataType(column) == "string") {
         return "CategoricalRow";
       } else if (
-        this.getDataType(column).indexOf("int") != 1 ||
-        this.getDataType(column).indexOf("float") != 1
-      )
+        this.getDataType(column).indexOf("int") == 0 ||
+        this.getDataType(column).indexOf("float") == 0
+      ) {
         return "NumericRow";
-      else {
+      } else {
         return "DateRow";
       }
     },

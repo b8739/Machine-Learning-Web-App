@@ -80,6 +80,7 @@ export default {
   computed: {
     ...mapState({
       tableList: state => state.initialData.tableList,
+
       projectName: state => state.initialData.projectName
     })
   },
@@ -117,12 +118,11 @@ export default {
         confirm("선택한 Dataset을 Database에서 삭제하시겠습니까? (다시 복구할 수 없습니다)") == true
       ) {
         let path = "http://localhost:5000/dropTable";
-        axios
-          .get(path, {
-            params: {
-              tableName: tableName
-            }
-          })
+        axios({
+          method: "post",
+          url: path,
+          data: { projectName: this.projectName, tableName: tableName }
+        })
           .then(res => {
             this.showTables();
             this.editMode = false;

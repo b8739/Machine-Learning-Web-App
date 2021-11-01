@@ -1,5 +1,5 @@
 <template>
-  <tr v-if="columns.length != 0">
+  <tr>
     <slot></slot>
     <!-- 3rd Column -->
     <td>
@@ -101,7 +101,10 @@ export default {
     PlotlyHist
   },
   methods: {},
-  created() {}
+  beforeMount() {},
+  mounted() {
+    // console.log(this.column);
+  }
 };
 </script>
 <style scoped>

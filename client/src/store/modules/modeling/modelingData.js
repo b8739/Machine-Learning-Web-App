@@ -42,6 +42,9 @@ const mutations = {
   },
   resetModelingData(state) {
     Object.assign(state, getDefaultState());
+  },
+  removeUndefined(state, arrayName) {
+    state.modelingRequest[arrayName].filter((element, i) => element !== undefined);
   }
 };
 
@@ -66,12 +69,15 @@ const actions = {
     console.log(path);
     console.log(state.modelingRequest);
     console.log(state.splitRatio);
+    commit("removeUndefined", "inputs");
+    commit("removeUndefined", "targets");
     // axios
     axios({
       method: "post",
       url: path,
       data: {
         modelingRequest: state.modelingRequest,
+        projectName: rootState.initialData.projectName,
         modelingDataset: state.modelingDataset,
         splitRatio: state.splitRatio
       }

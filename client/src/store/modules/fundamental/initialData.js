@@ -3,7 +3,7 @@ import Vue from "vue";
 import router from "@/router";
 const getDefaultState = () => {
   return {
-    summarizedInfo: null,
+    summarizedInfo: { interval: [] },
     tableList: [],
     navStatus: null,
     randomRange: null,
