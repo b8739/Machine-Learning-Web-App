@@ -13,15 +13,11 @@
         </v-btn>
       </v-list-item>
       <v-list dense>
-        <v-list-group v-model="activeState">
+        <!-- <v-list-group v-model="activeState">
           <template v-slot:activator>
             <v-list-item-title>Current Dataset</v-list-item-title>
           </template>
-          <!-- <v-list-item v-for="(tableName, tableIndex) in tableList" :key="tableIndex">
-            <v-list-item-title @click="clickTableNameEvent(tableName)">{{
-              tableName
-            }}</v-list-item-title>
-          </v-list-item> -->
+
           <v-select
             class="px-3"
             outlined
@@ -31,7 +27,7 @@
             :label="tableName"
             :items="tableList"
           ></v-select>
-        </v-list-group>
+        </v-list-group> -->
       </v-list>
       <keep-alive>
         <component v-bind:is="dynamicSideMenu"></component>

@@ -3,7 +3,7 @@ import Vue from "vue";
 import router from "@/router";
 const getDefaultState = () => {
   return {
-    summarizedInfo: { interval: [] },
+    summarizedInfo: {},
     tableList: [],
     navStatus: null,
     randomRange: null,
@@ -26,6 +26,9 @@ const mutations = {
   resetState(state) {
     Object.assign(state, getDefaultState());
   },
+  resetSummarizedInfo(state) {
+    state.summarizedInfo = {};
+  },
   loadColumns(state, payload) {
     state.columns.splice(0, state.columns.length);
     payload.forEach(element => {
@@ -42,8 +45,9 @@ const mutations = {
   },
 
   loadSummarizedInfo(state, payload) {
-    state.summarizedInfo = null;
-    state.summarizedInfo = payload;
+    // state.summarizedInfo = null;
+
+    Vue.set(state.summarizedInfo, payload.tableIndex, payload.data);
   },
   changeColumnName_vuex(state, payload) {
     let columnList = Object.keys(state.dataset);
@@ -121,22 +125,20 @@ const actions = {
 
     // 원본
   },
-  loadSummarizedData({ commit, state }) {
+  loadSummarizedData({ commit, state }, loadInfo) {
     const path = "http://localhost:5000/loadSummarizedData";
     axios({
       method: "post",
       url: path,
       data: {
-        tableName: state.tableName,
-        projectName: state.projectName
+        tableName: loadInfo.tableName,
+        projectName: state.projectName,
+        columnsToExclude: loadInfo.columnsToExclude
       }
     })
       .then(res => {
-        commit("loadSummarizedInfo", res.data);
-
-        if (router.currentRoute.path != "/preprocess") {
-          router.push({ name: "preprocess" });
-        }
+        let payload = { tableIndex: loadInfo.tableIndex, data: res.data };
+        commit("loadSummarizedInfo", payload);
       })
       .catch(error => {
         console.error(error);

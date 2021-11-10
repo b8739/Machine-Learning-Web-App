@@ -18,18 +18,18 @@
             </v-col>
             <!-- 화면 우측 -->
             <v-col cols="10" class="px-8">
-              <v-toolbar elevation="1">
-                <!-- Preprocess/Table 교체 버튼 -->
+              <!-- Preprocess/Table 교체 버튼 -->
+
+              <!-- <v-toolbar elevation="1">
                 <v-row>
                   <v-btn class="mr-2" @click="changeComponent('SummaryTable')">Features</v-btn>
                   <v-btn @click="changeComponent('AgGrid')">Table</v-btn>
-                  <!-- <v-btn @click="changeComponent('DataTable')">Table</v-btn> -->
 
                   <v-spacer></v-spacer>
                   <portal-target :name="summaryPortal"> </portal-target>
-                  <!-- <SaveMenu /> -->
+  
                 </v-row>
-              </v-toolbar>
+              </v-toolbar> -->
               <v-row>
                 <!-- <GraphBuilder :columns="columns" /> -->
                 <NewGraphBuilder />
@@ -242,8 +242,7 @@ export default {
     this.$root.$refs.preprocessComp = this;
     this.$root.$refs.preprocess = this;
     this.setNavStatus("preprocess");
-    this.loadColumns();
-    this.loadDatasetSize();
+    // this.loadDatasetSize();
   },
   mounted() {
     // console.log("preprocess mounted");

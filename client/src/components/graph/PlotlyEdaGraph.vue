@@ -99,6 +99,7 @@ export default {
       Plotly.deleteTraces(this.plotContainer, tpIndex);
     },
     updatePlot(featureName, data, axisType, tpIndex) {
+      console.log(tpIndex);
       // 입력하는 축의 데이터 (ex. x)
       this.data[tpIndex][axisType] = [data];
       // 반대 축 데이터도 다시 입력해주어야 초기화가 안됨 (ex. y)
@@ -113,7 +114,7 @@ export default {
 
       // Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
     },
-    loadFullData(featureName, axisType, tpIndex) {
+    loadFullData(dataset, featureName, axisType, tpIndex) {
       let path = "http://localhost:5000/loadEditGraphData";
       // axios
       this.$axios({
@@ -121,7 +122,7 @@ export default {
         url: path,
         data: {
           featureName: featureName,
-          tableName: this.tableName,
+          tableName: dataset,
           projectName: this.projectName
         }
       })
@@ -259,7 +260,7 @@ export default {
   },
   created() {
     eventBus.$on("loadAxis", payload => {
-      this.loadFullData(payload.featureName, payload.axisType, payload.tpIndex);
+      this.loadFullData(payload.dataset, payload.featureName, payload.axisType, payload.tpIndex);
     });
     eventBus.$on("changeAxis", payload => {
       this.changeAxis(payload.selectedAxis, payload.axisType, payload.tpIndex, payload.featureName);

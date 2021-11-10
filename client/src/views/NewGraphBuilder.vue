@@ -76,8 +76,21 @@
                                   <v-subheader>Type</v-subheader></v-col
                                 >
                                 <v-col class="pa-0 ma-0" cols="9">
-                                  <v-select dense></v-select></v-col
+                                  <v-select disabled dense></v-select></v-col
                               ></v-row>
+                              <v-row>
+                                <v-col class="pa-0 ma-0" cols="3">
+                                  <v-subheader>Dataset</v-subheader></v-col
+                                >
+                                <v-col class="pa-0 ma-0" cols="9">
+                                  <v-select
+                                    @input="loadColumns(tpIndex)"
+                                    dense
+                                    :items="tableList"
+                                    v-model="chosenDataset[tpIndex]"
+                                  ></v-select
+                                ></v-col>
+                              </v-row>
                               <v-row v-for="(axisType, atIndex) in axisTypes" :key="atIndex">
                                 <!-- x -->
                                 <v-col class="pa-0 ma-0" cols="3">
@@ -88,9 +101,15 @@
                                     clearable
                                     @click:clear="removeAxis(axisType, tpIndex)"
                                     @change="
-                                      featureName => loadAxis(featureName, axisType, tpIndex)
+                                      featureName =>
+                                        loadAxis(
+                                          chosenDataset[tpIndex],
+                                          featureName,
+                                          axisType,
+                                          tpIndex
+                                        )
                                     "
-                                    :items="columns"
+                                    :items="columnsOfDataset"
                                     dense
                                     v-model="selectedData[axisType][tpIndex]"
                                   ></v-select
@@ -225,6 +244,7 @@
 import Vue from "vue";
 import { eventBus } from "@/main";
 import PlotlyEdaGraph from "@/components/graph/PlotlyEdaGraph.vue";
+import axios from "axios";
 
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
@@ -259,7 +279,9 @@ export default {
           x: null,
           y: null
         }
-      ]
+      ],
+      chosenDataset: {},
+      columnsOfDataset: []
     };
   },
   watch: {
@@ -273,6 +295,24 @@ export default {
   methods: {
     ...mapMutations("edaMenuHandler", ["setMenuState"]),
     ...mapMutations("edaMenuHandler", ["resetEda"]),
+    loadColumns(tpIndex) {
+      let path = "http://localhost:5000/loadColumns";
+      axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.chosenDataset[tpIndex],
+          projectName: this.projectName
+        }
+      })
+        .then(res => {
+          console.log(res.data);
+          this.columnsOfDataset = res.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     loadGroupingData(axisType) {
       // 현재는 단일 groupingfeature만 되는 상태
       let path = "http://localhost:5000/loadGroupingData";
@@ -334,11 +374,16 @@ export default {
 
       eventBus.$emit("addEmptyTrace", true);
     },
-    loadAxis(featureName, axisType, tpIndex) {
+    loadAxis(dataset, featureName, axisType, tpIndex) {
       if (featureName == null || featureName == undefined) {
         return;
       } else {
-        let payload = { featureName: featureName, axisType: axisType, tpIndex: tpIndex };
+        let payload = {
+          dataset: dataset,
+          featureName: featureName,
+          axisType: axisType,
+          tpIndex: tpIndex
+        };
         eventBus.$emit("loadAxis", payload);
       }
     },
@@ -355,6 +400,8 @@ export default {
   computed: {
     ...mapState({
       tableName: state => state.initialData.tableName,
+      projectName: state => state.initialData.projectName,
+      tableList: state => state.initialData.tableList,
 
       columns: state => state.initialData.columns,
       menuState: state => state.edaMenuHandler.menuState

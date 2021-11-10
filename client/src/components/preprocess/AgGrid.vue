@@ -1,631 +1,356 @@
 <template>
-  <div>
-    <!-- Toolbars -->
-    <!-- <v-toolbar> {{ updateTransaction }}</v-toolbar> -->
-
-    <v-toolbar>
-      {{ hiddenCols }}
-      <v-toolbar-title class="mr-2">Undo/Redo:</v-toolbar-title>
+  <div style="width:100%">
+    <!-- <v-toolbar>
+      <v-toolbar-title class="mr-2 font-weight-bold subheading">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
+      <input id="undoInput" :value="availableUndo" />
       <input id="undoInput" readonly class="undo-redo-input" />
       <label>Available Redo's:</label>
       <input id="redoInput" readonly class="undo-redo-input" />
-      <v-btn small id="undoBtn" v-on:click="undo()">Undo</v-btn>
-      <v-btn small id="redoBtn" v-on:click="redo()">Redo</v-btn>
-      <v-btn small @click="filtercheck">filtercheck</v-btn>
-    </v-toolbar>
-    <v-toolbar v-show="false">
-      <div class="row">
-        <label>columnSeparator = </label>
-        <select id="columnSeparator">
-          <option value="none">(default)</option>
-          <option value="tab">tab</option>
-          <option value="|">bar (|)</option>
-        </select>
-      </div>
-    </v-toolbar>
-    <v-toolbar>
-      <v-toolbar-title class="mr-2"> Export CSV FIle:</v-toolbar-title>
-      <v-btn small v-on:click="exportLoadedData()"
-        >Download CSV file <label style="color:red">(Only currently loaded data)</label></v-btn
+      <v-btn outlined color="blue-grey" class="mr-2 " small id="undoBtn" v-on:click="undo()"
+        >Undo</v-btn
       >
-      <v-btn small v-on:click="exportAllData()"
-        >Download CSV file <label style="color:red">(All Data)</label></v-btn
+      <v-btn outlined color="blue-grey" class="mr-2 " small id="redoBtn" v-on:click="redo()"
+        >Redo</v-btn
       >
-    </v-toolbar>
-    <v-toolbar>
-      <v-toolbar-title class="mr-2"> CRUD Action (Server Side):</v-toolbar-title>
-      <v-btn small @click="updateRows()">Update Row</v-btn>
-      <v-btn small @click="deleteRows()">Delete Row</v-btn>
-      <v-btn small>Delete Column</v-btn>
-      <v-btn small @click="dialog_colDisplay = true">Drop Column (Hide)</v-btn>
-      <v-dialog v-model="dialog_colDisplay">
-        <v-card>
-          <v-container>
-            <v-chip-group v-model="hiddenCols" multiple active-class="error--text" class="ml-10">
-              <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" label>
-                {{ column }}
-              </v-chip>
-            </v-chip-group>
-          </v-container>
-          <v-card-actions>
-            <v-btn @click="hideColumn">Confirm</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <!-- AG Grid -->
-    </v-toolbar>
-    <v-toolbar>
-      <v-btn @click="dialog_colName = !dialog_colName">Change Column Name</v-btn>
+    </v-toolbar> -->
+    <v-btn @click="hidePanel = !hidePanel" small>Hide Panel</v-btn>
 
-      <v-dialog v-model="dialog_colName">
+    <div v-show="hidePanel">
+      <v-toolbar v-show="false">
+        <div class="row">
+          <label>columnSeparator = </label>
+          <select id="columnSeparator">
+            <option value="none">(default)</option>
+            <option value="tab">tab</option>
+            <option value="|">bar (|)</option>
+          </select>
+        </div>
+      </v-toolbar>
+      <v-toolbar>
+        <v-toolbar-title class="mr-2 font-weight-bold subheading">
+          Export CSV FIle:</v-toolbar-title
+        >
+        <v-btn class="mr-2" outlined color="blue-grey" small v-on:click="exportLoadedData()"
+          >Download CSV file <label style="color:red">(Only currently loaded data)</label></v-btn
+        >
+        <v-btn class="mr-2" outlined color="blue-grey" small v-on:click="exportAllData()"
+          >Download CSV file <label style="color:red">(All Data)</label></v-btn
+        >
+      </v-toolbar>
+      <v-toolbar>
+        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Edit Rows</v-toolbar-title>
+        <v-btn class="mr-2" outlined color="blue-grey" small @click="updateRows()"
+          >Update Row</v-btn
+        >
+        <v-btn class="mr-2" outlined color="blue-grey" small @click="deleteRows()"
+          >Delete Row</v-btn
+        >
+      </v-toolbar>
+
+      <v-dialog v-model="dialog_merge">
         <v-card>
+          <v-card-text>현재는 데이터셋 2개만 합칠 수 있습니다.</v-card-text>
+
           <v-container>
-            <v-row>
-              <v-col>From</v-col>
-              <v-col>To</v-col>
-            </v-row>
-            <v-row v-for="(column, columnIndex) in columns" :key="columnIndex">
-              <v-col><v-text-field disabled :label="column"></v-text-field></v-col>
-              <v-icon>mdi-arrow-right</v-icon>
-              <v-col
-                ><v-text-field
-                  v-model="gridColumns[columnIndex]"
-                  :placeholder="column"
-                ></v-text-field
-              ></v-col>
-            </v-row>
+            <v-select
+              :items="items"
+              item-text="name"
+              item-value="tableName"
+              v-model="tableToMerge"
+              chips
+              multiple
+            ></v-select>
           </v-container>
           <v-card-actions>
-            <v-btn @click="updateColumnName">Confirm</v-btn>
+            <v-btn @click="createMergedGrid">Confirm</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-toolbar>
+      <v-toolbar>
+        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Edit Columns</v-toolbar-title>
+        <v-btn class="mr-2" outlined color="blue-grey" small @click="openDisplayDialog()"
+          >Drop Column (Hide)</v-btn
+        >
+        <v-dialog v-model="dialog_colDisplay">
+          <v-card>
+            <v-container>
+              <v-chip-group
+                v-model="selectedColumns[currentGrid]"
+                multiple
+                active-class="error--text"
+                class="ml-10"
+              >
+                <v-chip v-for="(column, columnIndex) in loadedColumns" :key="columnIndex" label>
+                  {{ column }}
+                </v-chip>
+              </v-chip-group>
+            </v-container>
+            <v-card-actions>
+              <v-btn @click="hideColumn">Confirm</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+
+      <v-toolbar>
+        <v-toolbar-title class="mr-2 font-weight-bold subheading">
+          Edit Column Info</v-toolbar-title
+        >
+
+        <v-btn color="blue-grey" outlined @click="openChangeNameDialog" small
+          >Change Column Name</v-btn
+        >
+
+        <v-dialog v-model="dialog_colName">
+          <v-card>
+            <v-container>
+              <v-row>
+                <v-col>From</v-col>
+                <v-col>To</v-col>
+              </v-row>
+              <v-row v-for="(column, columnIndex) in loadedColumns" :key="columnIndex">
+                <v-col><v-text-field disabled :label="column"></v-text-field></v-col>
+                <v-icon>mdi-arrow-right</v-icon>
+                <v-col
+                  ><v-text-field
+                    v-model="gridColumns[columnIndex]"
+                    :placeholder="column"
+                  ></v-text-field
+                ></v-col>
+              </v-row>
+            </v-container>
+            <v-card-actions>
+              <v-btn @click="updateColumnName">Confirm</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+      <v-toolbar>
+        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Data Cleansing</v-toolbar-title>
+        <v-btn
+          color="blue-grey"
+          disabled
+          @click="dialog_nullToZero = true"
+          class="mr-2 "
+          outlined
+          small
+          >Null -> Zero</v-btn
+        >
+        <v-btn color="blue-grey" disabled @click="dialog_negativeToZero = true" outlined small
+          >Negative -> Zero</v-btn
+        >
+      </v-toolbar>
+      <!-- dialog -->
+      <!-- <v-dialog v-model="dialog_nullToZero">
+      <v-card>
+        <v-container>
+          <v-chip-group v-model="nullCols" multiple active-class="error--text" class="ml-10">
+            <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" label>
+              {{ column }}
+            </v-chip>
+          </v-chip-group>
+        </v-container>
+        <v-card-actions>
+          <v-btn @click="dialog_nullToZero = false">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog_negativeToZero">
+      <v-card>
+        <v-container>
+          <v-chip-group v-model="negativeCols" multiple active-class="error--text" class="ml-10">
+            <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" label>
+              {{ column }}
+            </v-chip>
+          </v-chip-group>
+        </v-container>
+        <v-card-actions>
+          <v-btn>Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog> -->
+      <!-- <v-col> tableNameToLoad {{ tableNameToLoad }} </v-col>
+    <v-col> currentGrid {{ currentGrid }} </v-col>
+    <v-col> gridList {{ gridList }} </v-col>
+    <v-col> tableToMerge {{ tableToMerge }} </v-col> -->
+
+      <!-- <v-col> loadedColumns {{ loadedColumns }} </v-col>
+    <v-col> gridColumns {{ gridColumns }} </v-col> -->
+      <!-- <v-col> columnsToExclude {{ columnsToExclude }} </v-col> -->
+      <!-- <v-col> gridList {{ gridList }}</v-col> -->
+
+      <v-toolbar width="100%">
+        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Merge/Concat</v-toolbar-title>
+
+        <v-btn class="mr-2" outlined color="blue-grey" small @click="dialog_merge = true"
+          >Merge Grid</v-btn
+        ></v-toolbar
+      >
+    </div>
     <v-toolbar>
       <v-chip-group class="ml-10">
         <v-chip
-          v-for="(dataGrid, gridIndex) in gridList"
+          v-for="(gridID, gridIndex) in gridList"
           :key="gridIndex"
+          v-if="gridID != undefined"
           v-bind="dynamicVchipProp(gridIndex)"
-          @click="currentGrid = gridIndex"
+          @click="setCurrentGrid(gridIndex), undoCalculate()"
           class="ml-1"
           close
-          @click:close="removeGrid(gridIndex)"
+          @click:close="removeGrid(gridID)"
           label
         >
-          Grid {{ gridIndex }}
+          Data {{ gridID }}
         </v-chip>
       </v-chip-group>
-      <v-btn @click="createNewGrid"><v-icon>mdi-plus</v-icon> Add Dataframe</v-btn></v-toolbar
-    >
 
-    <ag-grid-vue
-      v-for="(dataGrid, gridIndex) in gridList"
+      <v-btn class="mr-2" small @click="dialog_newGrid = true"
+        ><v-icon>mdi-plus</v-icon> Add Datatable</v-btn
+      >
+      <v-btn class="mr-2" small @click="showAnalysis" outlined> Show Analysis</v-btn>
+    </v-toolbar>
+    <AgGridData
+      v-for="(gridID, gridIndex) in gridList"
       :key="gridIndex"
-      v-show="currentGrid == gridIndex"
-      style="width: 1400px; height:800px"
-      class="ag-theme-alpine"
-      :columnDefs="columnDefs"
-      :rowModelType="rowModelType"
-      @grid-ready="onGridReady"
-      :defaultColDef="defaultColDef"
-      :components="components"
-      :rowBuffer="rowBuffer"
-      :rowSelection="rowSelection"
-      :paginationPageSize="paginationPageSize"
-      :cacheOverflowSize="cacheOverflowSize"
-      :cacheBlockSize="cacheBlockSize"
-      :maxConcurrentDatasourceRequests="maxConcurrentDatasourceRequests"
-      :infiniteInitialRowCount="infiniteInitialRowCount"
-      :modules="modules"
-      :undoRedoCellEditing="true"
-      :undoRedoCellEditingLimit="undoRedoCellEditingLimit"
-      @first-data-rendered="onFirstDataRendered"
-      @cell-value-changed="onCellValueChanged"
-      :getRowStyle="getRowStyle"
-      :maintainColumnOrder="true"
-    >
-    </ag-grid-vue>
+      v-if="gridID != undefined"
+      :gridID="gridID"
+      :columnsToExclude="columnsToExclude[gridID]"
+      :tableNameToLoad="tableNameToLoad[gridID]"
+    />
+
+    <AgGridSummary />
+    <v-dialog v-model="dialog_newGrid" width="500">
+      <v-card class="pa-4">
+        <v-select
+          v-model="tableNameToLoad[parseInt(currentGrid) + 1]"
+          @input="loadColumns"
+          :items="tableList"
+          label="Select Dataset"
+        ></v-select>
+        <v-select
+          v-model="columnsToExclude[parseInt(currentGrid) + 1]"
+          :items="columnsForGrid"
+          chips
+          multiple
+          label="Columns to Exclude (Load All Columns if not select any column)"
+        ></v-select>
+
+        <v-card-actions>
+          <v-btn @click="createNewGrid()">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import Vue from "vue";
+import AgGridData from "@/components/preprocess/AgGridData.vue";
+import AgGridSummary from "@/components/preprocess/AgGridSummary.vue";
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 
-import { AgGridVue } from "@ag-grid-community/vue";
-import { InfiniteRowModelModule } from "@ag-grid-community/infinite-row-model";
-import { CsvExportModule } from "@ag-grid-community/csv-export";
-import "@ag-grid-community/core/dist/styles/ag-grid.css";
-import "@ag-grid-community/core/dist/styles/ag-theme-alpine.css";
 import axios from "axios";
 
 export default {
-  name: "App",
   data() {
     return {
-      hiddenCols: [],
       vchipClickedProp: {
         color: "primary"
       },
-      currentGrid: 0,
-      gridList: [0],
-      gridColumns: [],
+      hidePanel: true,
+      dialog_newGrid: true,
       dialog_colDisplay: false,
       dialog_colName: false,
-      modules: [InfiniteRowModelModule, CsvExportModule],
-
-      gridApi: {},
-      columnApi: null,
-
-      components: null,
-      rowBuffer: null,
-      rowSelection: null,
-      rowModelType: null,
-      paginationPageSize: null,
-      cacheOverflowSize: null,
-      maxConcurrentDatasourceRequests: null,
-      infiniteInitialRowCount: null,
-      maxBlocksInCache: null,
-      cacheBlockSize: 100,
-      defaultColDef: {
-        flex: 1,
-        minWidth: 140,
-        editable: true,
-        resizable: true,
-        // undo
-        undoRedoCellEditingLimit: null
-      },
-      getRowStyle: null,
-      updateTransaction: [],
-      deleteTransaction: { 0: { row: [], column: [] } }
+      dialog_nullToZero: false,
+      dialog_negativeToZero: false,
+      dialog_merge: false,
+      gridColumns: [],
+      tableNameToLoad: {},
+      columnsToExclude: {},
+      columnsForGrid: [],
+      loadedColumns: [],
+      selectedColumns: [],
+      tableToMerge: []
     };
   },
   computed: {
     ...mapState({
       columns: state => state.initialData.columns,
+      tableList: state => state.initialData.tableList,
       datasetSize: state => state.initialData.datasetSize,
       tableName: state => state.initialData.tableName,
-      projectName: state => state.initialData.projectName
+      projectName: state => state.initialData.projectName,
+      summarizedInfo: state => state.initialData.summarizedInfo,
+      // gridapi
+      gridApi: state => state.aggrid.gridApi,
+      gridColumnApi: state => state.aggrid.gridColumnApi,
+      currentGrid: state => state.aggrid.currentGrid,
+      analysisDisplay: state => state.aggrid.analysisDisplay,
+      hiddenCols: state => state.aggrid.hiddenCols,
+      gridList: state => state.aggrid.gridList,
+      // undo redo
+      availableUndo: state => state.aggrid.availableUndo,
+      availableRedo: state => state.aggrid.availableRedo,
+      // transaction
+      updateTransaction: state => state.aggrid.updateTransaction,
+      deleteTransaction: state => state.aggrid.deleteTransaction
     }),
-
-    columnDefs() {
+    items() {
       let array = [];
-      this.columns.forEach(element => {
-        let lowered = element.toString().toLowerCase();
-        let filterObj = {
-          field: element,
-          filter: "agNumberColumnFilter"
-          //     equals: (oldVal, newVal) => {
-          //       console.log(oldVal);
-          //       console.log(newVal);
-          //       return true;
-          // }
-        };
-        if (lowered == "id") {
-          filterObj["maxWidth"] = 70;
-          filterObj["editable"] = false;
-        }
-        if (
-          lowered == "ts" ||
-          lowered == "timeseries" ||
-          lowered == "date" ||
-          lowered == "datetime"
-        ) {
-          filterObj["filter"] = "agDateColumnFilter";
-        }
-
-        array.push(filterObj);
+      this.gridList.forEach(element => {
+        let item = { name: "Data " + element, tableName: this.tableNameToLoad[element] };
+        array.push(item);
       });
       return array;
     }
   },
   components: {
-    AgGridVue
+    AgGridData,
+    AgGridSummary
   },
-
+  created() {
+    this.resetSummarizedInfo();
+    this.resetAggrid();
+  },
   methods: {
-    hideColumn() {
-      let finalState = [];
-      let state = {};
-      this.columns.forEach((element, index) => {
-        if (this.hiddenCols.includes(index)) {
-          state = { colId: element, hide: true };
-        } else {
-          state = { colId: element, hide: false };
-        }
-        finalState.push(state);
-        console.log(finalState);
+    ...mapMutations("initialData", ["resetSummarizedInfo"]),
+    ...mapMutations("aggrid", ["addGridApi"]),
+    ...mapMutations("aggrid", ["addGridColumnApi"]),
+    ...mapMutations("aggrid", ["setCurrentGrid"]),
+    ...mapMutations("aggrid", ["addCurrentGrid"]),
+    ...mapMutations("aggrid", ["setAnalysisDisplay"]),
+    ...mapMutations("aggrid", ["resetAggrid"]),
+    ...mapMutations("aggrid", ["addGridList"]),
+    ...mapMutations("aggrid", ["setAvailableUndo"]),
+    ...mapMutations("aggrid", ["setAvailableRedo"]),
+    ...mapMutations("aggrid", ["addDeleteTransaction"]),
+    ...mapActions("aggrid", ["removeGrid"]),
+
+    openChangeNameDialog() {
+      this.loadedColumns = [];
+      let columns = this.getGridColumns();
+      columns.forEach(element => {
+        this.loadedColumns.push(element);
       });
-
-      this.gridColumnApi.applyColumnState({
-        state: finalState
-      });
+      this.dialog_colName = !this.dialog_colName;
     },
-
-    dynamicVchipProp(gridIndex) {
-      if (gridIndex == this.currentGrid) {
-        return this.vchipClickedProp;
-      }
-    },
-    removeGrid(gridIndex) {
-      this.gridList.splice(gridIndex, 1);
-      Vue.delete(this.deleteTransaction, gridIndex);
-      this.currentGrid = this.gridList.length - 1;
-    },
-    getColumnDefs() {},
-    createNewGrid() {
-      this.currentGrid = this.gridList.length;
-      this.deleteTransaction[this.currentGrid] = { row: [], column: [] };
-
-      this.gridList.push(0);
-    },
-    updateColumnName() {
-      let changedElementIndex = [];
-      this.gridColumns.forEach((element, index) => {
-        if (element != this.columns[index]) {
-          changedElementIndex.push(index);
-        }
-      });
-      //headername 변경
-      const columnDefs = this.columnDefs;
-      changedElementIndex.forEach((element, index) => {
-        columnDefs[element].headerName = this.gridColumns[element];
-      });
-      this.gridApi[this.currentGrid].setColumnDefs(columnDefs);
-      //닫기
-      this.dialog_colName = false;
-    },
-    updateRows() {
-      let availableUndo = document.getElementById("undoInput").value;
-      if (availableUndo != 0) {
-        let path = "http://localhost:5000/updateRows";
-        // axios
-        axios({
-          method: "post",
-          url: path,
-          data: {
-            projectName: this.projectName,
-            tableName: this.tableName,
-            updateTransaction: this.updateTransaction
-          }
-        })
-          .then(res => {
-            console.log(res.data);
-          })
-
-          .catch(error => {
-            console.error(error);
-          });
-      }
-    },
-    deleteRows() {
-      let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
-      selectedRows.forEach(element => {
-        this.deleteTransaction[this.currentGrid]["row"].push(element["ID"]);
-      });
-      this.gridApi[this.currentGrid].refreshInfiniteCache();
-      // let path = "http://localhost:5000/deleteRows";
-
-      // // axios
-      // axios({
-      //   method: "post",
-      //   url: path,
-      //   data: {
-      //     projectName: this.projectName,
-      //     tableName: this.tableName,
-      //     selectedIDs: selectedIDs
-      //   }
-      // })
-      //   .then(res => {
-
-      //     this.gridApi[this.currentGrid].refreshInfiniteCache();
-      //     console.log(res.data);
-      //   })
-
-      //   .catch(error => {
-      //     console.error(error);
-      //   });
-    },
-    filtercheck() {
-      let dd = this.gridApi[this.currentGrid].getFilterModel();
-      console.log(dd);
-    },
-
-    getDisplayedRowCount() {
-      var count = this.gridApi[this.currentGrid].getDisplayedRowCount();
-      console.log("getDisplayedRowCount() => " + count);
-    },
-    printAllDisplayedRows() {
-      var count = this.gridApi[this.currentGrid].getDisplayedRowCount();
-      console.log("## printAllDisplayedRows");
-      for (var i = 0; i < count; i++) {
-        var rowNode = this.gridApi[this.currentGrid].getDisplayedRowAtIndex(i);
-        console.log("row " + i + " is " + rowNode.data);
-      }
-    },
-    getRowData() {
-      var rowData = [];
-      this.gridApi[this.currentGrid].forEachNode(function(node) {
-        rowData.push(node.data);
-      });
-      console.log("Row Data:");
-      console.log(rowData);
-    },
-    exportAllData() {
-      let filterModel = this.gridApi[this.currentGrid].getFilterModel();
-      filterModel = this.parseFilterModel(filterModel);
-
-      let path = "http://localhost:5000/exportAllData";
-      // axios
-      axios({
-        method: "post",
-        url: path,
-        data: {
-          projectName: this.projectName,
-          tableName: this.tableName,
-          filterModel: filterModel
-        }
-      })
-        .then(res => {
-          console.log(res);
-          const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "file.csv"); //or any other extension
-          document.body.appendChild(link);
-          link.click();
-        })
-
-        .catch(error => {
-          console.error(error);
-        });
-    },
-    exportLoadedData() {
-      let params = this.getParams();
-      if (params.columnSeparator) {
-        alert(
-          "NOTE: you are downloading a file with non-standard separators - it may not render correctly in Excel."
-        );
-      }
-
-      this.gridApi[this.currentGrid].exportDataAsCsv(params);
-    },
-    onBtnUpdate() {
-      this.dialog = true;
-
-      document.querySelector("#csvResult").value = this.gridApi[this.currentGrid].getDataAsCsv(
-        this.getParams()
-      );
-    },
-
-    onGridReady(params) {
-      console.log("on grid readty");
-      this.gridApi[this.gridList.length - 1] = params.api;
-      this.gridColumnApi = params.columnApi;
+    getGridColumns() {
       let vm = this;
-      updateData(vm);
-
-      // function
-      function updateData(vm) {
-        let dataSource = {
-          rowCount: null,
-
-          getRows: function(params) {
-            // console.log("asking for " + params.startRow + " to " + params.endRow);
-            let filterModel = vm.gridApi[vm.currentGrid].getFilterModel();
-            // console.log(vm.parseFilterModel(filterModel));
-            filterModel = vm.parseFilterModel(filterModel);
-            if (vm.deleteTransaction[vm.currentGrid] != undefined) {
-              let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.currentGrid]["row"] } };
-              console.log(filterModel);
-              filterModel.push(ninFilter);
-            }
-
-            console.log(filterModel);
-
-            let path = "http://localhost:5000/infiniteRowModel";
-
-            // axios
-            axios({
-              method: "post",
-              url: path,
-              data: {
-                tableName: vm.tableName,
-                projectName: vm.projectName,
-                startRow: params.startRow.toString(),
-                endRow: params.endRow.toString(),
-                filterModel: filterModel
-              }
-            })
-              .then(res => {
-                // console.log(res.data);
-
-                params.successCallback(res.data, vm.datasetSize);
-              })
-
-              .catch(error => {
-                console.error(error);
-              });
-          }
-        };
-
-        params.api.setDatasource(dataSource);
-      }
-    },
-    parseFilterModel(filterModel) {
-      if (Object.keys(filterModel).length == 0) {
-        return [];
-      } else {
-        let filterKeys = Object.keys(filterModel);
-        let conditionList = [];
-        filterKeys.forEach(element => {
-          // YES operator
-          let condition = {};
-
-          if ("operator" in filterModel[element]) {
-            let operator;
-            if (filterModel[element]["operator"] == "AND") {
-              operator = "$and";
-            } else {
-              operator = "$or";
-            }
-            condition[operator] = [];
-            for (let i = 1; i < 3; i++) {
-              let newCondition = this.serverSideFilter(
-                element,
-                filterModel[element]["condition" + i]
-              );
-              condition[operator].push(newCondition);
-            }
-          }
-          // NO operator
-          else {
-            // no operator
-            condition = this.serverSideFilter(element, filterModel[element]);
-          }
-          conditionList.push(condition);
-        });
-        return conditionList;
-      }
-    },
-    serverSideFilter(elementName, filterModel) {
-      let condition = {};
-      let filterType = filterModel.filterType;
-      if (filterType == "number") {
-        let filter = filterModel["filter"];
-
-        switch (filterModel["type"]) {
-          case "equals":
-            condition[elementName] = filter;
-            break;
-          case "notEqual":
-            condition[elementName] = { $ne: filter };
-            break;
-          case "lessThan":
-            condition[elementName] = { $lt: filter };
-
-            break;
-          case "lessThanOrEqual":
-            condition[elementName] = { $lte: filter };
-            break;
-          case "greaterThan":
-            condition[elementName] = { $gt: filter };
-
-            break;
-          case "greaterThanOrEqual":
-            condition[elementName] = { $gte: filter };
-
-            break;
-          case "inRange":
-            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
-
-            break;
-          default:
-            break;
-        }
-      } else if (filterType == "date") {
-        let filter = filterModel["dateFrom"];
-
-        switch (filterModel["type"]) {
-          case "equals":
-            condition[elementName] = filter;
-            break;
-          case "notEqual":
-            condition[elementName] = { $ne: filter };
-            break;
-
-          case "lessThan":
-            condition[elementName] = { $lt: filter };
-            break;
-
-          case "greaterThan":
-            condition[elementName] = { $gt: filter };
-
-            break;
-
-          case "inRange":
-            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
-
-            break;
-          case "dateFrom":
-            break;
-          default:
-            break;
-        }
-      } else if (filterType == "text") {
-        let filter = filterModel["filter"];
-
-        switch (filterModel["type"]) {
-          case "contains":
-            break;
-          case "notContains":
-            break;
-          case "startsWith":
-            break;
-          case "endsWith":
-            break;
-          default:
-            break;
-        }
-      }
-
-      return condition;
-    },
-    onFirstDataRendered() {
-      setValue("#undoInput", 0);
-      disable("#undoInput", true);
-      disable("#undoBtn", true);
-      setValue("#redoInput", 0);
-      disable("#redoInput", true);
-      disable("#redoBtn", true);
-    },
-    undoCalculate(params) {
-      var undoSize = params.api.getCurrentUndoSize();
-      setValue("#undoInput", undoSize);
-      disable("#undoBtn", undoSize < 1);
-      var redoSize = params.api.getCurrentRedoSize();
-      setValue("#redoInput", redoSize);
-      disable("#redoBtn", redoSize < 1);
-    },
-    onCellValueChanged(params) {
-      this.undoCalculate(params);
-      //transaction
-      // 출력
-      // console.log(`Field Name: ${params.colDef.field}`);
-      // console.log(`ID: ${params.data.ID}`);
-      // console.log(`New Value: ${params.newValue}`);
-      // update object
-      let update = {
-        field: params.colDef.field,
-        ID: params.data.ID,
-        newValue: params.newValue
-      };
-      // 중복 요소 삭제
-      let substringIndex = JSON.stringify(update).indexOf("newValue");
-      this.updateTransaction.forEach((element, index) => {
-        if (
-          JSON.stringify(element).substring(0, substringIndex) ==
-          JSON.stringify(update).substring(0, substringIndex)
-        ) {
-          Vue.delete(this.updateTransaction, index);
-        }
+      return this.gridColumnApi[this.currentGrid].getAllColumns().map(function(col) {
+        return col.getColId();
       });
+    },
+    openDisplayDialog() {
+      this.loadedColumns = [];
+      let columns = this.getGridColumns();
+      columns.forEach(element => {
+        this.loadedColumns.push(element);
+      });
+      this.dialog_colDisplay = true;
+    },
 
-      // 배열에 입력
-
-      this.updateTransaction.push(update);
-    },
-    undo() {
-      this.gridApi[this.currentGrid].undoCellEditing();
-    },
-    redo() {
-      this.gridApi[this.currentGrid].redoCellEditing();
-    },
-    getParams() {
-      return { columnSeparator: this.getValue("#columnSeparator") };
-    },
+    // excel
     getValue(inputSelector) {
       var text = document.querySelector(inputSelector).value;
       switch (text) {
@@ -678,37 +403,187 @@ export default {
         default:
           return text;
       }
-    }
-  },
-  mounted() {
-    this.columns.forEach(element => {
-      this.gridColumns.push(element);
-    });
-  },
-  beforeMount() {
-    // this.getRowStyle = params => {
-    //   if (params.data == undefined) {
-    //     return { display: "none" };
-    //   }
-    // };
-    this.components = {
-      loadingRenderer: params => {
-        if (params.value !== undefined) {
-          return params.value;
-        } else {
-          return '<img src="https://www.ag-grid.com/example-assets/loading.gif">';
-        }
-      }
-    };
-    this.rowBuffer = 0;
-    this.rowSelection = "multiple";
-    this.rowModelType = "infinite";
-    this.paginationPageSize = 100;
-    this.cacheOverflowSize = 2;
-    this.maxConcurrentDatasourceRequests = 1;
-    this.infiniteInitialRowCount = 1;
+    },
+    parseFilterModel(filterModel) {
+      if (Object.keys(filterModel).length == 0) {
+        return [];
+      } else {
+        let filterKeys = Object.keys(filterModel);
+        let conditionList = [];
+        filterKeys.forEach(element => {
+          // YES operator
+          let condition = {};
 
-    this.undoRedoCellEditingLimit = 5;
+          if ("operator" in filterModel[element]) {
+            let operator;
+            if (filterModel[element]["operator"] == "AND") {
+              operator = "$and";
+            } else {
+              operator = "$or";
+            }
+            condition[operator] = [];
+            for (let i = 1; i < 3; i++) {
+              let newCondition = this.serverSideFilter(
+                element,
+                filterModel[element]["condition" + i]
+              );
+              condition[operator].push(newCondition);
+            }
+          }
+          // NO operator
+          else {
+            // no operator
+            condition = this.serverSideFilter(element, filterModel[element]);
+          }
+          conditionList.push(condition);
+        });
+        return conditionList;
+      }
+    },
+    getParams() {
+      return { columnSeparator: this.getValue("#columnSeparator") };
+    },
+    exportAllData() {
+      let filterModel = this.gridApi[this.currentGrid].getFilterModel();
+      filterModel = this.parseFilterModel(filterModel);
+
+      let path = "http://localhost:5000/exportAllData";
+      // axios
+      axios({
+        method: "post",
+        url: path,
+        data: {
+          projectName: this.projectName,
+          tableName: this.tableNameToLoad[this.currentGrid],
+          filterModel: filterModel
+        }
+      })
+        .then(res => {
+          console.log(res);
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "file.csv"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    exportLoadedData() {
+      let params = this.getParams();
+      if (params.columnSeparator) {
+        alert(
+          "NOTE: you are downloading a file with non-standard separators - it may not render correctly in Excel."
+        );
+      }
+
+      this.gridApi[this.currentGrid].exportDataAsCsv(params);
+    },
+    // undo
+    undoCalculate() {
+      var undoSize = this.gridApi[this.currentGrid].getCurrentUndoSize();
+      this.setAvailableUndo(undoSize);
+      var redoSize = this.gridApi[this.currentGrid].getCurrentRedoSize();
+      this.setAvailableRedo(redoSize);
+    },
+    undo() {
+      this.gridApi[this.currentGrid].undoCellEditing();
+    },
+    redo() {
+      this.gridApi[this.currentGrid].redoCellEditing();
+    },
+
+    hideColumn() {
+      //방법 1) columnExclude에 추가
+      this.selectedColumns[this.currentGrid].forEach(element => {
+        if (element != null) {
+          this.columnsToExclude[this.currentGrid].push(this.loadedColumns[element]);
+        }
+      });
+      this.dialog_colDisplay = false;
+      this.selectedColumns = [];
+      // 방법 2) hide
+      // 문제: columnDef가 computed라서 원상복구됨
+
+      // let finalState = [];
+      // let state = {};
+
+      // this.loadedColumns.forEach((element, index) => {
+      //   if (this.hiddenCols[this.currentGrid].includes(index)) {
+      //     state = { colId: element, hide: true };
+      //   } else {
+      //     state = { colId: element, hide: false };
+      //   }
+      //   finalState.push(state);
+      //   console.log(finalState);
+      // });
+
+      // this.gridColumnApi[this.currentGrid].applyColumnState({
+      //   state: finalState
+      // });
+    },
+    updateColumnName() {
+      const columnDefs = this.gridApi[this.currentGrid].getColumnDefs();
+
+      let changedElementIndex = [];
+      this.gridColumns.forEach((element, index) => {
+        if (element != null) {
+          columnDefs[index].headerName = element;
+        }
+      });
+
+      this.gridApi[this.currentGrid].setColumnDefs(columnDefs);
+      this.gridColumns = [];
+      //닫기
+      this.dialog_colName = false;
+    },
+    deleteRows() {
+      let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
+      this.addDeleteTransaction(selectedRows);
+      this.gridApi[this.currentGrid].refreshInfiniteCache();
+    },
+    showAnalysis() {
+      this.setAnalysisDisplay(!this.analysisDisplay);
+    },
+    loadColumns() {
+      let path = "http://localhost:5000/loadColumns";
+      axios({
+        method: "post",
+        url: path,
+        data: {
+          tableName: this.tableNameToLoad[parseInt(this.currentGrid) + 1],
+          projectName: this.projectName
+        }
+      })
+        .then(res => {
+          this.columnsForGrid = res.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    createNewGrid() {
+      this.addGridList();
+      this.addCurrentGrid();
+      this.setAnalysisDisplay(false);
+    },
+    createMergedGrid() {
+      Vue.set(this.tableNameToLoad, parseInt(this.currentGrid) + 1, this.tableToMerge);
+      this.columnsToExclude[parseInt(this.currentGrid) + 1] = [];
+      this.addGridList();
+
+      this.addCurrentGrid();
+      this.setAnalysisDisplay(false);
+    },
+
+    dynamicVchipProp(gridIndex) {
+      if (gridIndex == this.currentGrid) {
+        return this.vchipClickedProp;
+      }
+    }
   }
 };
 </script>

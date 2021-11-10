@@ -71,13 +71,13 @@ import ModelingSummary from "@/components/modeling/ModelingSummary.vue";
 import ModelingResultSide from "@/components/modeling/ModelingResultSide.vue";
 import SaveChange from "@/components/save/SaveChange.vue";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
-window.disable = function disable(id, disabled) {
-  document.querySelector(id).disabled = disabled;
-};
+// window.disable = function disable(id, disabled) {
+//   document.querySelector(id).disabled = disabled;
+// };
 
-window.setValue = function setValue(id, value) {
-  document.querySelector(id).value = value;
-};
+// window.setValue = function setValue(id, value) {
+//   document.querySelector(id).value = value;
+// };
 
 export default {
   data() {

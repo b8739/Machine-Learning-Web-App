@@ -41,12 +41,9 @@
     </td>
 
     <!-- numeric 일 경우: distribution 표시 -->
-    <td>
+    <!-- <td>
       <span v-once class="tdTitle">Distribution</span>
-      <!-- <Histogram
-        :distribution="summarizedInfo['distribution'][column]"
-        :interval="summarizedInfo['interval'][column]"
-      /> -->
+
       <PlotlyHist
         :seriesName="column"
         :graphWidth="238"
@@ -54,23 +51,16 @@
         :distribution="summarizedInfo['distribution'][column]"
         :interval="summarizedInfo['interval'][column]"
       />
-    </td>
+    </td> -->
 
-    <td style="width:300px; height:250px">
-      <!-- @click="openEditModal(column)" -->
-      <!-- <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon v-bind="attrs" v-on="on" right>mdi-information-outline</v-icon>
-        </template>
-        <span>Only shows upto 500 rows of the dataset (randomized)</span>
-      </v-tooltip> -->
+    <!-- <td style="width:300px; height:250px">
+
 
       <v-row align="center">
         <v-col align-self="center"> <span class="tdTitle"> Graph </span></v-col>
       </v-row>
-      <!-- <TimeSeries :graphWidth="graphWidth" :graphHeight="graphHeight" :seriesName="column" /> -->
       <PlotlyLine :seriesName="column" :graphWidth="270" :graphHeight="200" :isEdit="false" />
-    </td>
+    </td> -->
   </tr>
 </template>
 <script>

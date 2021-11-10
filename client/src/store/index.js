@@ -15,6 +15,7 @@ import simulationResult from "@/store/modules/simulation/simulationResult.js";
 import saveFlag from "@/store/modules/save/saveFlag.js";
 // infiniteTable
 import tableData from "@/store/modules/dataTable/tableData.js";
+import aggrid from "@/store/modules/dataTable/aggrid.js";
 // preprocess
 import preprocessHandler from "@/store/modules/preprocess/preprocessHandler.js";
 import dataTableHandler from "@/store/modules/preprocess/dataTableHandler.js";
@@ -37,12 +38,13 @@ export default new Vuex.Store({
     dataTableHandler,
     summaryTableHandler,
     edaHandler,
-    edaMenuHandler
+    edaMenuHandler,
+    aggrid
   },
   plugins: [
     createPersistedState({
       // paths: ["initialData", "apexchartGraph", "modelingData", "simulationData", "simulationResult"]
-      // paths: ["initialData"]
+      paths: ["initialData"]
     })
   ]
 });

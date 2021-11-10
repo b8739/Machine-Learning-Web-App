@@ -96,7 +96,9 @@ export default {
     enterDataset(tableName) {
       if (!this.editMode) {
         this.setTableName(tableName);
-        this.loadSummarizedData();
+        this.$router.push("/preprocess");
+
+        // this.loadSummarizedData();
       }
     },
     showTables() {
