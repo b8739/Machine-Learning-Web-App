@@ -1,12 +1,6 @@
 <template>
   <div id="wrap">
     <Header> </Header>
-    <!-- <div>preprocessStatus:{{ preprocessStatus }}</div>
-    <div>editStatus:{{ editStatus }}</div>
-    <div>activatedEvent:{{ activatedEvent }}</div>
-
-    <div>additionalCancelEvent:{{ additionalCancelEvent }}</div>
-    <div>router:{{ $router.name }}</div> -->
 
     <v-main>
       <v-container id="mainWrapper" fluid>
@@ -23,7 +17,7 @@
               <!-- <v-toolbar elevation="1">
                 <v-row>
                   <v-btn class="mr-2" @click="changeComponent('SummaryTable')">Features</v-btn>
-                  <v-btn @click="changeComponent('AgGrid')">Table</v-btn>
+                  <v-btn @click="changeComponent('AgContainer')">Table</v-btn>
 
                   <v-spacer></v-spacer>
                   <portal-target :name="summaryPortal"> </portal-target>
@@ -63,7 +57,7 @@ import AverageModal from "@/components/average/AverageModal.vue";
 
 import SummaryTable from "@/components/preprocess/SummaryTable";
 import DataTable from "@/components/preprocess/DataTable";
-import AgGrid from "@/components/preprocess/AgGrid";
+import AgContainer from "@/components/preprocess/AgContainer";
 import SideMenu from "@/components/preprocess/SideMenu.vue";
 import SaveMenu from "@/components/save/SaveMenu.vue";
 
@@ -76,23 +70,8 @@ import { eventBus } from "@/main";
 export default {
   data() {
     return {
-      chartMountCount: 0,
-      // dataSet: {},
-      dialog1: false,
-      indexNum: "",
-      addForm: {}, //ex. sepal-width:' ' , sepal-length: ' ' ...
-      updateForm: {},
-      hadLoaded: false,
-      isHidden: true,
-      rowIndex: [],
-      showFeatures: false,
-      showTable: true,
-      // flag
-      featureFlag: true,
       // comp: "SummaryTable"
-      comp: "AgGrid"
-
-      // activatedEvent:null
+      comp: "AgContainer"
     };
   },
   watch: {},
@@ -105,7 +84,7 @@ export default {
     SaveMenu,
     DeleteStepper,
     AverageModal,
-    AgGrid
+    AgContainer
   },
   computed: {
     ...mapState({
@@ -113,8 +92,6 @@ export default {
       tableName: state => state.initialData.tableName,
       datasetSize: state => state.initialData.datasetSize,
       preprocessStatus: state => state.preprocessHandler.preprocessStatus,
-      activatedEvent: state => state.preprocessHandler.activatedEvent,
-      additionalCancelEvent: state => state.preprocessHandler.additionalCancelEvent,
       editStatus: state => state.preprocessHandler.editStatus,
       datasetItems: state => state.dataTableHandler.datasetItems,
       tableChangeFlag: state => state.dataTableHandler.tableChangeFlag
@@ -153,9 +130,6 @@ export default {
           console.error(error);
         });
     },
-    confirmEvent() {
-      this.activatedEvent();
-    },
 
     ...mapMutations("initialData", ["setNavStatus"]),
     ...mapMutations("preprocessHandler", ["setPreprocessStatus"]),
@@ -177,64 +151,7 @@ export default {
       // this.setComponent(componentName);
       eventBus.$emit("changeComponent", componentName);
       this.comp = componentName;
-    },
-
-    displaySwitch() {
-      this.showFeatures = !this.showFeatures;
-      this.showTable = !this.showTable;
-    },
-
-    // 변형시켜야 하는 메소드들
-    getIndexForUpdate(targetIndex) {
-      console.log(`targetIndex: ${targetIndex}`);
-      this.updateForm["ID"] = targetIndex;
-    },
-    // for update
-    onSubmitUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.updateDataModal.hide();
-      this.updateData(this.updateForm);
-      // this.updateBook(payload, this.updateForm);
-    },
-    onResetUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.updateDataModal.hide();
-      this.initForm();
-      this.loadData(); // why?
-    },
-    updateData(payload) {
-      console.log(payload);
-      const path = `http://localhost:5000/updateData`;
-      axios
-        .put(path, payload)
-        .then(() => {
-          this.loadData();
-        })
-        .catch(error => {
-          // eslint-disable-next-line
-          console.error(error);
-          this.loadData();
-        });
-    },
-    initForm() {
-      this.addForm = {};
-    },
-    showElement() {
-      this.isHidden = !this.isHidden;
-      for (let i = 0; i < Object.keys(this.dataSet[this.columns[0]]).length; i++) {
-        this.rowIndex.push(false);
-      }
-    },
-    openSaveChangeDialog() {
-      eventBus.$emit("openSaveChange", true);
-    },
-    rollback() {
-      const path = "http://localhost:5000/rollback";
-      axios.get(path).catch(error => {
-        console.error(error);
-      });
-    },
-    askSave() {}
+    }
   },
   created() {
     this.resetEda();
@@ -251,11 +168,6 @@ export default {
   beforeUnmount() {
     window.removeEventListener("beforeunload", this.askSave);
   },
-  // beforeRouteEnter(to, from, next) {
-  //   next(vm => {
-  //     vm.dialog1 = true;
-  //   });
-  // s}
 
   beforeDestroy() {
     this.askSave();
@@ -282,10 +194,5 @@ export default {
   height: 100vh;
   border-right: 1px solid #dee4ea;
   float: left;
-}
-#mainWrapper {
-  /* width: 70%; */
-  /* float: left; */
-  /* padding: 20px; */
 }
 </style>

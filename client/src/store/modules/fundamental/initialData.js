@@ -10,12 +10,25 @@ const getDefaultState = () => {
     columns: [],
     datasetSize: null,
     tableName: null,
-    projectName: null
+    projectName: null,
+    all2: [
+      { id: 1, tags: ["tag1", "tag2"] },
+      { id: 2, tags: ["tag1", "tag2"] },
+      { id: 3, tags: ["tag1", "tag2"] },
+      { id: 4, tags: ["tag1", "tag2"] }
+    ]
   };
 };
 const state = getDefaultState();
 
 const getters = {
+  indexById: state => {
+    return state.all2.reduce((map, item, index) => {
+      // Store the `index` instead of the `item`
+      map[item.id] = index;
+      return map;
+    }, {});
+  },
   numericColumns(state) {
     let columnValues = Object.keys(state.summarizedInfo["numeric"]);
     return columnValues;
@@ -133,7 +146,7 @@ const actions = {
       data: {
         tableName: loadInfo.tableName,
         projectName: state.projectName,
-        columnsToExclude: loadInfo.columnsToExclude
+        columnModel: loadInfo.columnModel
       }
     })
       .then(res => {

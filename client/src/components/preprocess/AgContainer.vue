@@ -1,9 +1,9 @@
 <template>
   <div style="width:100%">
+    <v-btn @click="getGridColumns"></v-btn>
     <!-- <v-toolbar>
       <v-toolbar-title class="mr-2 font-weight-bold subheading">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
-      <input id="undoInput" :value="availableUndo" />
       <input id="undoInput" readonly class="undo-redo-input" />
       <label>Available Redo's:</label>
       <input id="redoInput" readonly class="undo-redo-input" />
@@ -14,6 +14,23 @@
         >Redo</v-btn
       >
     </v-toolbar> -->
+    {{ selectedColumns }}
+    <v-toolbar>
+      <v-toolbar-title class="mr-2 font-weight-bold subheading"> Save </v-toolbar-title>
+      <v-btn color="blue-grey" class="mr-2 " outlined small @click="saveDialog = true"
+        >Save Draft</v-btn
+      >
+      <v-chip-group class="ml-10">
+        <v-chip
+          v-for="(draft, draftIndex) in draftList"
+          :key="draftIndex"
+          label
+          @click="loadDraft(draft.draftName)"
+        >
+          {{ draft.draftName }}
+        </v-chip>
+      </v-chip-group>
+    </v-toolbar>
     <v-btn @click="hidePanel = !hidePanel" small>Hide Panel</v-btn>
 
     <div v-show="hidePanel">
@@ -56,7 +73,7 @@
             <v-select
               :items="items"
               item-text="name"
-              item-value="tableName"
+              item-value="datasetName"
               v-model="tableToMerge"
               chips
               multiple
@@ -75,16 +92,14 @@
         <v-dialog v-model="dialog_colDisplay">
           <v-card>
             <v-container>
-              <v-chip-group
-                v-model="selectedColumns[currentGrid]"
+              <v-select
+                v-for="(model, modelIndex) in columnModel[currentGrid]"
+                :key="modelIndex"
+                :items="model"
+                chips
                 multiple
-                active-class="error--text"
-                class="ml-10"
-              >
-                <v-chip v-for="(column, columnIndex) in loadedColumns" :key="columnIndex" label>
-                  {{ column }}
-                </v-chip>
-              </v-chip-group>
+                v-model="selectedColumns[modelIndex]"
+              ></v-select>
             </v-container>
             <v-card-actions>
               <v-btn @click="hideColumn">Confirm</v-btn>
@@ -141,52 +156,32 @@
           >Negative -> Zero</v-btn
         >
       </v-toolbar>
-      <!-- dialog -->
-      <!-- <v-dialog v-model="dialog_nullToZero">
-      <v-card>
-        <v-container>
-          <v-chip-group v-model="nullCols" multiple active-class="error--text" class="ml-10">
-            <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" label>
-              {{ column }}
-            </v-chip>
-          </v-chip-group>
-        </v-container>
-        <v-card-actions>
-          <v-btn @click="dialog_nullToZero = false">Confirm</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="dialog_negativeToZero">
-      <v-card>
-        <v-container>
-          <v-chip-group v-model="negativeCols" multiple active-class="error--text" class="ml-10">
-            <v-chip v-for="(column, columnIndex) in columns" :key="columnIndex" label>
-              {{ column }}
-            </v-chip>
-          </v-chip-group>
-        </v-container>
-        <v-card-actions>
-          <v-btn>Confirm</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-      <!-- <v-col> tableNameToLoad {{ tableNameToLoad }} </v-col>
+
+      <!-- savedialog -->
+      <v-dialog v-model="saveDialog" persistent max-width="300">
+        <v-card class="pa-2">
+          <v-card-title>Draft 저장</v-card-title>
+          <v-text-field v-model="draftName" :counter="10" label="파일명"></v-text-field>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue-grey" text @click="saveDraft(draftName), (saveDialog = false)">
+              저장
+            </v-btn>
+            <v-btn color="blue-grey" text @click="saveDialog = false">
+              취소
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <!-- <v-col> datasetToLoad {{ datasetToLoad }} </v-col>
     <v-col> currentGrid {{ currentGrid }} </v-col>
     <v-col> gridList {{ gridList }} </v-col>
     <v-col> tableToMerge {{ tableToMerge }} </v-col> -->
 
       <!-- <v-col> loadedColumns {{ loadedColumns }} </v-col>
     <v-col> gridColumns {{ gridColumns }} </v-col> -->
-      <!-- <v-col> columnsToExclude {{ columnsToExclude }} </v-col> -->
+      <!-- <v-col> columnModel {{ columnModel }} </v-col> -->
       <!-- <v-col> gridList {{ gridList }}</v-col> -->
-
-      <v-toolbar width="100%">
-        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Merge/Concat</v-toolbar-title>
-
-        <v-btn class="mr-2" outlined color="blue-grey" small @click="dialog_merge = true"
-          >Merge Grid</v-btn
-        ></v-toolbar
-      >
     </div>
     <v-toolbar>
       <v-chip-group class="ml-10">
@@ -195,7 +190,7 @@
           :key="gridIndex"
           v-if="gridID != undefined"
           v-bind="dynamicVchipProp(gridIndex)"
-          @click="setCurrentGrid(gridIndex), undoCalculate()"
+          @click="setCurrentGrid(gridID)"
           class="ml-1"
           close
           @click:close="removeGrid(gridID)"
@@ -205,72 +200,77 @@
         </v-chip>
       </v-chip-group>
 
-      <v-btn class="mr-2" small @click="dialog_newGrid = true"
+      <v-btn class="mr-2" small @click="readyToAddDataTable"
         ><v-icon>mdi-plus</v-icon> Add Datatable</v-btn
       >
       <v-btn class="mr-2" small @click="showAnalysis" outlined> Show Analysis</v-btn>
     </v-toolbar>
-    <AgGridData
+    <!-- <AgGridMultiple
+      :gridID="0"
+      :columnModel="{ boston: ['CRIM'], concrete: ['cement'] }"
+      :datasetToLoad="['boston', 'concrete']"
+      gridType="AgGridMultiple"
+    /> -->
+
+    <component
       v-for="(gridID, gridIndex) in gridList"
       :key="gridIndex"
       v-if="gridID != undefined"
+      v-bind:is="gridType[gridID]"
       :gridID="gridID"
-      :columnsToExclude="columnsToExclude[gridID]"
-      :tableNameToLoad="tableNameToLoad[gridID]"
-    />
+      :columnModel="columnModel[gridID]"
+      :datasetToLoad="datasetToLoad[gridID]"
+      :gridType="gridType[gridID]"
+    ></component>
 
     <AgGridSummary />
-    <v-dialog v-model="dialog_newGrid" width="500">
-      <v-card class="pa-4">
-        <v-select
-          v-model="tableNameToLoad[parseInt(currentGrid) + 1]"
-          @input="loadColumns"
-          :items="tableList"
-          label="Select Dataset"
-        ></v-select>
-        <v-select
-          v-model="columnsToExclude[parseInt(currentGrid) + 1]"
-          :items="columnsForGrid"
-          chips
-          multiple
-          label="Columns to Exclude (Load All Columns if not select any column)"
-        ></v-select>
+    <AddGridDialog :dialog.sync="dialog_newGrid" />
+    <!-- debug
 
-        <v-card-actions>
-          <v-btn @click="createNewGrid()">Confirm</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <strong> columnsForGrid:</strong>
+    {{ columnsForGrid }}
+
+    <br />
+    <strong> datasetToLoad:</strong>
+    {{ datasetToLoad }}
+
+    <br />
+    <strong> columnModel:</strong>
+    {{ columnModel }} -->
   </div>
 </template>
 
 <script>
 import Vue from "vue";
-import AgGridData from "@/components/preprocess/AgGridData.vue";
+import AgGridSingle from "@/components/preprocess/AgGridSingle.vue";
+import AgGridMultiple from "@/components/preprocess/AgGridMultiple.vue";
 import AgGridSummary from "@/components/preprocess/AgGridSummary.vue";
+import AddGridDialog from "@/components/preprocess/AddGridDialog.vue";
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
-
+// import store from "@/store/modules/dataTable/aggrid";
 import axios from "axios";
 
 export default {
   data() {
     return {
+      draftList: [],
+      draftName: "",
+      saveDialog: false,
       vchipClickedProp: {
         color: "primary"
       },
       hidePanel: true,
-      dialog_newGrid: true,
+
+      dialog_newGrid: false,
       dialog_colDisplay: false,
       dialog_colName: false,
       dialog_nullToZero: false,
       dialog_negativeToZero: false,
       dialog_merge: false,
+
       gridColumns: [],
-      tableNameToLoad: {},
-      columnsToExclude: {},
-      columnsForGrid: [],
       loadedColumns: [],
-      selectedColumns: [],
+      selectedColumns: {},
       tableToMerge: []
     };
   },
@@ -287,66 +287,105 @@ export default {
       gridColumnApi: state => state.aggrid.gridColumnApi,
       currentGrid: state => state.aggrid.currentGrid,
       analysisDisplay: state => state.aggrid.analysisDisplay,
-      hiddenCols: state => state.aggrid.hiddenCols,
+
       gridList: state => state.aggrid.gridList,
-      // undo redo
-      availableUndo: state => state.aggrid.availableUndo,
-      availableRedo: state => state.aggrid.availableRedo,
       // transaction
       updateTransaction: state => state.aggrid.updateTransaction,
-      deleteTransaction: state => state.aggrid.deleteTransaction
+      //loadSetting
+      columnsForGrid: state => state.aggrid.columnsForGrid,
+      columnModel: state => state.aggrid.columnModel,
+      datasetToLoad: state => state.aggrid.datasetToLoad,
+      gridType: state => state.aggrid.gridType
     }),
+    currentTableNameToLoad() {
+      return this.datasetToLoad[parseInt(this.currentGrid) + 1];
+    },
     items() {
       let array = [];
       this.gridList.forEach(element => {
-        let item = { name: "Data " + element, tableName: this.tableNameToLoad[element] };
+        let item = { name: "Data " + element, datasetName: this.datasetToLoad[element] };
         array.push(item);
       });
       return array;
     }
   },
   components: {
-    AgGridData,
-    AgGridSummary
+    AgGridMultiple,
+    AgGridSummary,
+    AddGridDialog,
+    AgGridSingle
   },
   created() {
     this.resetSummarizedInfo();
     this.resetAggrid();
   },
+  mounted() {
+    this.loadDraftList();
+  },
   methods: {
+    loadDraftList() {
+      let path = "http://localhost:5000/loadDraftList";
+      // axios
+      axios({
+        method: "post",
+        url: path
+      })
+        .then(res => {
+          this.draftList = [];
+
+          res.data.forEach(element => {
+            this.draftList.push(element);
+          });
+        })
+
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    readyToAddDataTable() {
+      this.dialog_newGrid = true;
+      // Vue.set(this.columnModel, parseInt(this.currentGrid) + 1, []);
+    },
+
     ...mapMutations("initialData", ["resetSummarizedInfo"]),
     ...mapMutations("aggrid", ["addGridApi"]),
     ...mapMutations("aggrid", ["addGridColumnApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
-    ...mapMutations("aggrid", ["addCurrentGrid"]),
     ...mapMutations("aggrid", ["setAnalysisDisplay"]),
     ...mapMutations("aggrid", ["resetAggrid"]),
-    ...mapMutations("aggrid", ["addGridList"]),
     ...mapMutations("aggrid", ["setAvailableUndo"]),
     ...mapMutations("aggrid", ["setAvailableRedo"]),
-    ...mapMutations("aggrid", ["addDeleteTransaction"]),
+    ...mapMutations("aggrid", ["addNewDeletion"]),
+    ...mapMutations("aggrid", ["delColumnModelElement"]),
     ...mapActions("aggrid", ["removeGrid"]),
+    ...mapActions("aggrid", ["saveDraft"]),
+    ...mapActions("aggrid", ["loadDraft"]),
 
+    resetLoadInfo() {
+      let index = parseInt(this.currentGrid) + 1;
+      this.columnsForGrid = {}; // 이건 props로 안줘서 초기화해도됨
+      Vue.delete(this.datasetToLoad, index);
+      Vue.set(this.columnModel, index, []);
+    },
     openChangeNameDialog() {
-      this.loadedColumns = [];
-      let columns = this.getGridColumns();
-      columns.forEach(element => {
-        this.loadedColumns.push(element);
-      });
+      this.getGridColumns();
       this.dialog_colName = !this.dialog_colName;
     },
     getGridColumns() {
       let vm = this;
-      return this.gridColumnApi[this.currentGrid].getAllColumns().map(function(col) {
+      this.loadedColumns = [];
+      this.loadedColumns = vm.gridColumnApi[vm.currentGrid].getAllColumns().map(function(col) {
+        // return { columnName: col.getColId(), columnInfo: vm.currentGrid };
         return col.getColId();
       });
     },
+    test() {},
     openDisplayDialog() {
-      this.loadedColumns = [];
-      let columns = this.getGridColumns();
-      columns.forEach(element => {
-        this.loadedColumns.push(element);
-      });
+      // this.loadedColumns = [];
+      // let columns = this.getGridColumns();
+      // columns.forEach(element => {
+      //   this.loadedColumns.push(element);
+      // });
       this.dialog_colDisplay = true;
     },
 
@@ -440,6 +479,89 @@ export default {
         return conditionList;
       }
     },
+    serverSideFilter(elementName, filterModel) {
+      let condition = {};
+      let filterType = filterModel.filterType;
+      if (filterType == "number") {
+        let filter = filterModel["filter"];
+
+        switch (filterModel["type"]) {
+          case "equals":
+            condition[elementName] = filter;
+            break;
+          case "notEqual":
+            condition[elementName] = { $ne: filter };
+            break;
+          case "lessThan":
+            condition[elementName] = { $lt: filter };
+
+            break;
+          case "lessThanOrEqual":
+            condition[elementName] = { $lte: filter };
+            break;
+          case "greaterThan":
+            condition[elementName] = { $gt: filter };
+
+            break;
+          case "greaterThanOrEqual":
+            condition[elementName] = { $gte: filter };
+
+            break;
+          case "inRange":
+            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
+
+            break;
+          default:
+            break;
+        }
+      } else if (filterType == "date") {
+        let filter = filterModel["dateFrom"];
+
+        switch (filterModel["type"]) {
+          case "equals":
+            condition[elementName] = filter;
+            break;
+          case "notEqual":
+            condition[elementName] = { $ne: filter };
+            break;
+
+          case "lessThan":
+            condition[elementName] = { $lt: filter };
+            break;
+
+          case "greaterThan":
+            condition[elementName] = { $gt: filter };
+
+            break;
+
+          case "inRange":
+            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
+
+            break;
+          case "dateFrom":
+            break;
+          default:
+            break;
+        }
+      } else if (filterType == "text") {
+        let filter = filterModel["filter"];
+
+        switch (filterModel["type"]) {
+          case "contains":
+            break;
+          case "notContains":
+            break;
+          case "startsWith":
+            break;
+          case "endsWith":
+            break;
+          default:
+            break;
+        }
+      }
+
+      return condition;
+    },
     getParams() {
       return { columnSeparator: this.getValue("#columnSeparator") };
     },
@@ -454,8 +576,10 @@ export default {
         url: path,
         data: {
           projectName: this.projectName,
-          tableName: this.tableNameToLoad[this.currentGrid],
-          filterModel: filterModel
+          tableName: this.datasetToLoad[this.currentGrid],
+          filterModel: filterModel,
+          gridType: this.gridType[this.currentGrid],
+          columnModel: this.columnModel[this.currentGrid]
         }
       })
         .then(res => {
@@ -485,9 +609,9 @@ export default {
     // undo
     undoCalculate() {
       var undoSize = this.gridApi[this.currentGrid].getCurrentUndoSize();
-      this.setAvailableUndo(undoSize);
+      // id에 접근해서 setting해줘야함
       var redoSize = this.gridApi[this.currentGrid].getCurrentRedoSize();
-      this.setAvailableRedo(redoSize);
+      // id에 접근해서 setting해줘야함
     },
     undo() {
       this.gridApi[this.currentGrid].undoCellEditing();
@@ -498,32 +622,22 @@ export default {
 
     hideColumn() {
       //방법 1) columnExclude에 추가
-      this.selectedColumns[this.currentGrid].forEach(element => {
-        if (element != null) {
-          this.columnsToExclude[this.currentGrid].push(this.loadedColumns[element]);
-        }
+      Object.keys(this.selectedColumns).forEach(datasetName => {
+        // columnModel에서 삭제함으로써 reset되었을 때 불러오지도 않고, mount되면 columnDef에서도 삭제됨
+        this.selectedColumns[datasetName].forEach(element => {
+          let index = this.columnModel[this.currentGrid][datasetName].indexOf(element);
+          let payload = { datasetName: datasetName, index: index };
+          this.delColumnModelElement(payload);
+          // mounted되면 계산되어서 columnDef에서도 삭제되지만, 그전에는 계산이 안되므로 일단 hide
+          this.gridColumnApi[this.currentGrid].applyColumnState({
+            state: [{ colId: element, hide: true }]
+          });
+        });
       });
+
       this.dialog_colDisplay = false;
-      this.selectedColumns = [];
-      // 방법 2) hide
-      // 문제: columnDef가 computed라서 원상복구됨
-
-      // let finalState = [];
-      // let state = {};
-
-      // this.loadedColumns.forEach((element, index) => {
-      //   if (this.hiddenCols[this.currentGrid].includes(index)) {
-      //     state = { colId: element, hide: true };
-      //   } else {
-      //     state = { colId: element, hide: false };
-      //   }
-      //   finalState.push(state);
-      //   console.log(finalState);
-      // });
-
-      // this.gridColumnApi[this.currentGrid].applyColumnState({
-      //   state: finalState
-      // });
+      this.selectedColumns = {};
+      this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
     updateColumnName() {
       const columnDefs = this.gridApi[this.currentGrid].getColumnDefs();
@@ -542,37 +656,16 @@ export default {
     },
     deleteRows() {
       let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
-      this.addDeleteTransaction(selectedRows);
+      this.addNewDeletion(selectedRows);
       this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
     showAnalysis() {
       this.setAnalysisDisplay(!this.analysisDisplay);
     },
-    loadColumns() {
-      let path = "http://localhost:5000/loadColumns";
-      axios({
-        method: "post",
-        url: path,
-        data: {
-          tableName: this.tableNameToLoad[parseInt(this.currentGrid) + 1],
-          projectName: this.projectName
-        }
-      })
-        .then(res => {
-          this.columnsForGrid = res.data;
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    },
-    createNewGrid() {
-      this.addGridList();
-      this.addCurrentGrid();
-      this.setAnalysisDisplay(false);
-    },
+
     createMergedGrid() {
-      Vue.set(this.tableNameToLoad, parseInt(this.currentGrid) + 1, this.tableToMerge);
-      this.columnsToExclude[parseInt(this.currentGrid) + 1] = [];
+      Vue.set(this.datasetToLoad, parseInt(this.currentGrid) + 1, this.tableToMerge);
+      this.columnModel[parseInt(this.currentGrid) + 1] = [];
       this.addGridList();
 
       this.addCurrentGrid();

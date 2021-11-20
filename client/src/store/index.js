@@ -11,8 +11,7 @@ import modelingData from "@/store/modules/modeling/modelingData.js";
 // simulation
 import simulationData from "@/store/modules/simulation/simulationData.js";
 import simulationResult from "@/store/modules/simulation/simulationResult.js";
-// save
-import saveFlag from "@/store/modules/save/saveFlag.js";
+
 // infiniteTable
 import tableData from "@/store/modules/dataTable/tableData.js";
 import aggrid from "@/store/modules/dataTable/aggrid.js";
@@ -32,7 +31,7 @@ export default new Vuex.Store({
     modelingData,
     simulationData,
     simulationResult,
-    saveFlag,
+
     tableData,
     preprocessHandler,
     dataTableHandler,

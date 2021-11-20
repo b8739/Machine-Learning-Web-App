@@ -85,7 +85,7 @@ export default {
         .then(response => {
           // this.resetState();
           this.setTableName(this.newTableName);
-          this.loadSummarizedData();
+          // this.loadSummarizedData();
           this.dialog = false;
         })
         .catch(ex => {
