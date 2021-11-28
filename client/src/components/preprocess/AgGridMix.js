@@ -46,7 +46,12 @@ export default {
       analysisDisplay: state => state.aggrid.analysisDisplay,
       // transaction
       updateTransaction: state => state.aggrid.updateTransaction,
-      deleteTransaction: state => state.aggrid.deleteTransaction
+      deleteTransaction: state => state.aggrid.deleteTransaction,
+      // model
+      renameModel: state => state.aggrid.renameModel,
+      columnState: state => state.aggrid.columnState,
+      typeModel: state => state.aggrid.typeModel,
+      fillNaModel: state => state.aggrid.fillNaModel
     })
   },
   methods: {
@@ -55,7 +60,45 @@ export default {
     ...mapMutations("aggrid", ["setCurrentGrid"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("aggrid", ["setAnalysisDisplay"]),
+    ...mapMutations("aggrid", ["setColumnState"]),
+    loadColumnState(gridID) {
+      if (this.columnState[gridID]) {
+        var columnState = JSON.parse(this.columnState[gridID]);
+        if (columnState) {
+          console.log(typeof columnState);
 
+          this.gridColumnApi[gridID].applyColumnState({
+            state: columnState,
+            applyOrder: true
+          });
+        }
+      }
+    },
+    updateColumnHeader(gridID) {
+      let columnDefs = this.gridApi[gridID].getColumnDefs();
+
+      let renameModel;
+      if (this.renameModel[gridID] != undefined) {
+        renameModel = this.renameModel[gridID];
+      } else {
+        renameModel = [];
+      }
+      console.log(renameModel);
+      renameModel.forEach((element1, index) => {
+        columnDefs.forEach(element2 => {
+          if (element1["from"] == element2["colId"]) {
+            element2.headerName = element1["to"];
+          }
+        });
+      });
+      this.gridApi[gridID].setColumnDefs(columnDefs);
+      console.log(columnDefs);
+    },
+    onColumnMoved(params) {
+      var columnState = JSON.stringify(params.columnApi.getColumnState());
+      this.setColumnState(columnState);
+      // console.log(params.columnApi.getColumnState());
+    },
     loadColumns(tableName) {
       let path = "http://localhost:5000/loadColumns";
       axios({
@@ -236,16 +279,15 @@ export default {
     }
   },
   mounted() {
-    let payload = {
-      tableName: this.datasetToLoad,
-      tableIndex: this.gridID,
-      columnModel: this.columnModel
-    };
+    // let payload = {
+    //   tableName: this.datasetToLoad,
+    //   tableIndex: this.gridID,
+    //   columnModel: this.columnModel
+    // };
     // this.loadSummarizedData(payload); 임시로 주석
-
-    this.columns.forEach(element => {
-      this.gridColumns.push(element);
-    });
+    // this.columns.forEach(element => {
+    //   this.gridColumns.push(element);
+    // });
   },
   beforeMount() {
     this.components = {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn @click="resetCache">reset cache</v-btn>
+    <v-btn @click="onBtOrderColsMedalsFirst">reoder</v-btn>
     <ag-grid-vue
       v-show="currentGrid == gridID && analysisDisplay == false"
       style="width: 1550px; height:800px"
@@ -24,6 +24,7 @@
       @cell-value-changed="onCellValueChanged"
       :getRowStyle="getRowStyle"
       :maintainColumnOrder="true"
+      @column-moved="onColumnMoved"
     >
     </ag-grid-vue>
   </div>
@@ -52,9 +53,7 @@ export default {
 
     //   return this.columnModel[this.datasetToLoad];
     // },
-    dd() {
-      return this.columnModel[this.datasetToLoad];
-    },
+
     columnDefs() {
       return this.columnModel[this.datasetToLoad].map(function(col) {
         let lowered = col.toString().toLowerCase();
@@ -74,6 +73,12 @@ export default {
     }
   },
   methods: {
+    onBtOrderColsMedalsFirst() {
+      this.gridColumnApi[this.gridID].applyColumnState({
+        state: [{ colId: "ZN" }, { colId: "CRIM" }],
+        applyOrder: true
+      });
+    },
     resetCache() {
       this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
@@ -86,12 +91,15 @@ export default {
       // disable("#redoInput", true);
       // disable("#redoBtn", true);
     },
+
     onGridReady(params) {
       // console.log("on single grid readty");
       let payload = { api: params.api, gridID: this.gridID };
       this.addGridApi(payload);
       payload = { api: params.columnApi, gridID: this.gridID };
       this.addGridColumnApi(payload);
+      this.loadColumnState(this.gridID); // Order
+      this.updateColumnHeader(this.gridID);
 
       let vm = this;
 
@@ -112,10 +120,30 @@ export default {
               let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.gridID] } };
               filterModel.push(ninFilter);
             }
-            // console.log(`gridID:${vm.gridID}`);
-            // console.log(`deleteTransaction:${vm.deleteTransaction[vm.gridID]}`);
+            // 3) Rename Model
+            let renameModel;
+            if (vm.renameModel[vm.gridID] != undefined) {
+              renameModel = vm.renameModel[vm.gridID];
+            } else {
+              renameModel = [];
+            }
+            // 3) Type Model
+            let typeModel;
+            if (vm.typeModel[vm.gridID] != undefined) {
+              typeModel = vm.typeModel[vm.gridID];
+            } else {
+              typeModel = [];
+            }
+            // 4) fill Na Model
+            // 3) Type Model
+            let fillNaModel;
+            if (vm.fillNaModel[vm.gridID] != undefined) {
+              fillNaModel = vm.fillNaModel[vm.gridID];
+            } else {
+              fillNaModel = [];
+            }
             let path = "http://localhost:5000/infiniteRowModel";
-            // debug
+
             // axios
             axios({
               method: "post",
@@ -127,11 +155,15 @@ export default {
                 endRow: params.endRow,
                 filterModel: filterModel,
                 columnModel: vm.columnModel[vm.datasetToLoad],
+                renameModel: renameModel,
+                typeModel: typeModel,
+                fillNaModel: fillNaModel,
                 gridType: vm.gridType
               }
             })
               .then(res => {
-                // console.log(res.data);
+                console.log(res.data);
+
                 params.successCallback(res.data, vm.datasetSize);
               })
               .catch(error => {

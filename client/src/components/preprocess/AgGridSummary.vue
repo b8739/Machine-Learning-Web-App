@@ -1,7 +1,16 @@
 <template>
-  <div>
+  <div v-show="analysisDisplay == true">
+    <v-btn @click="load">수동</v-btn>
+    <v-select
+      v-model="datasetToLoad"
+      :items="tableList"
+      label="Select Dataset"
+      @input="loadStatistics"
+      clearable
+      clear-icon
+    ></v-select>
+    <!-- @input="loadColumns" -->
     <ag-grid-vue
-      v-show="analysisDisplay == true"
       style="width: 1400px; height:800px"
       class="ag-theme-alpine"
       :rowData="rowData"
@@ -28,11 +37,13 @@ import axios from "axios";
 export default {
   props: ["tableNameToLoad"],
   watch: {
-    summarizedInfo: {
+    currentDataset: {
       handler: function() {
-        // if (this.summarizedInfo[this.currentGrid] != undefined) {
-        // }
-        this.gridApi.setRowData(this.summarizedInfo[this.currentGrid]);
+        if (this.summarizedInfo[this.currentDataset] == undefined) {
+          this.loadSummarizedData(this.currentDataset);
+        } else {
+          this.gridApi.setRowData(this.summarizedInfo[this.currentDataset]);
+        }
       },
       deep: true
     }
@@ -40,6 +51,8 @@ export default {
   // setFilterModel
   data() {
     return {
+      currentDataset: null,
+      datasetToLoad: [],
       columnsForGrid: [],
 
       gridColumns: [],
@@ -65,7 +78,7 @@ export default {
         { field: "mean" },
         { field: "mode" },
         { field: "median" },
-        { field: "standard" },
+        { field: "std" },
         { field: "Q1" },
         { field: "Q2" },
         { field: "Q3" },
@@ -76,6 +89,8 @@ export default {
   },
   computed: {
     ...mapState({
+      tableList: state => state.initialData.tableList,
+
       summarizedInfo: state => state.initialData.summarizedInfo,
       // gridapi
       gridApi: state => state.aggrid.summaryGridApi,
@@ -92,6 +107,11 @@ export default {
     AgGridVue
   },
   methods: {
+    load() {
+      this.gridApi.setRowData(this.summarizedInfo["boston"]);
+    },
+    ...mapActions("initialData", ["loadSummarizedData"]),
+
     ...mapMutations("aggrid", ["setSummaryGridApi"]),
     ...mapMutations("aggrid", ["setSummaryColumnGridApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
@@ -100,12 +120,16 @@ export default {
     onGridReady(params) {
       this.setSummaryGridApi(params.api);
       this.setSummaryColumnGridApi(params.columnApi);
-      // this.gridApi = params.api;
-      // this.gridColumnApi = params.columnApi;
+    },
+    loadStatistics(value) {
+      console.log(`loadstatistics: ${value}`);
+      this.currentDataset = value;
     }
   },
   created() {},
-  mounted() {},
+  mounted() {
+    console.log("loadSummarize");
+  },
   beforeMount() {
     this.components = {
       loadingRenderer: params => {

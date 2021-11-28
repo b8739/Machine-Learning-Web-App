@@ -7,6 +7,8 @@ const getDefaultState = () => {
     gridApi: {},
     gridColumnApi: {},
 
+    columnState: {},
+
     summaryGridApi: null,
     summaryGridColumnApi: null,
 
@@ -20,8 +22,11 @@ const getDefaultState = () => {
 
     datasetToLoad: {},
     columnModel: {},
+    renameModel: {},
     columnsForGrid: {},
-    gridType: {}
+    gridType: {},
+    typeModel: {},
+    fillNaModel: {}
     // columns
   };
 };
@@ -29,6 +34,10 @@ const state = getDefaultState();
 const getters = {};
 
 const mutations = {
+  // Column State
+  setColumnState(state, payload) {
+    Vue.set(state.columnState, state.currentGrid, payload);
+  },
   /* Grid Api */
 
   addGridApi(state, payload) {
@@ -90,6 +99,7 @@ const mutations = {
     });
     state.currentGrid = 0;
   },
+
   // Preprocess
   // Transaction
 
@@ -116,9 +126,7 @@ const mutations = {
   delDatasetToLoad(state, gridID) {
     Vue.delete(state.datasetToLoad, gridID);
   },
-  setColumnModel(state, payload) {
-    state.columnModel[parseInt(state.currentGrid) + 1] = payload;
-  },
+
   setColumnsForGrid(state, payload) {
     Vue.set(state.columnsForGrid, payload.tableName, payload.data);
   },
@@ -132,11 +140,23 @@ const mutations = {
   delGridType(state, gridID) {
     Vue.delete(state.gridType, gridID);
   },
+  setColumnModel(state, payload) {
+    state.columnModel[parseInt(state.currentGrid) + 1] = payload;
+  },
   delColumnModel(state, gridID) {
     Vue.delete(state.columnModel, gridID);
   },
   delColumnModelElement(state, payload) {
     Vue.delete(state.columnModel[state.currentGrid][payload.datasetName], payload.index);
+  },
+  setRenameModel(state, payload) {
+    state.renameModel[state.currentGrid] = payload;
+  },
+  setTypeModel(state, payload) {
+    state.typeModel[state.currentGrid] = payload;
+  },
+  setFillNaModel(state, payload) {
+    state.fillNaModel[state.currentGrid] = payload;
   }
 };
 const actions = {
@@ -163,6 +183,7 @@ const actions = {
   },
   saveDraft({ commit, state }, draftName) {
     const path = "http://localhost:5000/saveDraft";
+
     // 수정
     axios({
       method: "post",
@@ -173,6 +194,8 @@ const actions = {
         deleteTransaction: state.deleteTransaction,
         datasetToLoad: state.datasetToLoad,
         columnModel: state.columnModel,
+        renameModel: state.renameModel,
+        columnState: state.columnState,
         gridType: state.gridType
       }
     })

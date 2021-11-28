@@ -25,6 +25,7 @@
       @cell-value-changed="onCellValueChanged"
       :getRowStyle="getRowStyle"
       :maintainColumnOrder="true"
+       onColumnMoved: onColumnMoved,
     >
     </ag-grid-vue>
   </div>

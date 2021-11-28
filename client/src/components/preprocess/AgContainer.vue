@@ -1,7 +1,12 @@
 <template>
   <div style="width:100%">
-    <v-btn @click="getGridColumns"></v-btn>
-    <!-- <v-toolbar>
+    <v-container>
+      <v-row>
+        <v-col cols="2"> <AgSideMenu @openDialog="dialogAction"/></v-col>
+
+        <v-col cols="10">
+          <v-btn @click="getColumnDef">get column def</v-btn>
+          <!-- <v-toolbar>
       <v-toolbar-title class="mr-2 font-weight-bold subheading">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
       <input id="undoInput" readonly class="undo-redo-input" />
@@ -14,84 +19,87 @@
         >Redo</v-btn
       >
     </v-toolbar> -->
-    {{ selectedColumns }}
-    <v-toolbar>
-      <v-toolbar-title class="mr-2 font-weight-bold subheading"> Save </v-toolbar-title>
-      <v-btn color="blue-grey" class="mr-2 " outlined small @click="saveDialog = true"
-        >Save Draft</v-btn
-      >
-      <v-chip-group class="ml-10">
-        <v-chip
-          v-for="(draft, draftIndex) in draftList"
-          :key="draftIndex"
-          label
-          @click="loadDraft(draft.draftName)"
-        >
-          {{ draft.draftName }}
-        </v-chip>
-      </v-chip-group>
-    </v-toolbar>
-    <v-btn @click="hidePanel = !hidePanel" small>Hide Panel</v-btn>
+          {{ selectedColumns }}
 
-    <div v-show="hidePanel">
-      <v-toolbar v-show="false">
-        <div class="row">
-          <label>columnSeparator = </label>
-          <select id="columnSeparator">
-            <option value="none">(default)</option>
-            <option value="tab">tab</option>
-            <option value="|">bar (|)</option>
-          </select>
-        </div>
-      </v-toolbar>
-      <v-toolbar>
-        <v-toolbar-title class="mr-2 font-weight-bold subheading">
-          Export CSV FIle:</v-toolbar-title
-        >
-        <v-btn class="mr-2" outlined color="blue-grey" small v-on:click="exportLoadedData()"
-          >Download CSV file <label style="color:red">(Only currently loaded data)</label></v-btn
-        >
-        <v-btn class="mr-2" outlined color="blue-grey" small v-on:click="exportAllData()"
-          >Download CSV file <label style="color:red">(All Data)</label></v-btn
-        >
-      </v-toolbar>
-      <v-toolbar>
-        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Edit Rows</v-toolbar-title>
-        <v-btn class="mr-2" outlined color="blue-grey" small @click="updateRows()"
-          >Update Row</v-btn
-        >
-        <v-btn class="mr-2" outlined color="blue-grey" small @click="deleteRows()"
-          >Delete Row</v-btn
-        >
-      </v-toolbar>
+          <div>
+            <v-toolbar v-show="false">
+              <div class="row">
+                <label>columnSeparator = </label>
+                <select id="columnSeparator">
+                  <option value="none">(default)</option>
+                  <option value="tab">tab</option>
+                  <option value="|">bar (|)</option>
+                </select>
+              </div>
+            </v-toolbar>
 
-      <v-dialog v-model="dialog_merge">
-        <v-card>
-          <v-card-text>현재는 데이터셋 2개만 합칠 수 있습니다.</v-card-text>
+            <!-- Save Dialog  -->
+            <v-dialog v-model="saveDialog" persistent max-width="300">
+              <v-card class="pa-2">
+                <v-card-title>Draft 저장</v-card-title>
+                <v-text-field v-model="draftName" :counter="10" label="파일명"></v-text-field>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue-grey" text @click="saveDraft(draftName), (saveDialog = false)">
+                    저장
+                  </v-btn>
+                  <v-btn color="blue-grey" text @click="saveDialog = false">
+                    취소
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+          <!-- Grid 추가, 삭제 및 관리 -->
+          <v-toolbar>
+            <v-chip-group class="ml-10">
+              <v-chip
+                v-for="(gridID, gridIndex) in gridList"
+                :key="gridIndex"
+                v-if="gridID != undefined"
+                v-bind="dynamicVchipProp(gridIndex)"
+                @click="setCurrentGrid(gridID)"
+                class="ml-1"
+                close
+                @click:close="removeGrid(gridID)"
+                label
+              >
+                Data {{ gridID }}
+              </v-chip>
+            </v-chip-group>
 
-          <v-container>
-            <v-select
-              :items="items"
-              item-text="name"
-              item-value="datasetName"
-              v-model="tableToMerge"
-              chips
-              multiple
-            ></v-select>
-          </v-container>
-          <v-card-actions>
-            <v-btn @click="createMergedGrid">Confirm</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-toolbar>
-        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Edit Columns</v-toolbar-title>
-        <v-btn class="mr-2" outlined color="blue-grey" small @click="openDisplayDialog()"
-          >Drop Column (Hide)</v-btn
-        >
-        <v-dialog v-model="dialog_colDisplay">
-          <v-card>
-            <v-container>
+            <v-btn class="mr-2" small @click="readyToAddDataTable"
+              ><v-icon>mdi-plus</v-icon> Add Datatable</v-btn
+            >
+            <v-btn class="mr-2" small @click="showAnalysis()" outlined> Show Analysis</v-btn>
+          </v-toolbar>
+          <!-- <AgGridMultiple
+      :gridID="0"
+      :columnModel="{ boston: ['CRIM'], concrete: ['cement'] }"
+      :datasetToLoad="['boston', 'concrete']"
+      gridType="AgGridMultiple"
+    /> -->
+
+          <component
+            v-for="(gridID, gridIndex) in gridList"
+            :key="gridIndex"
+            v-if="gridID != undefined"
+            v-bind:is="gridType[gridID]"
+            :gridID="gridID"
+            :columnModel="columnModel[gridID]"
+            :datasetToLoad="datasetToLoad[gridID]"
+            :gridType="gridType[gridID]"
+          ></component>
+
+          <AgGridSummary />
+          <AddGridDialog :dialog.sync="dialog_newGrid" />
+          <!-- Delete Column -->
+          <AgGridDialog
+            :dialog.sync="dialog_colDisplay"
+            :selectedColumns="selectedColumns"
+            :dialogName="'deleteColumn'"
+          >
+            <template v-slot:insideContainer>
               <v-select
                 v-for="(model, modelIndex) in columnModel[currentGrid]"
                 :key="modelIndex"
@@ -100,26 +108,20 @@
                 multiple
                 v-model="selectedColumns[modelIndex]"
               ></v-select>
-            </v-container>
-            <v-card-actions>
-              <v-btn @click="hideColumn">Confirm</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-toolbar>
+            </template>
 
-      <v-toolbar>
-        <v-toolbar-title class="mr-2 font-weight-bold subheading">
-          Edit Column Info</v-toolbar-title
-        >
+            <template v-slot:deleteColumnAction="slotProps">
+              <v-btn @click="slotProps.hideColumn">Confirm</v-btn>
+            </template>
+          </AgGridDialog>
 
-        <v-btn color="blue-grey" outlined @click="openChangeNameDialog" small
-          >Change Column Name</v-btn
-        >
-
-        <v-dialog v-model="dialog_colName">
-          <v-card>
-            <v-container>
+          <!-- Change Name -->
+          <AgGridDialog
+            :dialog.sync="dialog_colName"
+            :gridColumns="gridColumns"
+            :dialogName="'changeName'"
+          >
+            <template v-slot:insideContainer>
               <v-row>
                 <v-col>From</v-col>
                 <v-col>To</v-col>
@@ -134,109 +136,65 @@
                   ></v-text-field
                 ></v-col>
               </v-row>
-            </v-container>
-            <v-card-actions>
-              <v-btn @click="updateColumnName">Confirm</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-toolbar>
-      <v-toolbar>
-        <v-toolbar-title class="mr-2 font-weight-bold subheading"> Data Cleansing</v-toolbar-title>
-        <v-btn
-          color="blue-grey"
-          disabled
-          @click="dialog_nullToZero = true"
-          class="mr-2 "
-          outlined
-          small
-          >Null -> Zero</v-btn
-        >
-        <v-btn color="blue-grey" disabled @click="dialog_negativeToZero = true" outlined small
-          >Negative -> Zero</v-btn
-        >
-      </v-toolbar>
+            </template>
+            <template v-slot:changeNameAction="slotProps">
+              <v-btn @click="slotProps.updateColumnName">Confirm</v-btn>
+            </template>
+          </AgGridDialog>
 
-      <!-- savedialog -->
-      <v-dialog v-model="saveDialog" persistent max-width="300">
-        <v-card class="pa-2">
-          <v-card-title>Draft 저장</v-card-title>
-          <v-text-field v-model="draftName" :counter="10" label="파일명"></v-text-field>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue-grey" text @click="saveDraft(draftName), (saveDialog = false)">
-              저장
-            </v-btn>
-            <v-btn color="blue-grey" text @click="saveDialog = false">
-              취소
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <!-- <v-col> datasetToLoad {{ datasetToLoad }} </v-col>
-    <v-col> currentGrid {{ currentGrid }} </v-col>
-    <v-col> gridList {{ gridList }} </v-col>
-    <v-col> tableToMerge {{ tableToMerge }} </v-col> -->
-
-      <!-- <v-col> loadedColumns {{ loadedColumns }} </v-col>
-    <v-col> gridColumns {{ gridColumns }} </v-col> -->
-      <!-- <v-col> columnModel {{ columnModel }} </v-col> -->
-      <!-- <v-col> gridList {{ gridList }}</v-col> -->
-    </div>
-    <v-toolbar>
-      <v-chip-group class="ml-10">
-        <v-chip
-          v-for="(gridID, gridIndex) in gridList"
-          :key="gridIndex"
-          v-if="gridID != undefined"
-          v-bind="dynamicVchipProp(gridIndex)"
-          @click="setCurrentGrid(gridID)"
-          class="ml-1"
-          close
-          @click:close="removeGrid(gridID)"
-          label
-        >
-          Data {{ gridID }}
-        </v-chip>
-      </v-chip-group>
-
-      <v-btn class="mr-2" small @click="readyToAddDataTable"
-        ><v-icon>mdi-plus</v-icon> Add Datatable</v-btn
-      >
-      <v-btn class="mr-2" small @click="showAnalysis" outlined> Show Analysis</v-btn>
-    </v-toolbar>
-    <!-- <AgGridMultiple
-      :gridID="0"
-      :columnModel="{ boston: ['CRIM'], concrete: ['cement'] }"
-      :datasetToLoad="['boston', 'concrete']"
-      gridType="AgGridMultiple"
-    /> -->
-
-    <component
-      v-for="(gridID, gridIndex) in gridList"
-      :key="gridIndex"
-      v-if="gridID != undefined"
-      v-bind:is="gridType[gridID]"
-      :gridID="gridID"
-      :columnModel="columnModel[gridID]"
-      :datasetToLoad="datasetToLoad[gridID]"
-      :gridType="gridType[gridID]"
-    ></component>
-
-    <AgGridSummary />
-    <AddGridDialog :dialog.sync="dialog_newGrid" />
-    <!-- debug
-
-    <strong> columnsForGrid:</strong>
-    {{ columnsForGrid }}
-
-    <br />
-    <strong> datasetToLoad:</strong>
-    {{ datasetToLoad }}
-
-    <br />
-    <strong> columnModel:</strong>
-    {{ columnModel }} -->
+          <!-- Change Data Type -->
+          <AgGridDialog
+            :dialog.sync="dialog_colType"
+            :dialogName="'changeType'"
+            :dataTypes="dataTypes"
+          >
+            <template v-if="columnModel[currentGrid]" v-slot:insideContainer_type="slotProps">
+              {{ slotProps.dataTypeModel }}
+              <v-row
+                v-for="(colName, colIndex) in columnModel[currentGrid][datasetToLoad[currentGrid]]"
+                :key="colIndex"
+              >
+                <v-col><v-subheader v-text="colName"></v-subheader></v-col>
+                <v-col>
+                  <v-select
+                    v-if="slotProps.dataTypes"
+                    :items="dataTypeItems"
+                    :placeholder="slotProps.dataTypes[colName]"
+                    v-model="slotProps.dataTypeModel[colIndex]"
+                  ></v-select
+                ></v-col>
+                <!-- :label에 mongodb에서 불러온 datatype을 넣어줘야 함 -->
+              </v-row>
+            </template>
+            <template v-slot:changeTypeAction="slotProps">
+              <v-btn @click="slotProps.updateDataType()">Confirm</v-btn>
+            </template>
+          </AgGridDialog>
+          <!-- Fill NA -->
+          <AgGridDialog :dialog.sync="dialog_fillNa" :dialogName="'fillNa'">
+            <template v-if="columnModel[currentGrid]" v-slot:insideContainer_na="slotProps">
+              fillNaModel: {{ slotProps.fillNaModel }}
+              <v-card-subtitle>Leave the select box if not applying 'fillNa'</v-card-subtitle>
+              <v-row
+                v-for="(colName, colIndex) in columnModel[currentGrid][datasetToLoad[currentGrid]]"
+                :key="colIndex"
+              >
+                <v-col><v-subheader v-text="colName"></v-subheader></v-col>
+                <v-col>
+                  <v-select
+                    :items="[0, 1, 'Mean']"
+                    v-model="slotProps.fillNaModel[colIndex]"
+                  ></v-select
+                ></v-col>
+              </v-row>
+            </template>
+            <template v-slot:fillNaAction="slotProps">
+              <v-btn @click="slotProps.applyFillNa()">Confirm</v-btn>
+            </template>
+          </AgGridDialog>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -246,6 +204,8 @@ import AgGridSingle from "@/components/preprocess/AgGridSingle.vue";
 import AgGridMultiple from "@/components/preprocess/AgGridMultiple.vue";
 import AgGridSummary from "@/components/preprocess/AgGridSummary.vue";
 import AddGridDialog from "@/components/preprocess/AddGridDialog.vue";
+import AgGridDialog from "@/components/preprocess/AgGridDialog.vue";
+import AgSideMenu from "@/components/preprocess/AgSideMenu.vue";
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 // import store from "@/store/modules/dataTable/aggrid";
 import axios from "axios";
@@ -254,24 +214,26 @@ export default {
   data() {
     return {
       draftList: [],
+
       draftName: "",
       saveDialog: false,
       vchipClickedProp: {
         color: "primary"
       },
       hidePanel: true,
-
+      dialog_colType: false,
       dialog_newGrid: false,
       dialog_colDisplay: false,
       dialog_colName: false,
-      dialog_nullToZero: false,
-      dialog_negativeToZero: false,
-      dialog_merge: false,
+      dialog_fillNa: false,
 
       gridColumns: [],
       loadedColumns: [],
       selectedColumns: {},
-      tableToMerge: []
+      tableToMerge: [],
+      dataTypes: null,
+      sampleDataTypes: ["float", "int", "double"],
+      dataTypeItems: ["double", "string", "bool", "date", "int", "long", "decimal"]
     };
   },
   computed: {
@@ -313,35 +275,52 @@ export default {
     AgGridMultiple,
     AgGridSummary,
     AddGridDialog,
-    AgGridSingle
+    AgGridSingle,
+    AgGridDialog,
+    AgSideMenu
   },
   created() {
     this.resetSummarizedInfo();
     this.resetAggrid();
   },
-  mounted() {
-    this.loadDraftList();
-  },
+  mounted() {},
   methods: {
-    loadDraftList() {
-      let path = "http://localhost:5000/loadDraftList";
-      // axios
+    dialogAction(dialogName) {
+      if (dialogName == "changeColName") {
+        this.getGridColumns();
+        this.dialog_colName = !this.dialog_colName;
+      } else if (dialogName == "changeColType") {
+        this.getDataTypes();
+      } else if (dialogName == "dropColumn") {
+        this.dialog_colDisplay = true;
+      } else if (dialogName == "fillNA") {
+        this.dialog_fillNa = true;
+      }
+    },
+    getColumnDef() {
+      let dd = this.gridApi[this.currentGrid].getColumnDefs();
+      console.log(dd);
+    },
+    getDataTypes() {
+      let path = "http://localhost:5000/getDataTypes";
       axios({
         method: "post",
-        url: path
+        url: path,
+        data: {
+          projectName: this.projectName,
+          tableName: this.datasetToLoad[this.currentGrid],
+          columnModel: this.columnModel[this.currentGrid][this.datasetToLoad[this.currentGrid]]
+        }
       })
         .then(res => {
-          this.draftList = [];
-
-          res.data.forEach(element => {
-            this.draftList.push(element);
-          });
+          this.dataTypes = res.data;
+          this.dialog_colType = true;
         })
-
         .catch(error => {
           console.error(error);
         });
     },
+
     readyToAddDataTable() {
       this.dialog_newGrid = true;
       // Vue.set(this.columnModel, parseInt(this.currentGrid) + 1, []);
@@ -355,11 +334,8 @@ export default {
     ...mapMutations("aggrid", ["resetAggrid"]),
     ...mapMutations("aggrid", ["setAvailableUndo"]),
     ...mapMutations("aggrid", ["setAvailableRedo"]),
-    ...mapMutations("aggrid", ["addNewDeletion"]),
-    ...mapMutations("aggrid", ["delColumnModelElement"]),
     ...mapActions("aggrid", ["removeGrid"]),
     ...mapActions("aggrid", ["saveDraft"]),
-    ...mapActions("aggrid", ["loadDraft"]),
 
     resetLoadInfo() {
       let index = parseInt(this.currentGrid) + 1;
@@ -367,6 +343,7 @@ export default {
       Vue.delete(this.datasetToLoad, index);
       Vue.set(this.columnModel, index, []);
     },
+
     openChangeNameDialog() {
       this.getGridColumns();
       this.dialog_colName = !this.dialog_colName;
@@ -443,169 +420,7 @@ export default {
           return text;
       }
     },
-    parseFilterModel(filterModel) {
-      if (Object.keys(filterModel).length == 0) {
-        return [];
-      } else {
-        let filterKeys = Object.keys(filterModel);
-        let conditionList = [];
-        filterKeys.forEach(element => {
-          // YES operator
-          let condition = {};
 
-          if ("operator" in filterModel[element]) {
-            let operator;
-            if (filterModel[element]["operator"] == "AND") {
-              operator = "$and";
-            } else {
-              operator = "$or";
-            }
-            condition[operator] = [];
-            for (let i = 1; i < 3; i++) {
-              let newCondition = this.serverSideFilter(
-                element,
-                filterModel[element]["condition" + i]
-              );
-              condition[operator].push(newCondition);
-            }
-          }
-          // NO operator
-          else {
-            // no operator
-            condition = this.serverSideFilter(element, filterModel[element]);
-          }
-          conditionList.push(condition);
-        });
-        return conditionList;
-      }
-    },
-    serverSideFilter(elementName, filterModel) {
-      let condition = {};
-      let filterType = filterModel.filterType;
-      if (filterType == "number") {
-        let filter = filterModel["filter"];
-
-        switch (filterModel["type"]) {
-          case "equals":
-            condition[elementName] = filter;
-            break;
-          case "notEqual":
-            condition[elementName] = { $ne: filter };
-            break;
-          case "lessThan":
-            condition[elementName] = { $lt: filter };
-
-            break;
-          case "lessThanOrEqual":
-            condition[elementName] = { $lte: filter };
-            break;
-          case "greaterThan":
-            condition[elementName] = { $gt: filter };
-
-            break;
-          case "greaterThanOrEqual":
-            condition[elementName] = { $gte: filter };
-
-            break;
-          case "inRange":
-            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
-
-            break;
-          default:
-            break;
-        }
-      } else if (filterType == "date") {
-        let filter = filterModel["dateFrom"];
-
-        switch (filterModel["type"]) {
-          case "equals":
-            condition[elementName] = filter;
-            break;
-          case "notEqual":
-            condition[elementName] = { $ne: filter };
-            break;
-
-          case "lessThan":
-            condition[elementName] = { $lt: filter };
-            break;
-
-          case "greaterThan":
-            condition[elementName] = { $gt: filter };
-
-            break;
-
-          case "inRange":
-            condition[elementName] = { $gt: filter, $lt: filterModel["filterTo"] };
-
-            break;
-          case "dateFrom":
-            break;
-          default:
-            break;
-        }
-      } else if (filterType == "text") {
-        let filter = filterModel["filter"];
-
-        switch (filterModel["type"]) {
-          case "contains":
-            break;
-          case "notContains":
-            break;
-          case "startsWith":
-            break;
-          case "endsWith":
-            break;
-          default:
-            break;
-        }
-      }
-
-      return condition;
-    },
-    getParams() {
-      return { columnSeparator: this.getValue("#columnSeparator") };
-    },
-    exportAllData() {
-      let filterModel = this.gridApi[this.currentGrid].getFilterModel();
-      filterModel = this.parseFilterModel(filterModel);
-
-      let path = "http://localhost:5000/exportAllData";
-      // axios
-      axios({
-        method: "post",
-        url: path,
-        data: {
-          projectName: this.projectName,
-          tableName: this.datasetToLoad[this.currentGrid],
-          filterModel: filterModel,
-          gridType: this.gridType[this.currentGrid],
-          columnModel: this.columnModel[this.currentGrid]
-        }
-      })
-        .then(res => {
-          console.log(res);
-          const url = window.URL.createObjectURL(new Blob([res.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "file.csv"); //or any other extension
-          document.body.appendChild(link);
-          link.click();
-        })
-
-        .catch(error => {
-          console.error(error);
-        });
-    },
-    exportLoadedData() {
-      let params = this.getParams();
-      if (params.columnSeparator) {
-        alert(
-          "NOTE: you are downloading a file with non-standard separators - it may not render correctly in Excel."
-        );
-      }
-
-      this.gridApi[this.currentGrid].exportDataAsCsv(params);
-    },
     // undo
     undoCalculate() {
       var undoSize = this.gridApi[this.currentGrid].getCurrentUndoSize();
@@ -639,26 +454,7 @@ export default {
       this.selectedColumns = {};
       this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
-    updateColumnName() {
-      const columnDefs = this.gridApi[this.currentGrid].getColumnDefs();
 
-      let changedElementIndex = [];
-      this.gridColumns.forEach((element, index) => {
-        if (element != null) {
-          columnDefs[index].headerName = element;
-        }
-      });
-
-      this.gridApi[this.currentGrid].setColumnDefs(columnDefs);
-      this.gridColumns = [];
-      //닫기
-      this.dialog_colName = false;
-    },
-    deleteRows() {
-      let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
-      this.addNewDeletion(selectedRows);
-      this.gridApi[this.currentGrid].refreshInfiniteCache();
-    },
     showAnalysis() {
       this.setAnalysisDisplay(!this.analysisDisplay);
     },

@@ -7,11 +7,11 @@
         <div style="height:100vh">
           <v-row>
             <!-- 화면 좌측 -->
-            <v-col cols="2">
+            <!-- <v-col cols="2">
               <SideMenu />
-            </v-col>
+            </v-col> -->
             <!-- 화면 우측 -->
-            <v-col cols="10" class="px-8">
+            <v-col cols="12" class="px-8">
               <!-- Preprocess/Table 교체 버튼 -->
 
               <!-- <v-toolbar elevation="1">

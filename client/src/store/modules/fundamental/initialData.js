@@ -60,7 +60,7 @@ const mutations = {
   loadSummarizedInfo(state, payload) {
     // state.summarizedInfo = null;
 
-    Vue.set(state.summarizedInfo, payload.tableIndex, payload.data);
+    Vue.set(state.summarizedInfo, payload.tableName, payload.data);
   },
   changeColumnName_vuex(state, payload) {
     let columnList = Object.keys(state.dataset);
@@ -138,19 +138,27 @@ const actions = {
 
     // 원본
   },
-  loadSummarizedData({ commit, state }, loadInfo) {
-    const path = "http://localhost:5000/loadSummarizedData";
+  loadSummarizedData({ commit, state, rootState }, tableName) {
+    const path = "http://localhost:5000/loadStatistics";
     axios({
       method: "post",
       url: path,
       data: {
-        tableName: loadInfo.tableName,
-        projectName: state.projectName,
-        columnModel: loadInfo.columnModel
+        tableName: tableName,
+        projectName: state.projectName
+        // columnModel: loadInfo.columnModel
       }
     })
       .then(res => {
-        let payload = { tableIndex: loadInfo.tableIndex, data: res.data };
+        // res.data를 AgGrid에 적합하게 데이터 가공
+        let summarizedInfo = Object.keys(res.data).map(function(key) {
+          return res.data[key];
+        });
+        // summary aggrid data update
+        rootState.aggrid.summaryGridApi.setRowData(summarizedInfo);
+
+        // mutation
+        let payload = { tableName: tableName, data: summarizedInfo };
         commit("loadSummarizedInfo", payload);
       })
       .catch(error => {
