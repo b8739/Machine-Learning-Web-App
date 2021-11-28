@@ -5,7 +5,6 @@
         <v-col cols="2"> <AgSideMenu @openDialog="dialogAction"/></v-col>
 
         <v-col cols="10">
-          <v-btn @click="getColumnDef">get column def</v-btn>
           <!-- <v-toolbar>
       <v-toolbar-title class="mr-2 font-weight-bold subheading">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
@@ -19,7 +18,6 @@
         >Redo</v-btn
       >
     </v-toolbar> -->
-          {{ selectedColumns }}
 
           <div>
             <v-toolbar v-show="false">
@@ -71,7 +69,16 @@
             <v-btn class="mr-2" small @click="readyToAddDataTable"
               ><v-icon>mdi-plus</v-icon> Add Datatable</v-btn
             >
-            <v-btn class="mr-2" small @click="showAnalysis()" outlined> Show Analysis</v-btn>
+            <v-chip-group v-model="viewStatus" active-class="primary--text">
+              <v-chip class="mr-2" label small @click="setViewMode('table')"> Data Table</v-chip>
+              <v-chip class="mr-2" label small @click="setViewMode('statistics')">
+                Summary Statistics</v-chip
+              >
+
+              <v-chip class="mr-2" label small @click="setViewMode('distribution')()">
+                Feature Distribution</v-chip
+              >
+            </v-chip-group>
           </v-toolbar>
           <!-- <AgGridMultiple
       :gridID="0"
@@ -182,8 +189,8 @@
                 <v-col><v-subheader v-text="colName"></v-subheader></v-col>
                 <v-col>
                   <v-select
-                    :items="[0, 1, 'Mean']"
-                    v-model="slotProps.fillNaModel[colIndex]"
+                    :items="[0, 1, 'min', 'max', 'mean', 'std']"
+                    v-model="slotProps.fillNaModel[colName]"
                   ></v-select
                 ></v-col>
               </v-row>
@@ -213,6 +220,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      viewStatus: 0,
       draftList: [],
 
       draftName: "",
@@ -248,7 +256,7 @@ export default {
       gridApi: state => state.aggrid.gridApi,
       gridColumnApi: state => state.aggrid.gridColumnApi,
       currentGrid: state => state.aggrid.currentGrid,
-      analysisDisplay: state => state.aggrid.analysisDisplay,
+      viewMode: state => state.aggrid.viewMode,
 
       gridList: state => state.aggrid.gridList,
       // transaction
@@ -295,12 +303,11 @@ export default {
         this.dialog_colDisplay = true;
       } else if (dialogName == "fillNA") {
         this.dialog_fillNa = true;
+      } else if (dialogName == "saveDraft") {
+        this.saveDialog = true;
       }
     },
-    getColumnDef() {
-      let dd = this.gridApi[this.currentGrid].getColumnDefs();
-      console.log(dd);
-    },
+
     getDataTypes() {
       let path = "http://localhost:5000/getDataTypes";
       axios({
@@ -330,7 +337,7 @@ export default {
     ...mapMutations("aggrid", ["addGridApi"]),
     ...mapMutations("aggrid", ["addGridColumnApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
-    ...mapMutations("aggrid", ["setAnalysisDisplay"]),
+    ...mapMutations("aggrid", ["setViewMode"]),
     ...mapMutations("aggrid", ["resetAggrid"]),
     ...mapMutations("aggrid", ["setAvailableUndo"]),
     ...mapMutations("aggrid", ["setAvailableRedo"]),
@@ -356,7 +363,9 @@ export default {
         return col.getColId();
       });
     },
-    test() {},
+    test(value) {
+      alert(value);
+    },
     openDisplayDialog() {
       // this.loadedColumns = [];
       // let columns = this.getGridColumns();
@@ -456,16 +465,7 @@ export default {
     },
 
     showAnalysis() {
-      this.setAnalysisDisplay(!this.analysisDisplay);
-    },
-
-    createMergedGrid() {
-      Vue.set(this.datasetToLoad, parseInt(this.currentGrid) + 1, this.tableToMerge);
-      this.columnModel[parseInt(this.currentGrid) + 1] = [];
-      this.addGridList();
-
-      this.addCurrentGrid();
-      this.setAnalysisDisplay(false);
+      this.setViewMode("statistics");
     },
 
     dynamicVchipProp(gridIndex) {

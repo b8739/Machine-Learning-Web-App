@@ -76,7 +76,11 @@
                                   <v-subheader>Type</v-subheader></v-col
                                 >
                                 <v-col class="pa-0 ma-0" cols="9">
-                                  <v-select disabled dense></v-select></v-col
+                                  <v-select
+                                    dense
+                                    :items="['scatter', 'line', 'bar']"
+                                    @input="graphType => changeGraphType(graphType, tpIndex)"
+                                  ></v-select></v-col
                               ></v-row>
                               <v-row>
                                 <v-col class="pa-0 ma-0" cols="3">
@@ -251,6 +255,8 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      dialog: false,
+
       openedPanel: [null],
       selectedData: { x: [], y: [] },
       axisToUse: { x: [0], y: [0] },
@@ -262,7 +268,6 @@ export default {
       blurHandler: false,
       axisTypes: ["x", "y"],
       numTracePanel: [null],
-      dialog: false,
       drawer: true,
       depthStatus: true,
       mini: false,
@@ -295,6 +300,10 @@ export default {
   methods: {
     ...mapMutations("edaMenuHandler", ["setMenuState"]),
     ...mapMutations("edaMenuHandler", ["resetEda"]),
+    changeGraphType(graphType, tpIndex) {
+      let payload = { graphType: graphType, tpIndex: tpIndex };
+      eventBus.$emit("changeGraphType", payload);
+    },
     loadColumns(tpIndex) {
       let path = "http://localhost:5000/loadColumns";
       axios({

@@ -14,7 +14,7 @@ const getDefaultState = () => {
 
     currentGrid: -1,
 
-    analysisDisplay: false,
+    viewMode: "table",
 
     // transaction
     updateTransaction: {},
@@ -86,13 +86,21 @@ const mutations = {
   },
   /* Analysis Display */
 
-  setAnalysisDisplay(state, payload) {
-    state.analysisDisplay = payload;
+  setViewMode(state, payload) {
+    state.viewMode = payload;
   },
   /* Reset */
   resetAggrid(state) {
+    // Summary 저장
+    let save1 = state.summaryGridApi;
+    let save2 = state.summaryGridApi;
+    // 초기화
     Object.assign(state, getDefaultState());
+    // 저장해둔 Summary 다시 assign
+    state.summaryGridApi = save1;
+    state.summaryGridColumnApi = save2;
   },
+
   loadDraftInfo(state, payload) {
     Object.keys(payload).forEach(element => {
       state[element] = payload[element];
@@ -174,7 +182,9 @@ const actions = {
       .then(res => {
         commit("resetAggrid");
         console.log(state.gridList.length);
-        commit("loadDraftInfo", res.data);
+        setTimeout(() => {
+          commit("loadDraftInfo", res.data);
+        }, 100);
         console.log(res.data);
       })
       .catch(error => {
@@ -210,7 +220,7 @@ const actions = {
   createNewGrid({ commit, state }) {
     commit("addGridList");
     commit("addCurrentGrid");
-    commit("setAnalysisDisplay", false);
+    commit("setViewMode", "table");
     // grid 생성 (action으로 만들 필요성이 있음)
   },
   removeGrid({ commit, state }, gridID) {

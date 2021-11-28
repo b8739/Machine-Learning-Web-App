@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" persistent max-width="400px">
+    <v-dialog v-model="dialog" @click:outside="closeDialog()" persistent max-width="400px">
       <!-- <template v-slot:activator="{ on, attrs }">
         <v-btn color="" v-bind="attrs" v-on="on">
           Define Dataset
@@ -22,7 +22,7 @@
             <v-btn color="gray darken-1" text @click="dialog = false">
               Close
             </v-btn>
-            <v-btn color="blue darken-1" @click="eventHandler" text>
+            <v-btn color="blue darken-1" @click="dataUpload()" text>
               Confirm
             </v-btn>
           </v-card-actions>
@@ -38,14 +38,12 @@ import { eventBus } from "@/main";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 export default {
+  props: ["dialog"],
+
   data() {
     return {
-      dialog: false,
       newTableName: "",
       formData: null,
-      // flag
-      dataUploadFlag: false,
-      saveNewFileFlag: false,
       errorMessage: ""
     };
   },
@@ -60,16 +58,8 @@ export default {
     ...mapMutations("initialData", ["resetState"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("initialData", ["setTableName"]),
-
-    eventHandler() {
-      if (this.dataUploadFlag == true) {
-        this.dataUpload();
-        this.dataUploadFlag = false;
-      } else if (this.saveNewFileFlag == true) {
-        this.saveNewFile();
-        this.saveNewFileFlag = false;
-        this.dialog = false;
-      }
+    closeDialog() {
+      this.$emit("update:dialog", false);
     },
     async dataUpload() {
       axios
@@ -84,9 +74,9 @@ export default {
         })
         .then(response => {
           // this.resetState();
-          this.setTableName(this.newTableName);
-          // this.loadSummarizedData();
+
           this.dialog = false;
+          this.$emit("onComplete", true);
         })
         .catch(ex => {
           this.errorMessage = ex;
@@ -94,37 +84,10 @@ export default {
           console.log("ERR!!!!! : ", ex);
           // this.$router.push('/preprocess'); //delete later
         });
-    },
-    saveNewFile() {
-      let path = "http://localhost:5000/saveAsNewTable";
-      console.log(this.tableName);
-      console.log(this.newTableName);
-      axios;
-      this.$axios({
-        method: "post",
-        url: path,
-        data: {
-          tableName: this.tableName,
-          newTableName: this.newTableName
-        }
-      })
-        .then(res => {
-          this.updatePlot(featureName, res.data[featureName], axisType, tpIndex);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      this.newTableName = "";
     }
   },
   created() {
-    eventBus.$on("dataUploadMode", modalStatus => {
-      this.dialog = modalStatus;
-      this.dataUploadFlag = true;
-    });
-    eventBus.$on("saveNewFileMode", modalStatus => {
-      this.dialog = modalStatus;
-      this.saveNewFileFlag = true;
-    });
     eventBus.$on("formData", formData => {
       this.formData = formData;
     });

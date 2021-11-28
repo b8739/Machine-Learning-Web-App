@@ -26,6 +26,13 @@
             @input="loadDraft"
           ></v-select>
         </v-list-item>
+
+        <v-list-item @click="openDialog('saveDraft')">
+          <v-list-item-icon>
+            <v-icon>mdi-book-plus-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title draggable label>Save Draft</v-list-item-title>
+        </v-list-item>
       </v-list-group>
     </v-list>
     <!-- Row -->
@@ -34,7 +41,7 @@
         <template v-slot:activator>
           <v-list-item-title active>Edit Row</v-list-item-title>
         </template>
-        <v-list-item v-for="item in items.rowMenu" :key="item.title" link>
+        <v-list-item v-for="item in items.rowMenu" :key="item.title" link @click="item.action">
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -109,8 +116,8 @@ export default {
       mini: false,
       items: {
         rowMenu: [
-          { title: "Update Row", icon: "mdi-pencil" },
-          { title: "Delete Row", icon: "mdi-delete" }
+          { title: "Update Row", icon: "mdi-pencil", action: this.deleteRows },
+          { title: "Delete Row", icon: "mdi-delete", action: this.deleteRows }
         ],
         colMenu: [
           {
@@ -149,7 +156,7 @@ export default {
       gridApi: state => state.aggrid.gridApi,
       gridColumnApi: state => state.aggrid.gridColumnApi,
       currentGrid: state => state.aggrid.currentGrid,
-      analysisDisplay: state => state.aggrid.analysisDisplay,
+      viewMode: state => state.aggrid.viewMode,
 
       gridList: state => state.aggrid.gridList,
       // transaction

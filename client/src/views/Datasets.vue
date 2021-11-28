@@ -4,6 +4,12 @@
 
     <v-container fluid class="pl-10 pt-10">
       <v-row align="start">
+        <v-btn max-width="200px" class="mr-2" @click="enterDataset" color="primary">
+          <v-icon left class="mdi-24">
+            mdi-location-enter
+          </v-icon>
+          Enter project</v-btn
+        >
         <v-btn max-width="200px" class="mr-2" @click="openUploader" color="success">
           <v-icon left class="mdi-24">
             mdi-plus
@@ -20,7 +26,6 @@
       </v-row>
       <v-row>
         <v-sheet
-          @click="enterDataset(tableName)"
           light
           outlined
           width="350px"
@@ -38,17 +43,12 @@
               <v-card-text class="font-weight-thin caption">Creator:</v-card-text>
               <v-card-text class="font-weight-thin caption pt-0">Size:</v-card-text></v-row
             >
-            <!-- <v-row justify="end">
-              <v-btn small outlined color="secondary" @click="enterDataset(tableName)"
-                ><v-icon> mdi-subdirectory-arrow-right</v-icon>
-              </v-btn>
-            </v-row> -->
           </v-container>
         </v-sheet>
       </v-row>
       <!-- modal -->
-      <DefineDataset />
-      <Uploader />
+      <DefineDataset @onComplete="onCompleteEvent" :dialog.sync="dialog_define" />
+      <Uploader :dialog.sync="dialog_uploader" />
     </v-container>
   </div>
 </template>
@@ -68,7 +68,8 @@ export default {
     */
   data() {
     return {
-      // enterBlocked:false,
+      dialog_uploader: false,
+      dialog_define: false,
       editMode: false,
       files: [],
       datasets: [1, 2]
@@ -92,10 +93,14 @@ export default {
     ...mapMutations("initialData", ["setNavStatus"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("initialData", ["setTableName"]),
-
-    enterDataset(tableName) {
+    onCompleteEvent() {
+      alert("Data Successfully Uploaded");
+      this.showTables();
+      this.dialog_uploader = false;
+      this.dialog_define = false;
+    },
+    enterDataset() {
       if (!this.editMode) {
-        this.setTableName(tableName);
         this.$router.push("/preprocess");
 
         // this.loadSummarizedData();
@@ -136,15 +141,16 @@ export default {
       }
     },
     openUploader() {
-      eventBus.$emit("openUploader", true);
+      this.dialog_uploader = true;
     }
   },
   //실험
   created() {
-    // console.log("created");
     this.showTables();
     this.setNavStatus("datasets");
-    // console.log("Datatable created");
+    eventBus.$on("dataUploadMode", modalStatus => {
+      this.dialog_define = true;
+    });
   },
   mounted() {
     // console.log("mounted");

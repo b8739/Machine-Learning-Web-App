@@ -1,9 +1,8 @@
 <template>
   <div>
-    <v-btn @click="onBtOrderColsMedalsFirst">reoder</v-btn>
     <ag-grid-vue
-      v-show="currentGrid == gridID && analysisDisplay == false"
-      style="width: 1550px; height:800px"
+      v-show="currentGrid == gridID && viewMode == 'table'"
+      style="width: 100%; height:800px"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
       :rowModelType="rowModelType"
@@ -142,6 +141,8 @@ export default {
             } else {
               fillNaModel = [];
             }
+            console.log("fillNaModel");
+            console.log(fillNaModel);
             let path = "http://localhost:5000/infiniteRowModel";
 
             // axios

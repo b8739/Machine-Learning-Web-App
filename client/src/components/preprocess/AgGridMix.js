@@ -43,7 +43,7 @@ export default {
       gridApi: state => state.aggrid.gridApi,
       gridColumnApi: state => state.aggrid.gridColumnApi,
       currentGrid: state => state.aggrid.currentGrid,
-      analysisDisplay: state => state.aggrid.analysisDisplay,
+      viewMode: state => state.aggrid.viewMode,
       // transaction
       updateTransaction: state => state.aggrid.updateTransaction,
       deleteTransaction: state => state.aggrid.deleteTransaction,
@@ -59,7 +59,7 @@ export default {
     ...mapMutations("aggrid", ["addGridColumnApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
     ...mapActions("initialData", ["loadSummarizedData"]),
-    ...mapMutations("aggrid", ["setAnalysisDisplay"]),
+    ...mapMutations("aggrid", ["setViewMode"]),
     ...mapMutations("aggrid", ["setColumnState"]),
     loadColumnState(gridID) {
       if (this.columnState[gridID]) {

@@ -256,6 +256,37 @@ export default {
         this.data[tpIndex][oppositeAxis] = [this.data[tpIndex][oppositeAxis]];
       }
       Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
+    },
+    changeGraphType(payload) {
+      console.log(payload);
+      let update;
+      switch (payload.graphType) {
+        case "scatter":
+          update = {
+            type: "scatter",
+            mode: "markers"
+          };
+
+          break;
+        case "line":
+          update = {
+            type: "scatter",
+            mode: ""
+          };
+          break;
+        case "bar":
+          update = {
+            type: "bar",
+            mode: ""
+          };
+          break;
+
+        default:
+          return;
+      }
+      console.log(this.data[payload.tpIndex]);
+      // Plotly.restyle(this.plotContainer, this.data[payload.tpIndex], payload.tpIndex);
+      Plotly.restyle(this.plotContainer, update, payload.tpIndex);
     }
   },
   created() {
@@ -289,6 +320,9 @@ export default {
       }
       this.renderGroupingGraph(payload.data);
       console.log(payload.data);
+    });
+    eventBus.$on("changeGraphType", payload => {
+      this.changeGraphType(payload);
     });
   },
   mounted() {

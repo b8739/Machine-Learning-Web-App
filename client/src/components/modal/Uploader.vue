@@ -1,5 +1,5 @@
 <template>
-  <v-dialog @click:outside="removeFile" v-model="dialog" width="30vw">
+  <v-dialog @click:outside="removeFile(), closeDialog()" v-model="dialog" width="30vw">
     <v-card outlined class="py-10" @dragover.prevent @drop.stop.prevent="onDrop">
       <v-row justify="center" class="ma-0">
         <v-icon color="teal" class="mdi-48px"> mdi-briefcase-upload </v-icon>
@@ -36,13 +36,13 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 import { eventBus } from "@/main";
 
 export default {
+  props: ["dialog"],
   /*
       Defines the data used by the component
     */
   data() {
     return {
-      files: [],
-      dialog: false
+      files: []
     };
   },
 
@@ -116,6 +116,9 @@ export default {
     removeFile(key) {
       this.files.splice(key, 1);
     },
+    closeDialog() {
+      this.$emit("update:dialog", false);
+    },
     // dropzone methods
     onDrop(event) {
       const uploadedFiles = event.dataTransfer.files;
@@ -148,9 +151,6 @@ export default {
     //실험
   },
   created() {
-    eventBus.$on("openUploader", dialogStatus => {
-      this.dialog = dialogStatus;
-    });
     eventBus.$on("removeFile", status => {
       this.removeFile();
     });

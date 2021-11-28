@@ -1,6 +1,6 @@
 <template>
-  <div v-show="analysisDisplay == true">
-    <v-btn @click="load">수동</v-btn>
+  <div v-show="viewMode == 'statistics'">
+    <!-- <v-btn @click="load">수동</v-btn> -->
     <v-select
       v-model="datasetToLoad"
       :items="tableList"
@@ -11,7 +11,7 @@
     ></v-select>
     <!-- @input="loadColumns" -->
     <ag-grid-vue
-      style="width: 1400px; height:800px"
+      style="width: 100%; height:600px"
       class="ag-theme-alpine"
       :rowData="rowData"
       @grid-ready="onGridReady"
@@ -97,7 +97,7 @@ export default {
       gridColumnApi: state => state.aggrid.summaryGridColumnApi,
       currentGrid: state => state.aggrid.currentGrid,
       gridList: state => state.aggrid.gridList,
-      analysisDisplay: state => state.aggrid.analysisDisplay
+      viewMode: state => state.aggrid.viewMode
     }),
     rowData() {
       return this.summarizedInfo[this.currentGrid];
@@ -116,7 +116,7 @@ export default {
     ...mapMutations("aggrid", ["setSummaryColumnGridApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
     ...mapMutations("aggrid", ["addGridList"]),
-    ...mapMutations("aggrid", ["setAnalysisDisplay"]),
+    ...mapMutations("aggrid", ["setViewMode"]),
     onGridReady(params) {
       this.setSummaryGridApi(params.api);
       this.setSummaryColumnGridApi(params.columnApi);

@@ -163,15 +163,13 @@ export default {
   },
   mounted() {
     // console.log("preprocess mounted");
-    window.addEventListener("beforeunload", this.askSave); //새로고침 방지
+    // window.addEventListener("beforeunload", this.askSave); //새로고침 방지
   },
   beforeUnmount() {
-    window.removeEventListener("beforeunload", this.askSave);
+    // window.removeEventListener("beforeunload", this.askSave);
   },
 
-  beforeDestroy() {
-    this.askSave();
-  }
+  beforeDestroy() {}
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
   //     const path = "http://localhost:5000/overwriteTable";

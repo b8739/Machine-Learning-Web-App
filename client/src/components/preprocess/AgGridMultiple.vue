@@ -3,7 +3,7 @@
     Multiple
     <v-btn @click="getFinalColumns">getFinalColumns</v-btn>
     <ag-grid-vue
-      v-show="currentGrid == gridID && analysisDisplay == false"
+      v-show="currentGrid == gridID && viewMode == 'table'"
       style="width: 1550px; height:600px"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"

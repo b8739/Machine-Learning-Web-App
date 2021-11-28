@@ -31,7 +31,7 @@ export default {
       sampleDataTypes: ["float", "int", "double"],
       dataTypeItems: ["double", "string", "bool", "date", "int", "long", "decimal"],
       dataTypeModel: [],
-      fillNaModel: []
+      fillNaModel: {}
     };
   },
 
@@ -70,6 +70,21 @@ export default {
       console.log(finalResult);
       return finalResult;
     },
+    // getFinalFillNaModel() {
+    //   let vm = this;
+    //   let finalResult = this.fillNaModel.reduce(function(result, value, index) {
+    //     if (value != null || value != undefined) {
+    //       let key = vm.columnModel[vm.currentGrid][vm.datasetToLoad[vm.currentGrid]][index];
+    //       let resultValue = {};
+
+    //       resultValue[key] = { $ifNull: ["$" + key, value] };
+    //       result.push(resultValue);
+    //     }
+    //     return result;
+    //   }, []);
+    //   console.log(finalResult);
+    //   return finalResult;
+    // },
     getFinalFillNaModel() {
       let vm = this;
       let finalResult = this.fillNaModel.reduce(function(result, value, index) {
@@ -77,7 +92,7 @@ export default {
           let key = vm.columnModel[vm.currentGrid][vm.datasetToLoad[vm.currentGrid]][index];
           let resultValue = {};
 
-          resultValue[key] = { $ifNull: ["$" + key, value] };
+          resultValue[key] = value;
           result.push(resultValue);
         }
         return result;
@@ -86,8 +101,8 @@ export default {
       return finalResult;
     },
     applyFillNa() {
-      let finalNaModel = this.getFinalFillNaModel();
-      this.setFillNaModel(finalNaModel);
+      // let finalNaModel = this.getFinalFillNaModel();
+      this.setFillNaModel(this.fillNaModel);
       this.closeDialog();
       this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
