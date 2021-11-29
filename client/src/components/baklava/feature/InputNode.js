@@ -1,8 +1,10 @@
 import { NodeBuilder } from "@baklavajs/core";
 import FeatureOption from "@/components/baklava/feature/FeatureOption.vue";
-import store from "@/store/modules/fundamental/initialData";
+// import store from "@/store/modules/fundamental/initialData";
+import store from "@/store/modules/dataTable/aggrid";
 
-const columns = store.state.columns;
+const columnModel = store.state.columnModel;
+const datasetToLoad = store.state.datasetToLoad;
 
 export default new NodeBuilder("InputNode", {
   //   twoColumn: true,
@@ -15,7 +17,8 @@ export default new NodeBuilder("InputNode", {
     "Features",
     "ButtonOption",
     () => {
-      return { features: columns };
+      // return { features: columnModel[0][datasetToLoad[0]] };
+      return { features: [] };
     },
     "FeatureSidebar"
   )

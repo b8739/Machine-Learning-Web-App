@@ -21,7 +21,7 @@ const mutations = {
   saveModelingRequest(state, payload) {
     state.modelingRequest = payload;
   },
-  saveDatasetName(state, payload) {
+  saveDatasetInfo(state, payload) {
     state.modelingDataset = payload;
   },
   saveSplitRatio(state, payload) {
@@ -76,9 +76,9 @@ const actions = {
       method: "post",
       url: path,
       data: {
-        modelingRequest: state.modelingRequest,
         projectName: rootState.initialData.projectName,
-        modelingDataset: state.modelingDataset,
+        modelingRequest: state.modelingRequest,
+        modelingDataset: state.modelingDataset, // 어떤 draft, 어떤 grid인지 보내주고 나머지는 () mongodb에서 가져오면됨
         splitRatio: state.splitRatio
       }
     })

@@ -111,7 +111,6 @@ import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 export default {
   data() {
     return {
-      draftList: [],
       drawer: true,
       mini: false,
       items: {
@@ -165,12 +164,14 @@ export default {
       columnsForGrid: state => state.aggrid.columnsForGrid,
       columnModel: state => state.aggrid.columnModel,
       datasetToLoad: state => state.aggrid.datasetToLoad,
-      gridType: state => state.aggrid.gridType
+      gridType: state => state.aggrid.gridType,
+      draftList: state => state.aggrid.draftList
     })
   },
   methods: {
     ...mapMutations("aggrid", ["addNewDeletion"]),
     ...mapActions("aggrid", ["loadDraft"]),
+    ...mapActions("aggrid", ["loadDraftList"]),
 
     deleteRows() {
       let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
@@ -397,26 +398,6 @@ export default {
       }
 
       return condition;
-    },
-    // draft
-    loadDraftList() {
-      let path = "http://localhost:5000/loadDraftList";
-      // axios
-      axios({
-        method: "post",
-        url: path
-      })
-        .then(res => {
-          this.draftList = [];
-
-          res.data.forEach(element => {
-            this.draftList.push(element);
-          });
-        })
-
-        .catch(error => {
-          console.error(error);
-        });
     }
   },
 

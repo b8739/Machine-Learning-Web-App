@@ -1,11 +1,13 @@
 <template>
   <div>
-    <!-- <v-btn @click="getValue">get value</v-btn> -->
     <v-card dark color="#3f3f3f" class="rounded-0" elevation="0">
       <v-container>
+        <!-- <v-btn @click="getValue">get value</v-btn> -->
+
         <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
         <v-checkbox
-          v-for="(feature, index) in columns"
+          v-if="columnModel[gridValue][datasetToLoad[gridValue]] != undefined"
+          v-for="(feature, index) in columnModel[gridValue][datasetToLoad[gridValue]]"
           :key="index"
           v-model="checkedFeatures[index]"
           dense
@@ -18,6 +20,8 @@
 </template>
 <script>
 import Vue from "vue";
+import { eventBus } from "@/main";
+
 import { ButtonOption } from "@baklavajs/plugin-options-vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
 import { CheckboxOption } from "@baklavajs/plugin-options-vue";
@@ -36,7 +40,8 @@ export default {
       inputFeatures: null,
       selectedFeatures: [],
       checkedFeatures: [],
-      selectAllFlag: false
+      selectAllFlag: false,
+      gridValue: 0
     };
   },
 
@@ -47,8 +52,14 @@ export default {
       this.checkedFeatures = [];
       // flag가 false일 때 (select all이 해제된 상태) 전부 체크
       if (this.selectAllFlag == false) {
-        for (let i = 0; i < this.columns.length; i++) {
-          this.selectedFeatures.push(this.columns[i]);
+        for (
+          let i = 0;
+          i < this.columnModel[this.gridValue][this.datasetToLoad[this.gridValue]].length;
+          i++
+        ) {
+          this.selectedFeatures.push(
+            this.columnModel[this.gridValue][this.datasetToLoad[this.gridValue]][i]
+          );
           this.checkedFeatures.push(true);
         }
       }
@@ -57,7 +68,7 @@ export default {
       this.selectAllFlag = !this.selectAllFlag;
     },
     getValue() {
-      console.log(this.value.features);
+      console.log(this.gridValue);
     },
     featureUpdate(feature) {
       // 배열에 없으면 추가
@@ -77,20 +88,27 @@ export default {
   },
   computed: {
     ...mapState({
-      columns: state => state.initialData.columns
+      columnModel: state => state.aggrid.columnModel,
+      datasetToLoad: state => state.aggrid.datasetToLoad
     })
   },
-  created() {},
+  created() {
+    eventBus.$on("gridChange", newGridValue => {
+      this.gridValue = newGridValue;
+    });
+  },
   mounted() {
     //  다른 sidebar를 켰다가 다시 열면 값이 초기화되기 때문에, value값을 받아와서 다시 check 해줌
     console.log(`${this.node.name} mounted`);
     this.node.getOptionValue("Features").forEach(nodeValue => {
-      this.columns.forEach((column, index) => {
-        if (nodeValue == column) {
-          Vue.set(this.selectedFeatures, index, nodeValue);
-          Vue.set(this.checkedFeatures, index, true);
+      this.columnModel[this.gridValue][this.datasetToLoad[this.gridValue]].forEach(
+        (column, index) => {
+          if (nodeValue == column) {
+            Vue.set(this.selectedFeatures, index, nodeValue);
+            Vue.set(this.checkedFeatures, index, true);
+          }
         }
-      });
+      );
     });
   }
 };

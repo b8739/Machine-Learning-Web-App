@@ -83,7 +83,9 @@ export default {
         { field: "Q2" },
         { field: "Q3" },
         { field: "Q4" },
-        { field: "numOfNA" }
+        { field: "numOfNA" },
+        { field: "size" },
+        { field: "nunique" }
       ]
     };
   },

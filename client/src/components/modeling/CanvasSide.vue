@@ -11,11 +11,10 @@
       </v-list-item>
 
       <v-divider></v-divider>
-
       <v-list dense>
         <v-list-group prepend-icon="mdi-database" :value="true">
           <template v-slot:activator>
-            <v-list-item-title>Dataset</v-list-item-title>
+            <v-list-item-title>Dataset Version</v-list-item-title>
           </template>
           <v-list-item
             link
@@ -23,16 +22,30 @@
             :key="indexOfDataInfo"
           >
             <v-list-item-content>
-              <v-autocomplete
+              <v-select
                 class="mt-3"
                 outlined
                 clearable
                 hide-details
                 dense
-                :label="dataInfoLabels[indexOfDataInfo]"
-                :items="tableList"
-                @change="saveDatasetName"
-              ></v-autocomplete>
+                label="Draft"
+                :items="draftList"
+                item-text="draftName"
+                @input="loadDraft"
+                v-model="datasetInfo['draft']"
+              ></v-select>
+              <!-- @change="saveDatasetInfo" -->
+              <v-select
+                class="mt-3"
+                outlined
+                clearable
+                hide-details
+                dense
+                label="Grid"
+                :items="gridList"
+                v-model="datasetInfo['grid']"
+                @input="gridChange()"
+              ></v-select>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>
@@ -209,6 +222,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
+      datasetInfo: {},
       validationEndIndex: null,
       validationStartIndex: null,
       validationIndexArray: [],
@@ -216,7 +230,7 @@ export default {
       drawer: true,
       trainSet: null,
       testSet: null,
-      dataInfoLabels: ["Dataset"],
+      dataInfoLabels: ["Draft"],
       dataTypeLabels: ["Training", "Test", "Validation"],
       datasetRatio: ["60%", "20%", "20%"],
       algorithms: ["XGBoost", "Random Forest", "SVR"],
@@ -240,8 +254,10 @@ export default {
   computed: {
     ...mapState({
       tableList: state => state.initialData.tableList,
+      draftList: state => state.aggrid.draftList,
       datasetSize: state => state.initialData.datasetSize,
-      columns: state => state.initialData.columns
+      columns: state => state.initialData.columns,
+      gridList: state => state.aggrid.gridList
     }),
     ...mapGetters("initialData", ["indexNum"]),
     splitRatio() {
@@ -250,7 +266,12 @@ export default {
   },
   methods: {
     ...mapMutations("modelingData", ["saveSplitRatio"]),
-    ...mapMutations("modelingData", ["saveDatasetName"]),
+    ...mapMutations("modelingData", ["saveDatasetInfo"]),
+    ...mapActions("aggrid", ["loadDraftList"]),
+    ...mapActions("aggrid", ["loadDraft"]),
+    gridChange() {
+      eventBus.$emit("gridChange", this.datasetInfo["grid"]);
+    },
     addValidationIndex() {
       this.validationIndexArray.push({
         start: this.validationStartIndex,
@@ -264,6 +285,7 @@ export default {
     },
 
     saveRequest() {
+      this.saveDatasetInfo(this.datasetInfo);
       this.saveSplitRatio(this.splitRatio);
     },
     hideDetails(index) {
@@ -283,6 +305,10 @@ export default {
     eventBus.$on("saveRequest_canvasSide", status => {
       this.saveRequest();
     });
+  },
+  mounted() {
+    console.log("cside");
+    this.loadDraftList();
   }
 };
 </script>

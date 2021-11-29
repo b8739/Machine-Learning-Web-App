@@ -5,6 +5,9 @@
         <v-col cols="2"> <AgSideMenu @openDialog="dialogAction"/></v-col>
 
         <v-col cols="10">
+          <v-btn @click="test">test</v-btn>
+          {{ loadedColumns }}
+
           <!-- <v-toolbar>
       <v-toolbar-title class="mr-2 font-weight-bold subheading">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
@@ -358,13 +361,16 @@ export default {
     getGridColumns() {
       let vm = this;
       this.loadedColumns = [];
-      this.loadedColumns = vm.gridColumnApi[vm.currentGrid].getAllColumns().map(function(col) {
+      this.loadedColumns = vm.gridColumnApi[vm.currentGrid].getColumnState().map(function(col) {
         // return { columnName: col.getColId(), columnInfo: vm.currentGrid };
-        return col.getColId();
+        return col.colId;
       });
     },
-    test(value) {
-      alert(value);
+    test() {
+      let loadedColumns = this.gridColumnApi[this.currentGrid].getColumnState().map(function(col) {
+        // return { columnName: col.getColId(), columnInfo: vm.currentGrid };
+        return col.colId;
+      });
     },
     openDisplayDialog() {
       // this.loadedColumns = [];

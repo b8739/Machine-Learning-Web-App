@@ -134,18 +134,16 @@ export default {
               typeModel = [];
             }
             // 4) fill Na Model
-            // 3) Type Model
+
             let fillNaModel;
             if (vm.fillNaModel[vm.gridID] != undefined) {
               fillNaModel = vm.fillNaModel[vm.gridID];
             } else {
               fillNaModel = [];
             }
-            console.log("fillNaModel");
-            console.log(fillNaModel);
+            // axios
             let path = "http://localhost:5000/infiniteRowModel";
 
-            // axios
             axios({
               method: "post",
               url: path,

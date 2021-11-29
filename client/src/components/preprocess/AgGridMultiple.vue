@@ -25,7 +25,7 @@
       @cell-value-changed="onCellValueChanged"
       :getRowStyle="getRowStyle"
       :maintainColumnOrder="true"
-       onColumnMoved: onColumnMoved,
+      :onColumnMoved="onColumnMoved"
     >
     </ag-grid-vue>
   </div>
@@ -207,12 +207,31 @@ export default {
               let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.gridID] } };
               filterModel.push(ninFilter);
             }
+            // 3) Rename Model
+            let renameModel;
+            if (vm.renameModel[vm.gridID] != undefined) {
+              renameModel = vm.renameModel[vm.gridID];
+            } else {
+              renameModel = [];
+            }
+            // 3) Type Model
+            let typeModel;
+            if (vm.typeModel[vm.gridID] != undefined) {
+              typeModel = vm.typeModel[vm.gridID];
+            } else {
+              typeModel = [];
+            }
+            // 4) fill Na Model
 
-            console.log(`gridID:${vm.deleteTransaction[vm.gridID]}`);
-            console.log(`deleteTransaction:${vm.deleteTransaction[vm.gridID]}`);
+            let fillNaModel;
+            if (vm.fillNaModel[vm.gridID] != undefined) {
+              fillNaModel = vm.fillNaModel[vm.gridID];
+            } else {
+              fillNaModel = [];
+            }
+            // Axios
             let path = "http://localhost:5000/infiniteRowModel";
             // debug
-            // axios
 
             axios({
               method: "post",
@@ -224,6 +243,9 @@ export default {
                 endRow: params.endRow,
                 filterModel: filterModel,
                 columnModel: vm.columnModel,
+                renameModel: renameModel,
+                typeModel: typeModel,
+                fillNaModel: fillNaModel,
                 gridType: vm.gridType
               }
             })

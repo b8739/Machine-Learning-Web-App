@@ -26,7 +26,8 @@ const getDefaultState = () => {
     columnsForGrid: {},
     gridType: {},
     typeModel: {},
-    fillNaModel: {}
+    fillNaModel: {},
+    draftList: []
     // columns
   };
 };
@@ -94,11 +95,13 @@ const mutations = {
     // Summary 저장
     let save1 = state.summaryGridApi;
     let save2 = state.summaryGridApi;
+    let save3 = state.draftList;
     // 초기화
     Object.assign(state, getDefaultState());
     // 저장해둔 Summary 다시 assign
     state.summaryGridApi = save1;
     state.summaryGridColumnApi = save2;
+    state.draftList = save3;
   },
 
   loadDraftInfo(state, payload) {
@@ -168,6 +171,26 @@ const mutations = {
   }
 };
 const actions = {
+  // draft
+  loadDraftList({ commit, state }) {
+    let path = "http://localhost:5000/loadDraftList";
+    // axios
+    axios({
+      method: "post",
+      url: path
+    })
+      .then(res => {
+        state.draftList = [];
+
+        res.data.forEach(element => {
+          state.draftList.push(element);
+        });
+      })
+
+      .catch(error => {
+        console.error(error);
+      });
+  },
   loadDraft({ commit, state }, draftName) {
     console.log(draftName);
     const path = "http://localhost:5000/loadDraft";
@@ -191,7 +214,7 @@ const actions = {
         console.error(error);
       });
   },
-  saveDraft({ commit, state }, draftName) {
+  saveDraft({ commit, state, dispatch }, draftName) {
     const path = "http://localhost:5000/saveDraft";
 
     // 수정
@@ -206,11 +229,14 @@ const actions = {
         columnModel: state.columnModel,
         renameModel: state.renameModel,
         columnState: state.columnState,
+        typeModel: state.typeModel,
+        fillNaModel: state.fillNaModel,
         gridType: state.gridType
       }
     })
       .then(res => {
         console.log(res.data);
+        dispatch("loadDraftList");
       })
       .catch(error => {
         console.error(error);
