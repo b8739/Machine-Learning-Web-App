@@ -35,13 +35,20 @@
         </v-list-item>
       </v-list-group>
     </v-list>
+
     <!-- Row -->
     <v-list dense>
       <v-list-group v-model="activeState">
         <template v-slot:activator>
           <v-list-item-title active>Edit Row</v-list-item-title>
         </template>
-        <v-list-item v-for="item in items.rowMenu" :key="item.title" link @click="item.action">
+        <v-list-item
+          :disabled="item.title == 'Update Row'"
+          v-for="item in items.rowMenu"
+          :key="item.title"
+          link
+          @click="item.action"
+        >
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -87,6 +94,25 @@
         </v-list-item>
       </v-list-group>
     </v-list>
+    <!-- Table -->
+    <v-list dense>
+      <v-list-group v-model="activeState">
+        <template v-slot:activator>
+          <v-list-item-title active>Table Menu</v-list-item-title>
+        </template>
+        <v-list-item
+          v-for="item in items.tableMenu"
+          :key="item.title"
+          link
+          @click="item.action(item.param)"
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title draggable label>{{ item.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list-group>
+    </v-list>
     <!-- Export -->
     <v-list dense>
       <v-list-group v-model="activeState">
@@ -114,6 +140,14 @@ export default {
       drawer: true,
       mini: false,
       items: {
+        tableMenu: [
+          {
+            title: "Merge Tables",
+            icon: "mdi-pencil",
+            action: this.openDialog,
+            param: "mergeTable"
+          }
+        ],
         rowMenu: [
           { title: "Update Row", icon: "mdi-pencil", action: this.deleteRows },
           { title: "Delete Row", icon: "mdi-delete", action: this.deleteRows }
@@ -138,7 +172,8 @@ export default {
           { title: "All Data", icon: "mdi-export", action: this.exportAllData }
         ],
         cleaningMenu: [
-          { title: "Fill NA", icon: "mdi-basket-fill", action: this.openDialog, param: "fillNA" }
+          { title: "Fill NA", icon: "mdi-basket-fill", action: this.openDialog, param: "fillNA" },
+          { title: "Delete NA", icon: "mdi-delete", action: this.openDialog, param: "deleteNA" }
         ]
       },
 
@@ -253,7 +288,7 @@ export default {
       let filterModel = this.gridApi[this.currentGrid].getFilterModel();
       filterModel = this.parseFilterModel(filterModel);
 
-      let path = "http://localhost:5000/exportAllData";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/exportAllData";
       // axios
       axios({
         method: "post",

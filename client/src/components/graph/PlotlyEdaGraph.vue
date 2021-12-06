@@ -10,64 +10,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 let cloneDeep = require("lodash/cloneDeep");
 export default {
   data() {
-    return {
-      dataFormat: {
-        type: "scatter",
-        mode: "markers",
-        marker: {
-          size: 2
-        },
-        line: {
-          width: 1
-        }
-      },
-
-      data: [
-        {
-          type: "scatter",
-          mode: "markers",
-          marker: {
-            size: 2
-            // marker is an object, valid marker keys: #scatter-marker
-          },
-          line: {
-            // color: "rgb(219, 64, 82)",
-            width: 1
-          },
-
-          showlegend: true
-        }
-      ],
-      layout: {
-        width: this.graphWidth,
-        height: this.graphHeight,
-        margin: {
-          l: 30,
-          r: 20,
-          b: 20,
-          t: 40,
-          pad: 4
-        },
-        colorway: ["#2E93fA", "#66DA26", "#546E7A", "#E91E63", "#FF9800"],
-        xaxis: {
-          automargin: true
-        },
-        yaxis: {
-          automargin: true
-        },
-        title: {
-          text: "EDA Graph"
-        }
-      },
-      config: {
-        showSendToCloud: false,
-        displaylogo: false,
-        responsive: true,
-        showEditInChartStudio: false,
-
-        modeBarButtonsToRemove: ["sendDataToCloud"]
-      }
-    };
+    return this.getDefaultState();
   },
   props: ["graphWidth", "graphHeight", "isEdit"],
   computed: {
@@ -85,13 +28,79 @@ export default {
     }
   },
   methods: {
+    getDefaultState() {
+      return {
+        dataFormat: {
+          type: "scatter",
+          mode: "markers",
+          // type: "bar",
+
+          marker: {
+            size: 2
+          },
+          line: {
+            width: 1
+          }
+        },
+
+        data: [
+          {
+            // scatter
+            type: "scatter",
+            mode: "markers",
+            // type: "bar",
+            marker: {
+              size: 2
+              // marker is an object, valid marker keys: #scatter-marker
+            },
+            line: {
+              // color: "rgb(219, 64, 82)",
+              width: 1
+            },
+
+            showlegend: true
+          }
+        ],
+        layout: {
+          width: this.graphWidth,
+          height: this.graphHeight,
+          margin: {
+            l: 30,
+            r: 20,
+            b: 20,
+            t: 40,
+            pad: 4
+          },
+          colorway: ["#2E93fA", "#66DA26", "#546E7A", "#E91E63", "#FF9800"],
+          xaxis: {
+            automargin: true
+          },
+          yaxis: {
+            automargin: true
+          },
+          title: {
+            text: "EDA Graph"
+          }
+        },
+        config: {
+          showSendToCloud: false,
+          displaylogo: false,
+          responsive: true,
+          showEditInChartStudio: false,
+
+          modeBarButtonsToRemove: ["sendDataToCloud"]
+        }
+      };
+    },
     createPlot() {
+      Object.assign(this.$data, this.getDefaultState());
       Plotly.newPlot(this.plotContainer, this.data, this.layout, this.config);
     },
+
     addNewTrace() {
       let newTrace = cloneDeep(this.dataFormat);
-      newTrace["x"] = [[]];
-      newTrace["y"] = [[]];
+      // newTrace["x"] = [[]];
+      // newTrace["y"] = [[]];
 
       Plotly.addTraces(this.plotContainer, newTrace);
     },
@@ -115,7 +124,7 @@ export default {
       // Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
     },
     loadFullData(dataset, featureName, axisType, tpIndex) {
-      let path = "http://localhost:5000/loadEditGraphData";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadEditGraphData";
       // axios
       this.$axios({
         method: "post",
@@ -192,29 +201,25 @@ export default {
       };
       return axisInfo;
     },
-    changeAxis(selectedAxis, axisType, tpIndex, featureName) {
-      console.log(featureName);
+    changeAxis(selectedAxis, axisType, tpIndex, featureName, overlayModel) {
+      console.log("overlayModel");
+      console.log(overlayModel);
       let axis = this.getAxisName(axisType);
       this.data[tpIndex][axis] = selectedAxis;
-      this.data[tpIndex]["x"] = [this.data[tpIndex]["x"]];
-      this.data[tpIndex]["y"] = [this.data[tpIndex]["y"]];
+      // update를 하면 data가 유실되어서 wrap해서 다시 넣어주어야 하는데, 변경하는 axis의 값만 넣어줘야 한다. ex) changeAxis의 axisType이 y라면 y의 값만 wrap해서 다시 넣어준다.
+      // 안그러면 trace가 사라진다
+      let axisTypes = ["x", "y"];
+      axisTypes.forEach(axis => {
+        if (this.data[tpIndex][axis] != undefined) {
+          this.data[tpIndex][axis] = [this.data[tpIndex][axis]];
+        }
+      });
 
       let axisNum = axis + (parseInt(tpIndex) + 1);
       this.layout[axisNum] = this.getFontFormat(featureName, axisType, tpIndex);
       // changeoverlay
       this.layout[axisNum]["overlaying"] = axisType;
-      // this.changeOverlay("Data 1", tpIndex);
-
-      // this.layout[axisNum] = {};
-      // this.layout[axisNum]["overlaying"] = axisType;
-      // this.layout[axisNum]["automargin"] = true;
-      // this.layout[axisNum]["title"] = {};
-      // this.layout[axisNum]["title"]["text"] = featureName;
-      // this.layout[axisNum]["title"]["font"] = {
-      //   size: 14,
-      //   color: "#7f7f7f"
-      // };
-
+      this.changeOverlay(overlayModel, tpIndex);
       Plotly.update(this.plotContainer, this.data[tpIndex], this.layout, tpIndex);
     },
     changeGridInfo(rows, columns) {
@@ -249,7 +254,7 @@ export default {
       }
       Plotly.relayout(this.plotContainer, this.layout);
     },
-    removeAxis(axisType, tpIndex) {
+    removeData(axisType, tpIndex) {
       Vue.delete(this.data[tpIndex], axisType);
       let oppositeAxis = this.getOppositeAxis(axisType);
       if (this.data[tpIndex][oppositeAxis] != undefined) {
@@ -280,7 +285,13 @@ export default {
             mode: ""
           };
           break;
-
+        case "histogram":
+          update = {
+            type: "histogram",
+            histnorm: "count",
+            mode: ""
+          };
+          break;
         default:
           return;
       }
@@ -290,11 +301,27 @@ export default {
     }
   },
   created() {
+    eventBus.$on("resetAll", payload => {
+      this.createPlot();
+    });
+    eventBus.$on("graphUpdate", payload => {
+      Plotly.update(this.plotContainer, this.data, this.layout);
+    });
+    eventBus.$on("graphRelayout", payload => {
+      console.log("relayout");
+      Plotly.relayout(this.plotContainer, this.layout);
+    });
     eventBus.$on("loadAxis", payload => {
       this.loadFullData(payload.dataset, payload.featureName, payload.axisType, payload.tpIndex);
     });
     eventBus.$on("changeAxis", payload => {
-      this.changeAxis(payload.selectedAxis, payload.axisType, payload.tpIndex, payload.featureName);
+      this.changeAxis(
+        payload.selectedAxis,
+        payload.axisType,
+        payload.tpIndex,
+        payload.featureName,
+        payload.overlayModel
+      );
     });
     eventBus.$on("changeGridInfo", grid => {
       this.changeGridInfo(grid.rows, grid.columns);
@@ -302,8 +329,8 @@ export default {
     eventBus.$on("changeOverlay", payload => {
       this.changeOverlay(payload.value, payload.tpIndex);
     });
-    eventBus.$on("removeAxis", payload => {
-      this.removeAxis(payload.axisType, payload.tpIndex);
+    eventBus.$on("removeData", payload => {
+      this.removeData(payload.axisType, payload.tpIndex);
     });
     eventBus.$on("addEmptyTrace", status => {
       this.addNewTrace();

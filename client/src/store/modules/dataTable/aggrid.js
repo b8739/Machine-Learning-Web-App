@@ -3,38 +3,58 @@ import axios from "axios";
 
 const getDefaultState = () => {
   return {
+    // GRID STATE
     gridList: [],
+    currentGrid: -1,
+    viewMode: "table",
+
+    // GRID API
     gridApi: {},
     gridColumnApi: {},
 
-    columnState: {},
-
+    // GRID SUMMARY API
     summaryGridApi: null,
     summaryGridColumnApi: null,
 
-    currentGrid: -1,
-
-    viewMode: "table",
-
-    // transaction
-    updateTransaction: {},
-    deleteTransaction: {},
-
+    columnState: {},
+    // GRID INFO (REQUIRED)
     datasetToLoad: {},
     columnModel: {},
-    renameModel: {},
-    columnsForGrid: {},
     gridType: {},
+
+    // GRID FILTER
+    updateTransaction: {},
+    deleteModel: {},
+    renameModel: {},
     typeModel: {},
+
+    filterModel: {},
+    clientFilterModel: {},
+
     fillNaModel: {},
-    draftList: []
-    // columns
+    deleteNaModel: {},
+
+    //DRAFT
+    draftList: [],
+
+    // for dialog
+    columnsForGrid: {}
   };
 };
 const state = getDefaultState();
-const getters = {};
+const getters = {
+  gridListSize(state) {
+    return state.gridList.length;
+  }
+};
 
 const mutations = {
+  setFilterModel(state, payload) {
+    Vue.set(state.filterModel, state.currentGrid, payload);
+  },
+  setClientFilterModel(state, payload) {
+    Vue.set(state.clientFilterModel, state.currentGrid, payload);
+  },
   // Column State
   setColumnState(state, payload) {
     Vue.set(state.columnState, state.currentGrid, payload);
@@ -66,8 +86,8 @@ const mutations = {
     state.summaryGridColumnApi = payload;
   },
   /* Grid List */
-  addGridList(state) {
-    state.gridList.push(parseInt(state.currentGrid) + 1); // params.api
+  addGridList(state, gridListSize) {
+    state.gridList.push(gridListSize); // params.api
   },
   delGridList(state, gridID) {
     state.gridList.forEach((element, index) => {
@@ -123,16 +143,16 @@ const mutations = {
   },
   /* Delete */
   addNewDeletion(state, payload) {
-    if (state.deleteTransaction[state.currentGrid] == undefined) {
-      state.deleteTransaction[state.currentGrid] = [];
+    if (state.deleteModel[state.currentGrid] == undefined) {
+      state.deleteModel[state.currentGrid] = [];
     }
     payload.forEach(element => {
-      state.deleteTransaction[state.currentGrid].push(element["ID"]);
+      state.deleteModel[state.currentGrid].push(element["ID"]);
     });
   },
   /*tload setting*/
   setDatasetToLoad(state, payload) {
-    state.datasetToLoad[parseInt(state.currentGrid) + 1] = payload;
+    state.datasetToLoad[state.gridList.length] = payload;
   },
   delDatasetToLoad(state, gridID) {
     Vue.delete(state.datasetToLoad, gridID);
@@ -146,13 +166,13 @@ const mutations = {
     state.columnsForGrid = {};
   },
   setGridType(state, payload) {
-    state.gridType[parseInt(state.currentGrid) + 1] = payload;
+    state.gridType[state.gridList.length] = payload;
   },
   delGridType(state, gridID) {
     Vue.delete(state.gridType, gridID);
   },
   setColumnModel(state, payload) {
-    state.columnModel[parseInt(state.currentGrid) + 1] = payload;
+    state.columnModel[state.gridList.length] = payload;
   },
   delColumnModel(state, gridID) {
     Vue.delete(state.columnModel, gridID);
@@ -168,12 +188,43 @@ const mutations = {
   },
   setFillNaModel(state, payload) {
     state.fillNaModel[state.currentGrid] = payload;
+  },
+  setDeleteNaModel(state, payload) {
+    state.deleteNaModel[state.currentGrid] = payload;
   }
 };
 const actions = {
+  mergeTables({ commit, state, dispatch }, tableIndexes) {
+    if (tableIndexes.length == 2) {
+      let targetTables = tableIndexes.map(function(tableIndex) {
+        return state.datasetToLoad[tableIndex];
+      }); // ex. [boston, concrete]
+
+      //Set datasetToLoad
+      // console.log(state.datasetToLoad);
+      // let mergedDatasetToLoad = Object.keys(state.datasetToLoad).map(function(col) {
+      //   return state.datasetToLoad[col];
+      // });
+      commit("setDatasetToLoad", targetTables);
+
+      //Set columnModel
+      let mergedColumnModel = tableIndexes.reduce(function(result, value, index) {
+        let tableName = targetTables[index];
+        result[tableName] = state.columnModel[value][tableName];
+        return result;
+      }, {});
+      console.log(mergedColumnModel);
+
+      commit("setColumnModel", mergedColumnModel);
+
+      commit("setGridType", "AgGridMultiple");
+      //마지막
+      dispatch("createNewGrid");
+    }
+  },
   // draft
   loadDraftList({ commit, state }) {
-    let path = "http://localhost:5000/loadDraftList";
+    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDraftList";
     // axios
     axios({
       method: "post",
@@ -193,7 +244,7 @@ const actions = {
   },
   loadDraft({ commit, state }, draftName) {
     console.log(draftName);
-    const path = "http://localhost:5000/loadDraft";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDraft";
     // 수정
     axios({
       method: "post",
@@ -204,18 +255,18 @@ const actions = {
     })
       .then(res => {
         commit("resetAggrid");
-        console.log(state.gridList.length);
+        // console.log(state.gridList.length);
         setTimeout(() => {
           commit("loadDraftInfo", res.data);
         }, 100);
-        console.log(res.data);
+        // console.log(res.data);
       })
       .catch(error => {
         console.error(error);
       });
   },
   saveDraft({ commit, state, dispatch }, draftName) {
-    const path = "http://localhost:5000/saveDraft";
+    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/saveDraft";
 
     // 수정
     axios({
@@ -224,13 +275,17 @@ const actions = {
       data: {
         draftName: draftName,
         gridList: state.gridList,
-        deleteTransaction: state.deleteTransaction,
+        filterModel: state.filterModel,
+        clientFilterModel: state.clientFilterModel,
+
+        deleteModel: state.deleteModel,
         datasetToLoad: state.datasetToLoad,
         columnModel: state.columnModel,
         renameModel: state.renameModel,
         columnState: state.columnState,
         typeModel: state.typeModel,
         fillNaModel: state.fillNaModel,
+        deleteNaModel: state.deleteNaModel,
         gridType: state.gridType
       }
     })
@@ -243,9 +298,9 @@ const actions = {
       });
   },
 
-  createNewGrid({ commit, state }) {
-    commit("addGridList");
-    commit("addCurrentGrid");
+  createNewGrid({ commit, state, getters }) {
+    commit("addGridList", getters.gridListSize);
+    commit("setCurrentGrid", getters.gridListSize - 1);
     commit("setViewMode", "table");
     // grid 생성 (action으로 만들 필요성이 있음)
   },

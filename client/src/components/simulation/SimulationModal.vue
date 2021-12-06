@@ -624,7 +624,7 @@ export default {
       });
       console.log(rangeInfo);
       // axios
-      let path = "http://localhost:5000/runSimulation";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/runSimulation";
 
       this.$axios({
         method: "post",
@@ -649,7 +649,7 @@ export default {
     },
     getCaseFeatures(caseID) {
       // axios
-      let path = "http://localhost:5000/getCaseFeatures";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/getCaseFeatures";
 
       this.$axios({
         method: "post",
@@ -691,7 +691,7 @@ export default {
   },
   created() {
     eventBus.$on("openSimulation", caseID => {
-      this.getCaseFeatures(caseID);
+      // this.getCaseFeatures(caseID);
       this.dialog = true;
     });
     // radio button default 를 0으로
@@ -699,7 +699,7 @@ export default {
       this.samplesRadioModel.push(0);
     });
     //rand range
-    this.loadRandomData();
+    // this.loadRandomData();
   }
 };
 </script>

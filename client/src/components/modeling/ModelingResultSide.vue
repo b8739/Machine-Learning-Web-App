@@ -14,7 +14,7 @@
             light
             outlined
             width="100%"
-            @click="newWindow(case_[case_name])"
+            @click="loadModelCase(case_[case_name])"
           >
             <v-card-text class="font-weight-bold subheading pt-2 pb-0">
               {{ case_["case_name"] }}</v-card-text
@@ -55,9 +55,27 @@ export default {
     ...mapMutations("modelingData", ["saveCaseDataset"]),
     ...mapMutations("modelingData", ["saveGraphSources"]),
     ...mapMutations("modelingData", ["saveModelingSummary"]),
+    loadModelCase(caseName) {
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadModelCase";
+      axios({
+        method: "post",
+        url: path,
+        data: {
+          caseName: caseName
+        }
+      })
+        .then(res => {
+          console.log(res.data);
+          this.saveGraphSources(res.data["graphSources"]);
+          this.saveModelingSummary(res.data["modelingSummary"]);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     loadCases() {
       console.log("loadCases");
-      let path = "http://localhost:5000/loadCases";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
       axios
         .get(path)
         .then(res => {
@@ -65,29 +83,29 @@ export default {
           this.saveCaseList(res.data);
         })
         .catch(error => {});
-    },
-    newWindow(case_name) {
-      let w = 1000;
-      let h = 500;
-      let leftPosition = (screen.width - w) / 2;
-      let topPosition = (screen.height - h) / 2;
-      let url = "http://localhost:5000/" + case_name;
-
-      window.open(
-        url,
-        "modelingResult",
-        "width=" +
-          w +
-          ",height=" +
-          h +
-          ",top=" +
-          topPosition +
-          ",left=" +
-          leftPosition +
-          ", scrollbars=no"
-      );
-      eventBus.$emit("multiTab", true);
     }
+    // newWindow(case_name) {
+    //   let w = 1000;
+    //   let h = 500;
+    //   let leftPosition = (screen.width - w) / 2;
+    //   let topPosition = (screen.height - h) / 2;
+    //   let url = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + case_name;
+
+    //   window.open(
+    //     url,
+    //     "modelingResult",
+    //     "width=" +
+    //       w +
+    //       ",height=" +
+    //       h +
+    //       ",top=" +
+    //       topPosition +
+    //       ",left=" +
+    //       leftPosition +
+    //       ", scrollbars=no"
+    //   );
+    //   eventBus.$emit("multiTab", true);
+    // }
   },
   created() {
     this.loadCases();

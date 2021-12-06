@@ -5,7 +5,6 @@ import Projects from "../views/Projects";
 import Datasets from "../views/Datasets";
 
 import ModelingResult from "../views/modeling/ModelingResult";
-import ModelingSingleResult from "../views/modeling/ModelingSingleResult";
 
 import GraphBuilder from "../views/GraphBuilder";
 
@@ -85,13 +84,13 @@ const router = new VueRouter({
       name: "modelingResult",
       component: ModelingResult,
       props: true
-    },
-    {
-      path: "/modelingSingleResult/:case",
-      name: "modelingSingleResult",
-      component: ModelingSingleResult,
-      props: true
     }
+    // {
+    //   path: "/modelingSingleResult/:case",
+    //   name: "modelingSingleResult",
+    //   component: ModelingSingleResult,
+    //   props: true
+    // }
   ]
 });
 

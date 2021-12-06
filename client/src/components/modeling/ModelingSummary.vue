@@ -18,6 +18,15 @@
 import { eventBus } from "@/main";
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
+  //   watch: {
+  //   modelingSummary: {
+  //     handler: function(data) {
+
+  //       this.updatePlot();
+  //     },
+  //     deep: true
+  //   }
+  // },
   data() {
     return {
       tab: null,

@@ -2,6 +2,11 @@
   <v-app id="inspire">
     <!-- <v-btn @click="mongoTest">mongoTest</v-btn> -->
     <v-main>
+      <v-card>
+        <v-subheader>
+          Last AWS Update: 2021-12-06
+        </v-subheader>
+      </v-card>
       <v-container fluid fill-height>
         <v-row align="center" justify="center">
           <v-col xs="12" sm="8" md="4">
@@ -44,6 +49,9 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 export default {
   name: "Login",
+  data() {
+    return {};
+  },
   props: {
     source: String
   },
@@ -51,7 +59,7 @@ export default {
     // ...mapMutations("initialData", ["resetState"])
     ...mapActions("initialData", ["resetAllState"]),
     mongoTest() {
-      let path = "http://localhost:5000/test";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/test";
       // axios
       this.$axios({
         method: "get",

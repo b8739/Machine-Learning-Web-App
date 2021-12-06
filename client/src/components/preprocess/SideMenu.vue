@@ -116,7 +116,7 @@ export default {
     },
 
     showTables() {
-      let path = "http://localhost:5000/showTables";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
       axios({
         method: "post",
         url: path,

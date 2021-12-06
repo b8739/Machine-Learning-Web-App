@@ -65,7 +65,7 @@ export default {
     saveTableAxios(saveOption) {
       // if (this.summaryChangeNameFlag) {
       //   //summary 변경 있을 때
-      //   let path = "http://localhost:5000/changeColumnName";
+      //   let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnName";
       //   // axios
       //   this.$axios({
       //     method: "post",
@@ -89,7 +89,7 @@ export default {
       // }
       // if (this.summaryChangeTypeFlag) {
       //   //summary 변경 있을 때
-      //   let path = "http://localhost:5000/changeColumnType";
+      //   let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnType";
       //   // axios
       //   this.$axios({
       //     method: "post",
@@ -115,7 +115,7 @@ export default {
 
       // if (this.tableChangeFlag)
       {
-        const path = "http://localhost:5000/overwriteTable";
+        const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
         axios
           .get(path, {
             params: {

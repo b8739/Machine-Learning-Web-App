@@ -8,7 +8,8 @@
           :dataTypes="dataTypes"
           :dataTypeModel="dataTypeModel"
         ></slot>
-        <slot name="insideContainer_na" :fillNaModel="fillNaModel"></slot>
+        <slot name="insideContainer_fillNA" :fillNaModel="fillNaModel"></slot>
+        <slot name="insideContainer_deleteNA" :deleteNaModel="deleteNaModel"></slot>
       </v-container>
       <v-card-actions>
         <slot name="changeNameAction" :updateColumnName="updateColumnName"> </slot>
@@ -16,6 +17,8 @@
         <slot name="changeOrderAction"> </slot>
         <slot name="deleteColumnAction" :hideColumn="hideColumn"> </slot>
         <slot name="fillNaAction" :applyFillNa="applyFillNa"> </slot>
+        <slot name="deleteNaAction" :applyDeleteNa="applyDeleteNa"> </slot>
+        <slot name="mergeTableAction"> </slot>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -31,7 +34,8 @@ export default {
       sampleDataTypes: ["float", "int", "double"],
       dataTypeItems: ["double", "string", "bool", "date", "int", "long", "decimal"],
       dataTypeModel: [],
-      fillNaModel: {}
+      fillNaModel: {},
+      deleteNaModel: {}
     };
   },
 
@@ -54,6 +58,7 @@ export default {
     ...mapMutations("aggrid", ["setRenameModel"]),
     ...mapMutations("aggrid", ["setTypeModel"]),
     ...mapMutations("aggrid", ["setFillNaModel"]),
+    ...mapMutations("aggrid", ["setDeleteNaModel"]),
     ...mapMutations("aggrid", ["delColumnModelElement"]),
     getFinalDataTypeModel() {
       let vm = this;
@@ -99,6 +104,11 @@ export default {
       }, []);
       console.log(finalResult);
       return finalResult;
+    },
+    applyDeleteNa() {
+      this.setDeleteNaModel(this.deleteNaModel);
+      this.closeDialog();
+      this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
     applyFillNa() {
       // let finalNaModel = this.getFinalFillNaModel();

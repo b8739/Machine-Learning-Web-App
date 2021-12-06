@@ -1,7 +1,7 @@
 <template>
   <div>
-    Multiple
-    <v-btn @click="getFinalColumns">getFinalColumns</v-btn>
+    <!-- Multiple
+    <v-btn @click="getFinalColumns">getFinalColumns</v-btn> -->
     <ag-grid-vue
       v-show="currentGrid == gridID && viewMode == 'table'"
       style="width: 1550px; height:600px"
@@ -144,7 +144,7 @@ export default {
     updateRows() {
       let availableUndo = document.getElementById("undoInput").value;
       if (availableUndo != 0) {
-        let path = "http://localhost:5000/updateRows";
+        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/updateRows";
         // axios
         axios({
           method: "post",
@@ -202,10 +202,12 @@ export default {
             // 1) Get Filter Model
             let filterModel = vm.gridApi[vm.currentGrid].getFilterModel();
             filterModel = vm.parseFilterModel(filterModel);
-            // 2_ Filter Model + Delete Transaction
-            if (vm.deleteTransaction[vm.gridID] != undefined) {
-              let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.gridID] } };
-              filterModel.push(ninFilter);
+            // 2) Delete Model
+            let deleteModel;
+            if (vm.deleteModel[vm.gridID] != undefined) {
+              deleteModel = vm.deleteModel[vm.gridID];
+            } else {
+              deleteModel = [];
             }
             // 3) Rename Model
             let renameModel;
@@ -229,8 +231,16 @@ export default {
             } else {
               fillNaModel = [];
             }
+            // 5) delete Na Model
+
+            let deleteNaModel;
+            if (vm.deleteNaModel[vm.gridID] != undefined) {
+              deleteNaModel = vm.deleteNaModel[vm.gridID];
+            } else {
+              deleteNaModel = [];
+            }
             // Axios
-            let path = "http://localhost:5000/infiniteRowModel";
+            let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteRowModel";
             // debug
 
             axios({
@@ -242,10 +252,13 @@ export default {
                 startRow: params.startRow,
                 endRow: params.endRow,
                 filterModel: filterModel,
+                deleteModel: deleteModel,
                 columnModel: vm.columnModel,
                 renameModel: renameModel,
                 typeModel: typeModel,
                 fillNaModel: fillNaModel,
+                deleteNaModel: deleteNaModel,
+
                 gridType: vm.gridType
               }
             })

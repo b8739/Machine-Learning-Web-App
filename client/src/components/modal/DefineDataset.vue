@@ -63,7 +63,7 @@ export default {
     },
     async dataUpload() {
       axios
-        .post("http://localhost:5000/dataupload", this.formData, {
+        .post("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dataupload", this.formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           },

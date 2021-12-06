@@ -1,7 +1,9 @@
 <template>
   <div>
     <v-app-bar>
-      <a href="http://localhost:8080/"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
+      <a href="http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/"
+        ><img class="logo" src="@//assets/attic_logo.png" alt=""
+      /></a>
     </v-app-bar>
     <v-container fluid>
       <v-row>
@@ -47,64 +49,17 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      project_list: [],
+      project_list: []
       // plotly
-      data: [
-        {
-          x: [1, 2, 3, 4],
-          y: [10, 15, 13, 17],
-          type: "scatter",
-          marker: {
-            // marker is an object, valid marker keys: #scatter-marker
-            color: "rgb(16, 32, 77)" // more about "marker.color": #scatter-marker-color
-          }
-        },
-        {
-          type: "bar", // all "bar" chart attributes: #bar
-          x: [1, 2, 3], // more about "x": #bar-x
-          y: [3, 1, 6], // #bar-y
-          name: "bar chart example" // #bar-name
-        }
-      ],
-      layout: {
-        title: "My graph"
-      }
     };
   },
   methods: {
-    createPlot() {
-      let TESTER = this.$refs.tester;
-      Plotly.newPlot(
-        TESTER,
-        [
-          {
-            x: [1, 2, 3, 4, 5],
-            y: [1, 2, 4, 8, 16]
-          }
-        ],
-        {
-          width: 238,
-          height: 200,
-          margin: {
-            l: 20,
-            r: 20,
-            b: 20,
-            t: 20,
-            pad: 4
-          },
-          yaxis: {
-            automargin: true
-          }
-        },
-        { showSendToCloud: true }
-      );
-    },
     ...mapMutations("initialData", ["setNavStatus"]),
     ...mapMutations("initialData", ["setProjectName"]),
     ...mapMutations("initialData", ["resetState"]),
 
     loadProjects() {
-      let path = "http://localhost:5000/loadProjects";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadProjects";
       console.log(path);
 
       axios

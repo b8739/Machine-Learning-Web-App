@@ -25,14 +25,59 @@
         <v-container fluid fill-height class="pa-0">
           <v-row>
             <!-- 2nd -->
-            <v-col cols="3" class="pa-0 ma-0">
+            <v-col cols="4" class="pa-0 ma-0">
               <v-card class="pa-0 ma-0" height="100vh">
+                <!-- <v-btn @click="graphUpdate">graphUpdate</v-btn>
+                <v-btn @click="graphRelayout">Relayout</v-btn> -->
                 <v-container fluid v-show="menuState == 'data'">
-                  <v-row justify="end">
-                    <v-col class="px-0 mx-0" cols="4"
-                      ><v-btn @click="addEmptyTrace()">+ Data</v-btn></v-col
+                  <v-row class="px-0 mx-0" cols="4">
+                    <v-btn @click="progressDialog = true">
+                      개발 현황
+                    </v-btn>
+                  </v-row>
+                  <v-row class="px-0 mx-0" cols="4">
+                    <v-dialog width="50%" v-model="progressDialog">
+                      <v-simple-table>
+                        <template>
+                          <thead>
+                            <tr>
+                              <th>Feature</th>
+                              <th>Progress</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(info, index) in devProgess" :key="index">
+                              <td>{{ info.function }}</td>
+
+                              <td>
+                                <v-icon :color="iconColor(info.progress)">{{
+                                  info.progress
+                                }}</v-icon>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table></v-dialog
+                    >
+
+                    <v-btn small outlined @click="resetAll()"
+                      >Reset All (Data & Setting)</v-btn
                     ></v-row
                   >
+                  <v-row justify="end">
+                    <v-col class="px-0 mx-0" cols="4">
+                      <v-btn @click="addEmptyTrace()">+ Data</v-btn></v-col
+                    ></v-row
+                  >
+                  <v-row>
+                    <!-- <v-toolbar elevation="0">
+                      <v-radio-group>
+                        <v-radio label="Display All Data in a Single Graph (Overlay)"></v-radio>
+                        <v-radio label="Display Each Graph Independently (Subplot)"></v-radio>
+                      </v-radio-group> </v-toolbar
+                  > -->
+                  </v-row>
                   <v-row>
                     <v-expansion-panels multiple v-model="openedPanel">
                       <v-col>
@@ -44,7 +89,7 @@
                             <template v-slot:actions>
                               <v-icon class="expandIcon">$expand</v-icon>
                             </template>
-                            <span class="header"> Data {{ tpIndex + 1 }}</span>
+                            <span class="header"> Data {{ tracePanel }}</span>
                             <v-btn
                               @click="deleteTrace(tpIndex)"
                               class="closeIcon pa-0"
@@ -78,7 +123,8 @@
                                 <v-col class="pa-0 ma-0" cols="9">
                                   <v-select
                                     dense
-                                    :items="['scatter', 'line', 'bar']"
+                                    value="scatter"
+                                    :items="['scatter', 'line', 'bar', 'histogram']"
                                     @input="graphType => changeGraphType(graphType, tpIndex)"
                                   ></v-select></v-col
                               ></v-row>
@@ -103,7 +149,7 @@
                                 <v-col class="pa-0 ma-0" cols="9">
                                   <v-select
                                     clearable
-                                    @click:clear="removeAxis(axisType, tpIndex)"
+                                    @click:clear="removeData(axisType, tpIndex)"
                                     @change="
                                       featureName =>
                                         loadAxis(
@@ -113,7 +159,7 @@
                                           tpIndex
                                         )
                                     "
-                                    :items="columnsOfDataset"
+                                    :items="columnsOfDataset[chosenDataset[tpIndex]]"
                                     dense
                                     v-model="selectedData[axisType][tpIndex]"
                                   ></v-select
@@ -131,13 +177,15 @@
                                       :items="axisList[axisType]"
                                       item-text="id"
                                       item-value="value"
+                                      placeholder="Data 1"
                                       @change="
                                         selectedAxis =>
                                           changeAxis(
                                             selectedAxis,
                                             axisType,
                                             tpIndex,
-                                            selectedData[axisType][tpIndex]
+                                            selectedData[axisType][tpIndex],
+                                            overlayModel[tpIndex]
                                           )
                                       "
                                       dense
@@ -167,6 +215,13 @@
                 </v-container>
                 <v-container fluid v-show="menuState == 'subplots'">
                   <v-card-subtitle>Grid Setting</v-card-subtitle>
+                  <label class="caption ma-0 pa-0">
+                    Only the graphs that use
+                    <strong style="color:red"> own independent axis</strong>
+                    and
+                    <strong style="color:red">not overlayed</strong>
+                    are displayed as Subplots
+                  </label>
 
                   <v-row>
                     <v-col cols="5" class="px-0 mx-0"><v-subheader>Num of rows</v-subheader></v-col>
@@ -231,9 +286,9 @@
               </v-card>
             </v-col>
 
-            <v-col class="pa-0 ma-0">
+            <v-col cols="8" class="pa-0 ma-0">
               <v-card height="100%">
-                <PlotlyEdaGraph :graphWidth="700" :graphHeight="600" :isEdit="false" /> </v-card
+                <PlotlyEdaGraph :graphWidth="600" :graphHeight="600" :isEdit="false" /> </v-card
             ></v-col>
           </v-row>
         </v-container>
@@ -254,40 +309,7 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 export default {
   data() {
-    return {
-      dialog: false,
-
-      openedPanel: [null],
-      selectedData: { x: [], y: [] },
-      axisToUse: { x: [0], y: [0] },
-      overlayModel: [0],
-      grid: {
-        rows: 1,
-        columns: 1
-      },
-      blurHandler: false,
-      axisTypes: ["x", "y"],
-      numTracePanel: [null],
-      drawer: true,
-      depthStatus: true,
-      mini: false,
-      axisList: {
-        x: [{ id: "Data 1", value: "x" }],
-        y: [{ id: "Data 1", value: "y" }]
-      },
-      groupColumn: {
-        x: "",
-        y: ""
-      },
-      loadedFeatures: [
-        {
-          x: null,
-          y: null
-        }
-      ],
-      chosenDataset: {},
-      columnsOfDataset: []
-    };
+    return this.getDefaultState();
   },
   watch: {
     grid: {
@@ -300,31 +322,101 @@ export default {
   methods: {
     ...mapMutations("edaMenuHandler", ["setMenuState"]),
     ...mapMutations("edaMenuHandler", ["resetEda"]),
+    iconColor(value) {
+      if (value == "mdi-check") {
+        return "blue";
+      } else return "red";
+    },
+    getDefaultState() {
+      return {
+        progressDialog: false,
+        devProgess: [
+          { function: "Create Graph(s)", progress: "mdi-check" },
+          { function: "Remove Graph", progress: "mdi-check" },
+          { function: "Reset All", progress: "mdi-check" },
+          { function: "Load X/Y Data", progress: "mdi-check" },
+          { function: "Change Graph Type (ex. scatter,bar, histogram ...)", progress: "mdi-check" },
+          { function: "Share Axis / Independent Axis", progress: "mdi-check" },
+          { function: "Multiple Data in Single Graph", progress: "mdi-check" },
+          { function: "Each Data in Independent Graph (Subplot)", progress: "mdi-check" },
+          { function: "Transform (ex. Grouping)", progress: "mdi-close" }
+        ],
+        dialog: false,
+        overlayAllSwitch: false,
+        openedPanel: [null],
+        selectedData: { x: [], y: [] },
+        axisToUse: { x: { 0: 0 }, y: { 0: 0 } },
+        overlayModel: [0],
+        grid: {
+          rows: 1,
+          columns: 1
+        },
+        blurHandler: false,
+        axisTypes: ["x", "y"],
+        numTracePanel: [1],
+        drawer: true,
+        depthStatus: true,
+        mini: false,
+        axisList: {
+          x: [{ id: "Data 1", value: "x" }],
+          y: [{ id: "Data 1", value: "y" }]
+        },
+        groupColumn: {
+          x: "",
+          y: ""
+        },
+        loadedFeatures: [
+          {
+            x: null,
+            y: null
+          }
+        ],
+        chosenDataset: {},
+        columnsOfDataset: {}
+      };
+    },
+
+    resetAll() {
+      Object.assign(this.$data, this.getDefaultState());
+
+      eventBus.$emit("resetAll", "yes");
+    },
+    graphUpdate() {
+      eventBus.$emit("graphUpdate", "yes");
+    },
+    graphRelayout() {
+      eventBus.$emit("graphRelayout", "yes");
+    },
     changeGraphType(graphType, tpIndex) {
       let payload = { graphType: graphType, tpIndex: tpIndex };
       eventBus.$emit("changeGraphType", payload);
     },
     loadColumns(tpIndex) {
-      let path = "http://localhost:5000/loadColumns";
-      axios({
-        method: "post",
-        url: path,
-        data: {
-          tableName: this.chosenDataset[tpIndex],
-          projectName: this.projectName
-        }
-      })
-        .then(res => {
-          console.log(res.data);
-          this.columnsOfDataset = res.data;
+      // if문을 통해서 해당 table의 column이 load되어 있지 않을 경우에만 loadColumns
+      if (Object.keys(this.columnsOfDataset).includes(this.chosenDataset)) {
+        return;
+      } else {
+        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
+        axios({
+          method: "post",
+          url: path,
+          data: {
+            tableName: this.chosenDataset[tpIndex],
+            projectName: this.projectName
+          }
         })
-        .catch(error => {
-          console.error(error);
-        });
+          .then(res => {
+            let tableName = this.chosenDataset[tpIndex];
+            Vue.set(this.columnsOfDataset, tableName, res.data);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
     },
     loadGroupingData(axisType) {
       // 현재는 단일 groupingfeature만 되는 상태
-      let path = "http://localhost:5000/loadGroupingData";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadGroupingData";
       // axios
       this.$axios({
         method: "post",
@@ -346,10 +438,9 @@ export default {
           console.error(error);
         });
     },
-    removeAxis(axisType, tpIndex) {
+    removeData(axisType, tpIndex) {
       let payload = { axisType: axisType, tpIndex: tpIndex };
-
-      eventBus.$emit("removeAxis", payload);
+      eventBus.$emit("removeData", payload);
     },
     addAxis() {
       let axisTypes = ["x", "y"];
@@ -367,18 +458,26 @@ export default {
       eventBus.$emit("changeOverlay", payload);
     },
     deleteTrace(tpIndex) {
+      let axisList = ["x", "y"];
+      axisList.forEach(axis => {
+        Vue.delete(this.axisList[axis], tpIndex);
+        Vue.delete(this.selectedData[axis], tpIndex);
+        Vue.delete(this.axisToUse[axis], tpIndex);
+      });
+
+      Vue.delete(this.chosenDataset, tpIndex);
       Vue.delete(this.numTracePanel, tpIndex);
-      Vue.delete(this.axisList["x"], tpIndex);
-      Vue.delete(this.axisList["y"], tpIndex);
+
+      this.overlayModel.splice(tpIndex, 1);
       eventBus.$emit("deleteTrace", tpIndex);
     },
     addEmptyTrace() {
       this.openedPanel = [];
       this.openedPanel.push(this.numTracePanel.length);
-      this.numTracePanel.push(true);
+
+      this.numTracePanel.push(this.numTracePanel.length + 1);
       this.addAxis();
-      // this.axisToUse["x"].push("Data 1");
-      // this.axisToUse["y"].push("Data 1");
+
       this.overlayModel.push("Data 1");
 
       eventBus.$emit("addEmptyTrace", true);
@@ -396,12 +495,13 @@ export default {
         eventBus.$emit("loadAxis", payload);
       }
     },
-    changeAxis(selectedAxis, axisType, tpIndex, featureName) {
+    changeAxis(selectedAxis, axisType, tpIndex, featureName, overlayModel) {
       let payload = {
         selectedAxis: selectedAxis,
         axisType: axisType,
         tpIndex: tpIndex,
-        featureName: featureName
+        featureName: featureName,
+        overlayModel: overlayModel
       };
       eventBus.$emit("changeAxis", payload);
     }

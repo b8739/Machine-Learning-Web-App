@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="dialog" @click:outside="closeDialog" width="600">
     <v-card class="pa-4">
-      <strong>columnModel</strong>{{ columnModel }}
+      <!-- <strong>columnModel</strong>{{ columnModel }}
       <br />
-      <strong>datasetToLoad</strong>{{ datasetToLoad }}
+      <strong>datasetToLoad</strong>{{ datasetToLoad }} -->
       <v-tabs v-model="tab" align-with-title>
         <v-tabs-slider color="yellow"></v-tabs-slider>
 
@@ -92,6 +92,8 @@
 </template>
 <script>
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
+import { eventBus } from "@/main";
+
 import axios from "axios";
 
 export default {
@@ -184,7 +186,7 @@ export default {
       if (this.columnModel[datasetName] == undefined) {
         this.columnModel[datasetName] = [];
       }
-      let path = "http://localhost:5000/loadColumns";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
       // let tableName = this.tableNameToLoad[parseInt(this.currentGrid) + 1];
       axios({
         method: "post",
@@ -203,6 +205,18 @@ export default {
           console.error(error);
         });
     }
+  },
+  created() {
+    eventBus.$on("shortcut", dialogStatus => {
+      // load 정보 vuex에 전송
+      this.setDatasetToLoad("boston");
+      this.setColumnModel({ boston: ["CRIM", "CHAS", "ZN", "INDUS"] });
+      this.setGridType("AgGridSingle");
+
+      this.createNewGrid();
+      // dialog 초기화
+      this.resetLoadInfo();
+    });
   }
 };
 </script>

@@ -34,7 +34,7 @@
         </v-sheet>
       </v-row>
     </v-container>
-    <SimulationModal />
+    <!-- <SimulationModal /> -->
   </div>
 </template>
 <script>

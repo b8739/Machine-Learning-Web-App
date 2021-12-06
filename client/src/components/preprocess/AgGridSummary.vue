@@ -75,6 +75,7 @@ export default {
       getRowStyle: null,
       columnDefs: [
         { field: "name" },
+        { field: "dtype" },
         { field: "mean" },
         { field: "mode" },
         { field: "median" },
@@ -119,6 +120,7 @@ export default {
     ...mapMutations("aggrid", ["setCurrentGrid"]),
     ...mapMutations("aggrid", ["addGridList"]),
     ...mapMutations("aggrid", ["setViewMode"]),
+
     onGridReady(params) {
       this.setSummaryGridApi(params.api);
       this.setSummaryColumnGridApi(params.columnApi);

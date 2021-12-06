@@ -116,7 +116,7 @@ export default {
   },
   methods: {
     revertChanges() {
-      const path = "http://localhost:5000/revertChanges";
+      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/revertChanges";
       axios
         .get(path, {
           params: {
@@ -172,7 +172,7 @@ export default {
   beforeDestroy() {}
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-  //     const path = "http://localhost:5000/overwriteTable";
+  //     const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
   //     axios.get(path).catch(error => {
   //       console.error(error);
   //     });

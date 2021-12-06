@@ -24,6 +24,7 @@
       :getRowStyle="getRowStyle"
       :maintainColumnOrder="true"
       @column-moved="onColumnMoved"
+      @filter-changed="onFilterChanged"
     >
     </ag-grid-vue>
   </div>
@@ -82,7 +83,6 @@ export default {
       this.gridApi[this.currentGrid].refreshInfiniteCache();
     },
     onFirstDataRendered() {
-      console.log("first");
       // setValue("#undoInput", 0);
       // disable("#undoInput", true);
       // disable("#undoBtn", true);
@@ -98,6 +98,7 @@ export default {
       payload = { api: params.columnApi, gridID: this.gridID };
       this.addGridColumnApi(payload);
       this.loadColumnState(this.gridID); // Order
+      this.loadFilterState(this.gridID); // Filter
       this.updateColumnHeader(this.gridID);
 
       let vm = this;
@@ -110,14 +111,19 @@ export default {
           getRows: function(params) {
             // console.log("asking for " + params.startRow + " to " + params.endRow);
             // 1) Get Filter Model
+            let filterModel;
+            if (vm.filterModel[vm.gridID] != undefined) {
+              filterModel = vm.filterModel[vm.gridID];
+            } else {
+              filterModel = {};
+            }
 
-            let filterModel = vm.gridApi[vm.currentGrid].getFilterModel();
-
-            filterModel = vm.parseFilterModel(filterModel);
-            // 2_ Filter Model + Delete Transaction
-            if (vm.deleteTransaction[vm.gridID] != undefined) {
-              let ninFilter = { ID: { $nin: vm.deleteTransaction[vm.gridID] } };
-              filterModel.push(ninFilter);
+            // 2) Delete Model
+            let deleteModel;
+            if (vm.deleteModel[vm.gridID] != undefined) {
+              deleteModel = vm.deleteModel[vm.gridID];
+            } else {
+              deleteModel = [];
             }
             // 3) Rename Model
             let renameModel;
@@ -141,8 +147,17 @@ export default {
             } else {
               fillNaModel = [];
             }
+            // 5) delete Na Model
+
+            let deleteNaModel;
+            if (vm.deleteNaModel[vm.gridID] != undefined) {
+              deleteNaModel = vm.deleteNaModel[vm.gridID];
+            } else {
+              deleteNaModel = [];
+            }
+
             // axios
-            let path = "http://localhost:5000/infiniteRowModel";
+            let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteRowModel";
 
             axios({
               method: "post",
@@ -152,16 +167,18 @@ export default {
                 projectName: vm.projectName,
                 startRow: params.startRow,
                 endRow: params.endRow,
+                deleteModel: deleteModel,
                 filterModel: filterModel,
                 columnModel: vm.columnModel[vm.datasetToLoad],
                 renameModel: renameModel,
                 typeModel: typeModel,
                 fillNaModel: fillNaModel,
+                deleteNaModel: deleteNaModel,
                 gridType: vm.gridType
               }
             })
               .then(res => {
-                console.log(res.data);
+                // console.log(res.data);
 
                 params.successCallback(res.data, vm.datasetSize);
               })
@@ -178,7 +195,7 @@ export default {
     this.loadColumns(this.datasetToLoad);
   },
   mounted() {
-    console.log("single mounted");
+    // console.log("single mounted");
   }
 };
 </script>

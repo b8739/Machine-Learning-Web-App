@@ -46,12 +46,15 @@ export default {
       viewMode: state => state.aggrid.viewMode,
       // transaction
       updateTransaction: state => state.aggrid.updateTransaction,
-      deleteTransaction: state => state.aggrid.deleteTransaction,
+      deleteModel: state => state.aggrid.deleteModel,
       // model
       renameModel: state => state.aggrid.renameModel,
       columnState: state => state.aggrid.columnState,
       typeModel: state => state.aggrid.typeModel,
-      fillNaModel: state => state.aggrid.fillNaModel
+      fillNaModel: state => state.aggrid.fillNaModel,
+      deleteNaModel: state => state.aggrid.deleteNaModel,
+      filterModel: state => state.aggrid.filterModel,
+      clientFilterModel: state => state.aggrid.clientFilterModel
     })
   },
   methods: {
@@ -61,11 +64,13 @@ export default {
     ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("aggrid", ["setViewMode"]),
     ...mapMutations("aggrid", ["setColumnState"]),
+    ...mapMutations("aggrid", ["setFilterModel"]),
+    ...mapMutations("aggrid", ["setClientFilterModel"]),
     loadColumnState(gridID) {
       if (this.columnState[gridID]) {
         var columnState = JSON.parse(this.columnState[gridID]);
         if (columnState) {
-          console.log(typeof columnState);
+          // console.log(typeof columnState);
 
           this.gridColumnApi[gridID].applyColumnState({
             state: columnState,
@@ -73,6 +78,9 @@ export default {
           });
         }
       }
+    },
+    loadFilterState(gridID) {
+      this.gridApi[gridID].setFilterModel(this.clientFilterModel[gridID]);
     },
     updateColumnHeader(gridID) {
       let columnDefs = this.gridApi[gridID].getColumnDefs();
@@ -83,7 +91,7 @@ export default {
       } else {
         renameModel = [];
       }
-      console.log(renameModel);
+      // console.log(renameModel);
       renameModel.forEach((element1, index) => {
         columnDefs.forEach(element2 => {
           if (element1["from"] == element2["colId"]) {
@@ -92,15 +100,22 @@ export default {
         });
       });
       this.gridApi[gridID].setColumnDefs(columnDefs);
-      console.log(columnDefs);
+      // console.log(columnDefs);
     },
     onColumnMoved(params) {
       var columnState = JSON.stringify(params.columnApi.getColumnState());
       this.setColumnState(columnState);
       // console.log(params.columnApi.getColumnState());
     },
+    onFilterChanged(params) {
+      let filterModel = params.api.getFilterModel();
+      this.setClientFilterModel(filterModel);
+
+      let finalFilterModel = this.parseFilterModel(filterModel);
+      this.setFilterModel(finalFilterModel);
+    },
     loadColumns(tableName) {
-      let path = "http://localhost:5000/loadColumns";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
       axios({
         method: "post",
         url: path,
@@ -269,7 +284,7 @@ export default {
           JSON.stringify(element).substring(0, substringIndex) ==
           JSON.stringify(update).substring(0, substringIndex)
         ) {
-          this.deleteTransaction(index);
+          this.deleteModel(index);
         }
       });
 

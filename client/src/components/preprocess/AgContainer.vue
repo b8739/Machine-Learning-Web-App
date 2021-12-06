@@ -3,11 +3,45 @@
     <v-container>
       <v-row>
         <v-col cols="2"> <AgSideMenu @openDialog="dialogAction"/></v-col>
-
         <v-col cols="10">
-          <v-btn @click="test">test</v-btn>
-          {{ loadedColumns }}
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                개발 현황
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-simple-table>
+                  <template>
+                    <thead>
+                      <tr>
+                        <th>Feature</th>
+                        <th>Single Datatable</th>
+                        <th>Merged Datatable</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(info, index) in devProgess" :key="index">
+                        <td>{{ info.function }}</td>
+                        <td>
+                          <v-icon :color="iconColor(info.singleTable)">{{
+                            info.singleTable
+                          }}</v-icon>
+                        </td>
+                        <td>
+                          <v-icon :color="iconColor(info.mergedTable)">{{
+                            info.mergedTable
+                          }}</v-icon>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
 
+          <!-- {{ loadedColumns }}
+          <v-btn @click="test"> test</v-btn> -->
           <!-- <v-toolbar>
       <v-toolbar-title class="mr-2 font-weight-bold subheading">Undo/Redo:</v-toolbar-title>
       <label>Available Undo's:</label>
@@ -68,17 +102,19 @@
                 Data {{ gridID }}
               </v-chip>
             </v-chip-group>
+            <!-- <v-btn @click="shortcut()">shortcut create table</v-btn> -->
 
             <v-btn class="mr-2" small @click="readyToAddDataTable"
               ><v-icon>mdi-plus</v-icon> Add Datatable</v-btn
             >
+
             <v-chip-group v-model="viewStatus" active-class="primary--text">
               <v-chip class="mr-2" label small @click="setViewMode('table')"> Data Table</v-chip>
               <v-chip class="mr-2" label small @click="setViewMode('statistics')">
                 Summary Statistics</v-chip
               >
 
-              <v-chip class="mr-2" label small @click="setViewMode('distribution')()">
+              <v-chip class="mr-2" label small @click="setViewMode('distribution')">
                 Feature Distribution</v-chip
               >
             </v-chip-group>
@@ -101,10 +137,12 @@
             :gridType="gridType[gridID]"
           ></component>
 
+          <PlotlyDist />
           <AgGridSummary />
           <AddGridDialog :dialog.sync="dialog_newGrid" />
           <!-- Delete Column -->
           <AgGridDialog
+            v-if="columnModel[currentGrid]"
             :dialog.sync="dialog_colDisplay"
             :selectedColumns="selectedColumns"
             :dialogName="'deleteColumn'"
@@ -127,6 +165,7 @@
 
           <!-- Change Name -->
           <AgGridDialog
+            v-if="columnModel[currentGrid]"
             :dialog.sync="dialog_colName"
             :gridColumns="gridColumns"
             :dialogName="'changeName'"
@@ -154,11 +193,12 @@
 
           <!-- Change Data Type -->
           <AgGridDialog
+            v-if="columnModel[currentGrid]"
             :dialog.sync="dialog_colType"
             :dialogName="'changeType'"
             :dataTypes="dataTypes"
           >
-            <template v-if="columnModel[currentGrid]" v-slot:insideContainer_type="slotProps">
+            <template v-slot:insideContainer_type="slotProps">
               {{ slotProps.dataTypeModel }}
               <v-row
                 v-for="(colName, colIndex) in columnModel[currentGrid][datasetToLoad[currentGrid]]"
@@ -181,8 +221,12 @@
             </template>
           </AgGridDialog>
           <!-- Fill NA -->
-          <AgGridDialog :dialog.sync="dialog_fillNa" :dialogName="'fillNa'">
-            <template v-if="columnModel[currentGrid]" v-slot:insideContainer_na="slotProps">
+          <AgGridDialog
+            v-if="columnModel[currentGrid]"
+            :dialog.sync="dialog_fillNa"
+            :dialogName="'fillNa'"
+          >
+            <template v-slot:insideContainer_fillNA="slotProps">
               fillNaModel: {{ slotProps.fillNaModel }}
               <v-card-subtitle>Leave the select box if not applying 'fillNa'</v-card-subtitle>
               <v-row
@@ -202,6 +246,43 @@
               <v-btn @click="slotProps.applyFillNa()">Confirm</v-btn>
             </template>
           </AgGridDialog>
+          <!-- Delete NA -->
+          <AgGridDialog
+            v-if="columnModel[currentGrid]"
+            :dialog.sync="dialog_deleteNA"
+            :dialogName="'deleteNA'"
+          >
+            <template v-slot:insideContainer_deleteNA="slotProps">
+              {{ slotProps.deleteNaModel }}
+              <v-card-subtitle>Leave the checkbox if not applying 'Delete NA'</v-card-subtitle>
+              <v-row
+                v-for="(colName, colIndex) in columnModel[currentGrid][datasetToLoad[currentGrid]]"
+                :key="colIndex"
+              >
+                <v-col><v-subheader v-text="colName"></v-subheader></v-col>
+                <!-- <v-col>Num of NA.:{{}}</v-col> -->
+                <v-col>
+                  <v-checkbox v-model="slotProps.deleteNaModel[colName]" solo dense></v-checkbox
+                ></v-col>
+              </v-row>
+            </template>
+            <template v-slot:deleteNaAction="slotProps">
+              <v-btn @click="slotProps.applyDeleteNa()">Confirm</v-btn>
+            </template>
+          </AgGridDialog>
+          <!--  Merge Grid -->
+          <AgGridDialog :dialog.sync="dialog_merge" :dialogName="'mergeTables'">
+            <template v-slot:insideContainer>
+              현재는 ID를 기준으로 Table이 병합됩니다. (다른 컬럼 (ex.Date) 기준으로 병합할 수
+              있도록 업데이트 예정)
+              <!-- {{ tablesToMerge }} -->
+              <v-select :items="gridList" chips multiple v-model="tablesToMerge"></v-select>
+            </template>
+
+            <template v-slot:mergeTableAction="slotProps">
+              <v-btn @click="mergeTables(tablesToMerge)">Confirm</v-btn>
+            </template>
+          </AgGridDialog>
         </v-col>
       </v-row>
     </v-container>
@@ -210,12 +291,15 @@
 
 <script>
 import Vue from "vue";
+import PlotlyDist from "@/components/graph/PlotlyDist.vue";
 import AgGridSingle from "@/components/preprocess/AgGridSingle.vue";
 import AgGridMultiple from "@/components/preprocess/AgGridMultiple.vue";
 import AgGridSummary from "@/components/preprocess/AgGridSummary.vue";
 import AddGridDialog from "@/components/preprocess/AddGridDialog.vue";
 import AgGridDialog from "@/components/preprocess/AgGridDialog.vue";
 import AgSideMenu from "@/components/preprocess/AgSideMenu.vue";
+import { eventBus } from "@/main";
+
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 // import store from "@/store/modules/dataTable/aggrid";
 import axios from "axios";
@@ -223,6 +307,43 @@ import axios from "axios";
 export default {
   data() {
     return {
+      devProgess: [
+        {
+          function: "Create Table (All Columns/Only Selected Columns)",
+          singleTable: "mdi-check",
+          mergedTable: "mdi-check"
+        },
+        {
+          function: "Delete Table",
+          singleTable: "mdi-check",
+          mergedTable: "mdi-check"
+        },
+        {
+          function: "Load Draft",
+          singleTable: "mdi-check",
+          mergedTable: "mdi-check"
+        },
+        {
+          function: "Delete Draft",
+          singleTable: "mdi-check",
+          mergedTable: "mdi-check"
+        },
+        { function: "Delete Table", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Change Column Name", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Change Column Type", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Delete Row", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Update Row", singleTable: "mdi-close", mergedTable: "mdi-close" },
+        { function: "Drop Column", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Fill NA", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Delete NA", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        { function: "Merge Tables", singleTable: "mdi-check", mergedTable: "mdi-check" },
+        {
+          function: "Export as Excel (Only Loaded)",
+          singleTable: "mdi-check",
+          mergedTable: "mdi-close"
+        },
+        { function: "Export as Excel (All)", singleTable: "mdi-check", mergedTable: "mdi-close" }
+      ],
       viewStatus: 0,
       draftList: [],
 
@@ -232,19 +353,21 @@ export default {
         color: "primary"
       },
       hidePanel: true,
+      dialog_merge: false,
       dialog_colType: false,
       dialog_newGrid: false,
       dialog_colDisplay: false,
       dialog_colName: false,
       dialog_fillNa: false,
+      dialog_deleteNA: false,
 
       gridColumns: [],
       loadedColumns: [],
       selectedColumns: {},
-      tableToMerge: [],
+      tablesToMerge: [],
       dataTypes: null,
       sampleDataTypes: ["float", "int", "double"],
-      dataTypeItems: ["double", "string", "bool", "date", "int", "long", "decimal"]
+      dataTypeItems: ["double", "string", "bool", "date", "int", "long"]
     };
   },
   computed: {
@@ -283,6 +406,7 @@ export default {
     }
   },
   components: {
+    PlotlyDist,
     AgGridMultiple,
     AgGridSummary,
     AddGridDialog,
@@ -296,6 +420,16 @@ export default {
   },
   mounted() {},
   methods: {
+    ...mapActions("aggrid", ["createNewGrid"]),
+    ...mapActions("aggrid", ["mergeTables"]),
+    iconColor(value) {
+      if (value == "mdi-check") {
+        return "blue";
+      } else return "red";
+    },
+    shortcut() {
+      eventBus.$emit("shortcut", "s");
+    },
     dialogAction(dialogName) {
       if (dialogName == "changeColName") {
         this.getGridColumns();
@@ -304,15 +438,23 @@ export default {
         this.getDataTypes();
       } else if (dialogName == "dropColumn") {
         this.dialog_colDisplay = true;
-      } else if (dialogName == "fillNA") {
-        this.dialog_fillNa = true;
       } else if (dialogName == "saveDraft") {
         this.saveDialog = true;
+      } else if (dialogName == "fillNA") {
+        this.dialog_fillNa = true;
+      } else if (dialogName == "deleteNA") {
+        this.dialog_deleteNA = true;
+      } else if (dialogName == "mergeTable") {
+        if (this.gridList.length < 2) {
+          alert("Dataframe이 2개 이상 로드되어 있어야 합니다.");
+        } else {
+          this.dialog_merge = true;
+        }
       }
     },
 
     getDataTypes() {
-      let path = "http://localhost:5000/getDataTypes";
+      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/getDataTypes";
       axios({
         method: "post",
         url: path,
@@ -346,6 +488,10 @@ export default {
     ...mapMutations("aggrid", ["setAvailableRedo"]),
     ...mapActions("aggrid", ["removeGrid"]),
     ...mapActions("aggrid", ["saveDraft"]),
+    ...mapMutations("aggrid", ["setDatasetToLoad"]),
+    ...mapMutations("aggrid", ["setColumnModel"]),
+    ...mapMutations("aggrid", ["setGridType"]),
+    ...mapActions("aggrid", ["createNewGrid"]),
 
     resetLoadInfo() {
       let index = parseInt(this.currentGrid) + 1;
@@ -367,10 +513,8 @@ export default {
       });
     },
     test() {
-      let loadedColumns = this.gridColumnApi[this.currentGrid].getColumnState().map(function(col) {
-        // return { columnName: col.getColId(), columnInfo: vm.currentGrid };
-        return col.colId;
-      });
+      var columnState = JSON.stringify(this.gridColumnApi[this.currentGrid].getColumnState());
+      console.log(columnState);
     },
     openDisplayDialog() {
       // this.loadedColumns = [];
