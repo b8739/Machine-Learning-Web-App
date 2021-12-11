@@ -174,7 +174,7 @@ export default {
     },
     getRandValue() {
       let gridIdList = this.gridList.map(function(gridInfo) {
-        return gridInfo.randValue;
+        return gridInfo.id;
       });
       let randValue = Math.floor(Math.random() * (10 - 1) + 1);
 
