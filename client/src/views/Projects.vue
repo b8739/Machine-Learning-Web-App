@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-app-bar>
-      <a href="http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/"
-        ><img class="logo" src="@//assets/attic_logo.png" alt=""
-      /></a>
+      <a href="http://localhost:8080/"><img class="logo" src="@//assets/attic_logo.png" alt=""/></a>
     </v-app-bar>
     <v-container fluid>
       <v-row>
@@ -12,7 +10,7 @@
             <v-icon left class="mdi-36">
               mdi-folder-plus-outline
             </v-icon>
-            New Project
+            New Draft
           </v-btn>
           <v-card height="900px">
             <v-navigation-drawer width="100%">
@@ -59,7 +57,7 @@ export default {
     ...mapMutations("initialData", ["resetState"]),
 
     loadProjects() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadProjects";
+      let path = "http://localhost:5000/loadProjects";
       console.log(path);
 
       axios

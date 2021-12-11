@@ -116,7 +116,7 @@ export default {
     },
     createEditPlot() {
       let vm = this;
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadEditGraphData";
+      let path = "http://localhost:5000/loadEditGraphData";
       // axios
       this.$axios({
         method: "post",

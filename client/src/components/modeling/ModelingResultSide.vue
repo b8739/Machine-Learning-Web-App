@@ -56,7 +56,7 @@ export default {
     ...mapMutations("modelingData", ["saveGraphSources"]),
     ...mapMutations("modelingData", ["saveModelingSummary"]),
     loadModelCase(caseName) {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadModelCase";
+      let path = "http://localhost:5000/loadModelCase";
       axios({
         method: "post",
         url: path,
@@ -75,7 +75,7 @@ export default {
     },
     loadCases() {
       console.log("loadCases");
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
+      let path = "http://localhost:5000/loadCases";
       axios
         .get(path)
         .then(res => {
@@ -89,7 +89,7 @@ export default {
     //   let h = 500;
     //   let leftPosition = (screen.width - w) / 2;
     //   let topPosition = (screen.height - h) / 2;
-    //   let url = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + case_name;
+    //   let url = "http://localhost:5000/" + case_name;
 
     //   window.open(
     //     url,

@@ -196,7 +196,7 @@ export default {
     changeColumnType(index, event) {
       Vue.set(this.duplicatedColumns[index], "datatype", event);
 
-      //       let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnType";
+      //       let path = "http://localhost:5000/changeColumnType";
       // this.$axios({
       //   method: "post",
       //   url: path,
@@ -216,7 +216,6 @@ export default {
     updateValues() {
       this.addDuplicatedColumn;
     },
-    ...mapActions("initialData", ["loadSummarizedData"]),
     // ...mapActions("initialData", ["loadFundamentalData"]),
     ...mapMutations("initialData", ["changeColumnName_vuex"]),
     ...mapMutations("saveFlag", ["ChangeColumnNameFlag"]),
@@ -226,21 +225,6 @@ export default {
     ...mapMutations("summaryTableHandler", ["changeColumnOrder"]),
     renameColumns(index, event) {
       Vue.set(this.duplicatedColumns[index], "columnName", event);
-    },
-    saveClickedIconIndex(column) {
-      // v-icon click OFF
-      if (this.clickedIconKey == column) {
-        this.clickedIconKey = null;
-        // category 일 때
-
-        // this.changeColumnName_vue(this.columns[index], index);
-
-        // this.loadFundamentalData("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadData"); //vuex column, dataset, indexnum 변경
-        // this.loadSummarizedData();
-      } // v-icon click ON
-      else {
-        this.clickedIconKey = column;
-      }
     },
 
     getDataType(column) {
@@ -260,7 +244,7 @@ export default {
     },
 
     // changeColumnOrder(position, movedColumnName, newIndex) {
-    //   const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnOrder";
+    //   const api = "http://localhost:5000/changeColumnOrder";
     //   axios
     //     .get(api, {
     //       params: {
@@ -279,7 +263,7 @@ export default {
       console.log(payload);
       // this.changeColumnName_vuex(payload); //summarizedInfo의 이름까지 변경해야하는 문제 때문에 일단 보류
 
-      // const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnName_vue";
+      // const api = "http://localhost:5000/changeColumnName_vue";
       // axios
       //   .get(api, {
       //     params: {

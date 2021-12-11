@@ -5,7 +5,7 @@
       v-model="datasetToLoad"
       :items="tableList"
       label="Select Dataset"
-      @input="loadStatistics"
+      @input="setDataset"
       clearable
       clear-icon
     ></v-select>
@@ -40,7 +40,7 @@ export default {
     currentDataset: {
       handler: function() {
         if (this.summarizedInfo[this.currentDataset] == undefined) {
-          this.loadSummarizedData(this.currentDataset);
+          this.loadStatistics(this.currentDataset);
         } else {
           this.gridApi.setRowData(this.summarizedInfo[this.currentDataset]);
         }
@@ -113,7 +113,7 @@ export default {
     load() {
       this.gridApi.setRowData(this.summarizedInfo["boston"]);
     },
-    ...mapActions("initialData", ["loadSummarizedData"]),
+    ...mapActions("initialData", ["loadStatistics"]),
 
     ...mapMutations("aggrid", ["setSummaryGridApi"]),
     ...mapMutations("aggrid", ["setSummaryColumnGridApi"]),
@@ -125,7 +125,7 @@ export default {
       this.setSummaryGridApi(params.api);
       this.setSummaryColumnGridApi(params.columnApi);
     },
-    loadStatistics(value) {
+    setDataset(value) {
       console.log(`loadstatistics: ${value}`);
       this.currentDataset = value;
     }

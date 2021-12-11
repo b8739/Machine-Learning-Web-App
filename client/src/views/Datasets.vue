@@ -107,7 +107,7 @@ export default {
       }
     },
     showTables() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/showTables";
+      let path = "http://localhost:5000/showTables";
       axios({
         method: "post",
         url: path,
@@ -124,7 +124,7 @@ export default {
       if (
         confirm("선택한 Dataset을 Database에서 삭제하시겠습니까? (다시 복구할 수 없습니다)") == true
       ) {
-        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dropTable";
+        let path = "http://localhost:5000/dropTable";
         axios({
           method: "post",
           url: path,

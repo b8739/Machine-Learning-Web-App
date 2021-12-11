@@ -5,6 +5,10 @@ module.exports = {
   lintOnSave: false,
   assetsDir: "./static",
   publicPath: "/",
+  // devServer: {
+  //   port: 80,
+  //   host: "0.0.0.0"
+  // },
   // 용량 커서
   productionSourceMap: false,
   configureWebpack: config => {
@@ -14,6 +18,7 @@ module.exports = {
     config.output.chunkFilename = "js/[name].[hash].js";
   },
   configureWebpack: {
+    // plugins: [new BundleAnalyzerPlugin(), new VuefyLoaderPlugin()]
     plugins: [new VuefyLoaderPlugin()]
   }
 };

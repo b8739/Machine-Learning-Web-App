@@ -144,7 +144,7 @@ export default {
     updateRows() {
       let availableUndo = document.getElementById("undoInput").value;
       if (availableUndo != 0) {
-        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/updateRows";
+        let path = "http://localhost:5000/updateRows";
         // axios
         axios({
           method: "post",
@@ -240,7 +240,7 @@ export default {
               deleteNaModel = [];
             }
             // Axios
-            let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteRowModel";
+            let path = "http://localhost:5000/infiniteRowModel";
             // debug
 
             axios({

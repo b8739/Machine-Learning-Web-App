@@ -1,8 +1,8 @@
 <template>
-  <div style="width:100%">
-    <v-container>
+  <div style="width:100%;">
+    <v-container fluid>
       <v-row>
-        <v-col cols="2"> <AgSideMenu @openDialog="dialogAction"/></v-col>
+        <v-col cols=""> <AgSideMenu @openDialog="dialogAction"/></v-col>
         <v-col cols="10">
           <v-expansion-panels>
             <v-expansion-panel>
@@ -89,17 +89,17 @@
           <v-toolbar>
             <v-chip-group class="ml-10">
               <v-chip
-                v-for="(gridID, gridIndex) in gridList"
-                :key="gridIndex"
-                v-if="gridID != undefined"
-                v-bind="dynamicVchipProp(gridIndex)"
-                @click="setCurrentGrid(gridID)"
+                v-for="(grid, gridIndex) in gridList"
+                :key="grid.id"
+                v-if="grid != undefined"
+                v-bind="dynamicVchipProp(grid.id)"
+                @click="setCurrentGrid(grid.id)"
                 class="ml-1"
                 close
-                @click:close="removeGrid(gridID)"
+                @click:close="removeGrid(grid.id)"
                 label
               >
-                Data {{ gridID }}
+                {{ grid.name }}
               </v-chip>
             </v-chip-group>
             <!-- <v-btn @click="shortcut()">shortcut create table</v-btn> -->
@@ -113,10 +113,10 @@
               <v-chip class="mr-2" label small @click="setViewMode('statistics')">
                 Summary Statistics</v-chip
               >
-
+              <!-- 
               <v-chip class="mr-2" label small @click="setViewMode('distribution')">
                 Feature Distribution</v-chip
-              >
+              > -->
             </v-chip-group>
           </v-toolbar>
           <!-- <AgGridMultiple
@@ -127,14 +127,14 @@
     /> -->
 
           <component
-            v-for="(gridID, gridIndex) in gridList"
-            :key="gridIndex"
-            v-if="gridID != undefined"
-            v-bind:is="gridType[gridID]"
-            :gridID="gridID"
-            :columnModel="columnModel[gridID]"
-            :datasetToLoad="datasetToLoad[gridID]"
-            :gridType="gridType[gridID]"
+            v-for="(grid, gridIndex) in gridList"
+            :key="grid.id"
+            v-if="grid != undefined"
+            v-bind:is="gridType[grid.id]"
+            :gridID="grid.id"
+            :columnModel="columnModel[grid.id]"
+            :datasetToLoad="datasetToLoad[grid.id]"
+            :gridType="gridType[grid.id]"
           ></component>
 
           <PlotlyDist />
@@ -276,7 +276,14 @@
               현재는 ID를 기준으로 Table이 병합됩니다. (다른 컬럼 (ex.Date) 기준으로 병합할 수
               있도록 업데이트 예정)
               <!-- {{ tablesToMerge }} -->
-              <v-select :items="gridList" chips multiple v-model="tablesToMerge"></v-select>
+              <v-select
+                :items="gridList"
+                item-text="name"
+                item-value="id"
+                chips
+                multiple
+                v-model="tablesToMerge"
+              ></v-select>
             </template>
 
             <template v-slot:mergeTableAction="slotProps">
@@ -307,6 +314,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      show: false,
       devProgess: [
         {
           function: "Create Table (All Columns/Only Selected Columns)",
@@ -332,7 +340,7 @@ export default {
         { function: "Change Column Name", singleTable: "mdi-check", mergedTable: "mdi-check" },
         { function: "Change Column Type", singleTable: "mdi-check", mergedTable: "mdi-check" },
         { function: "Delete Row", singleTable: "mdi-check", mergedTable: "mdi-check" },
-        { function: "Update Row", singleTable: "mdi-close", mergedTable: "mdi-close" },
+        // { function: "Update Row", singleTable: "mdi-close", mergedTable: "mdi-close" },
         { function: "Drop Column", singleTable: "mdi-check", mergedTable: "mdi-check" },
         { function: "Fill NA", singleTable: "mdi-check", mergedTable: "mdi-check" },
         { function: "Delete NA", singleTable: "mdi-check", mergedTable: "mdi-check" },
@@ -383,6 +391,7 @@ export default {
       gridColumnApi: state => state.aggrid.gridColumnApi,
       currentGrid: state => state.aggrid.currentGrid,
       viewMode: state => state.aggrid.viewMode,
+      datatableName: state => state.aggrid.datatableName,
 
       gridList: state => state.aggrid.gridList,
       // transaction
@@ -417,8 +426,15 @@ export default {
   created() {
     this.resetSummarizedInfo();
     this.resetAggrid();
+    eventBus.$on("deleteRowsByGraph", selectedRows => {
+      this.addNewDeletion(selectedRows);
+      this.gridApi[this.currentGrid].refreshInfiniteCache();
+    });
   },
-  mounted() {},
+  mounted() {
+    console.log("loadDraft");
+    this.loadDraft();
+  },
   methods: {
     ...mapActions("aggrid", ["createNewGrid"]),
     ...mapActions("aggrid", ["mergeTables"]),
@@ -439,7 +455,12 @@ export default {
       } else if (dialogName == "dropColumn") {
         this.dialog_colDisplay = true;
       } else if (dialogName == "saveDraft") {
-        this.saveDialog = true;
+        var confirmflag = confirm("Draft를 덮어씌우시겠습니까?");
+
+        if (confirmflag) {
+          this.saveDraft();
+        } else {
+        }
       } else if (dialogName == "fillNA") {
         this.dialog_fillNa = true;
       } else if (dialogName == "deleteNA") {
@@ -454,7 +475,7 @@ export default {
     },
 
     getDataTypes() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/getDataTypes";
+      let path = "http://localhost:5000/getDataTypes";
       axios({
         method: "post",
         url: path,
@@ -479,6 +500,8 @@ export default {
     },
 
     ...mapMutations("initialData", ["resetSummarizedInfo"]),
+    ...mapMutations("aggrid", ["addNewDeletion"]),
+
     ...mapMutations("aggrid", ["addGridApi"]),
     ...mapMutations("aggrid", ["addGridColumnApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
@@ -492,6 +515,7 @@ export default {
     ...mapMutations("aggrid", ["setColumnModel"]),
     ...mapMutations("aggrid", ["setGridType"]),
     ...mapActions("aggrid", ["createNewGrid"]),
+    ...mapActions("aggrid", ["loadDraft"]),
 
     resetLoadInfo() {
       let index = parseInt(this.currentGrid) + 1;
@@ -618,8 +642,8 @@ export default {
       this.setViewMode("statistics");
     },
 
-    dynamicVchipProp(gridIndex) {
-      if (gridIndex == this.currentGrid) {
+    dynamicVchipProp(gridID) {
+      if (gridID == this.currentGrid) {
         return this.vchipClickedProp;
       }
     }

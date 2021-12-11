@@ -22,7 +22,7 @@
             :key="indexOfDataInfo"
           >
             <v-list-item-content>
-              <v-select
+              <!-- <v-select
                 class="mt-3"
                 outlined
                 clearable
@@ -33,7 +33,7 @@
                 item-text="draftName"
                 @input="loadDraft"
                 v-model="datasetInfo['draft']"
-              ></v-select>
+              ></v-select> -->
               <!-- @change="saveDatasetInfo" -->
               <v-select
                 class="mt-3"
@@ -41,9 +41,11 @@
                 clearable
                 hide-details
                 dense
-                label="Grid"
+                label="Select Datatable"
                 :items="gridList"
-                v-model="datasetInfo['grid']"
+                item-text="name"
+                item-value="id"
+                v-model="selectedGrid"
                 @input="gridChange()"
               ></v-select>
             </v-list-item-content>
@@ -72,8 +74,20 @@
                 </v-expansion-panel></v-expansion-panels
               > -->
               <v-container>
-                <v-row justify="center" align="center">
-                  <v-col cols="9">
+                <v-row>
+                  <!-- <v-col cols="3"> <v-subheader>Validation:</v-subheader></v-col> -->
+                  <v-col>
+                    <v-text-field
+                      :rules="[rules.required]"
+                      suffix="%"
+                      dense
+                      outlined
+                      label="Validation"
+                      clearable
+                      v-model="validationSet"
+                    ></v-text-field
+                  ></v-col>
+                  <!-- <v-col cols="9">
                     <v-row>
                       <v-card-text class="body-2 font-weight-medium pa-0">
                         Total Rows: {{ datasetSize }}</v-card-text
@@ -103,14 +117,14 @@
                         ></v-text-field
                       ></v-col>
                     </v-row>
-                  </v-col>
-                  <v-col cols="3">
+                  </v-col> -->
+                  <!-- <v-col cols="3">
                     <v-btn fab x-small cursor-pointer @click="addValidationIndex">
                       <v-icon>mdi-plus</v-icon></v-btn
                     >
-                  </v-col>
+                  </v-col> -->
                 </v-row>
-                <v-row>
+                <!-- <v-row>
                   <v-chip-group>
                     <v-chip
                       v-for="(validationIndex, index) in validationIndexArray"
@@ -139,7 +153,7 @@
                     >
                   </template>
                   <span>20% from the end of dataset</span>
-                </v-tooltip>
+                </v-tooltip> -->
               </v-container>
             </v-list-item>
           </v-list-group>
@@ -151,14 +165,15 @@
             </template>
             <v-list-item>
               <v-row>
-                <v-col cols=""> <v-subheader>Training:</v-subheader></v-col>
-                <v-col cols="7">
+                <!-- <v-col cols=""> <v-subheader>Training:</v-subheader></v-col> -->
+                <v-col cols="">
                   <v-text-field
                     :rules="[rules.required]"
                     suffix="%"
                     dense
                     outlined
                     clearable
+                    label="Training"
                     v-model="trainSet"
                   ></v-text-field
                 ></v-col>
@@ -166,14 +181,15 @@
             </v-list-item>
             <v-list-item>
               <v-row>
-                <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col>
-                <v-col cols="7">
+                <!-- <v-col cols="5"> <v-subheader>Test:</v-subheader></v-col> -->
+                <v-col cols="">
                   <v-text-field
                     :rules="[rules.required]"
                     suffix="%"
                     outlined
                     dense
                     clearable
+                    label="Test"
                     v-model="testSet"
                   ></v-text-field
                 ></v-col>
@@ -223,11 +239,13 @@ export default {
   data() {
     return {
       datasetInfo: {},
-      validationEndIndex: null,
-      validationStartIndex: null,
+      selectedGrid: null,
+      // validationEndIndex: null,
+      // validationStartIndex: null,
       validationIndexArray: [],
       dialog: false,
       drawer: true,
+      validationSet: null,
       trainSet: null,
       testSet: null,
       dataInfoLabels: ["Draft"],
@@ -261,16 +279,18 @@ export default {
     }),
     ...mapGetters("initialData", ["indexNum"]),
     splitRatio() {
-      return { validation: this.validationIndexArray, train: this.trainSet, test: this.testSet };
+      return { validation: this.validationSet, train: this.trainSet, test: this.testSet };
     }
   },
   methods: {
     ...mapMutations("modelingData", ["saveSplitRatio"]),
     ...mapMutations("modelingData", ["saveDatasetInfo"]),
+    ...mapMutations("modelingData", ["setSelectedGrid"]),
     ...mapActions("aggrid", ["loadDraftList"]),
     ...mapActions("aggrid", ["loadDraft"]),
     gridChange() {
-      eventBus.$emit("gridChange", this.datasetInfo["grid"]);
+      this.setSelectedGrid(this.selectedGrid);
+      // eventBus.$emit("setSelectedGrid", this.selectedGrid);
     },
     addValidationIndex() {
       this.validationIndexArray.push({
@@ -285,7 +305,7 @@ export default {
     },
 
     saveRequest() {
-      this.saveDatasetInfo(this.datasetInfo);
+      this.saveDatasetInfo(this.selectedGrid);
       this.saveSplitRatio(this.splitRatio);
     },
     hideDetails(index) {
@@ -308,7 +328,8 @@ export default {
   },
   mounted() {
     console.log("cside");
-    this.loadDraftList();
+    // this.loadDraftList();
+    this.loadDraft(this.projectName);
   }
 };
 </script>

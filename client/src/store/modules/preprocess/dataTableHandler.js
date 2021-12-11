@@ -117,7 +117,7 @@ const mutations = {
 
 const actions = {
   insertRow({ commit, state, getters, rootState }) {
-    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/insertRow";
+    let path = "http://localhost:5000/insertRow";
 
     axios({
       method: "post",
@@ -144,7 +144,7 @@ const actions = {
       });
   },
   deleteRow({ commit, state, getters, rootState }) {
-    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/deleteRow";
+    let path = "http://localhost:5000/deleteRow";
     axios({
       method: "post",
       url: path,
@@ -174,7 +174,7 @@ const actions = {
       });
   },
   updateRow({ commit, state, rootState }) {
-    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/updateRow";
+    let path = "http://localhost:5000/updateRow";
     if (state.columnFieldChangeFlag == false) {
       alert("No Changes to Update");
       return;
@@ -205,7 +205,7 @@ const actions = {
       });
   },
   infiniteLoadingCreated({ commit, state, rootState }) {
-    let api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteLoading";
+    let api = "http://localhost:5000/infiniteLoading";
     axios
       .get(api, {
         params: {

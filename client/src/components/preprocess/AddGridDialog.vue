@@ -7,34 +7,53 @@
       <v-tabs v-model="tab" align-with-title>
         <v-tabs-slider color="yellow"></v-tabs-slider>
 
-        <v-tab v-for="(item, itemIndex) in tabMenu" :key="itemIndex" @click="resetLoadInfo">
+        <v-tab
+          v-for="(item, itemIndex) in tabMenu"
+          :key="itemIndex"
+          @click="resetLoadInfo"
+          :disabled="itemIndex == 1"
+        >
           {{ item }}
         </v-tab>
       </v-tabs>
 
       <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <v-card flat>
-            <v-select
-              v-model="datasetToLoad"
-              @input="loadColumns"
-              :items="tableList"
-              label="Select Dataset"
-              clearable
-              clear-icon
-            ></v-select>
-            <v-btn small @click="selectAllItems()">Select All Columns</v-btn>
-            <v-select
-              v-model="columnModel[datasetToLoad]"
-              :items="columnsForGrid[datasetToLoad]"
-              chips
-              multiple
-              label="Select Columns (Only selected columns are loaded)"
-            ></v-select>
-          </v-card>
-        </v-tab-item>
+        <v-form ref="singleDataValidate">
+          <v-tab-item>
+            <v-card flat>
+              <v-text-field
+                label="Table Name"
+                placeholder="입력하지 않으면 'unnamed'로 생성됩니다"
+                v-model="datatableName"
+              ></v-text-field>
+              <v-select
+                v-model="datasetToLoad"
+                @input="loadColumns"
+                :items="tableList"
+                label="Select Dataset"
+                clearable
+                clear-icon
+                :rules="datasetRule"
+              ></v-select>
+              <v-btn color="primary" outlined small @click="selectAllItems()"
+                >Select All Columns</v-btn
+              >
+              <v-select
+                v-model="columnModel[datasetToLoad]"
+                :items="columnsForGrid[datasetToLoad]"
+                chips
+                multiple
+                label="Select Columns (Only selected columns are loaded)"
+                :rules="columnRule"
+                return-object
+              ></v-select>
+            </v-card>
+          </v-tab-item>
+        </v-form>
         <v-tab-item>
           <v-card height="800px" flat>
+            <v-text-field label="Table Name" v-model="datatableName"></v-text-field>
+
             <v-select
               v-model="datasetToLoad"
               :items="tableList"
@@ -99,12 +118,18 @@ import axios from "axios";
 export default {
   data() {
     return {
+      datasetRule: [v => v.length != 0 || `Dataset은 필수 선택사항입니다.`],
+
+      columnRule: [
+        v => v.length != 0 || "Column은 필수 선택 사항입니다. (모두 Load할 시에 Select All Columns)"
+      ],
       tabMenu: ["Load Single Dataset", "Load Integrated Datasets"],
       tab: null,
       merge_innerTab: null,
       // dataset load setting
       datasetToLoad: [],
-      columnModel: {}
+      columnModel: {},
+      datatableName: ""
     };
   },
   computed: {
@@ -112,7 +137,8 @@ export default {
       tableList: state => state.initialData.tableList,
       projectName: state => state.initialData.projectName,
       columnsForGrid: state => state.aggrid.columnsForGrid,
-      currentGrid: state => state.aggrid.currentGrid
+      currentGrid: state => state.aggrid.currentGrid,
+      gridList: state => state.aggrid.gridList
     }),
     columnsWithSelectAll() {
       let array = [];
@@ -128,6 +154,7 @@ export default {
     ...mapMutations("aggrid", ["setDatasetToLoad"]),
     ...mapMutations("aggrid", ["setColumnModel"]),
     ...mapMutations("aggrid", ["setColumnsForGrid"]),
+    ...mapMutations("aggrid", ["setDatatableName"]),
     ...mapMutations("aggrid", ["onTabChange"]),
     ...mapMutations("aggrid", ["setGridType"]),
     ...mapActions("aggrid", ["createNewGrid"]),
@@ -145,18 +172,39 @@ export default {
         });
       }
     },
+    getRandValue() {
+      let gridIdList = this.gridList.map(function(gridInfo) {
+        return gridInfo.randValue;
+      });
+      let randValue = Math.floor(Math.random() * (10 - 1) + 1);
+
+      while (gridIdList.includes(randValue)) {
+        randValue = Math.floor(Math.random() * (10 - 1) + 1);
+      }
+      return randValue;
+    },
     onDialogConfirm() {
-      // load 정보 vuex에 전송
-      this.setDatasetToLoad(this.datasetToLoad);
-      this.setColumnModel(this.columnModel);
+      if (!this.$refs.singleDataValidate.validate()) {
+        alert("필수 설정이 완료되지 않았습니다.");
+        return;
+      }
+      let randValue = this.getRandValue();
+      let payload = {
+        newGridID: randValue,
+        datatableName: this.datatableName,
+        datasetToLoad: this.datasetToLoad,
+        columnModel: this.columnModel
+      };
+
+      this.createNewGrid(payload);
       if (this.tab == 0) {
         this.setGridType("AgGridSingle");
       } else {
         this.setGridType("AgGridMultiple");
       }
-      this.createNewGrid();
       // dialog 초기화
       this.resetLoadInfo();
+      this.closeDialog();
       //columnsToExclude랑 datasetToload
     },
     onCheckboxChange(datasetName, column, booleanValue) {
@@ -172,6 +220,7 @@ export default {
       console.log(this.columnModel);
     },
     resetLoadInfo() {
+      this.datatableName = "";
       this.columnModel = {};
       this.datasetToLoad = [];
     },
@@ -186,7 +235,7 @@ export default {
       if (this.columnModel[datasetName] == undefined) {
         this.columnModel[datasetName] = [];
       }
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
+      let path = "http://localhost:5000/loadColumns";
       // let tableName = this.tableNameToLoad[parseInt(this.currentGrid) + 1];
       axios({
         method: "post",
@@ -211,9 +260,10 @@ export default {
       // load 정보 vuex에 전송
       this.setDatasetToLoad("boston");
       this.setColumnModel({ boston: ["CRIM", "CHAS", "ZN", "INDUS"] });
-      this.setGridType("AgGridSingle");
 
       this.createNewGrid();
+      this.setGridType("AgGridSingle");
+
       // dialog 초기화
       this.resetLoadInfo();
     });

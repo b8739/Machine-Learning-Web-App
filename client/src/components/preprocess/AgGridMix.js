@@ -61,7 +61,6 @@ export default {
     ...mapMutations("aggrid", ["addGridApi"]),
     ...mapMutations("aggrid", ["addGridColumnApi"]),
     ...mapMutations("aggrid", ["setCurrentGrid"]),
-    ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("aggrid", ["setViewMode"]),
     ...mapMutations("aggrid", ["setColumnState"]),
     ...mapMutations("aggrid", ["setFilterModel"]),
@@ -115,7 +114,7 @@ export default {
       this.setFilterModel(finalFilterModel);
     },
     loadColumns(tableName) {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
+      let path = "http://localhost:5000/loadColumns";
       axios({
         method: "post",
         url: path,
@@ -293,17 +292,7 @@ export default {
       this.addNewUpdate(update);
     }
   },
-  mounted() {
-    // let payload = {
-    //   tableName: this.datasetToLoad,
-    //   tableIndex: this.gridID,
-    //   columnModel: this.columnModel
-    // };
-    // this.loadSummarizedData(payload); 임시로 주석
-    // this.columns.forEach(element => {
-    //   this.gridColumns.push(element);
-    // });
-  },
+  mounted() {},
   beforeMount() {
     this.components = {
       loadingRenderer: params => {

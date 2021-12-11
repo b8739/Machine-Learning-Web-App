@@ -11,12 +11,20 @@ const getDefaultState = () => {
     graphSources: null,
     modelingSummary: null,
     caseList: [],
-    caseDataset: null
+    caseDataset: null,
+    selectedGrid: null,
+    parameterKeys: null
   };
 };
 const state = getDefaultState();
 
 const mutations = {
+  setParameterKeys(state, payload) {
+    state.parameterKeys = payload;
+  },
+  setSelectedGrid(state, payload) {
+    state.selectedGrid = payload;
+  },
   // request
   saveModelingRequest(state, payload) {
     state.modelingRequest = payload;
@@ -64,9 +72,8 @@ const actions = {
     }
     // define path
     let algorithmName = state.modelingRequest["algorithm"]["name"].toLowerCase(); // xgboost/rf/svr
-    let path =
-      "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + algorithmName + "_modeling";
-    // let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/" + algorithmPath;
+    let path = "http://localhost:5000/" + algorithmName + "_modeling";
+    // let path = "http://localhost:5000/" + algorithmPath;
     console.log(path);
     console.log(state.modelingRequest);
     console.log(state.splitRatio);
@@ -89,7 +96,7 @@ const actions = {
         router.push({ path: "/modelingResult/" + algorithmName });
       })
       .catch(error => {
-        console.error(error);
+        alert(error);
       });
   }
 };

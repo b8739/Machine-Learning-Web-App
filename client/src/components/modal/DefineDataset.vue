@@ -10,13 +10,25 @@
         <v-container fluid>
           <span class="headline">Define Dataset</span>
           <!-- 최상단 메뉴 탭 -->
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="newTableName"
+                :counter="10"
+                label="Name of Dataset"
+                required
+              ></v-text-field></v-col
+          ></v-row>
+          <v-spacer></v-spacer>
+          <v-row> <v-progress-linear :value="percentCompleted"></v-progress-linear></v-row>
+          <v-row justify="center">
+            <v-progress-circular
+              v-show="percentCompleted == 100"
+              indeterminate
+              color="primary"
+            ></v-progress-circular
+          ></v-row>
 
-          <v-text-field
-            v-model="newTableName"
-            :counter="10"
-            label="Name of Dataset"
-            required
-          ></v-text-field>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="gray darken-1" text @click="dialog = false">
@@ -26,7 +38,8 @@
               Confirm
             </v-btn>
           </v-card-actions>
-          <v-subheader class="red--text">{{ errorMessage }}</v-subheader>
+
+          <v-subheader class="red--text">{{ errorMessage }} </v-subheader>
         </v-container>
       </v-card>
     </v-dialog>
@@ -44,7 +57,8 @@ export default {
     return {
       newTableName: "",
       formData: null,
-      errorMessage: ""
+      errorMessage: "",
+      percentCompleted: 0
     };
   },
   computed: {
@@ -56,34 +70,39 @@ export default {
   methods: {
     ...mapMutations("initialData", ["loadSummarizedInfo"]),
     ...mapMutations("initialData", ["resetState"]),
-    ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapMutations("initialData", ["setTableName"]),
     closeDialog() {
       this.$emit("update:dialog", false);
     },
     async dataUpload() {
-      axios
-        .post("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dataupload", this.formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          params: {
-            tableName: this.newTableName,
-            projectName: this.projectName
-          }
-        })
-        .then(response => {
-          // this.resetState();
+      let config = {
+        onUploadProgress: progressEvent => {
+          let percentage = (progressEvent.loaded * 100) / progressEvent.total;
+          this.percentCompleted = Math.round(percentage);
+        },
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+        params: {
+          tableName: this.newTableName,
+          projectName: this.projectName
+        }
+      };
 
-          this.dialog = false;
+      axios
+        .post("http://localhost:5000/dataupload", this.formData, config)
+        .then(response => {
+          // this.dialog = false;
           this.$emit("onComplete", true);
         })
         .catch(ex => {
           this.errorMessage = ex;
+          this.errorMessage += "\n새로고침 후 다른 데이터로 다시 시도해주세요";
           // eventBus.$emit("removeFile", true);
-          console.log("ERR!!!!! : ", ex);
+          alert("ERR!!!!! : ", ex);
           // this.$router.push('/preprocess'); //delete later
         });
+      this.percentCompleted = 0;
       this.newTableName = "";
     }
   },

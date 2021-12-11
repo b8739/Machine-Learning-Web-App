@@ -58,9 +58,10 @@ export default {
           let trace = {
             y: this.graphSources[key][nestedKey],
             name: key + " " + nestedKey, //key: test/valid,
+            type: "scattergl",
             mode: "lines+markers",
             marker: {
-              size: 5
+              size: 1
             },
             line: {
               color: colors[key][nestedKey],

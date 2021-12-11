@@ -3,9 +3,8 @@
     <!-- <v-btn @click="mongoTest">mongoTest</v-btn> -->
     <v-main>
       <v-card>
-        <v-subheader>
-          Last AWS Update: 2021-12-06
-        </v-subheader>
+        <!-- <v-subheader> Last AWS Update: {{ uploadDate }} </v-subheader> -->
+        <v-subheader> Last AWS Update: 2021-12-10 11:05PM</v-subheader>
       </v-card>
       <v-container fluid fill-height>
         <v-row align="center" justify="center">
@@ -55,11 +54,25 @@ export default {
   props: {
     source: String
   },
+  computed: {
+    uploadDate() {
+      let date = new Date()
+        .toISOString()
+        .substr(0, 10)
+        .replace("T", " ");
+      let today = new Date();
+
+      let hours = today.getHours(); // 시
+      let minutes = today.getMinutes(); // 분
+
+      return date + " " + hours + ":" + minutes;
+    }
+  },
   methods: {
     // ...mapMutations("initialData", ["resetState"])
     ...mapActions("initialData", ["resetAllState"]),
     mongoTest() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/test";
+      let path = "http://localhost:5000/test";
       // axios
       this.$axios({
         method: "get",

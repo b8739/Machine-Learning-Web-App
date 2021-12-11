@@ -31,6 +31,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+
         <v-col cols="1">
           <v-btn @click="openModeling" block color="success">
             <v-icon left class="mdi-24">
@@ -153,7 +154,7 @@ export default {
       this.$router.push({ name: "modelingProcess" });
     },
     loadCases() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
+      let path = "http://localhost:5000/loadCases";
       axios
         .get(path)
         .then(res => {

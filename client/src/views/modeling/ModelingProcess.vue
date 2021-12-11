@@ -22,6 +22,11 @@
             <v-btn @click="runModel" color="primary"
               ><v-icon left small>mdi-play-outline</v-icon> Run</v-btn
             >
+            <v-progress-circular
+              v-show="showProgressBar == true"
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
           </v-toolbar>
           <Canvas></Canvas>
         </v-col>
@@ -41,7 +46,8 @@ export default {
   data() {
     return {
       modelingProcess: true,
-      modelingParameter: null
+      modelingParameter: null,
+      showProgressBar: false
     };
   },
   components: {
@@ -57,6 +63,7 @@ export default {
     runModel() {
       eventBus.$emit("saveRequest_canvas", true); // to Canvas.vue
       eventBus.$emit("saveRequest_canvasSide", true); // to CanvasSide.vue
+      this.showProgressBar = true;
     },
 
     getPos(e) {

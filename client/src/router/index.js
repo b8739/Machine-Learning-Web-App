@@ -6,7 +6,7 @@ import Datasets from "../views/Datasets";
 
 import ModelingResult from "../views/modeling/ModelingResult";
 
-import GraphBuilder from "../views/GraphBuilder";
+// import GraphBuilder from "../views/GraphBuilder";
 
 import SimulationResult from "../views/simulation/SimulationResult";
 
@@ -50,11 +50,11 @@ const router = new VueRouter({
       component: Preprocess,
       props: true
     },
-    {
-      path: "/eda",
-      component: GraphBuilder,
-      props: true
-    },
+    // {
+    //   path: "/eda",
+    //   component: GraphBuilder,
+    //   props: true
+    // },
     {
       path: "/models",
       component: Models,

@@ -36,6 +36,7 @@ const getDefaultState = () => {
 
     //DRAFT
     draftList: [],
+    currentDraft: null,
 
     // for dialog
     columnsForGrid: {}
@@ -86,12 +87,15 @@ const mutations = {
     state.summaryGridColumnApi = payload;
   },
   /* Grid List */
-  addGridList(state, gridListSize) {
-    state.gridList.push(gridListSize); // params.api
+  addGridList(state, gridInfo) {
+    if (gridInfo.name == "") {
+      gridInfo.name = "unnamed";
+    }
+    state.gridList.push(gridInfo); // params.api
   },
   delGridList(state, gridID) {
     state.gridList.forEach((element, index) => {
-      if (element == gridID) {
+      if (element.id == gridID) {
         Vue.delete(state.gridList, index);
       }
     });
@@ -128,7 +132,6 @@ const mutations = {
     Object.keys(payload).forEach(element => {
       state[element] = payload[element];
     });
-    state.currentGrid = 0;
   },
 
   // Preprocess
@@ -147,12 +150,13 @@ const mutations = {
       state.deleteModel[state.currentGrid] = [];
     }
     payload.forEach(element => {
-      state.deleteModel[state.currentGrid].push(element["ID"]);
+      state.deleteModel[state.currentGrid].push(element);
     });
   },
   /*tload setting*/
+
   setDatasetToLoad(state, payload) {
-    state.datasetToLoad[state.gridList.length] = payload;
+    state.datasetToLoad[payload.gridID] = payload.datasetToLoad;
   },
   delDatasetToLoad(state, gridID) {
     Vue.delete(state.datasetToLoad, gridID);
@@ -166,13 +170,13 @@ const mutations = {
     state.columnsForGrid = {};
   },
   setGridType(state, payload) {
-    state.gridType[state.gridList.length] = payload;
+    state.gridType[state.currentGrid] = payload;
   },
   delGridType(state, gridID) {
     Vue.delete(state.gridType, gridID);
   },
   setColumnModel(state, payload) {
-    state.columnModel[state.gridList.length] = payload;
+    state.columnModel[payload.gridID] = payload.columnModel;
   },
   delColumnModel(state, gridID) {
     Vue.delete(state.columnModel, gridID);
@@ -191,15 +195,19 @@ const mutations = {
   },
   setDeleteNaModel(state, payload) {
     state.deleteNaModel[state.currentGrid] = payload;
+  },
+  setCurrentDraft(state, payload) {
+    state.currentDraft = payload;
   }
 };
+
 const actions = {
   mergeTables({ commit, state, dispatch }, tableIndexes) {
     if (tableIndexes.length == 2) {
       let targetTables = tableIndexes.map(function(tableIndex) {
         return state.datasetToLoad[tableIndex];
       }); // ex. [boston, concrete]
-
+      console.log(targetTables);
       //Set datasetToLoad
       // console.log(state.datasetToLoad);
       // let mergedDatasetToLoad = Object.keys(state.datasetToLoad).map(function(col) {
@@ -224,7 +232,7 @@ const actions = {
   },
   // draft
   loadDraftList({ commit, state }) {
-    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDraftList";
+    let path = "http://localhost:5000/loadDraftList";
     // axios
     axios({
       method: "post",
@@ -242,42 +250,45 @@ const actions = {
         console.error(error);
       });
   },
-  loadDraft({ commit, state }, draftName) {
-    console.log(draftName);
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDraft";
+  loadDraft({ commit, state, rootState }) {
+    const path = "http://localhost:5000/loadDraft";
     // 수정
     axios({
       method: "post",
       url: path,
       data: {
-        draftName: draftName
+        projectName: rootState.initialData.projectName
       }
     })
       .then(res => {
-        commit("resetAggrid");
-        // console.log(state.gridList.length);
-        setTimeout(() => {
-          commit("loadDraftInfo", res.data);
-        }, 100);
-        // console.log(res.data);
+        // 비어있지 않을때만
+        if (res.data.length != 0) {
+          commit("resetAggrid");
+          // commit("setCurrentDraft", draftName);
+          setTimeout(() => {
+            commit("loadDraftInfo", res.data);
+            console.log(res.data);
+            // Set Current Grid
+            commit("setCurrentGrid", res.data["gridList"][0]["id"]);
+          }, 100);
+        }
       })
       .catch(error => {
         console.error(error);
       });
   },
-  saveDraft({ commit, state, dispatch }, draftName) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/saveDraft";
+  saveDraft({ commit, state, rootState, dispatch }) {
+    const path = "http://localhost:5000/saveDraft";
 
     // 수정
     axios({
       method: "post",
       url: path,
       data: {
-        draftName: draftName,
+        projectName: rootState.initialData.projectName,
         gridList: state.gridList,
         filterModel: state.filterModel,
         clientFilterModel: state.clientFilterModel,
-
         deleteModel: state.deleteModel,
         datasetToLoad: state.datasetToLoad,
         columnModel: state.columnModel,
@@ -290,7 +301,7 @@ const actions = {
       }
     })
       .then(res => {
-        console.log(res.data);
+        alert(res.data);
         dispatch("loadDraftList");
       })
       .catch(error => {
@@ -298,9 +309,11 @@ const actions = {
       });
   },
 
-  createNewGrid({ commit, state, getters }) {
-    commit("addGridList", getters.gridListSize);
-    commit("setCurrentGrid", getters.gridListSize - 1);
+  createNewGrid({ commit, state, getters }, payload) {
+    commit("setDatasetToLoad", { gridID: payload.newGridID, datasetToLoad: payload.datasetToLoad });
+    commit("setColumnModel", { gridID: payload.newGridID, columnModel: payload.columnModel });
+    commit("addGridList", { id: payload.newGridID, name: payload.datatableName });
+    commit("setCurrentGrid", payload.newGridID);
     commit("setViewMode", "table");
     // grid 생성 (action으로 만들 필요성이 있음)
   },
@@ -311,6 +324,7 @@ const actions = {
     commit("delDatasetToLoad", gridID);
     commit("delGridType", gridID);
     commit("delColumnModel", gridID);
+
     if (Object.keys(state.gridApi).length == 0) {
       commit("setCurrentGrid", -1);
     } else {

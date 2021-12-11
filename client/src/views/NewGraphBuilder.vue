@@ -111,6 +111,7 @@
                                 <v-col class="pa-0 ma-0" cols="8">
                                   <v-select
                                     dense
+                                    placeholder="Data 1"
                                     @change="value => changeOverlay(value, tpIndex)"
                                     v-model="overlayModel[tpIndex]"
                                     :items="overlayTargets"
@@ -128,18 +129,24 @@
                                     @input="graphType => changeGraphType(graphType, tpIndex)"
                                   ></v-select></v-col
                               ></v-row>
+                              <v-row> </v-row>
                               <v-row>
                                 <v-col class="pa-0 ma-0" cols="3">
                                   <v-subheader>Dataset</v-subheader></v-col
                                 >
+
                                 <v-col class="pa-0 ma-0" cols="9">
+                                  <!-- :disabled="currentDraft == null || currentDraft == undefined" -->
+
                                   <v-select
                                     @input="loadColumns(tpIndex)"
                                     dense
-                                    :items="tableList"
-                                    v-model="chosenDataset[tpIndex]"
-                                  ></v-select
-                                ></v-col>
+                                    :items="gridList"
+                                    item-text="name"
+                                    item-value="id"
+                                    v-model="selectedGrid[tpIndex]"
+                                  ></v-select>
+                                </v-col>
                               </v-row>
                               <v-row v-for="(axisType, atIndex) in axisTypes" :key="atIndex">
                                 <!-- x -->
@@ -153,13 +160,13 @@
                                     @change="
                                       featureName =>
                                         loadAxis(
-                                          chosenDataset[tpIndex],
+                                          selectedGrid[tpIndex],
                                           featureName,
                                           axisType,
                                           tpIndex
                                         )
                                     "
-                                    :items="columnsOfDataset[chosenDataset[tpIndex]]"
+                                    :items="columnsOfDataset[datasetToLoad[selectedGrid[tpIndex]]]"
                                     dense
                                     v-model="selectedData[axisType][tpIndex]"
                                   ></v-select
@@ -177,14 +184,16 @@
                                       :items="axisList[axisType]"
                                       item-text="id"
                                       item-value="value"
-                                      placeholder="Data 1"
+                                      placeholder="Data 1 "
                                       @change="
                                         selectedAxis =>
                                           changeAxis(
                                             selectedAxis,
                                             axisType,
                                             tpIndex,
-                                            selectedData[axisType][tpIndex],
+                                            selectedData[axisType][
+                                              Object.keys(axisList[axisType])[tpIndex]
+                                            ],
                                             overlayModel[tpIndex]
                                           )
                                       "
@@ -322,6 +331,7 @@ export default {
   methods: {
     ...mapMutations("edaMenuHandler", ["setMenuState"]),
     ...mapMutations("edaMenuHandler", ["resetEda"]),
+
     iconColor(value) {
       if (value == "mdi-check") {
         return "blue";
@@ -339,6 +349,8 @@ export default {
           { function: "Share Axis / Independent Axis", progress: "mdi-check" },
           { function: "Multiple Data in Single Graph", progress: "mdi-check" },
           { function: "Each Data in Independent Graph (Subplot)", progress: "mdi-check" },
+          { function: "Delete Rows by 'Rectangle Selection'", progress: "mdi-triangle-outline" },
+          { function: "Delete Rows by 'Lasso Selection'", progress: "mdi-close" },
           { function: "Transform (ex. Grouping)", progress: "mdi-close" }
         ],
         dialog: false,
@@ -346,7 +358,7 @@ export default {
         openedPanel: [null],
         selectedData: { x: [], y: [] },
         axisToUse: { x: { 0: 0 }, y: { 0: 0 } },
-        overlayModel: [0],
+        overlayModel: ["Data 1 "],
         grid: {
           rows: 1,
           columns: 1
@@ -358,8 +370,8 @@ export default {
         depthStatus: true,
         mini: false,
         axisList: {
-          x: [{ id: "Data 1", value: "x" }],
-          y: [{ id: "Data 1", value: "y" }]
+          x: [{ id: "Data 1 ", value: "x" }],
+          y: [{ id: "Data 1 ", value: "y" }]
         },
         groupColumn: {
           x: "",
@@ -371,14 +383,14 @@ export default {
             y: null
           }
         ],
-        chosenDataset: {},
+        selectedGrid: {},
         columnsOfDataset: {}
       };
     },
 
     resetAll() {
       Object.assign(this.$data, this.getDefaultState());
-
+      this.$data.dialog = true;
       eventBus.$emit("resetAll", "yes");
     },
     graphUpdate() {
@@ -392,21 +404,26 @@ export default {
       eventBus.$emit("changeGraphType", payload);
     },
     loadColumns(tpIndex) {
+      let datasetName = this.datasetToLoad[this.selectedGrid[tpIndex]];
+
+      console.log("datasetName");
+      console.log(datasetName);
       // if문을 통해서 해당 table의 column이 load되어 있지 않을 경우에만 loadColumns
-      if (Object.keys(this.columnsOfDataset).includes(this.chosenDataset)) {
+
+      if (Object.keys(this.columnsOfDataset).includes(datasetName)) {
         return;
       } else {
-        let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
+        let path = "http://localhost:5000/loadColumns";
         axios({
           method: "post",
           url: path,
           data: {
-            tableName: this.chosenDataset[tpIndex],
+            tableName: datasetName,
             projectName: this.projectName
           }
         })
           .then(res => {
-            let tableName = this.chosenDataset[tpIndex];
+            let tableName = datasetName;
             Vue.set(this.columnsOfDataset, tableName, res.data);
           })
           .catch(error => {
@@ -416,7 +433,7 @@ export default {
     },
     loadGroupingData(axisType) {
       // 현재는 단일 groupingfeature만 되는 상태
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadGroupingData";
+      let path = "http://localhost:5000/loadGroupingData";
       // axios
       this.$axios({
         method: "post",
@@ -465,7 +482,7 @@ export default {
         Vue.delete(this.axisToUse[axis], tpIndex);
       });
 
-      Vue.delete(this.chosenDataset, tpIndex);
+      Vue.delete(this.selectedGrid, tpIndex);
       Vue.delete(this.numTracePanel, tpIndex);
 
       this.overlayModel.splice(tpIndex, 1);
@@ -478,16 +495,17 @@ export default {
       this.numTracePanel.push(this.numTracePanel.length + 1);
       this.addAxis();
 
-      this.overlayModel.push("Data 1");
+      this.overlayModel.push("Data 1 ");
 
       eventBus.$emit("addEmptyTrace", true);
     },
-    loadAxis(dataset, featureName, axisType, tpIndex) {
+    loadAxis(gridID, featureName, axisType, tpIndex) {
+      // console.log(draftInfo);
       if (featureName == null || featureName == undefined) {
         return;
       } else {
         let payload = {
-          dataset: dataset,
+          gridID: gridID,
           featureName: featureName,
           axisType: axisType,
           tpIndex: tpIndex
@@ -508,13 +526,16 @@ export default {
   },
   computed: {
     ...mapState({
-      tableName: state => state.initialData.tableName,
+      currentDraft: state => state.aggrid.currentDraft,
+      gridList: state => state.aggrid.gridList,
       projectName: state => state.initialData.projectName,
       tableList: state => state.initialData.tableList,
+      datasetToLoad: state => state.aggrid.datasetToLoad,
 
       columns: state => state.initialData.columns,
       menuState: state => state.edaMenuHandler.menuState
     }),
+
     overlayTargets() {
       let array = ["None"];
 

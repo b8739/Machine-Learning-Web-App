@@ -71,7 +71,7 @@ export default {
       this.changeColumnOrder(movedInfo);
     }
     // changeColumnOrder(position, movedColumnName, newIndex) {
-    //   const api = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/changeColumnOrder";
+    //   const api = "http://localhost:5000/changeColumnOrder";
     //   axios
     //     .get(api, {
     //       params: {

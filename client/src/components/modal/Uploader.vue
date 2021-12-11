@@ -79,8 +79,9 @@ export default {
       /*
           Make the request to the POST /select-files URL
         */
+
       axios
-        .post("http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/dataupload", formData, {
+        .post("http://localhost:5000/dataupload", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           }
@@ -89,7 +90,7 @@ export default {
           localStorage.clear();
           console.log(res.data);
           this.setTableName(this.tableName);
-          this.loadSummarizedData();
+
           // this.loadSummarizedInfo(res);
         })
         .catch(ex => {

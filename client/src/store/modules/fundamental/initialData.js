@@ -108,7 +108,7 @@ const actions = {
     commit("preprocessHandler/setPreprocessStatus", null, { root: true });
   },
   loadDatasetSize({ commit, state }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadDatasetSize";
+    const path = "http://localhost:5000/loadDatasetSize";
     // 수정
     axios({
       method: "post",
@@ -123,7 +123,7 @@ const actions = {
       });
   },
   loadColumns({ commit, state }) {
-    let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadColumns";
+    let path = "http://localhost:5000/loadColumns";
     axios({
       method: "post",
       url: path,
@@ -138,8 +138,8 @@ const actions = {
 
     // 원본
   },
-  loadSummarizedData({ commit, state, rootState }, tableName) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadStatistics";
+  loadStatistics({ commit, state, rootState }, tableName) {
+    const path = "http://localhost:5000/loadStatistics";
     axios({
       method: "post",
       url: path,
@@ -166,7 +166,7 @@ const actions = {
       });
   },
   loadRandomData({ commit, state }) {
-    const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadRandomInfo";
+    const path = "http://localhost:5000/loadRandomInfo";
     axios
       .get(path, {
         params: {

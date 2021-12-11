@@ -2,12 +2,13 @@
   <div class="node_sidebar">
     <v-card style="background-color:transparent" class="pt-2" elevation="0" dark>
       <v-btn @click="getParameters" small color="grey darken-1">Get Sample Parameters</v-btn>
+      <v-btn @click="checkParameters"></v-btn>
       <v-container>
         <v-row
           align="center"
           justify="center"
           v-for="(parameter, index) in parameterKeys"
-          :key="index"
+          :key="parameter"
         >
           <v-col> {{ parameter }}</v-col>
           <v-col>
@@ -27,6 +28,7 @@
 <script>
 import Vue from "vue";
 import { InputOption } from "@baklavajs/plugin-options-vue";
+import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 export default {
   extends: InputOption,
@@ -40,7 +42,7 @@ export default {
 
   data() {
     return {
-      parameterKeys: null,
+      // parameterKeys: null,
       parameterValues: {},
       sampleParameters: {
         XGBoost: ["500", "0.08", "0.3", "0.04", "0.75", "0.5", "7"],
@@ -50,6 +52,13 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("modelingData", ["setParameterKeys"]),
+
+    checkParameters() {
+      console.log(this.parameterKeys); // 얘는 소실됨미
+
+      console.log(this.node.getOptionValue("Parameter")); //근데 얘는 결국 값이 바뀌고
+    },
     emitValue() {
       this.$emit("input", this.algorithmInfo);
     },
@@ -63,6 +72,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      parameterKeys: state => state.modelingData.parameterKeys
+    }),
     nodeName() {
       return this.node.name;
     },
@@ -77,8 +89,21 @@ export default {
       };
     }
   },
+  created() {
+    console.log("created");
+    if (this.parameterKeys == null) {
+      this.setParameterKeys(this.value.parameterKeys);
+    }
+    // Sidebar이 닫혔다가 다시 달릴 때 re-created되기 때문에 value값을 가져와서 다시 넣어준다
+    Object.keys(this.value.parameters).forEach(parameterKey => {
+      console.log(parameterKey);
+      console.log(this.value.parameters[parameterKey]);
+      this.parameterValues[parameterKey] = this.value.parameters[parameterKey];
+    });
+  },
   mounted() {
-    this.parameterKeys = this.value.parameterKeys;
+    console.log(this.node.getOptionValue("Parameter"));
+    console.log(this.value);
   }
 };
 </script>

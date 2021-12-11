@@ -656,7 +656,7 @@ export default {
       this.top = obj.getBoundingClientRect().top;
     },
     loadCases() {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadCases";
+      let path = "http://localhost:5000/loadCases";
       this.$axios
         .get(path)
         .then(res => {
@@ -666,7 +666,7 @@ export default {
     },
     saveModel() {
       let vm = this;
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/saveModel";
+      let path = "http://localhost:5000/saveModel";
       this.$axios({
         method: "post",
         url: path,

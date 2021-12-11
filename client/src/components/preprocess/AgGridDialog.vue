@@ -60,6 +60,7 @@ export default {
     ...mapMutations("aggrid", ["setFillNaModel"]),
     ...mapMutations("aggrid", ["setDeleteNaModel"]),
     ...mapMutations("aggrid", ["delColumnModelElement"]),
+
     getFinalDataTypeModel() {
       let vm = this;
       let finalResult = this.dataTypeModel.reduce(function(result, value, index) {

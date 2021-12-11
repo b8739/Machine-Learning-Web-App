@@ -2,7 +2,7 @@
   <div>
     <ag-grid-vue
       v-show="currentGrid == gridID && viewMode == 'table'"
-      style="width: 100%; height:800px"
+      style="width: 100%; height:700px"
       class="ag-theme-alpine"
       :columnDefs="columnDefs"
       :rowModelType="rowModelType"
@@ -109,7 +109,7 @@ export default {
         let dataSource = {
           rowCount: null,
           getRows: function(params) {
-            // console.log("asking for " + params.startRow + " to " + params.endRow);
+            console.log("asking for " + params.startRow + " to " + params.endRow);
             // 1) Get Filter Model
             let filterModel;
             if (vm.filterModel[vm.gridID] != undefined) {
@@ -157,7 +157,7 @@ export default {
             }
 
             // axios
-            let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/infiniteRowModel";
+            let path = "http://localhost:5000/infiniteRowModel";
 
             axios({
               method: "post",

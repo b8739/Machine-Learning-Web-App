@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer height="100vh" v-model="drawer" absolute :mini-variant.sync="mini">
+  <v-navigation-drawer height="110vh" v-model="drawer" absolute :mini-variant.sync="mini">
     <!-- User -->
     <!-- <v-list-item class="mt-10 px-2">
       <v-list-item-avatar>
@@ -18,16 +18,16 @@
         <template v-slot:activator>
           <v-list-item-title active>Versions</v-list-item-title>
         </template>
-        <v-list-item>
+        <!-- <v-list-item>
           <v-select
             :items="draftList"
             item-text="draftName"
             label="Select Draft"
             @input="loadDraft"
           ></v-select>
-        </v-list-item>
+        </v-list-item> -->
 
-        <v-list-item @click="openDialog('saveDraft')">
+        <v-list-item @click="openDialog('saveDraft')" :disabled="gridList.length == 0">
           <v-list-item-icon>
             <v-icon>mdi-book-plus-outline</v-icon>
           </v-list-item-icon>
@@ -43,7 +43,7 @@
           <v-list-item-title active>Edit Row</v-list-item-title>
         </template>
         <v-list-item
-          :disabled="item.title == 'Update Row'"
+          :disabled="gridList.length == 0"
           v-for="item in items.rowMenu"
           :key="item.title"
           link
@@ -63,6 +63,7 @@
           <v-list-item-title active>Edit Column</v-list-item-title>
         </template>
         <v-list-item
+          :disabled="gridList.length == 0"
           v-for="item in items.colMenu"
           :key="item.title"
           link
@@ -82,6 +83,7 @@
           <v-list-item-title active>Data Cleaning</v-list-item-title>
         </template>
         <v-list-item
+          :disabled="gridList.length == 0"
           v-for="item in items.cleaningMenu"
           :key="item.title"
           link
@@ -101,7 +103,9 @@
           <v-list-item-title active>Table Menu</v-list-item-title>
         </template>
         <v-list-item
+          :disabled="gridList.length == 0"
           v-for="item in items.tableMenu"
+          disabled
           :key="item.title"
           link
           @click="item.action(item.param)"
@@ -119,7 +123,13 @@
         <template v-slot:activator>
           <v-list-item-title active>Export (Excel)</v-list-item-title>
         </template>
-        <v-list-item v-for="item in items.exportMenu" :key="item.title" link @click="item.action">
+        <v-list-item
+          v-for="item in items.exportMenu"
+          :key="item.title"
+          link
+          @click="item.action"
+          :disabled="gridList.length == 0"
+        >
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -149,7 +159,7 @@ export default {
           }
         ],
         rowMenu: [
-          { title: "Update Row", icon: "mdi-pencil", action: this.deleteRows },
+          // { title: "Update Row", icon: "mdi-pencil", action: this.deleteRows },
           { title: "Delete Row", icon: "mdi-delete", action: this.deleteRows }
         ],
         colMenu: [
@@ -200,7 +210,18 @@ export default {
       columnModel: state => state.aggrid.columnModel,
       datasetToLoad: state => state.aggrid.datasetToLoad,
       gridType: state => state.aggrid.gridType,
-      draftList: state => state.aggrid.draftList
+      draftList: state => state.aggrid.draftList,
+      //filter
+      deleteModel: state => state.aggrid.deleteModel,
+      // model
+
+      renameModel: state => state.aggrid.renameModel,
+      columnState: state => state.aggrid.columnState,
+      typeModel: state => state.aggrid.typeModel,
+      fillNaModel: state => state.aggrid.fillNaModel,
+      deleteNaModel: state => state.aggrid.deleteNaModel,
+      filterModel: state => state.aggrid.filterModel,
+      gridType: state => state.aggrid.gridType
     })
   },
   methods: {
@@ -209,9 +230,16 @@ export default {
     ...mapActions("aggrid", ["loadDraftList"]),
 
     deleteRows() {
-      let selectedRows = this.gridApi[this.currentGrid].getSelectedRows();
-      this.addNewDeletion(selectedRows);
-      this.gridApi[this.currentGrid].refreshInfiniteCache();
+      var confirmflag = confirm("선택한 행(들)을 삭제하시겠습니까?");
+
+      if (confirmflag) {
+        let selectedRows = this.gridApi[this.currentGrid].getSelectedRows().map(function(row) {
+          return row["ID"];
+        });
+        this.addNewDeletion(selectedRows);
+        this.gridApi[this.currentGrid].refreshInfiniteCache();
+      } else {
+      }
     },
     //   Dialog
     openDialog(dialogName) {
@@ -285,10 +313,52 @@ export default {
       this.gridApi[this.currentGrid].exportDataAsCsv(params);
     },
     exportAllData() {
-      let filterModel = this.gridApi[this.currentGrid].getFilterModel();
-      filterModel = this.parseFilterModel(filterModel);
+      // 1) Filter Model
+      let filterModel;
+      if (this.filterModel[this.currentGrid] != undefined) {
+        filterModel = this.filterModel[this.currentGrid];
+      } else {
+        filterModel = {};
+      }
+      // 2) Delete Model
+      let deleteModel;
+      if (this.deleteModel[this.currentGrid] != undefined) {
+        deleteModel = this.deleteModel[this.currentGrid];
+      } else {
+        deleteModel = [];
+      }
+      // 3) Rename Model
+      let renameModel;
+      if (this.renameModel[this.currentGrid] != undefined) {
+        renameModel = this.renameModel[this.currentGrid];
+      } else {
+        renameModel = [];
+      }
+      // 3) Type Model
+      let typeModel;
+      if (this.typeModel[this.currentGrid] != undefined) {
+        typeModel = this.typeModel[this.currentGrid];
+      } else {
+        typeModel = [];
+      }
+      // 4) fill Na Model
 
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/exportAllData";
+      let fillNaModel;
+      if (this.fillNaModel[this.currentGrid] != undefined) {
+        fillNaModel = this.fillNaModel[this.currentGrid];
+      } else {
+        fillNaModel = [];
+      }
+      // 5) delete Na Model
+
+      let deleteNaModel;
+      if (this.deleteNaModel[this.currentGrid] != undefined) {
+        deleteNaModel = this.deleteNaModel[this.currentGrid];
+      } else {
+        deleteNaModel = [];
+      }
+
+      let path = "http://localhost:5000/exportAllData";
       // axios
       axios({
         method: "post",
@@ -298,7 +368,12 @@ export default {
           tableName: this.datasetToLoad[this.currentGrid],
           filterModel: filterModel,
           gridType: this.gridType[this.currentGrid],
-          columnModel: this.columnModel[this.currentGrid]
+          columnModel: this.columnModel[this.currentGrid][this.datasetToLoad[this.currentGrid]],
+          renameModel: renameModel,
+          typeModel: typeModel,
+          fillNaModel: fillNaModel,
+          deleteNaModel: deleteNaModel,
+          deleteModel: deleteModel
         }
       })
         .then(res => {

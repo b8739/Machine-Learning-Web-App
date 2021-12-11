@@ -22,7 +22,7 @@
 </template>
 <script>
 import { eventBus } from "@/main";
-import ApexChart from "@/components/simulation/ApexChart.vue";
+// import ApexChart from "@/components/simulation/ApexChart.vue";
 import SimulationResultSide from "@/components/simulation/SimulationResultSide.vue";
 
 import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
@@ -31,7 +31,7 @@ export default {
     return {};
   },
 
-  components: { ApexChart, SimulationResultSide },
+  components: { SimulationResultSide },
   computed: {
     ...mapState({})
   },

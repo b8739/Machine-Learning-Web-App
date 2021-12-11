@@ -113,7 +113,7 @@ export default {
 
         trace["xaxis"] = "x" + axisIndex;
         trace["yaxis"] = "y" + axisIndex;
-        console.log(trace["xaxis"]);
+        // console.log(trace["xaxis"]);
         data.push(trace);
       });
 

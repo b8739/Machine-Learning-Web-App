@@ -10,7 +10,7 @@ import axios from "axios";
 Vue.prototype.$axios = axios;
 
 // apex charts
-import VueApexCharts from "vue-apexcharts";
+// import VueApexCharts from "vue-apexcharts";
 // portal
 import PortalVue from "portal-vue";
 
@@ -47,7 +47,7 @@ Vue.config.productionTip = false;
 
 Vue.use(PortalVue);
 
-Vue.component("apexchart", VueApexCharts);
+// Vue.component("apexchart", VueApexCharts);
 Vue.config.productionTip = false;
 
 export const eventBus = new Vue();

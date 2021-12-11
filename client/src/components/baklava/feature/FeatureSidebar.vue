@@ -3,17 +3,20 @@
     <v-card dark color="#3f3f3f" class="rounded-0" elevation="0">
       <v-container>
         <!-- <v-btn @click="getValue">get value</v-btn> -->
+        <!-- <v-btn @click="test">Test</v-btn> -->
+        <v-subheader>Select DataTable First</v-subheader>
 
-        <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
-        <v-checkbox
-          v-if="columnModel[gridValue][datasetToLoad[gridValue]] != undefined"
-          v-for="(feature, index) in columnModel[gridValue][datasetToLoad[gridValue]]"
-          :key="index"
-          v-model="checkedFeatures[index]"
-          dense
-          :label="feature"
-          @change="featureUpdate(feature)"
-        ></v-checkbox>
+        <div v-if="selectedGrid != null">
+          <v-checkbox label="Select All" @change="selectAll"></v-checkbox>
+          <v-checkbox
+            v-for="(feature, index) in features"
+            :key="index"
+            v-model="checkedFeatures[index]"
+            dense
+            :label="feature"
+            @change="featureUpdate(feature)"
+          ></v-checkbox>
+        </div>
       </v-container>
     </v-card>
   </div>
@@ -41,11 +44,14 @@ export default {
       selectedFeatures: [],
       checkedFeatures: [],
       selectAllFlag: false,
-      gridValue: 0
+      gridValue: null
     };
   },
 
   methods: {
+    test() {
+      console.log(this.columnModel);
+    },
     selectAll() {
       // flag가 true일 때 (이미 selectall이 된 상태) 체크 해제
       this.selectedFeatures = [];
@@ -54,11 +60,11 @@ export default {
       if (this.selectAllFlag == false) {
         for (
           let i = 0;
-          i < this.columnModel[this.gridValue][this.datasetToLoad[this.gridValue]].length;
+          i < this.columnModel[this.selectedGrid][this.datasetToLoad[this.selectedGrid]].length;
           i++
         ) {
           this.selectedFeatures.push(
-            this.columnModel[this.gridValue][this.datasetToLoad[this.gridValue]][i]
+            this.columnModel[this.selectedGrid][this.datasetToLoad[this.selectedGrid]][i]
           );
           this.checkedFeatures.push(true);
         }
@@ -68,7 +74,7 @@ export default {
       this.selectAllFlag = !this.selectAllFlag;
     },
     getValue() {
-      console.log(this.gridValue);
+      console.log(this.selectedGrid);
     },
     featureUpdate(feature) {
       // 배열에 없으면 추가
@@ -89,8 +95,14 @@ export default {
   computed: {
     ...mapState({
       columnModel: state => state.aggrid.columnModel,
-      datasetToLoad: state => state.aggrid.datasetToLoad
-    })
+      datasetToLoad: state => state.aggrid.datasetToLoad,
+      selectedGrid: state => state.modelingData.selectedGrid
+    }),
+    features() {
+      if (this.selectedGrid == null) {
+        return null;
+      } else return this.columnModel[this.selectedGrid][this.datasetToLoad[this.selectedGrid]];
+    }
   },
   created() {
     eventBus.$on("gridChange", newGridValue => {
@@ -99,17 +111,19 @@ export default {
   },
   mounted() {
     //  다른 sidebar를 켰다가 다시 열면 값이 초기화되기 때문에, value값을 받아와서 다시 check 해줌
-    console.log(`${this.node.name} mounted`);
-    this.node.getOptionValue("Features").forEach(nodeValue => {
-      this.columnModel[this.gridValue][this.datasetToLoad[this.gridValue]].forEach(
-        (column, index) => {
-          if (nodeValue == column) {
-            Vue.set(this.selectedFeatures, index, nodeValue);
-            Vue.set(this.checkedFeatures, index, true);
+    // this.node.getOptionValue("Features")['features]로 하면 안되는데 이유를 모르겠음
+    if (this.selectedGrid != null) {
+      this.node.getOptionValue("Features").forEach(nodeValue => {
+        this.columnModel[this.selectedGrid][this.datasetToLoad[this.selectedGrid]].forEach(
+          (column, index) => {
+            if (nodeValue == column) {
+              Vue.set(this.selectedFeatures, index, nodeValue);
+              Vue.set(this.checkedFeatures, index, true);
+            }
           }
-        }
-      );
-    });
+        );
+      });
+    }
   }
 };
 </script>

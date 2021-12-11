@@ -101,15 +101,22 @@ export default {
       for (const v of result.values()) {
         this.algorithmRequest = v;
       }
+      let filteredInputs = this.algorithmRequest.inputs.filter(function(item) {
+        return item != null || item != undefined;
+      });
+      let filteredTargets = this.algorithmRequest.targets.filter(function(item) {
+        return item != null || item != undefined;
+      });
       // Error Handling *Input - Target feature 중복 방지
-      let inputs = this.algorithmRequest.inputs;
-      let targets = this.algorithmRequest.targets;
-      for (let i = 0; i < inputs.length; i++) {
-        if (targets.includes(inputs[i])) {
-          alert("Input과 Target에 중복되는 feature가 있습니다: " + inputs[i]);
+
+      for (let i = 0; i < filteredInputs.length; i++) {
+        if (filteredTargets.includes(filteredInputs[i])) {
+          alert("Input과 Target에 중복되는 feature가 있습니다: " + filteredInputs[i]);
           return false;
         }
       }
+      this.algorithmRequest.inputs = filteredInputs;
+      this.algorithmRequest.targets = filteredTargets;
       // 중복 없을 때만 vuex request
       // vuex request api, save response, and routing
       this.saveModelingRequest(this.algorithmRequest);
@@ -117,46 +124,46 @@ export default {
     },
 
     // build node types
-    buildFeatureNodes(featureName) {
-      let featureNode = new NodeBuilder("FeatureNode")
-        .setName(featureName)
-        .addOption("FeatureOption", "FeatureOption")
-        .addOption(
-          "Features",
-          "ButtonOption",
-          () => {
-            return { features: this.columns };
-          },
-          "FeatureSidebar"
-        )
-        .addOutputInterface("Out");
+    // buildFeatureNodes(featureName) {
+    //   let featureNode = new NodeBuilder("FeatureNode")
+    //     .setName(featureName)
+    //     .addOption("FeatureOption", "FeatureOption")
+    //     .addOption(
+    //       "Features",
+    //       "ButtonOption",
+    //       () => {
+    //         return { features: "features" };
+    //       },
+    //       "FeatureSidebar"
+    //     )
+    //     .addOutputInterface("Out");
 
-      // Input과 달리, Target의 경우 Input Interface도 필요하므로 추가
-      if (featureName == "Target") {
-        featureNode
-          .addInputInterface("In")
-          .addOption("ValueText", "TextOption")
-          .onCalculate(n => {
-            let result = n.getInterface("In").value;
-            console.log(result);
-            n.setOptionValue("ValueText", result);
-          });
-      }
-      // console.log(featureNode.events);
-      featureNode = featureNode.build();
+    //   // Input과 달리, Target의 경우 Input Interface도 필요하므로 추가
+    //   if (featureName == "Target") {
+    //     featureNode
+    //       .addInputInterface("In")
+    //       .addOption("ValueText", "TextOption")
+    //       .onCalculate(n => {
+    //         let result = n.getInterface("In").value;
+    //         console.log(result);
+    //         n.setOptionValue("ValueText", result);
+    //       });
+    //   }
+    //   // console.log(featureNode.events);
+    //   featureNode = featureNode.build();
 
-      let category = "Features";
-      this.editor.registerNodeType(featureName, featureNode, category);
-      //Add Node
-      let myNode = new featureNode();
-      this.editor.addNode(myNode);
+    //   let category = "Features";
+    //   this.editor.registerNodeType(featureName, featureNode, category);
+    //   //Add Node
+    //   let myNode = new featureNode();
+    //   this.editor.addNode(myNode);
 
-      if (featureName == "Input") {
-        myNode.position = { x: 400, y: 300 };
-      } else {
-        myNode.position = { x: 1100, y: 300 };
-      }
-    },
+    //   if (featureName == "Input") {
+    //     myNode.position = { x: 400, y: 300 };
+    //   } else {
+    //     myNode.position = { x: 1100, y: 300 };
+    //   }
+    // },
     buildAlgorithmNodes(algorithmName) {
       // dynamic parameter assign
       let parameters;

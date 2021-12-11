@@ -18,7 +18,7 @@ export default new NodeBuilder("InputNode", {
     "ButtonOption",
     () => {
       // return { features: columnModel[0][datasetToLoad[0]] };
-      return { features: [] };
+      return;
     },
     "FeatureSidebar"
   )

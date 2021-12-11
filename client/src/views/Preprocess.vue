@@ -3,12 +3,11 @@
     <Header> </Header>
 
     <v-main>
-      <v-container id="mainWrapper" fluid>
-        <div style="height:100vh">
+      <v-container fluid>
+        <div style="height:110vh">
           <v-row>
             <!-- 화면 좌측 -->
             <!-- <v-col cols="2">
-              <SideMenu />
             </v-col> -->
             <!-- 화면 우측 -->
             <v-col cols="12" class="px-8">
@@ -25,7 +24,7 @@
                 </v-row>
               </v-toolbar> -->
               <v-row>
-                <!-- <GraphBuilder :columns="columns" /> -->
+                <!-- <GraphBuilder /> -->
                 <NewGraphBuilder />
                 <DeleteStepper />
                 <AverageModal />
@@ -58,8 +57,6 @@ import AverageModal from "@/components/average/AverageModal.vue";
 import SummaryTable from "@/components/preprocess/SummaryTable";
 import DataTable from "@/components/preprocess/DataTable";
 import AgContainer from "@/components/preprocess/AgContainer";
-import SideMenu from "@/components/preprocess/SideMenu.vue";
-import SaveMenu from "@/components/save/SaveMenu.vue";
 
 //vuex
 import { mapActions, mapState, mapGetters, mapMutations } from "vuex";
@@ -78,10 +75,8 @@ export default {
   components: {
     SummaryTable,
     DataTable,
-    GraphBuilder,
     NewGraphBuilder,
-    SideMenu,
-    SaveMenu,
+    GraphBuilder,
     DeleteStepper,
     AverageModal,
     AgContainer
@@ -116,7 +111,7 @@ export default {
   },
   methods: {
     revertChanges() {
-      const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/revertChanges";
+      const path = "http://localhost:5000/revertChanges";
       axios
         .get(path, {
           params: {
@@ -139,7 +134,6 @@ export default {
     ...mapMutations("summaryTableHandler", ["resetSummaryTableVuex"]),
     ...mapMutations("edaHandler", ["resetEda"]),
     ...mapActions("preprocessHandler", ["cancelEvent"]),
-    ...mapActions("initialData", ["loadSummarizedData"]),
     ...mapActions("initialData", ["loadColumns"]),
     ...mapActions("initialData", ["loadDatasetSize"]),
     ...mapActions("summaryTableHandler", ["cloneOriginalArray"]),
@@ -172,7 +166,7 @@ export default {
   beforeDestroy() {}
   // beforeRouteLeave(to, from, next) {
   //   if (confirm("변경사항이 아직 저장되지 않았습니다. 저장하시겠습니까?") == true) {
-  //     const path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/overwriteTable";
+  //     const path = "http://localhost:5000/overwriteTable";
   //     axios.get(path).catch(error => {
   //       console.error(error);
   //     });

@@ -5,7 +5,7 @@ import axios from "axios";
 import createPersistedState from "vuex-persistedstate";
 // initial
 import initialData from "@/store/modules/fundamental/initialData.js";
-import apexchartGraph from "@/store/modules/fundamental/apexchartGraph.js";
+// import apexchartGraph from "@/store/modules/fundamental/apexchartGraph.js";
 // modeling
 import modelingData from "@/store/modules/modeling/modelingData.js";
 // simulation
@@ -27,7 +27,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
     initialData,
-    apexchartGraph,
+    // apexchartGraph,
     modelingData,
     simulationData,
     simulationResult,

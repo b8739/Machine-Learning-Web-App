@@ -21,7 +21,27 @@ export default {
       xaxisColumns: state => state.edaHandler.xaxisColumns,
       xaxisEvent: state => state.edaHandler.xaxisEvent,
       yaxisColumns: state => state.edaHandler.yaxisColumns,
-      yaxisEvent: state => state.edaHandler.yaxisEvent
+      yaxisEvent: state => state.edaHandler.yaxisEvent,
+      // aggrid
+
+      // gridapi
+      gridApi: state => state.aggrid.gridApi,
+      gridColumnApi: state => state.aggrid.gridColumnApi,
+      currentGrid: state => state.aggrid.currentGrid,
+
+      // transaction
+      updateTransaction: state => state.aggrid.updateTransaction,
+      deleteModel: state => state.aggrid.deleteModel,
+      // model
+      datasetToLoad: state => state.aggrid.datasetToLoad,
+
+      renameModel: state => state.aggrid.renameModel,
+      columnState: state => state.aggrid.columnState,
+      typeModel: state => state.aggrid.typeModel,
+      fillNaModel: state => state.aggrid.fillNaModel,
+      deleteNaModel: state => state.aggrid.deleteNaModel,
+      filterModel: state => state.aggrid.filterModel,
+      gridType: state => state.aggrid.gridType
     }),
     plotContainer() {
       return this.$refs["edaGraph"];
@@ -30,8 +50,10 @@ export default {
   methods: {
     getDefaultState() {
       return {
+        selectedData: [],
+
         dataFormat: {
-          type: "scatter",
+          type: "scattergl",
           mode: "markers",
           // type: "bar",
 
@@ -46,7 +68,7 @@ export default {
         data: [
           {
             // scatter
-            type: "scatter",
+            type: "scattergl",
             mode: "markers",
             // type: "bar",
             marker: {
@@ -57,7 +79,6 @@ export default {
               // color: "rgb(219, 64, 82)",
               width: 1
             },
-
             showlegend: true
           }
         ],
@@ -88,13 +109,45 @@ export default {
           responsive: true,
           showEditInChartStudio: false,
 
-          modeBarButtonsToRemove: ["sendDataToCloud"]
+          modeBarButtonsToRemove: ["sendDataToCloud"],
+          modeBarButtonsToAdd: [
+            {
+              name: "Delete Selected Data",
+              icon: {
+                path:
+                  "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+              },
+              click: () => {
+                if (this.selectedData.length != 0) {
+                  this.selectedData.forEach(element => {
+                    if (this.data[0].x != undefined) Vue.set(this.data[0].x, element, null);
+                    if (this.data[0].y != undefined) Vue.set(this.data[0].y, element, null);
+                  });
+                  if (this.data[0].x != undefined) this.data[0].x = [this.data[0].x]; //array로 wrap
+                  if (this.data[0].y != undefined) this.data[0].y = [this.data[0].y]; //array로 wrap
+                  Plotly.restyle(this.plotContainer, this.data[0]);
+                  //현재 eda는 철저히 save된 draft model에 한해서 움직이기 때문에
+                  eventBus.$emit("deleteRowsByGraph", this.selectedData);
+                }
+              }
+            }
+          ]
         }
       };
     },
     createPlot() {
+      let vm = this;
+
       Object.assign(this.$data, this.getDefaultState());
       Plotly.newPlot(this.plotContainer, this.data, this.layout, this.config);
+      this.plotContainer.on("plotly_selected", function(eventData) {
+        vm.selectedData = [];
+
+        eventData.points.forEach(element => {
+          vm.selectedData.push(element.pointIndex);
+        });
+      });
+      console.log(this.selectedData);
     },
 
     addNewTrace() {
@@ -118,24 +171,102 @@ export default {
       }
       this.data[tpIndex]["name"] = `Data ${tpIndex + 1}`;
       let fullAxis = this.getAxisName(axisType) + this.getAxisNumber(tpIndex);
+      console.log(fullAxis);
       this.layout[fullAxis] = this.getFontFormat(featureName, axisType, tpIndex);
       Plotly.update(this.plotContainer, this.data[tpIndex], this.layout, tpIndex);
 
       // Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
     },
-    loadFullData(dataset, featureName, axisType, tpIndex) {
-      let path = "http://atticmlapp.ap-northeast-2.elasticbeanstalk.com/loadEditGraphData";
+
+    // Load Original Dataset
+
+    // loadFullData(dataset, featureName, axisType, tpIndex) {
+    //   let path = "http://localhost:5000/loadEditGraphData";
+    //   // axios
+    //   this.$axios({
+    //     method: "post",
+    //     url: path,
+    //     data: {
+    //       featureName: featureName,
+    //       tableName: dataset,
+    //       projectName: this.projectName
+    //     }
+    //   })
+    //     .then(res => {
+    //       this.updatePlot(featureName, res.data[featureName], axisType, tpIndex);
+    //     })
+    //     .catch(error => {
+    //       console.error(error);
+    //     });
+    // },
+
+    // Load Grid
+    loadFullData(gridID, featureName, axisType, tpIndex) {
+      // 1) Filter Model
+      let filterModel;
+      if (this.filterModel[gridID] != undefined) {
+        filterModel = this.filterModel[gridID];
+      } else {
+        filterModel = {};
+      }
+      // 2) Delete Model
+      let deleteModel;
+      if (this.deleteModel[gridID] != undefined) {
+        deleteModel = this.deleteModel[gridID];
+      } else {
+        deleteModel = [];
+      }
+      // 3) Rename Model
+      let renameModel;
+      if (this.renameModel[gridID] != undefined) {
+        renameModel = this.renameModel[gridID];
+      } else {
+        renameModel = [];
+      }
+      // 3) Type Model
+      let typeModel;
+      if (this.typeModel[gridID] != undefined) {
+        typeModel = this.typeModel[gridID];
+      } else {
+        typeModel = [];
+      }
+      // 4) fill Na Model
+
+      let fillNaModel;
+      if (this.fillNaModel[gridID] != undefined) {
+        fillNaModel = this.fillNaModel[gridID];
+      } else {
+        fillNaModel = [];
+      }
+      // 5) delete Na Model
+
+      let deleteNaModel;
+      if (this.deleteNaModel[gridID] != undefined) {
+        deleteNaModel = this.deleteNaModel[gridID];
+      } else {
+        deleteNaModel = [];
+      }
+      let path = "http://localhost:5000/loadEditGraphData";
       // axios
       this.$axios({
         method: "post",
         url: path,
         data: {
-          featureName: featureName,
-          tableName: dataset,
-          projectName: this.projectName
+          columnModel: [featureName],
+
+          tableName: this.datasetToLoad[gridID],
+          projectName: this.projectName,
+          deleteModel: deleteModel,
+          filterModel: filterModel,
+          renameModel: renameModel,
+          typeModel: typeModel,
+          fillNaModel: fillNaModel,
+          deleteNaModel: deleteNaModel,
+          gridType: this.gridType[gridID]
         }
       })
         .then(res => {
+          // console.log(res.data);
           this.updatePlot(featureName, res.data[featureName], axisType, tpIndex);
         })
         .catch(error => {
@@ -181,10 +312,17 @@ export default {
         return "yaxis";
       }
     },
+    getFullAxisName(axisType, tpIndex) {
+      if (tpIndex == 0) {
+        return axisType + "axis" + "";
+      } else {
+        return axisType + "axis" + (parseInt(tpIndex) + 1);
+      }
+    },
     getAxisNumber(tpIndex) {
       if (tpIndex == 0) {
         return "";
-      } else return tpIndex;
+      } else return tpIndex + 1;
     },
     getFontFormat(featureName, axisType, tpIndex) {
       let axisInfo = {
@@ -202,8 +340,6 @@ export default {
       return axisInfo;
     },
     changeAxis(selectedAxis, axisType, tpIndex, featureName, overlayModel) {
-      console.log("overlayModel");
-      console.log(overlayModel);
       let axis = this.getAxisName(axisType);
       this.data[tpIndex][axis] = selectedAxis;
       // update를 하면 data가 유실되어서 wrap해서 다시 넣어주어야 하는데, 변경하는 axis의 값만 넣어줘야 한다. ex) changeAxis의 axisType이 y라면 y의 값만 wrap해서 다시 넣어준다.
@@ -215,11 +351,16 @@ export default {
         }
       });
 
-      let axisNum = axis + (parseInt(tpIndex) + 1);
-      this.layout[axisNum] = this.getFontFormat(featureName, axisType, tpIndex);
-      // changeoverlay
-      this.layout[axisNum]["overlaying"] = axisType;
-      this.changeOverlay(overlayModel, tpIndex);
+      let fullAxis = this.getFullAxisName(axisType, tpIndex);
+      // this.layout[axisNum] = this.getFontFormat(featureName, axisType, tpIndex);
+      // change overlay (overlay가 none이면 changeaxis할때도 반영해준다)
+      console.log("axisType");
+      console.log(axisType);
+      console.log("overlayModel");
+      console.log(overlayModel);
+
+      this.layout[fullAxis]["overlaying"] = axisType;
+      // this.changeOverlay(overlayModel, tpIndex);
       Plotly.update(this.plotContainer, this.data[tpIndex], this.layout, tpIndex);
     },
     changeGridInfo(rows, columns) {
@@ -231,36 +372,47 @@ export default {
       this.layout["grid"]["pattern"] = "independent";
       Plotly.relayout(this.plotContainer, this.layout);
     },
-    changeOverlay(value, tpIndex) {
-      console.log(value);
+    changeOverlay(overlayModel, tpIndex) {
+      console.log(overlayModel);
       let xaxis = "xaxis" + (parseInt(tpIndex) + 1);
       let yaxis = "yaxis" + (parseInt(tpIndex) + 1);
       // undefined일 때만 initialize (안그러면 getfontformat에서 세팅한 layout를 초기화해버리게됨)
-      if (this.layout[xaxis] == undefined && this.layout[yaxis] == undefined) {
+      if (this.layout[xaxis] == undefined) {
         this.layout[xaxis] = {};
+      }
+      if (this.layout[yaxis] == undefined) {
         this.layout[yaxis] = {};
       }
-
-      if (value == "Data 1") {
+      if (overlayModel == "Data 1") {
         this.layout[xaxis]["overlaying"] = "x";
         this.layout[yaxis]["overlaying"] = "y";
-      } else if (value == "None") {
+      } else if (overlayModel == "None") {
         Vue.delete(this.layout[xaxis], "overlaying");
         Vue.delete(this.layout[yaxis], "overlaying");
       } else {
-        let axisIndex = value.substring(5);
+        let axisIndex = overlayModel.substring(5);
         this.layout[xaxis]["overlaying"] = "x" + axisIndex;
         this.layout[yaxis]["overlaying"] = "y" + axisIndex;
       }
       Plotly.relayout(this.plotContainer, this.layout);
     },
     removeData(axisType, tpIndex) {
+      console.log(axisType);
+      console.log(tpIndex);
+      // Delete Data
       Vue.delete(this.data[tpIndex], axisType);
+      // 반대쪽 데이터는 사라지지 않도록 다시 넣어줌
       let oppositeAxis = this.getOppositeAxis(axisType);
       if (this.data[tpIndex][oppositeAxis] != undefined) {
         this.data[tpIndex][oppositeAxis] = [this.data[tpIndex][oppositeAxis]];
       }
-      Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
+      // Delete Name
+      let axisName = this.getFullAxisName(axisType, tpIndex); //xaxis,xaxis2
+      console.log(axisName);
+      Vue.delete(this.layout, axisName);
+
+      // Plotly.restyle(this.plotContainer, this.data[tpIndex], tpIndex);
+      Plotly.update(this.plotContainer, this.data[tpIndex], this.layout, tpIndex);
     },
     changeGraphType(payload) {
       console.log(payload);
@@ -268,14 +420,14 @@ export default {
       switch (payload.graphType) {
         case "scatter":
           update = {
-            type: "scatter",
+            type: "scattergl",
             mode: "markers"
           };
 
           break;
         case "line":
           update = {
-            type: "scatter",
+            type: "scattergl",
             mode: ""
           };
           break;
@@ -312,9 +464,10 @@ export default {
       Plotly.relayout(this.plotContainer, this.layout);
     });
     eventBus.$on("loadAxis", payload => {
-      this.loadFullData(payload.dataset, payload.featureName, payload.axisType, payload.tpIndex);
+      this.loadFullData(payload.gridID, payload.featureName, payload.axisType, payload.tpIndex);
     });
     eventBus.$on("changeAxis", payload => {
+      console.log(payload);
       this.changeAxis(
         payload.selectedAxis,
         payload.axisType,
@@ -353,8 +506,6 @@ export default {
     });
   },
   mounted() {
-    console.log("plotly eda mounted");
-
     (this.config["modeBarButtonsToAdd"] = [
       {
         name: "Edit in Graph Studio",

@@ -13,7 +13,7 @@ export default new NodeBuilder("TargetNode", {})
     "Features",
     "ButtonOption",
     () => {
-      return { features: columns };
+      return;
     },
     "FeatureSidebar"
   )
