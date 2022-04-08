@@ -6,7 +6,10 @@ import matplotlib
 
 matplotlib.use("TKAgg")
 import json
+
 from application import jsonify, Response
+
+
 from collections import OrderedDict, defaultdict
 
 

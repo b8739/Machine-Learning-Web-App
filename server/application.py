@@ -1,3 +1,11 @@
+import sys
+import os
+
+sys.path.append("./modeling")
+sys.path.append("./simulation")
+sys.path.append("./schema")
+sys.path.append("./restx")
+
 # flask
 from flask import (
     Flask,
@@ -12,81 +20,24 @@ from flask import (
     make_response,
     Markup,
 )
+
+
 from flask_restx import Resource, Api
 from jinja2 import Template
+
 from flask_cors import CORS
+
+
 from flask_uploads import UploadSet, configure_uploads, IMAGES, DATA, ALL
-
-# Bokeh
-from bokeh.embed import components
-from bokeh.plotting import figure
-
-# from bokeh.resources import INLINE
-# from bokeh.util.string import encode_utf8
-
-# for Bokeh Tornado
-
-# from threading import Thread
-
-# from tornado.ioloop import IOLoop
-
-# from bokeh.embed import server_document
-# from bokeh.layouts import column, layout
-# from bokeh.models import ColumnDataSource, Slider, MultiSelect, CustomJS
-# from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
-# from bokeh.server.server import Server
-# from bokeh.themes import Theme
-
-# from bokeh.plotting import figure
-# from bokeh.resources import CDN
-# from bokeh.embed import file_html
-
-# plotly
-import plotly.express as px
-from plotly.data import iris
-
-import pages
-
-# append path
-import os
-import sys
-
-sys.path.append("./modeling")
-sys.path.append("./simulation")
-sys.path.append("./schema")
-sys.path.append("./dashApp")
-sys.path.append("./restx")
-
-import plotlyConfig
-import datashaderConfig
-
-
-# Dash
-import dash
-from dash import Dash
-from dash import dcc
-from dash import html
-from dash.dependencies import Input, Output, State, ALL, State, MATCH, ALLSMALLER
-from dash_extensions.enrich import Dash, Output, Input, Trigger, ServersideOutput
-from dash.exceptions import PreventUpdate
-import dash_labs as dl  # pip install dash-labs
-import dash_bootstrap_components as dbc  # pip install dash-bootstrap-components
-import dash_table
-
-from holoviews.operation.datashader import datashade
-import holoviews.operation.datashader as hd
-from holoviews import opts
-
-# from holoviews.plotting.plotly.dash import to_dash
-import holoviews as hv
 
 
 # db config
 from config import *
 import time
 
+# from werkzeug import secure_filename
 
-from werkzeug.utils import secure_filename
+# from werkzeug.utils import secure_filename
 
 
 import mongoconfig
@@ -103,9 +54,9 @@ import pandas as pd
 import numpy as np
 
 # summarizer
-from dataSummarizer import summarizeData
-from distributionData import getDistributionData
-from newDataSummarizer import test
+# from dataSummarizer import summarizeData
+# from distributionData import getDistributionData
+# from newDataSummarizer import test
 from normalDistribution import randGenerator_nd
 
 
@@ -140,38 +91,8 @@ CORS(application, resources={r"/*": {"origins": "*"}})
 # restx
 from datasets import Datasets
 from modeling import Modeling
-
 from draft import Draft
 
-
-# #####################################################################################
-# flask restx 실험 하느라 잠시 주석
-# external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-
-# # Create Plotly App
-# plotlyApp = Dash(
-#     __name__,
-#     # prevent_initial_callbacks=True,
-#     server=application,
-#     url_base_pathname="/plotlyApp/",
-#     external_stylesheets=external_stylesheets,
-# )
-# plotlyApp = plotlyConfig.createDashApp(plotlyApp)
-
-# # Create Datashader App
-# dsApp = Dash(
-#     __name__,
-#     # prevent_initial_callbacks=True,
-#     server=application,
-#     url_base_pathname="/dsApp/",
-#     suppress_callback_exceptions=True,
-#     # external_stylesheets=[dbc.themes.COSMO],
-#     external_stylesheets=external_stylesheets,
-# )
-
-# dsApp = datashaderConfig.createDashApp(dsApp)
-# dsApp.config.suppress_callback_exceptions = True
-# --------------------------------------------------------------------------------------------------------
 
 api = Api(application)
 api.add_namespace(Datasets, "/datasets")
