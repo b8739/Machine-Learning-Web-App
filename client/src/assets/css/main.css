@@ -1,0 +1,22 @@
+body {
+  background-color: #f2f2f2;
+}
+a {
+  text-decoration: none;
+}
+ul,
+ol,
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+/* vuetify */
+.v-label {
+  font-size: 13px !important;
+}
+/* .v-text-field__slot label {
+  text-align: center !important;
+} */
