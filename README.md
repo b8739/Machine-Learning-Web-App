@@ -1,3 +1,73 @@
+# Machine Learning Web App (작성중)
+
+머신러닝의 기본 프로세스 [Preprocess, EDA, Modeling]를 이용할 수 있는 웹 서비스
+
+![업로드중..](blob:https://velog.io/d3cf012f-1f20-470d-8edc-8e4185acb5c6)
+
+## 🧐 웹 어플리케이션의 핵심 기능
+
+### **Preprocess**
+
+🔎 **기본 기능**
+
+- 데이터 (csv/xlsx 파일)를 테이블 형태로 화면 상에 불러오고, 기본적인 데이터 전처리 (Row 삭제, Column 삭제, Tag 이름 변경, NA 처리) 등의 기능들을 수행할 수 있습니다.
+- 데이터의 Summary Statistics (mean, median, mode 등) 테이블을 제공합니다.
+- 전처리한 데이터를 Excel 파일로 Export할 수 있습니다.
+- 전처리한 데이터를 데이터베이스에 저장하고, 이후 똑같이 불러와서 이어서 진행할 수 있습니다.
+
+✅ **차별점**
+
+- **Draft Version 관리:**
+  - 엑셀의 시트처럼 동일한 데이터에 한해서 여러 Draft Version만들고, 저장하고, 활용할 수 있습니다. (각 버전마다 전처리를 다르게 해서 다른 모델링 결과를 보려고 할 때 유용합니다)
+  - 전처리 할 때 MongoDB의 Aggregation을 활용하기 때문에, **원본을 유지한 체** 여러 버전을 만들 수 있습니다.
+- **Data Aggregation**:
+  - MongoDB의 Aggregation을 활용하여, 각 Tag에 대하여 조건 (Equals, Greater than, Less than)을 부여해서 데이터를 필터링 할 수 있습니다.
+- **Lazy Loading:**
+  - Lazy Loading 라이브러리 중 하나인 Infinite Loading을 활용하여, 용량이 큰 데이터를 테이블로 불러사용자의 UX를 헤치지 않습니다.
+
+---
+
+### **EDA**
+
+🔎 **기본 기능**
+
+- Plotly 라이브러리를 활용하여 데이터를 웹 상에 시각화합니다.
+
+✅ **차별점**
+
+- **Preprocess와의 호환:**
+  - 단순히 원본 데이터의 그래프로 불러오는 것이 아니라, 데이터를 전처리할 때마다 업데이트된 상태의 데이터를 업데이트할 수 있습니다.
+- **화면 분할:**
+  - EDA 페이지가 화면의 전체를 차지하는 것이 아니라, 전처리 화면 옆에 서랍처럼 꺼내어서 그래프를 불러올 수 있기 때문에, 전처리의 흐름을 깨뜨리지 않습니다.
+
+---
+
+### **Modeling**
+
+🔎 **기본 기능:**
+
+- XGBoost, SVR, Random Forest 알고리즘을 활용한 모델링을 수행하고, 결과를 확인 및 저장할 수 있습니다.
+
+✅ **차별점**
+
+- **Canvas를 통한 Modeling 설계**
+  - GUI처럼 Canvas 화면에서 Input 태그, Output 태그, 알고리즘 등을 Node 형태로 추가하고, 이 Node들을 마우스로 연결해서 사용하기 때문에, 보다 직관적으로 모델링을 설계할 수 있습니다.
+- **Modeling 결과**
+  - Plotly 라이브러리를 활용하여, Actual과 Predictive 값을 예측한 비교 그래프, 그리고 Prediction Power (R^2, MAPE, RMSE 값)등을 시각적으로 확인할 수 있습니다.
+
+## **📝 목차**
+
+- [로컬 머신에서 실행하기](https://github.com/connect-foundation/2019-10/blob/develop/README.md#-%EB%A1%9C%EC%BB%AC-%EB%A8%B8%EC%8B%A0%EC%97%90%EC%84%9C-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0)
+- [기술 스택](https://github.com/connect-foundation/2019-10/blob/develop/README.md#%EA%B8%B0%EC%88%A0-%EC%8A%A4%ED%83%9D)
+
+## **💻 로컬 머신에서 실행하기**
+
+### (작성중)
+
+---
+
+## **📚기술 스택**
+
 <div align="center">
      <img src="https://img.shields.io/badge/vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white"> 
           <img src="https://img.shields.io/badge/vuex-1c2e4a?style=for-the-badge&logo=vue.js&logoColor=white"> 

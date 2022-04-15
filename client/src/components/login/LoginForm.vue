@@ -10,7 +10,6 @@
         <v-row align="center" justify="center">
           <v-col xs="12" sm="8" md="4">
             <v-card class="elevation-12">
-              <!-- <img class="logo" src="../../assets/attic_logo.png" alt="" /> -->
               <v-toolbar dark color="primary">
                 <v-toolbar-title>Login</v-toolbar-title>
               </v-toolbar>
