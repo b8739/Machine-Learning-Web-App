@@ -1,43 +1,46 @@
 <template>
   <div>
-    <a href="http://localhost:8080/">
-      <!-- <img class="logo" src="../../assets/attic_logo.png" alt=""/> -->
-      <v-img
-        class="logo"
-        :src="require('../../assets/attic_logo.png')"
-        aspect-ratio="1"
-        max-height="60"
-        contain
-        max-width="60"
-      ></v-img>
-    </a>
     <nav>
-      <!-- Dataset -->
-      <router-link id="routerLink" :class="{ underline: navStatus == 'datasets' }" to="/datasets"
-        >Datasets</router-link
-      >
-      <!-- Preprocess -->
-      <router-link
-        id="routerLink"
-        :class="{ underline: navStatus == 'preprocess' }"
-        to="/preprocess"
-        >Preprocess</router-link
-      >
-      <!-- EDA -->
+      <a class="home-link" href="http://localhost:8080/">
+        ML WEB APP
+        <!-- <img class="logo" src="../../assets/attic_logo.png" alt=""/>
+        <!-- <v-img
+          :src="require('../../assets/machine-learning.png')"
+          aspect-ratio="1"
+          height="40"
+          contain
+          width="40"
+        ></v-img>  -->
+      </a>
 
-      <a id="routerLink" @click="openDialog(true)">EDA</a>
+      <div class="nav-container">
+        <!-- Dataset -->
+        <router-link id="routerLink" :class="{ underline: navStatus == 'datasets' }" to="/datasets"
+          >Datasets</router-link
+        >
+        <!-- Preprocess -->
+        <router-link
+          id="routerLink"
+          :class="{ underline: navStatus == 'preprocess' }"
+          to="/preprocess"
+          >Preprocess</router-link
+        >
+        <!-- EDA -->
 
-      <!-- Modeling -->
-      <router-link id="routerLink" :class="{ underline: navStatus == 'models' }" to="/models"
-        >Modeling</router-link
-      >
-      <!-- Simulation -->
-      <!-- <router-link
+        <a id="routerLink" @click="openDialog(true)">EDA</a>
+
+        <!-- Modeling -->
+        <router-link id="routerLink" :class="{ underline: navStatus == 'models' }" to="/models"
+          >Modeling</router-link
+        >
+        <!-- Simulation -->
+        <!-- <router-link
         id="routerLink"
         :class="{ underline: navStatus == 'simulation' }"
         to="/Simulations"
         >Simulation</router-link
       > -->
+      </div>
     </nav>
     <v-spacer></v-spacer>
   </div>
@@ -50,27 +53,6 @@ export default {
     return {};
   },
   methods: {
-    // openGraphBuilder() {
-    //   let w = screen.width * 0.8;
-    //   let h = screen.height * 0.8;
-    //   let leftPosition = (screen.width - w) / 2;
-    //   let topPosition = (screen.height - h) / 2;
-    //   let url = "http://localhost:8000/eda";
-    //   window.open(
-    //     url,
-    //     "modelingResult",
-    //     "width=" +
-    //       w +
-    //       ",height=" +
-    //       h +
-    //       ",top=" +
-    //       topPosition +
-    //       ",left=" +
-    //       leftPosition +
-    //       ", scrollbars=no"
-    //   );
-    // },
-
     openDialog() {
       eventBus.$emit("openDialog", true);
     }
@@ -90,20 +72,26 @@ body {
 }
 
 /* base.html */
-.logo {
+.home-link {
   width: 110px;
   position: absolute;
+  margin-top: 1rem;
   top: 0px;
   left: 20px;
+  font-weight: 700;
 }
 
 nav {
-  text-align: center;
   height: 60px;
-  /* background-color: #87ceeb; */
   background-color: #f5f5f5;
   overflow: hidden;
   border-bottom: 0.5px solid #cccbcbe7;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-container {
+  text-align: center;
 }
 nav #routerLink {
   display: inline-block;
