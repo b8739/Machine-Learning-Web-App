@@ -22,7 +22,7 @@
         <slot name="changeType_action" :updateDataType="updateDataType"> </slot>
         <slot name="changeOrder_action"> </slot>
         <slot name="deleteColumn_action" :dropColumn="dropColumn"> </slot>
-        <slot name="fillNa-action" :applyFillNa="applyFillNa"> </slot>
+        <slot name="fillNa_action" :applyFillNa="applyFillNa"> </slot>
         <slot name="deleteNa_action" :applyDeleteNa="applyDeleteNa"> </slot>
         <slot name="mergeTable_action"> </slot>
       </v-card-actions>

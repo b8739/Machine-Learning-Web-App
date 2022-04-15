@@ -247,10 +247,10 @@
           <AgGridDialog
             v-if="columnModel[currentGrid]"
             :dialog.sync="dialog_fillNa"
-            :dialogName="'fillNa'"
+            :dialogName="'fillNA'"
           >
             <template v-slot:fillNA="slotProps">
-              fillNaModel: {{ slotProps.fillNaModel }}
+              <!-- fillNaModel: {{ slotProps.fillNaModel }} -->
               <v-card-subtitle>Leave the select box if not applying 'fillNa'</v-card-subtitle>
               <v-row
                 v-for="(colName, colIndex) in columnModel[currentGrid][datasetToLoad[currentGrid]]"
@@ -276,7 +276,7 @@
             :dialogName="'deleteNA'"
           >
             <template v-slot:deleteNA="slotProps">
-              {{ slotProps.deleteNaModel }}
+              <!-- {{ slotProps.deleteNaModel }} -->
               <v-card-subtitle>Leave the checkbox if not applying 'Delete NA'</v-card-subtitle>
               <v-row
                 v-for="(colName, colIndex) in columnModel[currentGrid][datasetToLoad[currentGrid]]"
