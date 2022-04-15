@@ -33,7 +33,7 @@ export default {
       // showModelingSummary: false,
       headers: [
         {
-          text: "Modeling Summary",
+          text: "Prediction Power",
           align: "start",
           sortable: false,
           value: "name"

@@ -403,12 +403,12 @@ class Algorithm:
         modelingResult["test"] = {
             "R_square": rSquare_test,
             "RMSE": RMSE_test,
-            "MAPE": MAPE_test,
+            # "MAPE": MAPE_test,
         }
         modelingResult["valid"] = {
             "R_square": rSquare_valid,
             "RMSE": RMSE_valid,
-            "MAPE": MAPE_valid,
+            # "MAPE": MAPE_valid,
         }
 
         modelingValues = {"test": None, "valid": None}

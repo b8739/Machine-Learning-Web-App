@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-1" elevation="0">
+  <v-card class="mt-10" elevation="0">
     <v-container>
       <!-- <v-btn @click="test()"></v-btn> -->
       <v-row>
@@ -47,8 +47,8 @@ export default {
     updatePlot() {
       let data = {};
       let colors = {
-        test: { Actual: "rgb(65,105,225)", Predictive: "rgb(0,191,255)" },
-        valid: { Actual: "rgb(80, 200, 120)", Predictive: "rgb(34, 139, 34)" }
+        test: { Actual: "rgb(243, 157, 60)", Predictive: "rgb(80, 160, 229)" },
+        valid: { Actual: "rgb(80, 200, 120)", Predictive: "rgb(80, 160, 229)" }
       };
       Object.keys(this.graphSources).forEach(key => {
         //key: test/valid
@@ -58,14 +58,14 @@ export default {
           let trace = {
             y: this.graphSources[key][nestedKey],
             name: key + " " + nestedKey, //key: test/valid,
-            type: "scattergl",
+            type: "scatter",
             mode: "lines+markers",
             marker: {
-              size: 1
+              size: 5.5
             },
             line: {
               color: colors[key][nestedKey],
-              width: 1
+              width: 2
             },
 
             showlegend: true
@@ -73,10 +73,10 @@ export default {
           data[key].push(trace);
         });
         if (key == "test") {
-          this.layout["title"] = "Test Result";
+          this.layout["title"]["text"] = "Test Result";
           Plotly.react(this.testPlot, data[key], this.layout, this.config);
         } else {
-          this.layout["title"] = "Valid Result";
+          this.layout["title"]["text"] = "Valid Result";
           Plotly.react(this.validPlot, data[key], this.layout, this.config);
         }
       });
@@ -94,15 +94,15 @@ export default {
           },
           line: {
             // color: "rgb(219, 64, 82)",
-            width: 1
+            width: 5
           },
 
           showlegend: true
         }
       ],
       layout: {
-        width: 800,
-        height: 200,
+        width: 1500,
+        height: 220,
         margin: {
           l: 30,
           r: 20,
@@ -126,7 +126,11 @@ export default {
           // overlaying: "y"
         },
         title: {
-          text: "Modeling Result"
+          text: "Modeling Result",
+          font: {
+            family: "Times New Roman",
+            size: 21
+          }
         }
         // grid: {
         //   rows: 2,
@@ -146,3 +150,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.d {
+  color: rgb(236, 118, 95);
+}
+</style>

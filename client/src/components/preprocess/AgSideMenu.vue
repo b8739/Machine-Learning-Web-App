@@ -47,30 +47,30 @@
         <template v-slot:activator>
           <v-list-item-title active>Edit Row</v-list-item-title>
         </template>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-list-item
-              :disabled="gridList.length == 0"
-              v-for="item in items.rowMenu"
-              v-bind="attrs"
-              v-on="on"
-              :key="item.title"
-              link
-              @click="item.action"
-            >
-              <v-list-item-icon>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title draggable label>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-          </template>
+        <!-- <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }"> -->
+        <v-list-item
+          :disabled="gridList.length == 0"
+          v-for="item in items.rowMenu"
+          v-bind="attrs"
+          v-on="on"
+          :key="item.title"
+          link
+          @click="item.action"
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title draggable label>{{ item.title }}</v-list-item-title>
+        </v-list-item>
+        <!-- </template>
           <span>
             Delete Selected Rows와 Delete Loaded Rows의 차이: <br />
             Delete Selected Rows: 마우스로 선택한 모든 데이터를 삭제 <br />
             Delete Loaded Rows: 테이블상에 로드된 (필터 적용된/그래프로 선택된) 모든 데이터를 삭제
             <br />
           </span>
-        </v-tooltip>
+        </v-tooltip> -->
       </v-list-group>
     </v-list>
     <!-- Column -->
