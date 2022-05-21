@@ -102,13 +102,4 @@
 - **Modeling 결과**
   - Plotly 라이브러리를 활용하여, Actual과 Predictive 값을 예측한 비교 그래프, 그리고 Prediction Power (R^2, MAPE, RMSE 값)등을 시각적으로 확인할 수 있습니다.
 
-## **📝 목차**
 
-- [로컬 머신에서 실행하기](https://github.com/connect-foundation/2019-10/blob/develop/README.md#-%EB%A1%9C%EC%BB%AC-%EB%A8%B8%EC%8B%A0%EC%97%90%EC%84%9C-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0)
-- [기술 스택](https://github.com/connect-foundation/2019-10/blob/develop/README.md#%EA%B8%B0%EC%88%A0-%EC%8A%A4%ED%83%9D)
-
-## **💻 로컬 머신에서 실행하기**
-
-### (작성중)
-
----
