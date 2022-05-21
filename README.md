@@ -1,4 +1,4 @@
-# Machine Learning Web App (작성중)
+# Machine Learning Web App 
 
 머신러닝의 기본 프로세스, 데이터 전처리부터, EDA (Explorative Data Analysis), 모델링까지 GUI로 쉽고 간편하게 이용할 수 있는 웹 서비스입니다.
 
